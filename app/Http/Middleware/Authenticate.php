@@ -18,4 +18,12 @@ class Authenticate extends Middleware
             return route('login');
         }
     }
+
+    protected function authenticate($request, array $guards)
+    {
+        if ($request->expectsJson() || in_array('api', $guards)) {
+            throw new BusinessException(CodeResponse::UN_LOGIN);
+        }
+        return parent::authenticate($request, $guards);
+    }
 }
