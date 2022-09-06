@@ -4,12 +4,16 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Utils\CodeResponse;
+use App\Utils\Traits\VerifyRequestInput;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class BaseController extends Controller
 {
+    use VerifyRequestInput;
+
     protected $only;
     protected $except;
 
