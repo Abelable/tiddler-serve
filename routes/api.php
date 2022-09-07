@@ -17,5 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->group(function() {
     Route::post('wx_mp/mobile', 'AuthController@getWxMpUserMobile');
     Route::post('wx_mp/register', 'AuthController@wxMpRegister');
-    Route::post('wx_mp/login', 'AuthController@getUserInfoByCode');
+    Route::post('wx_mp/login', 'AuthController@wxMpLogin');
+    Route::get('user_info', 'UserController@getUserInfo');
 });
+
+

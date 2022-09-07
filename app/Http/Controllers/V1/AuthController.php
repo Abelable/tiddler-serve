@@ -34,24 +34,15 @@ class AuthController extends BaseController
         return $this->success($token);
     }
 
-    public function getUserInfoByCode()
+    public function wxMpLogin()
     {
         $code = $this->verifyRequiredString('code');
         $result = WxMpServe::new()->getUserOpenid($code);
         $user = UserService::getInstance()->getByOpenid($result['openid']);
-        $response = null;
+        $token = null;
         if (!is_null($user)) {
             $token = Auth::guard('api')->login($user);
-            $response = [
-                'token' => $token,
-                'userInfo' => [
-                    'avatar' => $user->avatar,
-                    'nickname' => $user->nickname,
-                    'gender' => $user->gender,
-                    'mobile' => $user->mobile
-                ]
-            ];
         }
-        return $this->success($response);
+        return $this->success($token);
     }
 }
