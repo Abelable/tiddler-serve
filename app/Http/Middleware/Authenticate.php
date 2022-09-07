@@ -17,15 +17,12 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            return route('login');
+            throw new BusinessException(CodeResponse::UN_LOGIN);
         }
     }
 
     protected function authenticate($request, array $guards)
     {
-        if ($request->expectsJson() || in_array('api', $guards)) {
-            throw new BusinessException(CodeResponse::UN_LOGIN);
-        }
         return parent::authenticate($request, $guards);
     }
 }
