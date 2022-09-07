@@ -6,8 +6,9 @@ class CodeResponse
 {
     const SUCCESS = [0, '成功'];
     const FAIL = [-1, '失败'];
-    const PARAM_ILLEGAL = [401, '参数不合法'];
-    const PARAM_VALUE_ILLEGAL = [402, '参数值不对'];
+    const TOKEN_INVALID = [401, 'token失效'];
+    const PARAM_ILLEGAL = [402, '参数不合法'];
+    const PARAM_VALUE_ILLEGAL = [403, '参数值不对'];
     const NOT_FOUND = [404, '数据不存在'];
     const UN_LOGIN = [501, '未登录'];
     const SYSTEM_ERROR = [502, '系统内部错误'];

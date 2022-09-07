@@ -16,7 +16,10 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
+        if (!$request->expectsJson()) {
+            if ($request->header('Authorization')) {
+                throw new BusinessException(CodeResponse::TOKEN_INVALID);
+            }
             throw new BusinessException(CodeResponse::UN_LOGIN);
         }
     }
