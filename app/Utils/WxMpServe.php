@@ -33,7 +33,7 @@ class WxMpServe
     private function getAccessToken()
     {
         $result = $this->httpGet(sprintf(self::GET_ACCESS_TOKEN_URL, env('WX_MP_APPID'), env('WX_MP_SECRET')));
-        if ($result['errcode'] != 0) {
+        if (!empty($result['errcode'])) {
             throw new \Exception('获取微信小程序access_tokeny异常：' . $result['errcode'] . $result['errmsg']);
         }
         $accessToken = $result['access_token'];
@@ -53,7 +53,7 @@ class WxMpServe
     public function getUserOpenid($code)
     {
         $result = $this->httpGet(sprintf(self::GET_OPENID_URL, env('WX_MP_APPID'), env('WX_MP_SECRET'), $code));
-        if ($result['errcode'] != 0) {
+        if (!empty($result['errcode'])) {
             throw new \Exception('获取微信小程序openid异常：' . $result['errcode'] . $result['errmsg']);
         }
         return $result;

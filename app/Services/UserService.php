@@ -19,4 +19,9 @@ class UserService extends BaseService
         $user->save();
         return $user;
     }
+
+    public function getByOpenid($openid)
+    {
+        return User::query()->where('openid', $openid)->first();
+    }
 }
