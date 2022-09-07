@@ -33,8 +33,9 @@ class WxMpServe
     private function getAccessToken()
     {
         $result = $this->httpGet(sprintf(self::GET_ACCESS_TOKEN_URL, env('WX_MP_APPID'), env('WX_MP_SECRET')));
-//        if ($result['errcode'] != 0) {
-//        }
+        if ($result['errcode'] != 0) {
+            throw new \Exception('获取微信小程序access_tokeny异常：' . $result['errcode'] . $result['errmsg']);
+        }
         $accessToken = $result['access_token'];
         Cache::put(self::ACCESS_TOKEN_KEY, $accessToken, 7200);
         return $accessToken;
@@ -43,12 +44,18 @@ class WxMpServe
     public function getUserPhoneNumber($code)
     {
         $result = $this->httpPost(sprintf(self::GET_PHONE_NUMBER_URL, $this->accessToken), ['code' => $code]);
+        if ($result['errcode'] != 0) {
+            throw new \Exception('获取微信小程序用户手机号异常：' . $result['errcode'] . $result['errmsg']);
+        }
         return $result['phone_info']['purePhoneNumber'];
     }
 
     public function getUserOpenid($code)
     {
         $result = $this->httpGet(sprintf(self::GET_OPENID_URL, env('WX_MP_APPID'), env('WX_MP_SECRET'), $code));
+        if ($result['errcode'] != 0) {
+            throw new \Exception('获取微信小程序openid异常：' . $result['errcode'] . $result['errmsg']);
+        }
         return $result;
     }
 }
