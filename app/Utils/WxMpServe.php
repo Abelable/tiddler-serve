@@ -12,6 +12,7 @@ class WxMpServe
     const ACCESS_TOKEN_KEY = 'wx_mp_access_token';
     const GET_ACCESS_TOKEN_URL = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s';
     const GET_PHONE_NUMBER_URL = 'https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=%s';
+    const GET_OPENID_URL = 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code';
 
     private $accessToken;
 
@@ -43,5 +44,11 @@ class WxMpServe
     {
         $result = $this->httpPost(sprintf(self::GET_PHONE_NUMBER_URL, $this->accessToken), ['code' => $code]);
         return $result['phone_info']['purePhoneNumber'];
+    }
+
+    public function getUserOpenid($code)
+    {
+        $result = $this->httpGet(sprintf(self::GET_OPENID_URL, env('WX_MP_APPID'), env('WX_MP_SECRET'), $code));
+        return $result;
     }
 }
