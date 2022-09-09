@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\WxMpRegisterInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller
 {
@@ -43,6 +45,15 @@ class AuthController extends Controller
         $token = null;
         if (!is_null($user)) {
             $token = Auth::guard('user')->login($user);
+        }
+        return $this->success($token);
+    }
+
+    public function refreshToken() {
+        try {
+            $token = Auth::guard('user')->refresh();
+        } catch (\Exception $e) {
+            throw new BusinessException(CodeResponse::UNAUTHORIZED, 'token失效，请重新登录');
         }
         return $this->success($token);
     }

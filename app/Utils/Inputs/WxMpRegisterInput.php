@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class WxMpRegisterInput extends Input
+class WxMpRegisterInput extends BaseInput
 {
     public $code;
     public $avatar;

@@ -8,11 +8,11 @@ use Illuminate\Support\Facades\Validator;
 use function collect;
 use function request;
 
-class Input
+class BaseInput
 {
     /**
      * @param null|array $data
-     * @return Input
+     * @return BaseInput
      * @throws BusinessException
      */
     public static function new($data = null)

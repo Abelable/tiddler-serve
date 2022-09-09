@@ -132,8 +132,8 @@ class Controller extends BaseController
 
     private function codeReturn(array $codeResponse, $data = null, $info = '')
     {
-        list($errno, $errmsg) = $codeResponse;
-        $res = ['errno' => $errno];
+        list($code, $message) = $codeResponse;
+        $res = ['code' => $code];
         if (is_array($data)) {
             $data = array_filter($data, function ($item) {
                 return $item !== null;
@@ -142,7 +142,7 @@ class Controller extends BaseController
         } elseif (!is_null($data)) {
             $res['data'] = $data;
         }
-        $res['errmsg'] = $info ?: $errmsg;
+        $res['message'] = $info ?: $message;
         return response()->json($res);
     }
 }

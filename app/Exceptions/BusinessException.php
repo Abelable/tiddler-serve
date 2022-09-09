@@ -2,15 +2,20 @@
 
 namespace App\Exceptions;
 
-use Exception;
-use Throwable;
 
-class BusinessException extends Exception
+class BusinessException extends \Exception
 {
-    public function __construct(array $codeResponse, $tips = '', Throwable $previous = null)
+    protected $statusCode;
+
+    public function __construct(array $codeResponse, $tips = '', \Throwable $previous = null)
     {
-        list($code, $message) = $codeResponse;
-        $message = !empty($tips) ? $tips : $message;
-        parent::__construct($message, $code, $previous);
+        list($statusCode, $code, $message) = $codeResponse;
+        $this->statusCode = $statusCode;
+        parent::__construct(!empty($tips) ? $tips : $message, $code, $previous);
+    }
+
+    public function getStatusCode()
+    {
+        return $this->statusCode;
     }
 }

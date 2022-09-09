@@ -43,9 +43,9 @@ class Handler extends ExceptionHandler
     {
         if ($e instanceof BusinessException) {
             return response()->json([
-                'errno' => $e->getCode(),
-                'errmsg' => $e->getMessage()
-            ]);
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ], $e->getStatusCode());
         }
         return parent::render($request, $e);
     }

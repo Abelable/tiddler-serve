@@ -19,6 +19,8 @@ Route::prefix('auth')->group(function() {
         Route::post('register', 'AuthController@wxMpRegister');
         Route::post('login', 'AuthController@wxMpLogin');
     });
+
+    Route::get('token_refresh', 'AuthController@RefreshToken');
 });
 
 Route::get('user_info', 'UserController@getUserInfo');
