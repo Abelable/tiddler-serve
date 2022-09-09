@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\WxMpRegisterInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends BaseController
+class AuthController extends Controller
 {
     protected $only = [];
 
@@ -30,7 +31,7 @@ class AuthController extends BaseController
         }
 
         $user = UserService::getInstance()->register($result['openid'], $result['unionid'], $input);
-        $token = Auth::guard('api')->login($user);
+        $token = Auth::guard('user')->login($user);
         return $this->success($token);
     }
 
@@ -41,7 +42,7 @@ class AuthController extends BaseController
         $user = UserService::getInstance()->getByOpenid($result['openid']);
         $token = null;
         if (!is_null($user)) {
-            $token = Auth::guard('api')->login($user);
+            $token = Auth::guard('user')->login($user);
         }
         return $this->success($token);
     }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\V1;
 
-class UserController extends BaseController
+use App\Http\Controllers\Controller;
+
+class UserController extends Controller
 {
     public function getUserInfo()
     {

@@ -15,10 +15,33 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->group(function() {
-    Route::post('wx_mp/mobile', 'AuthController@getWxMpUserMobile');
-    Route::post('wx_mp/register', 'AuthController@wxMpRegister');
-    Route::post('wx_mp/login', 'AuthController@wxMpLogin');
-    Route::get('user_info', 'UserController@getUserInfo');
+    Route::prefix('wx_mp')->group(function() {
+        Route::post('mobile', 'AuthController@getWxMpUserMobile');
+        Route::post('register', 'AuthController@wxMpRegister');
+        Route::post('login', 'AuthController@wxMpLogin');
+    });
+});
+
+Route::get('user_info', 'UserController@getUserInfo');
+
+// 管理后台
+Route::namespace('Admin')->prefix('admin')->group(function() {
+    Route::post('login', 'AdminController@login');
+    Route::post('list', 'AdminController@list');
+    Route::post('add', 'AdminController@add');
+
+    Route::prefix('role')->group(function() {
+        Route::post('list', 'RoleController@list');
+        Route::post('add', 'RoleController@add');
+        Route::post('edit', 'RoleController@edit');
+        Route::post('delete', 'RoleController@delete');
+    });
+
+    Route::prefix('user')->group(function() {
+        Route::post('list', 'UserController@list');
+        Route::post('edit', 'UserController@edit');
+        Route::post('delete', 'UserController@delete');
+    });
 });
 
 
