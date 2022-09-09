@@ -17,18 +17,15 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (!$request->expectsJson()) {
-            return route('login');
-        }
-    }
-
-    protected function authenticate($request, array $guards)
-    {
-        if (in_array('user', $guards) || in_array('admin', $guards)) {
             if ($request->header('Authorization')) {
                 throw new BusinessException(CodeResponse::FORBIDDEN, 'token已过期，请尝试刷新token');
             }
             throw new BusinessException(CodeResponse::UNAUTHORIZED, '未携带token访问');
         }
+    }
+
+    protected function authenticate($request, array $guards)
+    {
         return parent::authenticate($request, $guards);
     }
 }

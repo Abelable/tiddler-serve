@@ -132,7 +132,7 @@ class Controller extends BaseController
 
     private function codeReturn(array $codeResponse, $data = null, $info = '')
     {
-        list($code, $message) = $codeResponse;
+        list($statusCode, $code, $message) = $codeResponse;
         $res = ['code' => $code];
         if (is_array($data)) {
             $data = array_filter($data, function ($item) {
@@ -143,6 +143,6 @@ class Controller extends BaseController
             $res['data'] = $data;
         }
         $res['message'] = $info ?: $message;
-        return response()->json($res);
+        return response()->json($res, $statusCode);
     }
 }
