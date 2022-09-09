@@ -13,4 +13,10 @@ class AdminController extends Controller
 
     public function add()
     {}
+
+    public function edit()
+    {}
+
+    public function delete()
+    {}
 }
