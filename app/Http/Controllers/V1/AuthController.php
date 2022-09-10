@@ -42,7 +42,7 @@ class AuthController extends Controller
         $code = $this->verifyRequiredString('code');
         $result = WxMpServe::new()->getUserOpenid($code);
         $user = UserService::getInstance()->getByOpenid($result['openid']);
-        $token = null;
+        $token = '';
         if (!is_null($user)) {
             $token = Auth::guard('user')->login($user);
         }
