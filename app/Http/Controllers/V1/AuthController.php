@@ -41,11 +41,14 @@ class AuthController extends Controller
     {
         $code = $this->verifyRequiredString('code');
         $result = WxMpServe::new()->getUserOpenid($code);
-        $user = UserService::getInstance()->getByOpenid($result['openid']);
-        $token = null;
-        if (!is_null($user)) {
+
+        try {
+            $user = UserService::getInstance()->getByOpenid($result['openid']);
             $token = Auth::guard('user')->login($user);
+        } catch (\Exception $e) {
+            throw new BusinessException(CodeResponse::NOT_FOUND, '用户不存在');
         }
+
         return $this->success($token);
     }
 

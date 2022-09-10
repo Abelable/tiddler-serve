@@ -9,6 +9,11 @@ class CodeResponse
 
     const UNAUTHORIZED = [401, 10001, '未授权'];
     const FORBIDDEN = [403, 10002, '禁止访问'];
+    const NOT_FOUND = [404, 10003, '数据不存在'];
+
+
+
+
 
 
 
@@ -22,7 +27,6 @@ class CodeResponse
 
     const PARAM_ILLEGAL = [402, '参数不合法'];
     const PARAM_VALUE_ILLEGAL = [403, '参数值不对'];
-    const NOT_FOUND = [404, '数据不存在'];
 
     const AUTH_CAPTCHA_FREQUENCY = [702, '验证码未超时1分钟，不能发送'];
     const AUTH_CAPTCHA_UNMATCH = [703, '验证码错误'];
