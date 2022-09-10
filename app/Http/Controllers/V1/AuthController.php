@@ -53,7 +53,7 @@ class AuthController extends Controller
         try {
             $token = Auth::guard('user')->refresh();
         } catch (\Exception $e) {
-            throw new BusinessException(CodeResponse::UNAUTHORIZED, 'token失效，请重新登录');
+            throw new BusinessException(CodeResponse::FORBIDDEN, 'token失效，请重新登录');
         }
         return $this->success($token);
     }

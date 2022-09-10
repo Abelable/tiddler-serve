@@ -18,9 +18,9 @@ class Authenticate extends Middleware
     {
         if (!$request->expectsJson()) {
             if ($request->header('Authorization')) {
-                throw new BusinessException(CodeResponse::FORBIDDEN, 'token已过期，请尝试刷新token');
+                throw new BusinessException(CodeResponse::UNAUTHORIZED, 'token已过期，请尝试刷新token');
             }
-            throw new BusinessException(CodeResponse::UNAUTHORIZED, '未携带token访问');
+            throw new BusinessException(CodeResponse::FORBIDDEN, '未携带token访问');
         }
     }
 
