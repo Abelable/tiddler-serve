@@ -45,6 +45,13 @@ class WxMpServe
     {
         $result = $this->httpPost(sprintf(self::GET_PHONE_NUMBER_URL, $this->accessToken), ['code' => $code]);
         if ($result['errcode'] != 0) {
+            // 目前有出现access_token在缓存有效期内失效的问题，暂未找到具体解决办法，在此作重置处理
+            if ($result['errcode'] == 40001) {
+                Cache::forget(self::ACCESS_TOKEN_KEY);
+                $accessToken = $this->getAccessToken();
+                $this->accessToken = $accessToken;
+                return $this->getUserPhoneNumber($code);
+            }
             throw new \Exception('获取微信小程序用户手机号异常：' . $result['errcode'] . $result['errmsg']);
         }
         return $result['phone_info']['purePhoneNumber'];
