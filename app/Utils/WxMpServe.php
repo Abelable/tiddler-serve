@@ -34,7 +34,7 @@ class WxMpServe
     {
         $result = $this->httpGet(sprintf(self::GET_ACCESS_TOKEN_URL, env('WX_MP_APPID'), env('WX_MP_SECRET')));
         if (!empty($result['errcode'])) {
-            throw new \Exception('获取微信小程序access_tokeny异常：' . $result['errcode'] . $result['errmsg']);
+            throw new \Exception('获取微信小程序access_token异常：' . $result['errcode'] . $result['errmsg']);
         }
         $accessToken = $result['access_token'];
         Cache::put(self::ACCESS_TOKEN_KEY, $accessToken, now()->addSeconds(7000));
