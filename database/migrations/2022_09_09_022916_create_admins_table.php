@@ -15,8 +15,8 @@ class CreateAdminsTable extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('avatar')->comment('管理员头像');
-            $table->string('nickname')->comment('管理员昵称');
+            $table->string('avatar')->default('')->comment('管理员头像');
+            $table->string('nickname')->default('')->comment('管理员昵称');
             $table->string('account')->unique()->comment('管理员账号');
             $table->string('password')->comment('管理员账号密码');
             $table->integer('role_id')->comment('管理员角色id');

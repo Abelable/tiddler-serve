@@ -9,10 +9,12 @@ class CodeResponse
 
     const UNAUTHORIZED = [401, 10001, '未授权'];
     const FORBIDDEN = [403, 10002, '禁止访问'];
+    const INVALID_ACCOUNT = [403, 10003, '账号或密码错误'];
     const NOT_FOUND = [404, 10003, '数据不存在'];
 
 
 
+    const REGISTERED_ACCOUNT = [200, 10004, '账号已存在'];
 
 
 

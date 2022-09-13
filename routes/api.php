@@ -27,8 +27,11 @@ Route::get('user_info', 'UserController@getUserInfo');
 
 // 管理后台
 Route::namespace('Admin')->prefix('admin')->group(function() {
-    Route::post('login', 'AuthController@login');
-    Route::post('logout', 'AuthController@logout');
+    Route::prefix('auth')->group(function() {
+        Route::post('login', 'AuthController@login');
+        Route::post('logout', 'AuthController@logout');
+        Route::post('me', 'AuthController@info');
+    });
 
     Route::post('list', 'AdminController@list');
     Route::post('add', 'AdminController@add');
