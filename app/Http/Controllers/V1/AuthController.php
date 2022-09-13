@@ -9,7 +9,6 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\WxMpRegisterInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthController extends Controller
 {
