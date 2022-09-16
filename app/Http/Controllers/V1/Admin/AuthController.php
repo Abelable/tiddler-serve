@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V1\Admin;
 
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Services\Admin\AdminService;
 use App\Utils\CodeResponse;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller
 {
     protected $guard = 'admin';
-    protected $only = ['logout', 'info'];
+    protected $only = ['info'];
 
     public function login()
     {
@@ -36,6 +37,22 @@ class AuthController extends Controller
     {
         Auth::guard('admin')->logout();
         return $this->success();
+    }
+
+    public function refreshToken() {
+        try {
+            $token = Auth::guard('admin')->refresh();
+
+            // 由于删除用户之后，鉴权失败，但刷新token依旧有效，暂未找到解决办法，因此增加这一层校验
+            try {
+                Auth::guard('admin')->userOrFail();
+            } catch (\Exception $e) {
+                throw new BusinessException(CodeResponse::FORBIDDEN, 'token失效，请重新登录');
+            }
+        } catch (\Exception $e) {
+            throw new BusinessException(CodeResponse::FORBIDDEN, 'token失效，请重新登录');
+        }
+        return $this->success($token);
     }
 
     public function info()

@@ -29,8 +29,9 @@ Route::get('user_info', 'UserController@getUserInfo');
 Route::namespace('Admin')->prefix('admin')->group(function() {
     Route::prefix('auth')->group(function() {
         Route::post('login', 'AuthController@login');
-        Route::post('logout', 'AuthController@logout');
-        Route::post('me', 'AuthController@info');
+        Route::get('logout', 'AuthController@logout');
+        Route::get('me', 'AuthController@info');
+        Route::get('token_refresh', 'AuthController@RefreshToken');
     });
 
     Route::post('list', 'AdminController@list');
