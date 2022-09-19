@@ -41,6 +41,7 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
 
     Route::prefix('role')->group(function() {
         Route::post('list', 'RoleController@list');
+        Route::get('detail', 'RoleController@detail');
         Route::post('add', 'RoleController@add');
         Route::post('edit', 'RoleController@edit');
         Route::post('delete', 'RoleController@delete');

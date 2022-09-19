@@ -12,16 +12,15 @@ class CodeResponse
     const INVALID_ACCOUNT = [403, 10003, '账号或密码错误'];
     const NOT_FOUND = [404, 10003, '数据不存在'];
 
-
-
     const REGISTERED_ACCOUNT = [200, 10004, '账号已存在'];
+    const AUTH_NAME_REGISTERED = [200, 10005, '用户已注册'];
+
 
 
 
 
     const TOKEN_INVALID = [401, 'token失效'];
     const AUTH_INVALID_ACCOUNT = [700, '账号不存在'];
-    const AUTH_NAME_REGISTERED = [704, '用户已注册'];
     const AUTH_MOBILE_REGISTERED = [705, '手机号码已经注册'];
     const UN_LOGIN = [501, '未登录'];
     const SYSTEM_ERROR = [502, '系统内部错误'];
