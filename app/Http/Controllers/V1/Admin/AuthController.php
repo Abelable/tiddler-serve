@@ -19,17 +19,17 @@ class AuthController extends Controller
         $account = $this->verifyRequiredString('account');
         $password = $this->verifyRequiredString('password');
 
-        $user = AdminService::getInstance()->getUserByAccount($account);
-        if (is_null($user)) {
+        $admin = AdminService::getInstance()->getAdminByAccount($account);
+        if (is_null($admin)) {
             return $this->fail(CodeResponse::INVALID_ACCOUNT);
         }
 
-        $isPass = Hash::check($password, $user->getAuthPassword());
+        $isPass = Hash::check($password, $admin->getAuthPassword());
         if (!$isPass) {
             return $this->fail(CodeResponse::INVALID_ACCOUNT);
         }
 
-        $token = Auth::guard('admin')->login($user);
+        $token = Auth::guard('admin')->login($admin);
         return $this->success($token);
     }
 
@@ -57,10 +57,10 @@ class AuthController extends Controller
 
     public function info()
     {
-        $user = $this->admin();
+        $admin = $this->admin();
         return $this->success([
-            'nickname' => $user->nickname,
-            'avatar' => $user->avatar
+            'nickname' => $admin->nickname,
+            'avatar' => $admin->avatar
         ]);
     }
 }

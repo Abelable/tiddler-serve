@@ -35,6 +35,7 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
     });
 
     Route::post('list', 'AdminController@list');
+    Route::get('detail', 'AdminController@detail');
     Route::post('add', 'AdminController@add');
     Route::post('edit', 'AdminController@edit');
     Route::post('delete', 'AdminController@delete');
@@ -45,6 +46,7 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
         Route::post('add', 'RoleController@add');
         Route::post('edit', 'RoleController@edit');
         Route::post('delete', 'RoleController@delete');
+        Route::get('options', 'RoleController@options');
     });
 
     Route::prefix('user')->group(function() {
