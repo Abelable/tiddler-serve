@@ -57,7 +57,9 @@ class Admin extends BaseModel implements JWTSubject, AuthenticatableContract, Au
      *
      * @var array<int, string>
      */
-    protected $hidden = [];
+    protected $hidden = [
+        'password'
+    ];
 
     /**
      * The attributes that should be cast.

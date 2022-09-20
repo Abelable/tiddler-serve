@@ -54,6 +54,8 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
         Route::post('edit', 'UserController@edit');
         Route::post('delete', 'UserController@delete');
     });
+
+//    Route::get('oss_config', '');
 });
 
 

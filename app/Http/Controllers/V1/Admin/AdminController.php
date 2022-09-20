@@ -25,7 +25,7 @@ class AdminController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $admin = AdminService::getInstance()->getAdminById($id, ['id', 'avatar', 'nickname', 'role_id']);
+        $admin = AdminService::getInstance()->getAdminById($id);
         if (is_null($admin)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前管理员不存在');
         }
@@ -43,8 +43,12 @@ class AdminController extends Controller
         }
 
         $admin = Admin::new();
-        $admin->avatar = $input->avatar;
-        $admin->nickname = $input->nickname;
+        if (!empty($input->avatar)) {
+            $admin->avatar = $input->avatar;
+        }
+        if (!empty($input->nickname)) {
+            $admin->nickname = $input->nickname;
+        }
         $admin->account = $input->account;
         $admin->password = Hash::make($input->password);
         $admin->role_id = $input->roleId;
@@ -63,8 +67,12 @@ class AdminController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前管理员不存在');
         }
 
-        $admin->avatar = $input->avatar;
-        $admin->nickname = $input->nickname;
+        if (!empty($input->avatar)) {
+            $admin->avatar = $input->avatar;
+        }
+        if (!empty($input->nickname)) {
+            $admin->nickname = $input->nickname;
+        }
         $admin->role_id = $input->roleId;
         $admin->save();
 

@@ -22,7 +22,7 @@ class AdminService extends BaseService
     {
         $query = Admin::query();
         if (!empty($input->nickname)) {
-            $query = $query->where('nickname', 'like', $input->nickname);
+            $query = $query->where('nickname', 'like', "%$input->nickname%");
         }
         if (!empty($input->account)) {
             $query = $query->where('account', $input->account);
