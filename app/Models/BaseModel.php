@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
@@ -10,14 +11,18 @@ use Illuminate\Support\Str;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|BaseModel query()
- * @mixin \Eloquent
  * @method static \Illuminate\Database\Query\Builder|BaseModel onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|BaseModel query()
  * @method static \Illuminate\Database\Query\Builder|BaseModel withTrashed()
  * @method static \Illuminate\Database\Query\Builder|BaseModel withoutTrashed()
+ * @mixin \Eloquent
  */
 class BaseModel extends Model
 {
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
+
     public static function new()
     {
         return new static();

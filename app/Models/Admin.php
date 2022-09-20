@@ -21,19 +21,24 @@ use Illuminate\Notifications\Notifiable;
  * @property int $role_id 管理员角色id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin newQuery()
+ * @method static \Illuminate\Database\Query\Builder|Admin onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin query()
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereAccount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Admin whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Admin whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|Admin withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|Admin withoutTrashed()
  * @mixin \Eloquent
  */
 class Admin extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract

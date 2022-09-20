@@ -21,6 +21,7 @@ class CreateAdminsTable extends Migration
             $table->string('password')->comment('管理员账号密码');
             $table->integer('role_id')->comment('管理员角色id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

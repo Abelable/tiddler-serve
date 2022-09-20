@@ -10,13 +10,12 @@ class CodeResponse
     const UNAUTHORIZED = [401, 10001, '未授权'];
     const FORBIDDEN = [403, 10002, '禁止访问'];
     const INVALID_ACCOUNT = [403, 10003, '账号或密码错误'];
+    const PARAM_MISSING = [400, 10004, '缺少参数'];
+    const PARAM_INVALID = [400, 10005, '参数值类型错误'];
     const NOT_FOUND = [404, 10003, '数据不存在'];
 
     const REGISTERED_ACCOUNT = [200, 10004, '账号已存在'];
     const AUTH_NAME_REGISTERED = [200, 10005, '用户已注册'];
-
-
-
 
 
     const TOKEN_INVALID = [401, 'token失效'];
@@ -26,7 +25,6 @@ class CodeResponse
     const SYSTEM_ERROR = [502, '系统内部错误'];
     const UPDATED_FAIL = [505, '数据更新失败'];
 
-    const PARAM_ILLEGAL = [402, '参数不合法'];
     const PARAM_VALUE_ILLEGAL = [403, '参数值不对'];
 
     const AUTH_CAPTCHA_FREQUENCY = [702, '验证码未超时1分钟，不能发送'];

@@ -11,6 +11,7 @@ use App\Utils\Inputs\PageInput;
 class RoleController extends Controller
 {
     protected $guard = 'admin';
+    protected $except = ['add'];
 
     public function list()
     {
@@ -44,7 +45,7 @@ class RoleController extends Controller
 
     public function edit()
     {
-        $id = $this->verifyRequiredId('id');
+        $id = $this->verifyId('id');
         $name = $this->verifyRequiredString('name');
         $desc = $this->verifyString('desc');
 

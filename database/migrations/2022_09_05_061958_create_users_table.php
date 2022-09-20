@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('unionid')->unique()->comment('微信unionid');
             $table->integer('gender')->default(0)->comment('性别：0-未知，1-男，2-女');
             $table->timestamps();
+            $table->softDeletes();
         });
         DB::statement("ALTER TABLE `users` comment '用户表'");
     }
