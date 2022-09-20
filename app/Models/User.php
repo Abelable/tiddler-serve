@@ -60,7 +60,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      *
      * @var array<int, string>
      */
-    protected $hidden = [];
+    protected $hidden = [
+        'openid',
+        'unionid'
+    ];
 
     /**
      * The attributes that should be cast.

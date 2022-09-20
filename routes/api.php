@@ -51,7 +51,7 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
 
     Route::prefix('user')->group(function() {
         Route::post('list', 'UserController@list');
-        Route::post('edit', 'UserController@edit');
+        Route::post('detail', 'UserController@detail');
         Route::post('delete', 'UserController@delete');
     });
 
