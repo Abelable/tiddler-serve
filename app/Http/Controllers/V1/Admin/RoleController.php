@@ -70,4 +70,10 @@ class RoleController extends Controller
         $role->delete();
         return $this->success();
     }
+
+    public function options()
+    {
+        $options = RoleService::getInstance()->getRoleOptions(['id', 'name']);
+        return $this->success($options);
+    }
 }
