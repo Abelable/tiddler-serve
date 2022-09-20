@@ -18,6 +18,11 @@ class RoleService extends BaseService
         return AdminRole::query()->find($id, $columns);
     }
 
+    public function getRoleByName($name, $columns = ['*'])
+    {
+        return AdminRole::query()->where('name', $name)->first($columns);
+    }
+
     public function getRoleOptions($columns = ['*'])
     {
         return AdminRole::query()->get($columns);

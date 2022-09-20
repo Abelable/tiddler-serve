@@ -16,6 +16,7 @@ class CodeResponse
 
     const REGISTERED_ACCOUNT = [200, 10004, '账号已存在'];
     const AUTH_NAME_REGISTERED = [200, 10005, '用户已注册'];
+    const DATA_EXISTED = [200, 10006, '数据已存在'];
 
 
     const TOKEN_INVALID = [401, 'token失效'];

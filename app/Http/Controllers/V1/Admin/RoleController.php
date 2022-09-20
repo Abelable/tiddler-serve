@@ -11,7 +11,6 @@ use App\Utils\Inputs\PageInput;
 class RoleController extends Controller
 {
     protected $guard = 'admin';
-    protected $except = ['add'];
 
     public function list()
     {
@@ -34,6 +33,11 @@ class RoleController extends Controller
     {
         $name = $this->verifyRequiredString('name');
         $desc = $this->verifyString('desc');
+
+        $role = RoleService::getInstance()->getRoleByName($name);
+        if (!is_null($role)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '管理员角色已存在');
+        }
 
         $role = AdminRole::new();
         $role->name = $name;
