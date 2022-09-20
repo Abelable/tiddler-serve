@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Utils\Inputs;
+use Illuminate\Validation\Rule;
 
 class PageInput extends BaseInput
 {

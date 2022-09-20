@@ -13,8 +13,8 @@ class RoleService extends BaseService
         return AdminRole::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getRoleById($id)
+    public function getRoleById($id, $columns = ['*'])
     {
-        return AdminRole::query()->find($id);
+        return AdminRole::query()->find($id, $columns);
     }
 }
