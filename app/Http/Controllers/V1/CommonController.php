@@ -9,7 +9,7 @@ class CommonController extends Controller
 {
     protected $only = ['getOssConfig'];
 
-    public function getOssConfig()
+    public function ossConfig()
     {
         $config = AliOssServe::new()->getOssConfig();
         return $this->success($config);

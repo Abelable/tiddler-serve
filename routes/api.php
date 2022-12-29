@@ -25,7 +25,16 @@ Route::prefix('auth')->group(function () {
 
 Route::get('user_info', 'UserController@getUserInfo');
 
-Route::get('oss_config', 'CommonController@getOssConfig');
+Route::get('oss_config', 'CommonController@ossConfig');
+
+Route::prefix('shop')->group(function () {
+    Route::prefix('category')->group(function () {
+        Route::get('options', 'ShopController@categoryOptions');
+    });
+    Route::prefix('merchant')->group(function () {
+        Route::post('settle_in', 'ShopController@categoryOptions');
+    });
+});
 
 
 /*
@@ -60,5 +69,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('list', 'UserController@list');
         Route::get('detail', 'UserController@detail');
         Route::post('delete', 'UserController@delete');
+    });
+
+    Route::prefix('shop')->group(function () {
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'ShopCategoryController@list');
+            Route::post('add', 'ShopCategoryController@add');
+            Route::post('edit', 'ShopCategoryController@edit');
+            Route::post('delete', 'ShopCategoryController@delete');
+            Route::get('options', 'ShopCategoryController@options');
+        });
     });
 });
