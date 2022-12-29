@@ -13,29 +13,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('auth')->group(function() {
-    Route::prefix('wx_mp')->group(function() {
+Route::prefix('auth')->group(function () {
+    Route::prefix('wx_mp')->group(function () {
         Route::post('mobile', 'AuthController@getWxMpUserMobile');
         Route::post('register', 'AuthController@wxMpRegister');
         Route::post('login', 'AuthController@wxMpLogin');
     });
 
-    Route::get('token_refresh', 'AuthController@RefreshToken');
+    Route::get('token_refresh', 'AuthController@refreshToken');
 });
 
 Route::get('user_info', 'UserController@getUserInfo');
+
+Route::get('oss_config', 'CommonController@getOssConfig');
+
 
 /*
 |--------------------------------------------------------------------------
 | 管理后台接口
 |--------------------------------------------------------------------------
 */
-Route::namespace('Admin')->prefix('admin')->group(function() {
-    Route::prefix('auth')->group(function() {
+Route::namespace('Admin')->prefix('admin')->group(function () {
+    Route::prefix('auth')->group(function () {
         Route::post('login', 'AuthController@login');
         Route::get('logout', 'AuthController@logout');
         Route::get('me', 'AuthController@info');
-        Route::get('token_refresh', 'AuthController@RefreshToken');
+        Route::get('token_refresh', 'AuthController@refreshToken');
     });
 
     Route::post('list', 'AdminController@list');
@@ -44,7 +47,7 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
     Route::post('edit', 'AdminController@edit');
     Route::post('delete', 'AdminController@delete');
 
-    Route::prefix('role')->group(function() {
+    Route::prefix('role')->group(function () {
         Route::post('list', 'RoleController@list');
         Route::get('detail', 'RoleController@detail');
         Route::post('add', 'RoleController@add');
@@ -53,11 +56,9 @@ Route::namespace('Admin')->prefix('admin')->group(function() {
         Route::get('options', 'RoleController@options');
     });
 
-    Route::prefix('user')->group(function() {
+    Route::prefix('user')->group(function () {
         Route::post('list', 'UserController@list');
         Route::get('detail', 'UserController@detail');
         Route::post('delete', 'UserController@delete');
     });
-
-//    Route::get('oss_config', '');
 });
