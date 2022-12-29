@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ShopCategory;
+use App\Utils\Inputs\PageInput;
 
 class ShopCategoryService extends BaseService
 {

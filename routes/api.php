@@ -32,7 +32,7 @@ Route::prefix('shop')->group(function () {
         Route::get('options', 'ShopController@categoryOptions');
     });
     Route::prefix('merchant')->group(function () {
-        Route::post('settle_in', 'ShopController@categoryOptions');
+        Route::post('settle_in', 'ShopController@addMerchant');
     });
 });
 
@@ -74,6 +74,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::prefix('shop')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'ShopCategoryController@list');
+            Route::get('detail', 'ShopCategoryController@detail');
             Route::post('add', 'ShopCategoryController@add');
             Route::post('edit', 'ShopCategoryController@edit');
             Route::post('delete', 'ShopCategoryController@delete');

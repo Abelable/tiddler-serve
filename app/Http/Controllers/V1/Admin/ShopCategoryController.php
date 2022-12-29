@@ -18,6 +18,16 @@ class ShopCategoryController extends Controller
         return $this->successPaginate($list);
     }
 
+    public function detail()
+    {
+        $id = $this->verifyRequiredId('id');
+        $category = ShopCategoryService::getInstance()->getCategoryById($id);
+        if (is_null($category)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺分类不存在');
+        }
+        return $this->success($category);
+    }
+
     public function add()
     {
         $name = $this->verifyRequiredString('name');
@@ -38,6 +48,11 @@ class ShopCategoryController extends Controller
     {
         $id = $this->verifyId('id');
         $name = $this->verifyRequiredString('name');
+
+        $category = ShopCategoryService::getInstance()->getCategoryByName($name);
+        if (!is_null($category)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '当前店铺分类已存在');
+        }
 
         $category = ShopCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
