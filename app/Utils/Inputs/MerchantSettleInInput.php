@@ -4,7 +4,6 @@ namespace App\Utils\Inputs;
 
 class MerchantSettleInInput extends BaseInput
 {
-    public $userId;
     public $type;
     public $companyName;
     public $regionList;
@@ -17,6 +16,7 @@ class MerchantSettleInInput extends BaseInput
     public $idCardFrontPhoto;
     public $idCardBackPhoto;
     public $holdIdCardPhoto;
+    public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
     public $shopName;
@@ -25,7 +25,6 @@ class MerchantSettleInInput extends BaseInput
     public function rules()
     {
         return [
-            'userId' => 'required|integer|digits_between:1,20',
             'type' => 'required|integer|in:1,2',
             'companyName' => 'string',
             'regionList' => 'required|string',
@@ -38,6 +37,7 @@ class MerchantSettleInInput extends BaseInput
             'idCardFrontPhoto' => 'required|string',
             'idCardBackPhoto' => 'required|string',
             'holdIdCardPhoto' => 'required|string',
+            'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|regex:/^([1-9]{1})(\d{15}|\d{16}|\d{18})$/',
             'bankName' => 'required|string',
             'shopName' => 'required|string',

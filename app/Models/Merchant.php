@@ -58,6 +58,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|Merchant withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Merchant withoutTrashed()
  * @mixin \Eloquent
+ * @property string $bank_card_owner_name 持卡人姓名
+ * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereBankCardOwnerName($value)
  */
 class Merchant extends BaseModel
 {

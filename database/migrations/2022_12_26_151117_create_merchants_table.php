@@ -30,6 +30,7 @@ class CreateMerchantsTable extends Migration
             $table->string('id_card_front_photo')->comment('身份证正面照片');
             $table->string('id_card_back_photo')->comment('身份证反面照片');
             $table->string('hold_id_card_photo')->comment('手持身份证照片');
+            $table->string('bank_card_owner_name')->comment('持卡人姓名');
             $table->string('bank_card_number')->comment('银行卡号');
             $table->string('bank_name')->comment('开户银行及支行名称');
             $table->string('shop_name')->comment('店铺名称');

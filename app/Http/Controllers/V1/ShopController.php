@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
+use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
 use App\Utils\Inputs\MerchantSettleInInput;
 
@@ -19,6 +20,11 @@ class ShopController extends Controller
     {
         /** @var MerchantSettleInInput $input */
         $input = MerchantSettleInInput::new();
+
+        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
+        if (!is_null($merchant)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请');
+        }
 
         $merchant = Merchant::new();
         $merchant->user_id = $this->userId();
@@ -36,6 +42,7 @@ class ShopController extends Controller
         $merchant->id_card_front_photo = $input->idCardFrontPhoto;
         $merchant->id_card_back_photo = $input->idCardBackPhoto;
         $merchant->hold_id_card_photo = $input->holdIdCardPhoto;
+        $merchant->bank_card_owner_name = $input->bankCardOwnerName;
         $merchant->bank_card_number = $input->bankCardNumber;
         $merchant->bank_name = $input->bankName;
         $merchant->shop_name = $input->shopName;
@@ -43,5 +50,17 @@ class ShopController extends Controller
         $merchant->save();
 
         return $this->success();
+    }
+
+    public function merchantStatusInfo()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $merchant = MerchantService::getInstance()->getMerchantById($id, ['status', 'failure_reason', 'type']);
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '您暂未提交店铺申请');
+        }
+
+        return $this->success($merchant);
     }
 }
