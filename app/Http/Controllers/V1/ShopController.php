@@ -54,13 +54,7 @@ class ShopController extends Controller
 
     public function merchantStatusInfo()
     {
-        $id = $this->verifyRequiredId('id');
-
-        $merchant = MerchantService::getInstance()->getMerchantById($id, ['status', 'failure_reason', 'type']);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '您暂未提交店铺申请');
-        }
-
-        return $this->success($merchant);
+        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId(), ['id', 'status', 'failure_reason', 'type']);
+        return $this->success($merchant ?: '');
     }
 }

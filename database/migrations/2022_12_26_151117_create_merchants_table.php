@@ -17,12 +17,12 @@ class CreateMerchantsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
-            $table->string('failure_reason')->comment('审核失败原因');
+            $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('type')->comment('商家类型：1-个人，2-企业');
-            $table->string('company_name')->comment('企业名称');
+            $table->string('company_name')->default('')->comment('企业名称');
             $table->string('region_list')->comment('省市区');
             $table->string('address_detail')->comment('地址详情');
-            $table->string('business_license_photo')->comment('营业执照照片');
+            $table->string('business_license_photo')->default('')->comment('营业执照照片');
             $table->string('name')->comment('联系人姓名');
             $table->string('mobile')->comment('手机号');
             $table->string('email')->comment('邮箱');

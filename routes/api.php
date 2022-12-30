@@ -28,11 +28,10 @@ Route::get('user_info', 'UserController@getUserInfo');
 Route::get('oss_config', 'CommonController@ossConfig');
 
 Route::prefix('shop')->group(function () {
-    Route::prefix('category')->group(function () {
-        Route::get('options', 'ShopController@categoryOptions');
-    });
+    Route::get('category_options', 'ShopController@categoryOptions');
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'ShopController@addMerchant');
+        Route::get('status', 'ShopController@merchantStatusInfo');
     });
 });
 
