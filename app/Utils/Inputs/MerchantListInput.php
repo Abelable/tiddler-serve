@@ -2,15 +2,17 @@
 
 namespace App\Utils\Inputs;
 
-class UserListInput extends PageInput
+class MerchantListInput extends PageInput
 {
-    public $nickname;
+    public $type;
+    public $name;
     public $mobile;
 
     public function rules()
     {
         return array_merge([
-            'nickname' => 'string',
+            'type' => 'integer',
+            'name' => 'string',
             'mobile' => 'regex:/^1[345789][0-9]{9}$/',
         ], parent::rules());
     }

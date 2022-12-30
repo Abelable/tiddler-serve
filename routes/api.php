@@ -42,6 +42,8 @@ Route::prefix('shop')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::namespace('Admin')->prefix('admin')->group(function () {
+    Route::get('oss_config', 'CommonController@ossConfig');
+
     Route::prefix('auth')->group(function () {
         Route::post('login', 'AuthController@login');
         Route::get('logout', 'AuthController@logout');
@@ -78,6 +80,12 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'ShopCategoryController@edit');
             Route::post('delete', 'ShopCategoryController@delete');
             Route::get('options', 'ShopCategoryController@options');
+        });
+        Route::prefix('merchant')->group(function () {
+            Route::post('list', 'MerchantController@list');
+            Route::get('detail', 'MerchantController@detail');
+            Route::post('approved', 'MerchantController@approved');
+            Route::post('reject', 'MerchantController@reject');
         });
     });
 });
