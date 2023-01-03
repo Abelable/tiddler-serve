@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\MerchantService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantListInput;
 
 class MerchantController extends Controller
@@ -31,10 +32,12 @@ class MerchantController extends Controller
     public function approved()
     {
         $id = $this->verifyRequiredId('id');
+
         $merchant = MerchantService::getInstance()->getMerchantById($id);
         if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
+
         $merchant->status = 1;
         $merchant->save();
         return $this->success();
@@ -44,10 +47,12 @@ class MerchantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
+
         $merchant = MerchantService::getInstance()->getMerchantById($id);
         if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
+
         $merchant->status = 3;
         $merchant->failure_reason = $reason;
         $merchant->save();
