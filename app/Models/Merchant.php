@@ -22,6 +22,7 @@ namespace App\Models;
  * @property string $id_card_back_photo 身份证反面照片
  * @property string $hold_id_card_photo 手持身份证照片
  * @property string $bank_card_number 银行卡号
+ * @property string $bank_card_owner_name 持卡人姓名
  * @property string $bank_name 开户银行及支行名称
  * @property string $shop_name 店铺名称
  * @property int $shop_category_id 店铺分类id
@@ -58,7 +59,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|Merchant withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Merchant withoutTrashed()
  * @mixin \Eloquent
- * @property string $bank_card_owner_name 持卡人姓名
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereBankCardOwnerName($value)
  */
 class Merchant extends BaseModel

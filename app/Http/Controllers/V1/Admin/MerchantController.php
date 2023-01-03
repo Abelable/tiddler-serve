@@ -14,7 +14,7 @@ class MerchantController extends Controller
     public function list()
     {
         $input = MerchantListInput::new();
-        $columns = ['id', 'type', 'status', 'failure_reason', 'name', 'mobile', 'shop_name', 'shop_category_id', 'created_at', 'updated_at'];
+        $columns = ['id', 'type', 'status', 'failure_reason', 'name', 'mobile', 'created_at', 'updated_at'];
         $list = MerchantService::getInstance()->getMerchantList($input, $columns);
         return $this->successPaginate($list);
     }
