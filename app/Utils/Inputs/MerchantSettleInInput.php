@@ -6,7 +6,8 @@ class MerchantSettleInInput extends BaseInput
 {
     public $type;
     public $companyName;
-    public $regionList;
+    public $regionDesc;
+    public $regionCodeList;
     public $addressDetail;
     public $businessLicensePhoto;
     public $name;
@@ -26,10 +27,11 @@ class MerchantSettleInInput extends BaseInput
     {
         return [
             'type' => 'required|integer|in:1,2',
-            'companyName' => 'required_if:type,2,string',
-            'regionList' => 'required|string',
+            'companyName' => 'required_if:type,2',
+            'regionDesc' => 'required|string',
+            'regionCodeList' => 'required|string',
             'addressDetail' => 'required|string',
-            'businessLicensePhoto' => 'required_if:type,2,string',
+            'businessLicensePhoto' => 'required_if:type,2',
             'name' => 'required|string',
             'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
             'email' => 'required|email',

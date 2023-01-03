@@ -20,7 +20,8 @@ class CreateMerchantsTable extends Migration
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('type')->comment('商家类型：1-个人，2-企业');
             $table->string('company_name')->default('')->comment('企业名称');
-            $table->string('region_list')->comment('省市区');
+            $table->string('region_desc')->comment('省市区描述');
+            $table->string('region_code_list')->comment('省市区编码');
             $table->string('address_detail')->comment('地址详情');
             $table->string('business_license_photo')->default('')->comment('营业执照照片');
             $table->string('name')->comment('联系人姓名');

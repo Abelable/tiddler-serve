@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Merchant;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantSettleInInput;
 
 class ShopController extends Controller
@@ -33,7 +34,8 @@ class ShopController extends Controller
             $merchant->company_name = $input->companyName;
             $merchant->business_license_photo = $input->businessLicensePhoto;
         }
-        $merchant->region_list = $input->regionList;
+        $merchant->region_desc = $input->regionDesc;
+        $merchant->region_code_list = $input->regionCodeList;
         $merchant->address_detail = $input->addressDetail;
         $merchant->name = $input->name;
         $merchant->mobile = $input->mobile;
