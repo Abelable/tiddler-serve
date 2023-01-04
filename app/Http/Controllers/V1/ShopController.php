@@ -30,7 +30,7 @@ class ShopController extends Controller
         $merchant = Merchant::new();
         $merchant->user_id = $this->userId();
         $merchant->type = $input->type;
-        if ($input->type === 2) {
+        if ($input->type == 2) {
             $merchant->company_name = $input->companyName;
             $merchant->business_license_photo = $input->businessLicensePhoto;
         }
@@ -58,5 +58,15 @@ class ShopController extends Controller
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId(), ['id', 'status', 'failure_reason', 'type']);
         return $this->success($merchant ?: '');
+    }
+
+    public function deleteMerchant()
+    {
+        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '商家信息不存在');
+        }
+        $merchant->delete();
+        return $this->success();
     }
 }
