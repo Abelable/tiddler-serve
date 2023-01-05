@@ -17,6 +17,7 @@ class CreateMerchantsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
+            $table->string('order_sn')->default('')->comment('商家订单编号');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('type')->comment('商家类型：1-个人，2-企业');
             $table->string('company_name')->default('')->comment('企业名称');
