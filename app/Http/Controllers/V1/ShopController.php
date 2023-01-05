@@ -4,10 +4,12 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
+use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantSettleInInput;
+use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopController extends Controller
 {
@@ -62,7 +64,10 @@ class ShopController extends Controller
 
     public function payDeposit()
     {
-
+        $orderId = $this->verifyRequiredId('orderId');
+        $order = MerchantOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $payParams = Pay::wechat()->miniapp($order);
+        return $this->success($payParams);
     }
 
     public function deleteMerchant()

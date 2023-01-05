@@ -1,95 +1,77 @@
 <?php
 
-declare(strict_types=1);
-
-use Yansongda\Pay\Pay;
-
 return [
     'alipay' => [
-        'default' => [
-            // 必填-支付宝分配的 app_id
-            'app_id' => '',
-            // 必填-应用私钥 字符串或路径
-            'app_secret_cert' => '',
-            // 必填-应用公钥证书 路径
-            'app_public_cert_path' => '',
-            // 必填-支付宝公钥证书 路径
-            'alipay_public_cert_path' => '',
-            // 必填-支付宝根证书 路径
-            'alipay_root_cert_path' => '',
-            'return_url' => '',
-            'notify_url' => '',
-            // 选填-服务商模式下的服务商 id，当 mode 为 Pay::MODE_SERVICE 时使用该参数
-            'service_provider_id' => '',
-            // 选填-默认为正常模式。可选为： MODE_NORMAL, MODE_SANDBOX, MODE_SERVICE
-            'mode' => Pay::MODE_NORMAL,
+        // 支付宝分配的 APPID
+        'app_id' => env('ALI_APP_ID', ''),
+
+        // 支付宝异步通知地址
+        'notify_url' => '',
+
+        // 支付成功后同步通知地址
+        'return_url' => '',
+
+        // 阿里公共密钥，验证签名时使用
+        'ali_public_key' => env('ALI_PUBLIC_KEY', ''),
+
+        // 自己的私钥，签名时使用
+        'private_key' => env('ALI_PRIVATE_KEY', ''),
+
+        // 使用公钥证书模式，请配置下面两个参数，同时修改 ali_public_key 为以 .crt 结尾的支付宝公钥证书路径，如（./cert/alipayCertPublicKey_RSA2.crt）
+        // 应用公钥证书路径
+        // 'app_cert_public_key' => './cert/appCertPublicKey.crt',
+
+        // 支付宝根证书路径
+        // 'alipay_root_cert' => './cert/alipayRootCert.crt',
+
+        // optional，默认 warning；日志路径为：sys_get_temp_dir().'/logs/yansongda.pay.log'
+        'log' => [
+            'file' => storage_path('logs/alipay.log'),
+        //  'level' => 'debug'
+        //  'type' => 'single', // optional, 可选 daily.
+        //  'max_file' => 30,
         ],
+
+        // optional，设置此参数，将进入沙箱模式
+        // 'mode' => 'dev',
     ],
+
     'wechat' => [
-        'default' => [
-            // 必填-商户号，服务商模式下为服务商商户号
-            'mch_id' => env('WX_PAY_MCH_ID', ''),
-            // 必填-商户秘钥
-            'mch_secret_key' => env('WX_PAY_KEY', ''),
-            // 必填-商户私钥 字符串或路径
-            'mch_secret_cert' => storage_path('app/wxpay/apiclient_key.pem'),
-            // 必填-商户公钥证书路径
-            'mch_public_cert_path' => storage_path('app/wxpay/apiclient_cert.pem'),
-            // 必填
-            'notify_url' => env('APP_URL') . 'wx/order/notify',
-            // 选填-公众号 的 app_id
-            'mp_app_id' => '',
-            // 选填-小程序 的 app_id
-            'mini_app_id' => '',
-            // 选填-app 的 app_id
-            'app_id' => '',
-            // 选填-合单 app_id
-            'combine_app_id' => '',
-            // 选填-合单商户号
-            'combine_mch_id' => '',
-            // 选填-服务商模式下，子公众号 的 app_id
-            'sub_mp_app_id' => '',
-            // 选填-服务商模式下，子 app 的 app_id
-            'sub_app_id' => '',
-            // 选填-服务商模式下，子小程序 的 app_id
-            'sub_mini_app_id' => '',
-            // 选填-服务商模式下，子商户id
-            'sub_mch_id' => '',
-            // 选填-微信公钥证书路径, optional，强烈建议 php-fpm 模式下配置此参数
-            'wechat_public_cert_path' => [
-                '45F59D4DABF31918AFCEC556D5D2C6E376675D57' => __DIR__.'/Cert/wechatPublicKey.crt',
-            ],
-            // 选填-默认为正常模式。可选为： MODE_NORMAL, MODE_SERVICE
-            'mode' => Pay::MODE_NORMAL,
+        // 公众号 APPID
+        'app_id' => '',
+
+        // 小程序 APPID
+        'miniapp_id' => env('WX_MP_APPID', ''),
+
+        // APP 引用的 appid
+        'appid' => '',
+
+        // 微信支付分配的微信商户号
+        'mch_id' => env('WX_PAY_MCH_ID', ''),
+
+        // 微信支付异步通知地址
+        'notify_url' => env('APP_URL') . 'wx/order/notify',
+
+        // 微信支付签名秘钥
+        'key' => env('WX_PAY_KEY', ''),
+
+        // 客户端证书路径，退款、红包等需要用到。请填写绝对路径，linux 请确保权限问题。pem 格式。
+        'cert_client' => storage_path('app/wxpay/apiclient_cert.pem'),
+
+        // 客户端秘钥路径，退款、红包等需要用到。请填写绝对路径，linux 请确保权限问题。pem 格式。
+        'cert_key' => storage_path('app/wxpay/apiclient_key.pem'),
+
+        // optional，默认 warning；日志路径为：sys_get_temp_dir().'/logs/yansongda.pay.log'
+        'log' => [
+            'file' => storage_path('logs/wechat.log'),
+        //  'level' => 'debug'
+        //  'type' => 'single', // optional, 可选 daily.
+        //  'max_file' => 30,
         ],
-    ],
-    'unipay' => [
-        'default' => [
-            // 必填-商户号
-            'mch_id' => '',
-            // 必填-商户公私钥
-            'mch_cert_path' => '',
-            // 必填-商户公私钥密码
-            'mch_cert_password' => '000000',
-            // 必填-银联公钥证书路径
-            'unipay_public_cert_path' => '',
-            // 必填
-            'return_url' => '',
-            // 必填
-            'notify_url' => '',
-        ],
-    ],
-    'http' => [ // optional
-        'timeout' => 5.0,
-        'connect_timeout' => 5.0,
-        // 更多配置项请参考 [Guzzle](https://guzzle-cn.readthedocs.io/zh_CN/latest/request-options.html)
-    ],
-    // optional，默认 warning；日志路径为：sys_get_temp_dir().'/logs/yansongda.pay.log'
-    'logger' => [
-        'enable' => false,
-        'file' => null,
-        'level' => 'debug',
-        'type' => 'single', // optional, 可选 daily.
-        'max_file' => 30,
+
+        // optional
+        // 'dev' 时为沙箱模式
+        // 'hk' 时为东南亚节点
+        // 'mode' => 'dev',
     ],
 ];

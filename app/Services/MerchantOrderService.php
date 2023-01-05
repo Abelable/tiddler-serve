@@ -38,7 +38,7 @@ class MerchantOrderService extends BaseService
         return MerchantOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function getWxPayOrder(int $userId, int $orderId, int $openid)
+    public function getWxPayOrder(int $userId, int $orderId, string $openid)
     {
         $order = MerchantOrder::query()->where('user_id', $userId)->find($orderId);
 
@@ -50,8 +50,8 @@ class MerchantOrderService extends BaseService
         }
 
         return [
-            'out_trade_no' => $order->order_sn,
-            'body' => '商家订单：' . $order->order_sn,
+            'out_trade_no' => time(),
+            'body' => 'merchant_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
