@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\UserService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\UserListInput;
 

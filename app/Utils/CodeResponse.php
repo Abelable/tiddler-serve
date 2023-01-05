@@ -11,6 +11,8 @@ class CodeResponse
     const DATA_EXISTED = [200, 10006, '数据已存在'];
     const PARAM_INVALID = [200, 10007, '参数值类型错误'];
     const PARAM_VALUE_ILLEGAL = [200, 10008, '参数值错误'];
+    const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
+
 
     const PARAM_MISSING = [400, 10004, '缺少参数'];
     const UNAUTHORIZED = [401, 10001, '未授权'];

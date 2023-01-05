@@ -20,7 +20,9 @@ class CreateMerchantOrdersTable extends Migration
             $table->string('order_sn')->comment('订单编号');
             $table->integer('status')->default(0)->comment('订单状态：0-待支付，1-支付成功');
             $table->string('payment_amount')->comment('支付金额');
+            $table->integer('pay_id')->default(0)->comment('支付id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

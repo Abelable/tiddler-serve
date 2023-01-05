@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Utils\Inputs\UserListInput;
 use App\Utils\Inputs\WxMpRegisterInput;
 
 class UserService extends BaseService
@@ -23,5 +24,22 @@ class UserService extends BaseService
     public function getByOpenid($openid)
     {
         return User::query()->where('openid', $openid)->first();
+    }
+
+    public function getUserList(UserListInput $input, $columns = ['*'])
+    {
+        $query = User::query();
+        if (!empty($input->nickname)) {
+            $query = $query->where('nickname', 'like', "%$input->nickname%");
+        }
+        if (!empty($input->mobile)) {
+            $query = $query->where('mobile', $input->mobile);
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getUserById($id, $columns = ['*'])
+    {
+        return User::query()->find($id, $columns);
     }
 }

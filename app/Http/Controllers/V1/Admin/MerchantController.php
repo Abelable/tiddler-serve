@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantListInput;
+use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
 {
@@ -38,8 +40,13 @@ class MerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
 
-        $merchant->status = 1;
-        $merchant->save();
+        DB::transaction(function () use ($merchant) {
+            $merchant->status = 1;
+            $merchant->save();
+
+            MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->type == 1 ? '1000' : '10000');
+        });
+
         return $this->success();
     }
 
