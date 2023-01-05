@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MerchantOrder;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -54,5 +55,10 @@ class MerchantOrderService extends BaseService
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
+    }
+
+    public function getOrderList(PageInput $input, $columns = ['*'])
+    {
+        return MerchantOrder::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 }

@@ -7,6 +7,7 @@ use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantListInput;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
@@ -43,7 +44,7 @@ class MerchantController extends Controller
         DB::transaction(function () use ($merchant) {
             $order = MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->type == 1 ? '1000' : '10000');
             $merchant->status = 1;
-            $merchant->order_sn = $order->order_sn;
+            $merchant->order_id = $order->id;
             $merchant->save();
         });
 
@@ -64,5 +65,13 @@ class MerchantController extends Controller
         $merchant->failure_reason = $reason;
         $merchant->save();
         return $this->success();
+    }
+
+    public function orderList()
+    {
+        $input = PageInput::new();
+        $columns = ['id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
+        $list = MerchantOrderService::getInstance()->getOrderList($input, $columns);
+        return $this->successPaginate($list);
     }
 }

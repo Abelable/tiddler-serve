@@ -87,6 +87,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('detail', 'MerchantController@detail');
             Route::post('approved', 'MerchantController@approved');
             Route::post('reject', 'MerchantController@reject');
+            Route::post('order_list', 'MerchantController@orderList');
         });
     });
 });

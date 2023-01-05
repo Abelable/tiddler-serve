@@ -60,6 +60,11 @@ class ShopController extends Controller
         return $this->success($merchant ?: '');
     }
 
+    public function payDeposit()
+    {
+
+    }
+
     public function deleteMerchant()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
