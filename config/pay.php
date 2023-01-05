@@ -50,7 +50,7 @@ return [
         'mch_id' => env('WX_PAY_MCH_ID', ''),
 
         // 微信支付异步通知地址
-        'notify_url' => env('APP_URL') . 'wx/order/notify',
+        'notify_url' => env('APP_URL') . 'wx/pay/notify',
 
         // 微信支付签名秘钥
         'key' => env('WX_PAY_KEY', ''),

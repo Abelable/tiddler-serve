@@ -38,8 +38,8 @@ Route::prefix('shop')->group(function () {
 });
 
 Route::prefix('wx')->group(function () {
-    Route::prefix('order')->group(function () {
-        Route::post('notify', 'CommonController@wxOrderNotify');
+    Route::prefix('pay')->group(function () {
+        Route::post('notify', 'CommonController@wxPayNotify');
     });
 });
 

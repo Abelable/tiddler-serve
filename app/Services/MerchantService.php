@@ -31,4 +31,15 @@ class MerchantService extends BaseService
     {
         return Merchant::query()->find($id, $columns);
     }
+
+    public function paySuccess(int $merchantId)
+    {
+        $merchant = $this->getMerchantById($merchantId);
+        if (is_null($merchant)) {
+            $this->throwBadArgumentValue();
+        }
+        $merchant->status = 2;
+        $merchant->save();
+        return $merchant;
+    }
 }
