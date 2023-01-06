@@ -80,6 +80,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'UserController@delete');
     });
 
+    Route::prefix('merchant')->group(function () {
+        Route::post('list', 'MerchantController@list');
+        Route::get('detail', 'MerchantController@detail');
+        Route::post('approved', 'MerchantController@approved');
+        Route::post('reject', 'MerchantController@reject');
+        Route::post('order_list', 'MerchantController@orderList');
+    });
+
     Route::prefix('shop')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'ShopCategoryController@list');
@@ -88,13 +96,6 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'ShopCategoryController@edit');
             Route::post('delete', 'ShopCategoryController@delete');
             Route::get('options', 'ShopCategoryController@options');
-        });
-        Route::prefix('merchant')->group(function () {
-            Route::post('list', 'MerchantController@list');
-            Route::get('detail', 'MerchantController@detail');
-            Route::post('approved', 'MerchantController@approved');
-            Route::post('reject', 'MerchantController@reject');
-            Route::post('order_list', 'MerchantController@orderList');
         });
         Route::post('list', 'ShopController@list');
         Route::get('detail', 'ShopController@detail');
