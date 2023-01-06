@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
+use App\Services\ExpressService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
@@ -102,5 +103,11 @@ class ShopController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
         return $this->success($shop);
+    }
+
+    public function expressOptions()
+    {
+        $options = ExpressService::getInstance()->getExpressOptions(['id', 'code', 'name']);
+        return $this->success($options);
     }
 }

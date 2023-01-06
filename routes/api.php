@@ -37,6 +37,8 @@ Route::prefix('shop')->group(function () {
     });
     Route::get('shop_info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
+    Route::get('express_options', 'ShopController@expressOptions');
+
 });
 
 Route::prefix('wx')->group(function () {
@@ -99,5 +101,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         });
         Route::post('list', 'ShopController@list');
         Route::get('detail', 'ShopController@detail');
+    });
+
+    Route::prefix('express')->group(function () {
+        Route::post('list', 'ExpressController@list');
+        Route::get('detail', 'ExpressController@detail');
+        Route::post('add', 'ExpressController@add');
+        Route::post('edit', 'ExpressController@edit');
+        Route::post('delete', 'ExpressController@delete');
+        Route::get('options', 'ExpressController@options');
     });
 });

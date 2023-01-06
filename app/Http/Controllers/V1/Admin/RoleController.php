@@ -49,7 +49,7 @@ class RoleController extends Controller
 
     public function edit()
     {
-        $id = $this->verifyId('id');
+        $id = $this->verifyRequiredId('id');
         $name = $this->verifyRequiredString('name');
         $desc = $this->verifyString('desc');
 
