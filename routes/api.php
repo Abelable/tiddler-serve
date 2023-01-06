@@ -38,9 +38,7 @@ Route::prefix('shop')->group(function () {
 });
 
 Route::prefix('wx')->group(function () {
-    Route::prefix('pay')->group(function () {
-        Route::post('notify', 'CommonController@wxPayNotify');
-    });
+    Route::post('pay_notify', 'CommonController@wxPayNotify');
 });
 
 
