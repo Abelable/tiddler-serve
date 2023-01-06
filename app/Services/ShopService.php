@@ -15,5 +15,6 @@ class ShopService extends BaseService
         $shop->name = $name;
         $shop->category_id = $categoryId;
         $shop->save();
+        return $shop;
     }
 }

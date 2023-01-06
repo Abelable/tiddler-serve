@@ -20,6 +20,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $openid 小程序openid
  * @property string $unionid 微信unionid
  * @property int $gender 性别：0-未知，1-男，2-女
+ * @property int $shop_id 店铺id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -38,6 +39,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereOpenid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUnionid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
