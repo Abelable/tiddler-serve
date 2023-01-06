@@ -21,7 +21,14 @@ class ShopService extends BaseService
 
     public function getShopList(ShopListInput $input, $columns = ['*'])
     {
-        return Shop::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        $query = Shop::query();
+        if (!empty($input->name)) {
+            $query = $query->where('name', $input->name);
+        }
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getShopById(int $id, $columns = ['*'])
