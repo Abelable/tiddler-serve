@@ -7,12 +7,15 @@ use App\Models\Merchant;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
+use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantSettleInInput;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopController extends Controller
 {
+    protected $except = ['getShopInfo'];
+
     public function categoryOptions()
     {
         $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
@@ -78,5 +81,26 @@ class ShopController extends Controller
         }
         $merchant->delete();
         return $this->success();
+    }
+
+    public function shopInfo()
+    {
+        $id = $this->verifyRequiredId('id');
+        $columns = ['id', 'name', 'type', 'avatar', 'cover'];
+        $shop = ShopService::getInstance()->getShopById($id, $columns);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
+        }
+        return $this->success($shop);
+    }
+
+    public function myShopInfo()
+    {
+        $columns = ['id', 'name', 'type', 'avatar', 'cover'];
+        $shop = ShopService::getInstance()->getShopByUserId($this->userId(), $columns);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
+        }
+        return $this->success($shop);
     }
 }

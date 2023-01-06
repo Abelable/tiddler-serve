@@ -35,6 +35,8 @@ Route::prefix('shop')->group(function () {
         Route::post('pay_deposit', 'ShopController@payDeposit');
         Route::post('delete', 'ShopController@deleteMerchant');
     });
+    Route::get('shop_info', 'ShopController@shopInfo');
+    Route::get('my_shop_info', 'ShopController@myShopInfo');
 });
 
 Route::prefix('wx')->group(function () {
@@ -94,5 +96,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('reject', 'MerchantController@reject');
             Route::post('order_list', 'MerchantController@orderList');
         });
+        Route::post('list', 'ShopController@list');
+        Route::get('detail', 'ShopController@detail');
     });
 });
