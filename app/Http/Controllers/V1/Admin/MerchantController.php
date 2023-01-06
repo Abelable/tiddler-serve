@@ -48,6 +48,8 @@ class MerchantController extends Controller
             $merchant->save();
         });
 
+        // todo：短信通知商家
+
         return $this->success();
     }
 
@@ -64,6 +66,8 @@ class MerchantController extends Controller
         $merchant->status = 3;
         $merchant->failure_reason = $reason;
         $merchant->save();
+        // todo：短信通知商家
+
         return $this->success();
     }
 
