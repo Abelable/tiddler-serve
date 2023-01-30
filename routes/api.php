@@ -29,16 +29,25 @@ Route::get('oss_config', 'CommonController@ossConfig');
 
 Route::prefix('shop')->group(function () {
     Route::get('category_options', 'ShopController@categoryOptions');
+
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'ShopController@addMerchant');
         Route::get('status', 'ShopController@merchantStatusInfo');
         Route::post('pay_deposit', 'ShopController@payDeposit');
         Route::post('delete', 'ShopController@deleteMerchant');
     });
+
     Route::get('shop_info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
     Route::get('express_options', 'ShopController@expressOptions');
 
+    Route::prefix('freight_template')->group(function () {
+        Route::get('list', 'FreightTemplateController@list');
+        Route::get('detail', 'FreightTemplateController@detail');
+        Route::post('add', 'FreightTemplateController@add');
+        Route::post('edit', 'FreightTemplateController@edit');
+        Route::post('delete', 'FreightTemplateController@delete');
+    });
 });
 
 Route::prefix('wx')->group(function () {

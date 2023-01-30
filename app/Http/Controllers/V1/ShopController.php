@@ -15,7 +15,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopController extends Controller
 {
-    protected $except = ['getShopInfo'];
+    protected $except = ['shopInfo'];
 
     public function categoryOptions()
     {
