@@ -14,9 +14,8 @@ class FreightTemplateController extends Controller
 {
     public function list()
     {
-        $input = PageInput::new();
-        $list = FreightTemplateService::getInstance()->getListByUserId($this->userId(), $input, ['id', 'name']);
-        return $this->successPaginate($list);
+        $list = FreightTemplateService::getInstance()->getListByUserId($this->userId(), ['id', 'name']);
+        return $this->success($list);
     }
 
     public function detail()

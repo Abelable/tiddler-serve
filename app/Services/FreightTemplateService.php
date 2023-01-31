@@ -7,9 +7,9 @@ use App\Utils\Inputs\PageInput;
 
 class FreightTemplateService extends BaseService
 {
-    public function getListByUserId($userId, PageInput $input, $columns = ['*'])
+    public function getListByUserId($userId, $columns = ['*'])
     {
-        return FreightTemplate::query()->where('user_id', $userId)->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return FreightTemplate::query()->where('user_id', $userId)->get($columns);
     }
 
     public function getFreightTemplateById($id, $columns = ['*'])
