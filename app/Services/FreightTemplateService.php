@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\FreightTemplate;
-use App\Utils\Inputs\PageInput;
 
 class FreightTemplateService extends BaseService
 {

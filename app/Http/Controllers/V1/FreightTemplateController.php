@@ -36,6 +36,7 @@ class FreightTemplateController extends Controller
 
         $freightTemplate = FreightTemplate::new();
         $freightTemplate->user_id = $this->userId();
+        $freightTemplate->mode = $input->mode;
         $freightTemplate->name = $input->name;
         $freightTemplate->title = $input->title;
         $freightTemplate->compute_mode = $input->computeMode;
@@ -58,6 +59,7 @@ class FreightTemplateController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前运费模板不存在');
         }
 
+        $freightTemplate->mode = $input->mode;
         $freightTemplate->name = $input->name;
         $freightTemplate->title = $input->title;
         $freightTemplate->compute_mode = $input->computeMode;
