@@ -32,6 +32,7 @@ class CreateCommoditiesTable extends Migration
             $table->string('detail_image_list')->comment('商品详情图片');
             $table->longText('spec_list')->comment('商品规格列表，使用场景：编辑商品信息');
             $table->longText('sku_list')->comment('商品sku，使用场景：购买商品');
+            $table->integer('sales_volume')->default(0)->comment('商品销量');
             $table->timestamps();
             $table->softDeletes();
         });

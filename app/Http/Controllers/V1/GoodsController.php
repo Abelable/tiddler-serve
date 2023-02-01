@@ -16,8 +16,8 @@ class GoodsController extends Controller
     public function list()
     {
         $input = PageInput::new();
-        $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price'];
-        $list = GoodsService::getInstance()->getList($input);
+        $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price', 'sales_volume'];
+        $list = GoodsService::getInstance()->getList($input, $columns);
         return $this->successPaginate($list);
     }
 
@@ -74,5 +74,10 @@ class GoodsController extends Controller
         unset($goods->shop_id);
 
         return $this->success($goods);
+    }
+
+    public function add()
+    {
+
     }
 }

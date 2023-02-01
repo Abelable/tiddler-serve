@@ -23,6 +23,7 @@ namespace App\Models;
  * @property string $detail_image_list 商品详情图片
  * @property string $spec_list 商品规格列表，使用场景：编辑商品信息
  * @property string $sku_list 商品sku，使用场景：购买商品
+ * @property int $sales_volume 商品销量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -43,6 +44,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereReturnAddressId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereSkuList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commodity whereSpecList($value)
