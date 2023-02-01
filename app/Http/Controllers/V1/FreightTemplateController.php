@@ -8,7 +8,6 @@ use App\Services\FreightTemplateService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\FreightTemplateAddInput;
 use App\Utils\Inputs\FreightTemplateEditInput;
-use App\Utils\Inputs\PageInput;
 
 class FreightTemplateController extends Controller
 {

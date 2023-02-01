@@ -48,6 +48,13 @@ Route::prefix('shop')->group(function () {
         Route::post('edit', 'FreightTemplateController@edit');
         Route::post('delete', 'FreightTemplateController@delete');
     });
+    Route::prefix('goods_return_address')->group(function () {
+        Route::get('list', 'GoodsReturnAddressController@list');
+        Route::get('detail', 'GoodsReturnAddressController@detail');
+        Route::post('add', 'GoodsReturnAddressController@add');
+        Route::post('edit', 'GoodsReturnAddressController@edit');
+        Route::post('delete', 'GoodsReturnAddressController@delete');
+    });
 });
 
 Route::prefix('wx')->group(function () {
