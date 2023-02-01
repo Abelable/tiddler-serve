@@ -48,12 +48,23 @@ Route::prefix('shop')->group(function () {
         Route::post('edit', 'FreightTemplateController@edit');
         Route::post('delete', 'FreightTemplateController@delete');
     });
+
     Route::prefix('goods_return_address')->group(function () {
         Route::get('list', 'GoodsReturnAddressController@list');
         Route::get('detail', 'GoodsReturnAddressController@detail');
         Route::post('add', 'GoodsReturnAddressController@add');
         Route::post('edit', 'GoodsReturnAddressController@edit');
         Route::post('delete', 'GoodsReturnAddressController@delete');
+    });
+
+    Route::prefix('goods')->group(function () {
+        Route::get('list', 'GoodsController@merchantGoodsList');
+        Route::get('detail', 'GoodsController@detail');
+        Route::post('add', 'GoodsController@add');
+        Route::post('edit', 'GoodsController@edit');
+        Route::post('up', 'GoodsController@up');
+        Route::post('down', 'GoodsController@down');
+        Route::post('delete', 'GoodsController@delete');
     });
 });
 
