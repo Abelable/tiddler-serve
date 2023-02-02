@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Commodity;
+use App\Models\Goods;
 use App\Services\GoodsService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
@@ -11,6 +11,7 @@ use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ShopGoodsListInput;
 
 class GoodsController extends Controller
 {
@@ -22,7 +23,21 @@ class GoodsController extends Controller
         $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price', 'sales_volume'];
         $paginate = GoodsService::getInstance()->getList($input, $columns);
         $goodsList = collect($paginate->items());
-        $list = $goodsList->map(function (Commodity $goods) {
+        $list = $goodsList->map(function (Goods $goods) {
+            $goods->image_list = json_decode($goods->image_list);
+            return $goods;
+        });
+        return $this->success($this->paginate($paginate, $list));
+    }
+
+    public function shopGoodsList()
+    {
+        /** @var ShopGoodsListInput $input */
+        $input = ShopGoodsListInput::new();
+        $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price', 'sales_volume'];
+        $paginate = GoodsService::getInstance()->getShopGoodsList($input, $columns);
+        $goodsList = collect($paginate->items());
+        $list = $goodsList->map(function (Goods $goods) {
             $goods->image_list = json_decode($goods->image_list);
             return $goods;
         });
@@ -89,7 +104,7 @@ class GoodsController extends Controller
         /** @var GoodsAddInput $input */
         $input = GoodsAddInput::new();
 
-        $goods = Commodity::new();
+        $goods = Goods::new();
         $shopId = $this->user()->shop_id;
         if ($shopId == 0) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
