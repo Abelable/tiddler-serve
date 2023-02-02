@@ -8,7 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $shop_id 店铺id
- * @property int $status 申请状态：0-待审核，1-审核通过，2-下架
+ * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
  * @property string $video 主图视频
  * @property string $image_list 主图图片

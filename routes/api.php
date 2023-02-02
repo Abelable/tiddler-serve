@@ -126,6 +126,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('delete', 'ShopCategoryController@delete');
             Route::get('options', 'ShopCategoryController@options');
         });
+
         Route::post('list', 'ShopController@list');
         Route::get('detail', 'ShopController@detail');
     });
@@ -137,5 +138,19 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('edit', 'ExpressController@edit');
         Route::post('delete', 'ExpressController@delete');
         Route::get('options', 'ExpressController@options');
+    });
+
+    Route::prefix('goods')->group(function () {
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'GoodsCategoryController@list');
+            Route::get('detail', 'GoodsCategoryController@detail');
+            Route::post('add', 'GoodsCategoryController@add');
+            Route::post('edit', 'GoodsCategoryController@edit');
+            Route::post('delete', 'GoodsCategoryController@delete');
+            Route::get('options', 'GoodsCategoryController@options');
+        });
+
+        Route::post('list', 'ShopController@list');
+        Route::get('detail', 'ShopController@detail');
     });
 });

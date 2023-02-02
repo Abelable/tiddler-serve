@@ -49,10 +49,15 @@ class GoodsController extends Controller
         /** @var MerchantGoodsListInput $input */
         $input = MerchantGoodsListInput::new();
 
-        $columns = ['id', 'status', 'name', 'failure_reason', 'created_at'];
-        $list = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
-
-        return $this->successPaginate($list);
+        $columns = ['id', 'image_list', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
+        $paginate = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
+        $goodsList = collect($paginate->items());
+        $list = $goodsList->map(function (Goods $goods) {
+            $goods['image'] = json_decode($goods->image_list)[0];
+            unset($goods->image_list);
+            return $goods;
+        });
+        return $this->success($this->paginate($paginate, $list));
     }
 
     public function detail()
