@@ -9,8 +9,9 @@ class CodeResponse
     const REGISTERED_ACCOUNT = [200, 10004, '账号已存在'];
     const AUTH_NAME_REGISTERED = [200, 10005, '用户已注册'];
     const DATA_EXISTED = [200, 10006, '数据已存在'];
-    const PARAM_INVALID = [200, 10007, '参数值类型错误'];
-    const PARAM_VALUE_ILLEGAL = [200, 10008, '参数值错误'];
+    const PARAM_ILLEGAL = [200, 10007, '参数值错误'];
+    const PARAM_VALUE_INVALID = [200, 10008, '参数值类型错误'];
+    const PARAM_VALUE_ILLEGAL = [200, 10009, '参数值错误'];
     const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
 
 

@@ -69,7 +69,7 @@ trait VerifyRequestInput
             throw new BusinessException(CodeResponse::PARAM_MISSING);
         }
         if ($validator->fails()) {
-            throw new BusinessException(CodeResponse::PARAM_INVALID);
+            throw new BusinessException(CodeResponse::PARAM_VALUE_INVALID);
         }
         return $value;
     }

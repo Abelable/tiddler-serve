@@ -33,7 +33,7 @@ class BaseInput
 
         $validator = Validator::make($data, $this->rules());
         if ($validator->fails()) {
-            throw new BusinessException(CodeResponse::PARAM_INVALID, $validator->errors());
+            throw new BusinessException(CodeResponse::PARAM_VALUE_INVALID, $validator->errors());
         }
 
         $map = get_object_vars($this);
