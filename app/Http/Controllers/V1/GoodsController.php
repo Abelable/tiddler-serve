@@ -21,7 +21,7 @@ class GoodsController extends Controller
     public function list()
     {
         $input = PageInput::new();
-        $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
+        $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $list = GoodsService::getInstance()->getList($input, $columns);
         return $this->successPaginate($list);
     }
@@ -131,7 +131,7 @@ class GoodsController extends Controller
         if ($shopId == 0) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
         }
-        $goods->shop_id = $this->user()->shop_id;
+        $goods->shop_id = $shopId;
         $goods->user_id = $this->userId();
         $goods->image = $input->image;
         if (!empty($input->video)) {
