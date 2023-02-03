@@ -184,6 +184,7 @@ class GoodsController extends Controller
         }
 
         $goods->status = 0;
+        $goods->failure_reason = '';
         $goods->image = $input->image;
         if (!empty($input->video)) {
             $goods->video = $input->video;
