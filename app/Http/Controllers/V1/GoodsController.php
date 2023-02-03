@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Goods;
+use App\Services\GoodsCategoryService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
@@ -20,28 +21,18 @@ class GoodsController extends Controller
     public function list()
     {
         $input = PageInput::new();
-        $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price', 'sales_volume'];
-        $paginate = GoodsService::getInstance()->getList($input, $columns);
-        $goodsList = collect($paginate->items());
-        $list = $goodsList->map(function (Goods $goods) {
-            $goods->image_list = json_decode($goods->image_list);
-            return $goods;
-        });
-        return $this->success($this->paginate($paginate, $list));
+        $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
+        $list = GoodsService::getInstance()->getList($input, $columns);
+        return $this->successPaginate($list);
     }
 
     public function shopGoodsList()
     {
         /** @var ShopGoodsListInput $input */
         $input = ShopGoodsListInput::new();
-        $columns = ['id', 'name', 'video', 'image_list', 'price', 'market_price', 'sales_volume'];
-        $paginate = GoodsService::getInstance()->getShopGoodsList($input, $columns);
-        $goodsList = collect($paginate->items());
-        $list = $goodsList->map(function (Goods $goods) {
-            $goods->image_list = json_decode($goods->image_list);
-            return $goods;
-        });
-        return $this->success($this->paginate($paginate, $list));
+        $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
+        $list = GoodsService::getInstance()->getShopGoodsList($input, $columns);
+        return $this->successPaginate($list);
     }
 
     public function merchantGoodsList()
@@ -49,22 +40,33 @@ class GoodsController extends Controller
         /** @var MerchantGoodsListInput $input */
         $input = MerchantGoodsListInput::new();
 
-        $columns = ['id', 'image_list', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
-        $paginate = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
-        $goodsList = collect($paginate->items());
-        $list = $goodsList->map(function (Goods $goods) {
-            $goods['image'] = json_decode($goods->image_list)[0];
-            unset($goods->image_list);
-            return $goods;
-        });
-        return $this->success($this->paginate($paginate, $list));
+        $columns = ['id', 'image', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
+        $list = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
+        return $this->successPaginate($list);
     }
 
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'video', 'image_list', 'name', 'freight_template_id', 'category_id', 'return_address_id', 'price', 'market_price', 'stock', 'commission_rate', 'detail_image_list', 'spec_list'];
+        $columns = [
+            'id',
+            'image',
+            'video',
+            'image_list',
+            'detail_image_list',
+            'default_spec_image',
+            'name',
+            'freight_template_id',
+            'category_id',
+            'return_address_id',
+            'price',
+            'market_price',
+            'stock',
+            'commission_rate',
+            'spec_list',
+            'sku_list'
+        ];
         $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
@@ -73,6 +75,7 @@ class GoodsController extends Controller
         $goods->image_list = json_decode($goods->image_list);
         $goods->detail_image_list = json_decode($goods->detail_image_list);
         $goods->spec_list = json_decode($goods->spec_list);
+        $goods->sku_list = json_decode($goods->sku_list);
 
         return $this->success($goods);
     }
@@ -81,7 +84,20 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'shop_id', 'video', 'image_list', 'name', 'price', 'market_price', 'stock', 'detail_image_list', 'sku_list'];
+        $columns = [
+            'id',
+            'shop_id',
+            'video',
+            'image_list',
+            'default_spec_image',
+            'name',
+            'price',
+            'market_price',
+            'stock',
+            'detail_image_list',
+            'spec_list',
+            'sku_list'
+        ];
         $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
@@ -89,6 +105,7 @@ class GoodsController extends Controller
 
         $goods->image_list = json_decode($goods->image_list);
         $goods->detail_image_list = json_decode($goods->detail_image_list);
+        $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
         if ($goods->shop_id != 0) {
@@ -116,10 +133,13 @@ class GoodsController extends Controller
         }
         $goods->shop_id = $this->user()->shop_id;
         $goods->user_id = $this->userId();
+        $goods->image = $input->image;
         if (!empty($input->video)) {
             $goods->video = $input->video;
         }
         $goods->image_list = $input->imageList;
+        $goods->detail_image_list = $input->detailImageList;
+        $goods->default_spec_image = $input->defaultSpecImage;
         $goods->name = $input->name;
         $goods->freight_template_id = $input->freightTemplateId;
         $goods->category_id = $input->categoryId;
@@ -149,11 +169,18 @@ class GoodsController extends Controller
         if ($goods->shop_id != $this->user()->shop_id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法编辑');
         }
+        if ($goods->status != 2) {
+            return $this->fail(CodeResponse::FORBIDDEN, '非审核未通过商品，无法编辑');
+        }
 
+        $goods->status = 0;
+        $goods->image = $input->image;
         if (!empty($input->video)) {
             $goods->video = $input->video;
         }
         $goods->image_list = $input->imageList;
+        $goods->detail_image_list = $input->detailImageList;
+        $goods->default_spec_image = $input->defaultSpecImage;
         $goods->name = $input->name;
         $goods->freight_template_id = $input->freightTemplateId;
         $goods->category_id = $input->categoryId;
@@ -182,7 +209,7 @@ class GoodsController extends Controller
         if ($goods->shop_id != $this->user()->shop_id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法上架该商品');
         }
-        if ($goods->status != 2) {
+        if ($goods->status != 3) {
             return $this->fail(CodeResponse::FORBIDDEN, '非下架商品，无法上架');
         }
         $goods->status = 1;
@@ -225,5 +252,11 @@ class GoodsController extends Controller
         $goods->delete();
 
         return $this->success();
+    }
+
+    public function categoryOptions()
+    {
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
+        return $this->success($options);
     }
 }

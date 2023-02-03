@@ -4,8 +4,11 @@ namespace App\Utils\Inputs;
 
 class GoodsAddInput extends BaseInput
 {
+    public $image;
     public $video;
     public $imageList;
+    public $detailImageList;
+    public $defaultSpecImage;
     public $name;
     public $freightTemplateId;
     public $categoryId;
@@ -14,15 +17,17 @@ class GoodsAddInput extends BaseInput
     public $marketPrice;
     public $stock;
     public $commissionRate;
-    public $detailImageList;
     public $specList;
     public $skuList;
 
     public function rules()
     {
         return [
+            'image' => 'required|string',
             'video' => 'string',
             'imageList' => 'required|string',
+            'detailImageList' => 'required|string',
+            'defaultSpecImage' => 'required|string',
             'name' => 'required|string',
             'freightTemplateId' => 'required|integer|digits_between:1,20',
             'categoryId' => 'required|integer|digits_between:1,20',
@@ -31,7 +36,6 @@ class GoodsAddInput extends BaseInput
             'marketPrice' => 'numeric',
             'stock' => 'required|integer',
             'commissionRate' => 'required|numeric',
-            'detailImageList' => 'required|string',
             'specList' => 'required|string',
             'skuList' => 'required|string',
         ];

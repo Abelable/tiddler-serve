@@ -58,6 +58,7 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('goods')->group(function () {
+        Route::get('category_options', 'GoodsController@categoryOptions');
         Route::get('list', 'GoodsController@merchantGoodsList');
         Route::get('detail', 'GoodsController@detail');
         Route::post('add', 'GoodsController@add');

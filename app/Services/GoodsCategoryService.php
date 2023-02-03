@@ -24,6 +24,6 @@ class GoodsCategoryService extends BaseService
 
     public function getCategoryOptions($columns = ['*'])
     {
-        return GoodsCategory::query()->get($columns);
+        return GoodsCategory::query()->orderBy('id', 'asc')->get($columns);
     }
 }
