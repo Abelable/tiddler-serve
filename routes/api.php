@@ -61,7 +61,7 @@ Route::prefix('shop')->group(function () {
         Route::get('category_options', 'GoodsController@categoryOptions');
         Route::get('totals', 'GoodsController@goodsListTotals');
         Route::get('list', 'GoodsController@merchantGoodsList');
-        Route::get('detail', 'GoodsController@detail');
+        Route::get('info', 'GoodsController@goodsInfo');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
         Route::post('up', 'GoodsController@up');

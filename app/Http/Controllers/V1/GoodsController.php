@@ -55,7 +55,7 @@ class GoodsController extends Controller
         return $this->successPaginate($list);
     }
 
-    public function detail()
+    public function goodsInfo()
     {
         $id = $this->verifyRequiredId('id');
 
