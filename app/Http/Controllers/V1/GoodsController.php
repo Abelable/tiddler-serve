@@ -35,6 +35,16 @@ class GoodsController extends Controller
         return $this->successPaginate($list);
     }
 
+    public function goodsListTotals()
+    {
+        return $this->success([
+            GoodsService::getInstance()->getListTotal($this->userId(), 1),
+            GoodsService::getInstance()->getListTotal($this->userId(), 3),
+            GoodsService::getInstance()->getListTotal($this->userId(), 0),
+            GoodsService::getInstance()->getListTotal($this->userId(), 2),
+        ]);
+    }
+
     public function merchantGoodsList()
     {
         /** @var MerchantGoodsListInput $input */
@@ -232,7 +242,7 @@ class GoodsController extends Controller
         if ($goods->status != 1) {
             return $this->fail(CodeResponse::FORBIDDEN, '非售卖中商品，无法下架');
         }
-        $goods->status = 2;
+        $goods->status = 3;
         $goods->save();
 
         return $this->success();

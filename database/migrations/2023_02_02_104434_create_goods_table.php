@@ -21,8 +21,8 @@ class CreateGoodsTable extends Migration
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->string('image')->comment('列表图片');
             $table->string('video')->default('')->comment('主图视频');
-            $table->string('image_list')->comment('主图图片列表');
-            $table->string('detail_image_list')->comment('详情图片列表');
+            $table->longText('image_list')->comment('主图图片列表');
+            $table->longText('detail_image_list')->comment('详情图片列表');
             $table->string('default_spec_image')->comment('默认规格图片');
             $table->string('name')->comment('商品名称');
             $table->integer('freight_template_id')->default(0)->comment('运费模板id：0-包邮');
