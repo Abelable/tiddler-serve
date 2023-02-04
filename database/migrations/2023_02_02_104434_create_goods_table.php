@@ -15,8 +15,8 @@ class CreateGoodsTable extends Migration
     {
         Schema::create('goods', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('shop_id')->comment('店铺id');
+            $table->integer('user_id')->default(0)->comment('用户id');
+            $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->string('image')->comment('列表图片');
