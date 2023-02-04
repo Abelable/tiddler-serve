@@ -9,7 +9,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property string $consignee_name 收货人姓名
  * @property string $mobile 手机号
- * @property string $address 收获地址
+ * @property string $address_detail 收获地址
  * @property string $supplement 补充说明
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -18,7 +18,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress newQuery()
  * @method static \Illuminate\Database\Query\Builder|GoodsReturnAddress onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress query()
- * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress whereAddressDetail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress whereConsigneeName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsReturnAddress whereDeletedAt($value)

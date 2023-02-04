@@ -15,10 +15,10 @@ class CreateGoodsReturnAddressesTable extends Migration
     {
         Schema::create('goods_return_addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
+            $table->integer('user_id')->default(0)->comment('用户id');
             $table->string('consignee_name')->comment('收货人姓名');
             $table->string('mobile')->comment('手机号');
-            $table->string('address')->comment('收获地址');
+            $table->string('address_detail')->comment('收获地址');
             $table->string('supplement')->default('')->comment('补充说明');
             $table->timestamps();
             $table->softDeletes();
