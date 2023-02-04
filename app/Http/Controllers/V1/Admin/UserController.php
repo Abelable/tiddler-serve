@@ -5,11 +5,11 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\UserListInput;
+use App\Utils\Inputs\Admin\UserListInput;
 
 class UserController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function list()
     {

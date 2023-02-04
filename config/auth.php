@@ -40,7 +40,7 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
-        'admin' => [
+        'Admin' => [
             'driver' => 'jwt',
             'provider' => 'admins',
         ],

@@ -10,7 +10,7 @@ use App\Utils\Inputs\PageInput;
 
 class ShopCategoryController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function list()
     {

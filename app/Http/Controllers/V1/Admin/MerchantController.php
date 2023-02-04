@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function list()
     {

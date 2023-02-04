@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Utils\Inputs;
+namespace App\Utils\Inputs\Admin;
+
+use App\Utils\Inputs\PageInput;
 
 class ShopListInput extends PageInput
 {

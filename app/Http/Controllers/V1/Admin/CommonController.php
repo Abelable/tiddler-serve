@@ -7,7 +7,7 @@ use App\Utils\AliOssServe;
 
 class CommonController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function ossConfig()
     {

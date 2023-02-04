@@ -6,14 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Services\Admin\AdminService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\AdminAddInput;
-use App\Utils\Inputs\AdminEditInput;
-use App\Utils\Inputs\AdminListInput;
+use App\Utils\Inputs\Admin\AdminAddInput;
+use App\Utils\Inputs\Admin\AdminEditInput;
+use App\Utils\Inputs\Admin\AdminListInput;
 use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function list()
     {

@@ -4,7 +4,7 @@ namespace App\Services\Admin;
 
 use App\Models\Admin;
 use App\Services\BaseService;
-use App\Utils\Inputs\AdminListInput;
+use App\Utils\Inputs\Admin\AdminListInput;
 
 class AdminService extends BaseService
 {

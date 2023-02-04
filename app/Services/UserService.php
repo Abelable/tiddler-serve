@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Utils\Inputs\UserListInput;
+use App\Utils\Inputs\Admin\UserListInput;
 use App\Utils\Inputs\WxMpRegisterInput;
 
 class UserService extends BaseService

@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Utils\Inputs;
+namespace App\Utils\Inputs\Admin;
 
-class AdminAddInput extends BaseInput
+use App\Utils\Inputs\BaseInput;
+
+class AdminEditInput extends BaseInput
 {
+    public $id;
     public $avatar;
     public $nickname;
-    public $account;
-    public $password;
     public $roleId;
 
     public function rules()
     {
         return [
+            'id' => 'required|integer|digits_between:1,20',
             'avatar' => 'string',
             'nickname' => 'string',
-            'account' => 'required|string',
-            'password' => 'required|string',
             'roleId' => 'required|integer|digits_between:1,20',
         ];
     }

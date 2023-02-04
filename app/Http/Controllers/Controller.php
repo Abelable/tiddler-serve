@@ -62,7 +62,7 @@ class Controller extends BaseController
      */
     public function admin()
     {
-        return Auth::guard('admin')->user();
+        return Auth::guard('Admin')->user();
     }
 
 

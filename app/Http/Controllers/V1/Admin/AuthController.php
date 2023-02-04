@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
     protected $only = ['info'];
 
     public function login()
@@ -29,23 +29,23 @@ class AuthController extends Controller
             return $this->fail(CodeResponse::INVALID_ACCOUNT);
         }
 
-        $token = Auth::guard('admin')->login($admin);
+        $token = Auth::guard('Admin')->login($admin);
         return $this->success($token);
     }
 
     public function logout()
     {
-        Auth::guard('admin')->logout();
+        Auth::guard('Admin')->logout();
         return $this->success();
     }
 
     public function refreshToken() {
         try {
-            $token = Auth::guard('admin')->refresh();
+            $token = Auth::guard('Admin')->refresh();
 
             // 由于删除用户之后，鉴权失败，但刷新token依旧有效，暂未找到解决办法，因此增加这一层校验
             try {
-                Auth::guard('admin')->userOrFail();
+                Auth::guard('Admin')->userOrFail();
             } catch (\Exception $e) {
                 throw new BusinessException(CodeResponse::FORBIDDEN, 'token失效，请重新登录');
             }

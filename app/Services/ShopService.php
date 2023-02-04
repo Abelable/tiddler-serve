@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Shop;
-use App\Utils\Inputs\ShopListInput;
+use App\Utils\Inputs\Admin\ShopListInput;
 
 class ShopService extends BaseService
 {

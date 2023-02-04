@@ -5,11 +5,11 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ShopListInput;
+use App\Utils\Inputs\Admin\ShopListInput;
 
 class ShopController extends Controller
 {
-    protected $guard = 'admin';
+    protected $guard = 'Admin';
 
     public function list()
     {

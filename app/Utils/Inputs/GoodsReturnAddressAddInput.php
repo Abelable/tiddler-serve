@@ -6,7 +6,7 @@ class GoodsReturnAddressAddInput extends BaseInput
 {
     public $consigneeName;
     public $mobile;
-    public $address;
+    public $addressDetail;
     public $supplement;
 
     public function rules()
@@ -14,7 +14,7 @@ class GoodsReturnAddressAddInput extends BaseInput
         return [
             'consigneeName' => 'required|string',
             'mobile' => 'required|string',
-            'address' => 'required|string',
+            'addressDetail' => 'required|string',
             'supplement' => 'string',
         ];
     }

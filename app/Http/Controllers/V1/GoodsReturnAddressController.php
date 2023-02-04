@@ -35,7 +35,7 @@ class GoodsReturnAddressController extends Controller
         $address->user_id = $this->userId();
         $address->consignee_name = $input->consigneeName;
         $address->mobile = $input->mobile;
-        $address->address = $input->address;
+        $address->address_detail = $input->addressDetail;
         if (!empty($input->supplement)) {
             $address->supplement = $input->supplement;
         }
@@ -56,7 +56,7 @@ class GoodsReturnAddressController extends Controller
 
         $address->consignee_name = $input->consigneeName;
         $address->mobile = $input->mobile;
-        $address->address = $input->address;
+        $address->address_detail = $input->addressDetail;
         if (!empty($input->supplement)) {
             $address->supplement = $input->supplement;
         }
