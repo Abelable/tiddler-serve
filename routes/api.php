@@ -152,7 +152,15 @@ Route::namespace('Admin')->prefix('Admin')->group(function () {
             Route::get('options', 'GoodsCategoryController@options');
         });
 
-        Route::post('list', 'ShopController@list');
-        Route::get('detail', 'ShopController@detail');
+        Route::post('list', 'GoodsController@list');
+        Route::get('detail', 'GoodsController@detail');
+        Route::get('owner_list', 'GoodsController@ownerList');
+        Route::get('owner_detail', 'GoodsController@ownerDetail');
+        Route::post('up', 'GoodsController@up');
+        Route::post('down', 'GoodsController@down');
+        Route::post('reject', 'GoodsController@reject');
+        Route::post('delete', 'GoodsController@delete');
+        Route::post('add', 'GoodsController@add');
+        Route::post('edit', 'GoodsController@edit');
     });
 });

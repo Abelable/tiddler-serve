@@ -16,7 +16,7 @@ class GoodsController extends Controller
 {
     protected $guard = 'Admin';
 
-    public function goodsList()
+    public function list()
     {
         $input = GoodsListInput::new();
         $columns = ['id', 'image', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
@@ -49,7 +49,7 @@ class GoodsController extends Controller
         return $this->success($goods);
     }
 
-    public function approved()
+    public function up()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -92,7 +92,7 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function ownerGoodsList()
+    public function ownerList()
     {
         $input = GoodsListInput::new();
         $columns = ['id', 'image', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
@@ -114,7 +114,7 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function ownerGoodsDetail()
+    public function ownerDetail()
     {
         $id = $this->verifyRequiredId('id');
         $goods = GoodsService::getInstance()->getGoodsById($id);
