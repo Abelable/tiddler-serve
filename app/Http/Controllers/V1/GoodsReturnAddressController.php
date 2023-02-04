@@ -13,7 +13,7 @@ class GoodsReturnAddressController extends Controller
 {
     public function list()
     {
-        $columns = ['id', 'consignee_name', 'mobile', 'address'];
+        $columns = ['id', 'consignee_name', 'mobile', 'address_detail'];
         $list = GoodsReturnAddressService::getInstance()->getListByUserId($this->userId(), $columns);
         return $this->success($list);
     }
