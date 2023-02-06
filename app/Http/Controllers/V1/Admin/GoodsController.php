@@ -19,7 +19,20 @@ class GoodsController extends Controller
     public function list()
     {
         $input = GoodsListInput::new();
-        $columns = ['id', 'image', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
+        $columns = [
+            'id',
+            'image',
+            'name',
+            'category_id',
+            'price',
+            'stock',
+            'commission_rate',
+            'sales_volume',
+            'status',
+            'failure_reason',
+            'created_at',
+            'updated_at'
+        ];
         $list = GoodsService::getInstance()->getMerchantGoodsList($input, $columns);
         return $this->successPaginate($list);
     }
@@ -43,6 +56,8 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
 
+        unset($shop->merchant_id);
+        unset($goods->shop_id);
         $goods['shop_info'] = $shop;
         $goods['merchant_info'] = $merchant;
 

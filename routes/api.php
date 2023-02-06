@@ -80,7 +80,7 @@ Route::prefix('wx')->group(function () {
 | 管理后台接口
 |--------------------------------------------------------------------------
 */
-Route::namespace('Admin')->prefix('Admin')->group(function () {
+Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::get('oss_config', 'CommonController@ossConfig');
 
     Route::prefix('auth')->group(function () {

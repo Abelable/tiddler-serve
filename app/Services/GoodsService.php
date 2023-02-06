@@ -48,7 +48,9 @@ class GoodsService extends BaseService
 
     public function getMerchantGoodsList(GoodsListInput $input, $columns=['*'])
     {
-        $query = Goods::query()->where('shop_id', '!=', 0);
+        $query = Goods::query()
+            ->where('shop_id', '!=', 0)
+            ->whereIn('status', [0, 1, 2]);
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
