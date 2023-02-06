@@ -36,6 +36,11 @@ class ShopService extends BaseService
         return Shop::query()->find($id, $columns);
     }
 
+    public function getShopListByIds(array $ids)
+    {
+        return Shop::query()->whereIn('id', $ids)->get();
+    }
+
     public function getShopByUserId(int $userId, $columns = ['*'])
     {
         return Shop::query()->where('user_id', $userId)->first($columns);

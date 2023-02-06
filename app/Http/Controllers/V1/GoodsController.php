@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Goods;
+use App\Models\Shop;
 use App\Services\GoodsCategoryService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
@@ -12,7 +13,6 @@ use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\ShopGoodsListInput;
 
 class GoodsController extends Controller
 {
@@ -20,18 +20,33 @@ class GoodsController extends Controller
 
     public function list()
     {
+        $categoryId = $this->verifyRequiredId('categoryId');
         $input = PageInput::new();
+
         $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $list = GoodsService::getInstance()->getList($input, $columns);
-        return $this->successPaginate($list);
+        $page = GoodsService::getInstance()->getListByCategoryId($categoryId, $input, $columns);
+        $goodsList = collect($page->items());
+        $shopIds = $goodsList->pluck('shop_id')->toArray();
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+        $list = $goodsList->map(function (Goods $goods) use ($shopList) {
+            if ($goods->shop_id != 0) {
+                /** @var Shop $shop */
+                $shop = $shopList->get($goods->shop_id);
+                $goods['shop_info'] = $shop;
+            }
+            unset($goods->shop_id);
+            return $goods;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function shopGoodsList()
     {
-        /** @var ShopGoodsListInput $input */
-        $input = ShopGoodsListInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $input = PageInput::new();
         $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $list = GoodsService::getInstance()->getShopGoodsList($input, $columns);
+        $list = GoodsService::getInstance()->getGoodsListByShopId($shopId, $input, $columns);
         return $this->successPaginate($list);
     }
 

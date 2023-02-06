@@ -58,7 +58,6 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('goods')->group(function () {
-        Route::get('category_options', 'GoodsController@categoryOptions');
         Route::get('totals', 'GoodsController@goodsListTotals');
         Route::get('list', 'GoodsController@merchantGoodsList');
         Route::get('info', 'GoodsController@goodsInfo');
@@ -68,6 +67,11 @@ Route::prefix('shop')->group(function () {
         Route::post('down', 'GoodsController@down');
         Route::post('delete', 'GoodsController@delete');
     });
+});
+
+Route::prefix('goods')->group(function () {
+    Route::get('category_options', 'GoodsController@categoryOptions');
+    Route::get('list', 'GoodsController@list');
 });
 
 Route::prefix('wx')->group(function () {

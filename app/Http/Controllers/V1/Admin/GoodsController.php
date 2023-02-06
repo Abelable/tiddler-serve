@@ -41,17 +41,49 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
+        $goodsColumns = [
+            'id',
+            'shop_id',
+            'image',
+            'name',
+            'category_id',
+            'price',
+            'stock',
+            'commission_rate',
+            'sales_volume',
+            'status',
+            'failure_reason',
+            'created_at',
+            'updated_at'
+        ];
+        $goods = GoodsService::getInstance()->getGoodsById($id, $goodsColumns);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $shop = ShopService::getInstance()->getShopById($goods->shop_id);
+        $shopColumns = [
+            'id',
+            'merchant_id',
+            'avatar',
+            'name',
+            'category_id',
+            'created_at',
+            'updated_at'
+        ];
+        $shop = ShopService::getInstance()->getShopById($goods->shop_id, $shopColumns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
 
-        $merchant = MerchantService::getInstance()->getMerchantById($shop->merchant_id);
+        $merchantColumns = [
+            'id',
+            'type',
+            'name',
+            'mobile',
+            'created_at',
+            'updated_at'
+        ];
+        $merchant = MerchantService::getInstance()->getMerchantById($shop->merchant_id, $merchantColumns);
         if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }

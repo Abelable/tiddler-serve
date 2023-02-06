@@ -6,16 +6,19 @@ use App\Models\Goods;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\ShopGoodsListInput;
 
 class GoodsService extends BaseService
 {
-    public function getList(PageInput $input, $columns=['*'])
+    public function getListByCategoryId($categoryId, PageInput $input, $columns=['*'])
     {
-        return Goods::query()
-            ->where('status', 1)
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+        $query = Goods::query()->where('status', 1);
+        if (!empty($categoryId)) {
+            $query = $query->where('category_id', $categoryId);
+        }
+        return $query
+                ->orderBy('sales_volume', 'desc')
+                ->orderBy($input->sort, $input->order)
+                ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getListTotal($userId, $status)
@@ -23,11 +26,11 @@ class GoodsService extends BaseService
         return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
-    public function getShopGoodsList(ShopGoodsListInput $input, $columns=['*'])
+    public function getGoodsListByShopId($shopId, PageInput $input, $columns=['*'])
     {
         return Goods::query()
             ->where('status', 1)
-            ->where('shop_id', $input->shopId)
+            ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
@@ -57,7 +60,7 @@ class GoodsService extends BaseService
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
-        if (!empty($input->status)) {
+        if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
