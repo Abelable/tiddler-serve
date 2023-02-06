@@ -27,7 +27,7 @@ class GoodsController extends Controller
         $page = GoodsService::getInstance()->getListByCategoryId($categoryId, $input, $columns);
         $goodsList = collect($page->items());
         $shopIds = $goodsList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
         $list = $goodsList->map(function (Goods $goods) use ($shopList) {
             if ($goods->shop_id != 0) {
                 /** @var Shop $shop */
