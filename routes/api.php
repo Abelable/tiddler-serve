@@ -76,6 +76,10 @@ Route::prefix('goods')->group(function () {
     Route::get('detail', 'GoodsController@detail');
 });
 
+Route::prefix('cart')->group(function () {
+    Route::post('add', 'CartController@add');
+});
+
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
 });

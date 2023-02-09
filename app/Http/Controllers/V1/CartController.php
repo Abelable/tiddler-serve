@@ -108,7 +108,7 @@ class CartController extends Controller
             $cart->user_id = $this->userId();
             $cart->shop_id = $goods->shop_id;
             $cart->goods_id = $goods->id;
-            $cart->goods_category_id = $goods->goods_category_id;
+            $cart->goods_category_id = $goods->category_id;
             $cart->goods_image = $goods->image;
             $cart->goods_name = $goods->name;
             if ($selectedSkuIndex != -1 && count($skuList) != 0) {
