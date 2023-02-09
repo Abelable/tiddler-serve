@@ -37,7 +37,7 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'ShopController@deleteMerchant');
     });
 
-    Route::get('shop_info', 'ShopController@shopInfo');
+    Route::get('info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
     Route::get('express_options', 'ShopController@expressOptions');
 
@@ -57,6 +57,7 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'GoodsReturnAddressController@delete');
     });
 
+    Route::get('goods_list', 'GoodsController@shopGoodsList');
     Route::prefix('goods')->group(function () {
         Route::get('totals', 'GoodsController@goodsListTotals');
         Route::get('list', 'GoodsController@merchantGoodsList');
@@ -72,6 +73,7 @@ Route::prefix('shop')->group(function () {
 Route::prefix('goods')->group(function () {
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
+    Route::get('detail', 'GoodsController@detail');
 });
 
 Route::prefix('wx')->group(function () {

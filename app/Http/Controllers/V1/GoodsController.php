@@ -16,7 +16,13 @@ use App\Utils\Inputs\PageInput;
 
 class GoodsController extends Controller
 {
-    protected $except = ['list', 'info'];
+    protected $except = ['categoryOptions', 'list', 'detail'];
+
+    public function categoryOptions()
+    {
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
+        return $this->success($options);
+    }
 
     public function list()
     {
@@ -26,6 +32,67 @@ class GoodsController extends Controller
         $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $page = GoodsService::getInstance()->getListByCategoryId($categoryId, $input, $columns);
         $goodsList = collect($page->items());
+        $list = $this->addShopInfoToGoodsList($goodsList);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function detail()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $columns = [
+            'id',
+            'shop_id',
+            'category_id',
+            'image',
+            'video',
+            'image_list',
+            'default_spec_image',
+            'name',
+            'price',
+            'market_price',
+            'stock',
+            'sales_volume',
+            'detail_image_list',
+            'spec_list',
+            'sku_list'
+        ];
+        $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $goods->image_list = json_decode($goods->image_list);
+        $goods->detail_image_list = json_decode($goods->detail_image_list);
+        $goods->spec_list = json_decode($goods->spec_list);
+        $goods->sku_list = json_decode($goods->sku_list);
+
+        $goods['recommend_goods_list'] = $this->getRecommendGoodsList($id, $goods->category_id);
+        unset($goods->category_id);
+
+        if ($goods->shop_id != 0) {
+            $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'avatar', 'name']);
+            if (is_null($shopInfo)) {
+                return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
+            }
+            $shopInfo['goods_list'] = GoodsService::getInstance()->getTopListByShopId($id, $goods->shop_id, 6, ['id', 'image', 'name', 'price']);
+            $goods['shop_info'] = $shopInfo;
+        }
+        unset($goods->shop_id);
+
+        return $this->success($goods);
+    }
+
+    private function getRecommendGoodsList($goodsId, $categoryId)
+    {
+        $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
+        $goodsList = GoodsService::getInstance()->getTopListByCategoryIds([$goodsId], [$categoryId], 10, $columns);
+        return $this->addShopInfoToGoodsList($goodsList);
+    }
+
+    private function addShopInfoToGoodsList($goodsList)
+    {
         $shopIds = $goodsList->pluck('shop_id')->toArray();
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
         $list = $goodsList->map(function (Goods $goods) use ($shopList) {
@@ -37,8 +104,7 @@ class GoodsController extends Controller
             unset($goods->shop_id);
             return $goods;
         });
-
-        return $this->success($this->paginate($page, $list));
+        return $list;
     }
 
     public function shopGoodsList()
@@ -101,47 +167,6 @@ class GoodsController extends Controller
         $goods->detail_image_list = json_decode($goods->detail_image_list);
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
-
-        return $this->success($goods);
-    }
-
-    public function info()
-    {
-        $id = $this->verifyRequiredId('id');
-
-        $columns = [
-            'id',
-            'shop_id',
-            'video',
-            'image_list',
-            'default_spec_image',
-            'name',
-            'price',
-            'market_price',
-            'stock',
-            'detail_image_list',
-            'spec_list',
-            'sku_list'
-        ];
-        $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-
-        $goods->image_list = json_decode($goods->image_list);
-        $goods->detail_image_list = json_decode($goods->detail_image_list);
-        $goods->spec_list = json_decode($goods->spec_list);
-        $goods->sku_list = json_decode($goods->sku_list);
-
-        if ($goods->shop_id != 0) {
-            $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'avatar', 'name']);
-            if (is_null($shopInfo)) {
-                return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
-            }
-            $goods['shop_info'] = $shopInfo;
-        }
-
-        unset($goods->shop_id);
 
         return $this->success($goods);
     }
@@ -278,11 +303,5 @@ class GoodsController extends Controller
         $goods->delete();
 
         return $this->success();
-    }
-
-    public function categoryOptions()
-    {
-        $options = GoodsCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
-        return $this->success($options);
     }
 }

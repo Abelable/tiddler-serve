@@ -21,6 +21,35 @@ class GoodsService extends BaseService
                 ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getTopListByCategoryIds(array $goodsIds, array $categoryIds, $limit, $columns=['*'])
+    {
+        $query = Goods::query()->where('status', 1);
+
+        if (!empty($categoryIds)) {
+            $query = $query->whereIn('category_id', $categoryIds);
+        }
+        if (!empty($goodsIds)) {
+            $query = $query->whereNotIn('id', $goodsIds);
+        }
+        return $query
+                ->orderBy('sales_volume', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->take($limit)
+                ->get($columns);
+    }
+
+    public function getTopListByShopId($goodsId, $shopId, $limit, $columns=['*'])
+    {
+        return Goods::query()
+            ->where('status', 1)
+            ->where('shop_id', $shopId)
+            ->where('id', '!=', $goodsId)
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get($columns);
+    }
+
     public function getListTotal($userId, $status)
     {
         return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
@@ -31,6 +60,7 @@ class GoodsService extends BaseService
         return Goods::query()
             ->where('status', 1)
             ->where('shop_id', $shopId)
+            ->orderBy('sales_volume', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

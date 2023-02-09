@@ -12,13 +12,16 @@ class CodeResponse
     const PARAM_ILLEGAL = [200, 10007, '参数值错误'];
     const PARAM_VALUE_INVALID = [200, 10008, '参数值类型错误'];
     const PARAM_VALUE_ILLEGAL = [200, 10009, '参数值错误'];
-    const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
 
+    const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
+    const CART_INVALID_OPERATION = [200, 10010, '购物车操作失败'];
 
     const PARAM_MISSING = [400, 10004, '缺少参数'];
     const UNAUTHORIZED = [401, 10001, '未授权'];
+
     const FORBIDDEN = [403, 10002, '禁止访问'];
     const INVALID_ACCOUNT = [403, 10003, '账号或密码错误'];
+
     const NOT_FOUND = [404, 10003, '数据不存在'];
 
     const UPDATED_FAIL = [505, 10000, '数据更新失败'];
