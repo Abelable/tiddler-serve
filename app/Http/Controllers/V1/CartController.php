@@ -95,6 +95,13 @@ class CartController extends Controller
                 })
             ];
         });
+        if (in_array(0, $shopIds)) {
+            $cartList->push([
+                'goodsList' => $cartGoodsList->filter(function (Cart $cart) {
+                    return $cart->shop_id == 0;
+                })
+            ]);
+        }
 
         $goodsColumns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $recommendGoodsList = GoodsService::getInstance()->getTopListByCategoryIds($goodsIds, $goodsCategoryIds, 10, $goodsColumns);
