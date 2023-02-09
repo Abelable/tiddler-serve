@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Services\CartService;
 use App\Services\GoodsService;
+use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CartAddInput;
 use App\Utils\Inputs\CartEditInput;
@@ -20,6 +21,9 @@ class CartController extends Controller
 
     public function list()
     {
+        $list = CartService::getInstance()->cartList($this->userId());
+        $shopIds = array_unique($list->pluck('shop_id')->toArray());
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
 
     }
 
@@ -40,6 +44,7 @@ class CartController extends Controller
             $cart->user_id = $this->userId();
             $cart->shop_id = $goods->shop_id;
             $cart->goods_id = $goods->id;
+            $cart->goods_category_id = $goods->goods_category_id;
             $cart->goods_image = $goods->image;
             $cart->goods_name = $goods->name;
             if ($selectedSkuIndex != -1 && count($skuList) != 0) {
@@ -72,6 +77,10 @@ class CartController extends Controller
         $this->validateCartGoodsStatus($input->goodsId, $selectedSkuIndex, $number);
 
         $cart = CartService::getInstance()->getCartById($input->id);
+        if ($cart->status != 1) {
+            return $this->fail(CodeResponse::CART_INVALID_OPERATION, '购物车商品已失效，无法编辑');
+        }
+
         $cart->selected_sku_index = $selectedSkuIndex;
         $cart->number = $number;
         $cart->save();

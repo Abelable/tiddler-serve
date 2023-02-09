@@ -11,6 +11,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $shop_id 商品所属店铺id
  * @property int $goods_id 商品id
+ * @property int $goods_category_id 商品分类id
  * @property string $goods_image 商品图片
  * @property string $goods_name 商品名称
  * @property string $selected_sku_name 选中的规格名称
@@ -27,6 +28,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart query()
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereGoodsCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereGoodsImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereGoodsName($value)

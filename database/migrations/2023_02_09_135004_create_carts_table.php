@@ -20,6 +20,7 @@ class CreateCartsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('shop_id')->comment('商品所属店铺id');
             $table->integer('goods_id')->comment('商品id');
+            $table->integer('goods_category_id')->comment('商品分类id');
             $table->string('goods_image')->comment('商品图片');
             $table->string('goods_name')->comment('商品名称');
             $table->string('selected_sku_name')->default('')->comment('选中的规格名称');
