@@ -48,19 +48,25 @@ class CartController extends Controller
             /** @var Goods $goods */
             $goods = $goodsList->get($cart->goods_id);
             if (is_null($goods) || $goods->status != 1) {
-                $cart->status = 2;
+                $cart->status = 3;
                 $cart->status_desc = '商品已下架';
                 $cart->save();
                 return $cart;
             }
-            if ($cart->selected_sku_index == -1 && $cart->number > $goods->stock) {
-                if ($goods->stock != 0) {
-                    $cart->number = $goods->stock;
+            if ($cart->selected_sku_index == -1) {
+                if ($cart->number > $goods->stock) {
+                    if ($goods->stock != 0) {
+                        $cart->number = $goods->stock;
+                        $cart->save();
+                        $cart['stock'] = $goods->stock;
+                    } else {
+                        $cart->status = 3;
+                        $cart->status_desc = '商品暂无库存';
+                        $cart->save();
+                    }
                 } else {
-                    $cart->status = 2;
-                    $cart->status_desc = '商品库存不足';
+                    $cart['stock'] = $goods->stock;
                 }
-                $cart->save();
                 return $cart;
             }
             if ($cart->selected_sku_index != -1) {
@@ -76,14 +82,16 @@ class CartController extends Controller
                     if ($sku->stock != 0) {
                         $cart->number = $sku->stock;
                         $cart->save();
+                        $cart['stock'] = $sku->stock;
                     } else {
                         $cart->status = 2;
-                        $cart->status_desc = '当前规格库存不足';
+                        $cart->status_desc = '当前规格暂无库存';
                     }
-                    return $cart;
+                } else {
+                    $cart['stock'] = $sku->stock;
                 }
+                return $cart;
             }
-            return $cart;
         });
 
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
