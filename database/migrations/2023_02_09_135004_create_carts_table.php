@@ -27,7 +27,7 @@ class CreateCartsTable extends Migration
             $table->integer('selected_sku_index')->default(-1)->comment('选中的规格索引');
             $table->float('price')->comment('商品价格');
             $table->float('market_price')->default(0)->comment('市场价格');
-            $table->integer('number')->comment('商品id');
+            $table->integer('number')->comment('商品数量');
             $table->timestamps();
             $table->softDeletes();
         });
