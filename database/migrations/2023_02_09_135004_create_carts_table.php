@@ -22,8 +22,8 @@ class CreateCartsTable extends Migration
             $table->integer('goods_id')->comment('商品id');
             $table->string('goods_image')->comment('商品图片');
             $table->string('goods_name')->comment('商品名称');
-            $table->string('selected_spec_desc')->comment('选中的规格描述');
-            $table->integer('selected_sku_index')->comment('选中的sku索引');
+            $table->string('selected_sku_name')->default('')->comment('选中的规格名称');
+            $table->integer('selected_sku_index')->default(-1)->comment('选中的规格索引');
             $table->float('price')->comment('商品价格');
             $table->float('market_price')->default(0)->comment('市场价格');
             $table->integer('number')->comment('商品id');

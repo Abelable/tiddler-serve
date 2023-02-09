@@ -13,8 +13,8 @@ namespace App\Models;
  * @property int $goods_id 商品id
  * @property string $goods_image 商品图片
  * @property string $goods_name 商品名称
- * @property string $selected_spec_desc 选中的规格描述
- * @property int $selected_sku_index 选中的sku索引
+ * @property string $selected_sku_name 选中的规格名称
+ * @property int $selected_sku_index 选中的规格索引
  * @property float $price 商品价格
  * @property float $market_price 市场价格
  * @property int $number 商品id
@@ -35,7 +35,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSelectedSkuIndex($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSelectedSpecDesc($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSelectedSkuName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereStatusDesc($value)
