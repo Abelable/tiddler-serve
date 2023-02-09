@@ -18,7 +18,7 @@ namespace App\Models;
  * @property int $selected_sku_index 选中的规格索引
  * @property float $price 商品价格
  * @property float $market_price 市场价格
- * @property int $number 商品id
+ * @property int $number 商品数量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
