@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Goods;
-use App\Models\Shop;
 use App\Services\GoodsCategoryService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
@@ -32,7 +31,7 @@ class GoodsController extends Controller
         $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $page = GoodsService::getInstance()->getListByCategoryId($categoryId, $input, $columns);
         $goodsList = collect($page->items());
-        $list = $this->addShopInfoToGoodsList($goodsList);
+        $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
 
         return $this->success($this->paginate($page, $list));
     }
@@ -68,7 +67,7 @@ class GoodsController extends Controller
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
-        $goods['recommend_goods_list'] = $this->getRecommendGoodsList($id, $goods->category_id);
+        $goods['recommend_goods_list'] = GoodsService::getInstance()->getRecommendGoodsList([$id], [$goods->category_id]);
         unset($goods->category_id);
 
         if ($goods->shop_id != 0) {
@@ -82,29 +81,6 @@ class GoodsController extends Controller
         unset($goods->shop_id);
 
         return $this->success($goods);
-    }
-
-    private function getRecommendGoodsList($goodsId, $categoryId)
-    {
-        $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $goodsList = GoodsService::getInstance()->getTopListByCategoryIds([$goodsId], [$categoryId], 10, $columns);
-        return $this->addShopInfoToGoodsList($goodsList);
-    }
-
-    private function addShopInfoToGoodsList($goodsList)
-    {
-        $shopIds = $goodsList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
-        $list = $goodsList->map(function (Goods $goods) use ($shopList) {
-            if ($goods->shop_id != 0) {
-                /** @var Shop $shop */
-                $shop = $shopList->get($goods->shop_id);
-                $goods['shop_info'] = $shop;
-            }
-            unset($goods->shop_id);
-            return $goods;
-        });
-        return $list;
     }
 
     public function shopGoodsList()

@@ -111,8 +111,7 @@ class CartController extends Controller
             ]);
         }
 
-        $goodsColumns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $recommendGoodsList = GoodsService::getInstance()->getTopListByCategoryIds($goodsIds, $goodsCategoryIds, 10, $goodsColumns);
+        $recommendGoodsList = GoodsService::getInstance()->getRecommendGoodsList($goodsIds, $goodsCategoryIds);
 
         return $this->success([
             'cartList' => $cartList,

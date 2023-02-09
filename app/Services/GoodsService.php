@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Goods;
+use App\Models\Shop;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
@@ -114,5 +115,33 @@ class GoodsService extends BaseService
             $query = $query->where('status', $input->status);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getRecommendGoodsList
+    (
+        $goodsIds,
+        $categoryIds,
+        $limit = 10,
+        $columns=['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume']
+    )
+    {
+        $goodsList = $this->getTopListByCategoryIds($goodsIds, $categoryIds, $limit, $columns);
+        return $this->addShopInfoToGoodsList($goodsList);
+    }
+
+    public function addShopInfoToGoodsList($goodsList)
+    {
+        $shopIds = $goodsList->pluck('shop_id')->toArray();
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
+        $list = $goodsList->map(function (Goods $goods) use ($shopList) {
+            if ($goods->shop_id != 0) {
+                /** @var Shop $shop */
+                $shop = $shopList->get($goods->shop_id);
+                $goods['shop_info'] = $shop;
+            }
+            unset($goods->shop_id);
+            return $goods;
+        });
+        return $list;
     }
 }
