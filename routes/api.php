@@ -78,6 +78,7 @@ Route::prefix('goods')->group(function () {
 
 Route::prefix('cart')->group(function () {
     Route::post('add', 'CartController@add');
+    Route::get('list', 'CartController@list');
 });
 
 Route::prefix('wx')->group(function () {

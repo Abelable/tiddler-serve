@@ -23,13 +23,27 @@ class CartController extends Controller
 
     public function list()
     {
-        $cartColumns = ['id', 'goods_id', 'shop_id', 'goods_category_id', 'goods_image', 'goods_name', 'selected_sku_name', 'selected_sku_index', 'price', 'market_price', 'number'];
+        $cartColumns = [
+            'id',
+            'status',
+            'status_desc',
+            'goods_id',
+            'shop_id',
+            'goods_category_id',
+            'goods_image',
+            'goods_name',
+            'selected_sku_name',
+            'selected_sku_index',
+            'price',
+            'market_price',
+            'number'
+        ];
         $list = CartService::getInstance()->cartList($this->userId(), $cartColumns);
         $goodsIds = array_unique($list->pluck('goods_id')->toArray());
         $goodsCategoryIds = array_unique($list->pluck('goods_category_id')->toArray());
         $shopIds = array_unique($list->pluck('shop_id')->toArray());
 
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds);
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds)->keyBy('id');
         $cartGoodsList = $list->map(function (Cart $cart) use ($goodsList) {
             /** @var Goods $goods */
             $goods = $goodsList->get($cart->goods_id);
@@ -37,6 +51,7 @@ class CartController extends Controller
                 $cart->status = 2;
                 $cart->status_desc = '商品已下架';
                 $cart->save();
+                return $cart;
             }
             if ($cart->selected_sku_index == -1 && $cart->number > $goods->stock) {
                 if ($goods->stock != 0) {
@@ -46,6 +61,7 @@ class CartController extends Controller
                     $cart->status_desc = '商品库存不足';
                 }
                 $cart->save();
+                return $cart;
             }
             if ($cart->selected_sku_index != -1) {
                 $skuList = json_decode($goods->sku_list);
@@ -54,6 +70,7 @@ class CartController extends Controller
                     $cart->status = 2;
                     $cart->status_desc = '商品规格不存在';
                     $cart->save();
+                    return $cart;
                 }
                 if ($cart->number > $sku->stock) {
                     if ($sku->stock != 0) {
@@ -62,22 +79,19 @@ class CartController extends Controller
                     } else {
                         $cart->status = 2;
                         $cart->status_desc = '当前规格库存不足';
-                        return $cart;
                     }
+                    return $cart;
                 }
             }
-            unset($cart->shop_id);
-            unset($cart->goods_category_id);
-            unset($cart->selected_sku_index);
             return $cart;
         });
 
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
         $cartList = $shopList->map(function (Shop $shop) use ($cartGoodsList) {
             return [
-                'shop_info' => $shop,
-                'goods_list' => array_filter($cartGoodsList, function (Goods $goods) use ($shop) {
-                    return $goods->shop_id == $shop->id;
+                'shopInfo' => $shop,
+                'goodsList' => $cartGoodsList->filter(function (Cart $cart) use ($shop) {
+                    return $cart->shop_id == $shop->id;
                 })
             ];
         });
@@ -86,8 +100,8 @@ class CartController extends Controller
         $recommendGoodsList = GoodsService::getInstance()->getTopListByCategoryIds($goodsIds, $goodsCategoryIds, 10, $goodsColumns);
 
         return $this->success([
-            'cart_list' => $cartList,
-            'recommend_goods_list' => $recommendGoodsList
+            'cartList' => $cartList,
+            'recommendGoodsList' => $recommendGoodsList
         ]);
     }
 

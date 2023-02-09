@@ -79,7 +79,7 @@ class GoodsService extends BaseService
         return Goods::query()->find($id, $columns);
     }
 
-    public function getGoodsListByIds(arr $ids, $columns=['*'])
+    public function getGoodsListByIds($ids, $columns=['*'])
     {
         return Goods::query()->whereIn('id', $ids)->get($columns);
     }
