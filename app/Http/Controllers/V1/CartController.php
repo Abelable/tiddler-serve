@@ -151,7 +151,7 @@ class CartController extends Controller
         }
         $cart->save();
 
-        return  $this->goodsNumber();
+        return $this->goodsNumber();
     }
 
     public function edit()
@@ -161,7 +161,7 @@ class CartController extends Controller
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        $cart = CartService::getInstance()->getExistCart($input->goodsId, $selectedSkuIndex);
+        $cart = CartService::getInstance()->getExistCart($input->goodsId, $selectedSkuIndex, $input->id);
         if (!is_null($cart)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
@@ -169,6 +169,9 @@ class CartController extends Controller
         $this->validateCartGoodsStatus($input->goodsId, $selectedSkuIndex, $number);
 
         $cart = CartService::getInstance()->getCartById($input->id);
+        if (is_null($cart)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '购物车中未添加该商品');
+        }
         if ($cart->status != 1) {
             return $this->fail(CodeResponse::CART_INVALID_OPERATION, '购物车商品已失效，无法编辑');
         }
@@ -177,7 +180,7 @@ class CartController extends Controller
         $cart->number = $number;
         $cart->save();
 
-        return  $this->goodsNumber();
+        return $this->list();
     }
 
     private function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
@@ -199,5 +202,12 @@ class CartController extends Controller
             }
         }
         return [$goods, $skuList];
+    }
+
+    public function delete()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids', []);
+        CartService::getInstance()->deleteCartList($this->userId(), $ids);
+        return $this->list();
     }
 }

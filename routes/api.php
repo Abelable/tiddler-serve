@@ -77,8 +77,11 @@ Route::prefix('goods')->group(function () {
 });
 
 Route::prefix('cart')->group(function () {
-    Route::post('add', 'CartController@add');
+    Route::get('goods_number', 'CartController@goodsNumber');
     Route::get('list', 'CartController@list');
+    Route::post('add', 'CartController@add');
+    Route::post('edit', 'CartController@edit');
+    Route::post('delete', 'CartController@delete');
 });
 
 Route::prefix('wx')->group(function () {
