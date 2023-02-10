@@ -193,9 +193,21 @@ class CartController extends Controller
         }
 
         $cart->number = $number;
+        if ($cart->status == 2) {
+            $cart->status = 1;
+            $cart->status_desc = '';
+        }
         $cart->save();
 
-        return $this->success($cart);
+        return $this->success([
+            'status' => $cart->status,
+            'statusDesc' => $cart->status_desc,
+            'selectedSkuIndex' => $cart->selected_sku_index,
+            'selectedSkuName' => $cart->selected_sku_name,
+            'price' => $cart->price,
+            'number' => $cart->number,
+            'stock' => ($selectedSkuIndex != -1 && count($skuList) != 0) ? $skuList[$selectedSkuIndex]->stock : $goods->stock,
+        ]);
     }
 
     private function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
