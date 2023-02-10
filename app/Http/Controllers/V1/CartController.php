@@ -104,7 +104,7 @@ class CartController extends Controller
             ];
         });
         if (in_array(0, $shopIds)) {
-            $cartList->push([
+            $cartList->prepend([
                 'goodsList' => $cartGoodsList->filter(function (Cart $cart) {
                     return $cart->shop_id == 0;
                 })
