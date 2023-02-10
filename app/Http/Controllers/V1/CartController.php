@@ -53,7 +53,8 @@ class CartController extends Controller
                 $cart->save();
                 return $cart;
             }
-            if ($cart->selected_sku_index == -1) {
+            $skuList = json_decode($goods->sku_list);
+            if (count($skuList) == 0) {
                 if ($cart->number > $goods->stock) {
                     if ($goods->stock != 0) {
                         $cart->number = $goods->stock;
@@ -69,29 +70,31 @@ class CartController extends Controller
                 }
                 return $cart;
             }
-            if ($cart->selected_sku_index != -1) {
-                $skuList = json_decode($goods->sku_list);
-                $sku = $skuList[$cart->selected_sku_index];
-                if (is_null($sku) || $cart->selected_sku_name != $sku->name) {
-                    $cart->status = 2;
-                    $cart->status_desc = '商品规格不存在';
-                    $cart->save();
-                    return $cart;
-                }
-                if ($cart->number > $sku->stock) {
-                    if ($sku->stock != 0) {
-                        $cart->number = $sku->stock;
-                        $cart->save();
-                        $cart['stock'] = $sku->stock;
-                    } else {
-                        $cart->status = 2;
-                        $cart->status_desc = '当前规格暂无库存';
-                    }
-                } else {
-                    $cart['stock'] = $sku->stock;
-                }
+            $sku = $skuList[$cart->selected_sku_index];
+            if (is_null($sku) || $cart->selected_sku_name != $sku->name) {
+                $cart->status = 2;
+                $cart->status_desc = '商品规格不存在';
+                $cart->selected_sku_index = -1;
+                $cart->selected_sku_name = '';
+                $cart->save();
                 return $cart;
             }
+            if ($cart->number > $sku->stock) {
+                if ($sku->stock != 0) {
+                    $cart->number = $sku->stock;
+                    $cart->save();
+                    $cart['stock'] = $sku->stock;
+                } else {
+                    $cart->status = 2;
+                    $cart->status_desc = '当前规格暂无库存';
+                    $cart->selected_sku_index = -1;
+                    $cart->selected_sku_name = '';
+                    $cart->save();
+                }
+            } else {
+                $cart['stock'] = $sku->stock;
+            }
+            return $cart;
         });
 
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
