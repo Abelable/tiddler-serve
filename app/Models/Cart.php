@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\Cart
  *
  * @property int $id
- * @property int $status 购物车商品状态：1-正常状态，2-库存不足、所选规格已不存在、商品已下架、商品已删除
+ * @property int $status 购物车商品状态：1-正常状态，2-所选规格库存为0、所选规格已不存在，3-商品库存为0、商品已下架、商品已删除
  * @property string $status_desc 购物车商品状态描述
  * @property int $user_id 用户id
  * @property int $shop_id 商品所属店铺id
