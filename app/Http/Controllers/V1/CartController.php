@@ -148,8 +148,8 @@ class CartController extends Controller
             $cart->goods_image = $goods->image;
             $cart->goods_name = $goods->name;
             if ($selectedSkuIndex != -1 && count($skuList) != 0) {
-                $cart->selected_sku_name = $skuList[$selectedSkuIndex]->name;
                 $cart->selected_sku_index = $selectedSkuIndex;
+                $cart->selected_sku_name = $skuList[$selectedSkuIndex]->name;
                 $cart->price = $skuList[$selectedSkuIndex]->price;
             } else {
                 $cart->price = $goods->price;
@@ -174,21 +174,28 @@ class CartController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
 
-        $this->validateCartGoodsStatus($input->goodsId, $selectedSkuIndex, $number);
+        [$goods, $skuList] = $this->validateCartGoodsStatus($input->goodsId, $selectedSkuIndex, $number);
 
         $cart = CartService::getInstance()->getCartById($input->id);
         if (is_null($cart)) {
             return $this->fail(CodeResponse::NOT_FOUND, '购物车中未添加该商品');
         }
-        if ($cart->status != 1) {
-            return $this->fail(CodeResponse::CART_INVALID_OPERATION, '购物车商品已失效，无法编辑');
+        if ($cart->status == 3) {
+            return $this->fail(CodeResponse::CART_INVALID_OPERATION, '购物车商品已下架，无法编辑');
         }
 
-        $cart->selected_sku_index = $selectedSkuIndex;
+        if ($selectedSkuIndex != -1 && count($skuList) != 0) {
+            $cart->selected_sku_index = $selectedSkuIndex;
+            $cart->selected_sku_name = $skuList[$selectedSkuIndex]->name;
+            $cart->price = $skuList[$selectedSkuIndex]->price;
+        } else {
+            $cart->price = $goods->price;
+        }
+
         $cart->number = $number;
         $cart->save();
 
-        return $this->success();
+        return $this->success($cart);
     }
 
     private function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
