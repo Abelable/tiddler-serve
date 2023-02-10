@@ -100,6 +100,10 @@ class CartController extends Controller
                 'shopInfo' => $shop,
                 'goodsList' => $cartGoodsList->filter(function (Cart $cart) use ($shop) {
                     return $cart->shop_id == $shop->id;
+                })->map(function (Cart $cart) {
+                    unset($cart->shop_id);
+                    unset($cart->goods_category_id);
+                    return $cart;
                 })
             ];
         });
@@ -107,6 +111,10 @@ class CartController extends Controller
             $cartList->prepend([
                 'goodsList' => $cartGoodsList->filter(function (Cart $cart) {
                     return $cart->shop_id == 0;
+                })->map(function (Cart $cart) {
+                    unset($cart->shop_id);
+                    unset($cart->goods_category_id);
+                    return $cart;
                 })
             ]);
         }
