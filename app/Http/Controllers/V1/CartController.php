@@ -188,7 +188,7 @@ class CartController extends Controller
         $cart->number = $number;
         $cart->save();
 
-        return $this->list();
+        return $this->success();
     }
 
     private function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
@@ -216,6 +216,6 @@ class CartController extends Controller
     {
         $ids = $this->verifyArrayNotEmpty('ids', []);
         CartService::getInstance()->deleteCartList($this->userId(), $ids);
-        return $this->list();
+        return $this->success();;
     }
 }
