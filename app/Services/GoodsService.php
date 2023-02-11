@@ -5,21 +5,30 @@ namespace App\Services;
 use App\Models\Goods;
 use App\Models\Shop;
 use App\Utils\Inputs\Admin\GoodsListInput;
+use App\Utils\Inputs\GoodsAllListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
 
 class GoodsService extends BaseService
 {
-    public function getListByCategoryId($categoryId, PageInput $input, $columns=['*'])
+    public function getAllList(GoodsAllListInput $input, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
-        if (!empty($categoryId)) {
-            $query = $query->where('category_id', $categoryId);
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
         }
-        return $query
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        if (!empty($input->sort)) {
+            $query = $query->orderBy($input->sort, $input->order);
+        } else {
+            $query = $query
                 ->orderBy('sales_volume', 'desc')
-                ->orderBy($input->sort, $input->order)
-                ->paginate($input->limit, $columns, 'page', $input->page);
+                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
+                ->orderBy('created_at', 'desc');
+        }
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getTopListByCategoryIds(array $goodsIds, array $categoryIds, $limit, $columns=['*'])

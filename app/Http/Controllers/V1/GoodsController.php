@@ -10,6 +10,7 @@ use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
+use App\Utils\Inputs\GoodsAllListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
 
@@ -25,11 +26,10 @@ class GoodsController extends Controller
 
     public function list()
     {
-        $categoryId = $this->verifyRequiredId('categoryId');
-        $input = PageInput::new();
+        $input = GoodsAllListInput::new();
 
         $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $page = GoodsService::getInstance()->getListByCategoryId($categoryId, $input, $columns);
+        $page = GoodsService::getInstance()->getAllList($input, $columns);
         $goodsList = collect($page->items());
         $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
 
