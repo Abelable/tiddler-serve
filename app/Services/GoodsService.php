@@ -43,6 +43,7 @@ class GoodsService extends BaseService
         }
         return $query
                 ->orderBy('sales_volume', 'desc')
+                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
                 ->get($columns);
