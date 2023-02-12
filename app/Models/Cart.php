@@ -6,6 +6,7 @@ namespace App\Models;
  * App\Models\Cart
  *
  * @property int $id
+ * @property int $scene 场景值：1-添加购物车，2-直接购买
  * @property int $status 购物车商品状态：1-正常状态，2-所选规格库存为0、所选规格已不存在，3-商品库存为0、商品已下架、商品已删除
  * @property string $status_desc 购物车商品状态描述
  * @property int $user_id 用户id
@@ -36,6 +37,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Cart whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSelectedSkuIndex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereSelectedSkuName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Cart whereShopId($value)
