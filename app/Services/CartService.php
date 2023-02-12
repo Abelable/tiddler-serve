@@ -11,12 +11,12 @@ class CartService extends BaseService
 {
     public function cartGoodsNumber($userId)
     {
-        return Cart::query()->where('user_id', $userId)->sum('number');
+        return Cart::query()->where('user_id', $userId)->where('scene', '1')->sum('number');
     }
 
     public function cartList($userId, $columns = ['*'])
     {
-        return Cart::query()->where('user_id', $userId)->get($columns);
+        return Cart::query()->where('user_id', $userId)->where('scene', '1')->get($columns);
     }
 
     public function addCart($userId, CartAddInput $input, $scene = 1)
@@ -27,7 +27,7 @@ class CartService extends BaseService
 
         [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
 
-        $cart = $this->getExistCart($goodsId, $selectedSkuIndex);
+        $cart = $this->getExistCart($goodsId, $selectedSkuIndex, $scene);
         if (!is_null($cart)) {
             $cart->number = $cart->number + $number;
         } else {
@@ -61,7 +61,7 @@ class CartService extends BaseService
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        $cart = $this->getExistCart($goodsId, $selectedSkuIndex, $cartId);
+        $cart = $this->getExistCart($goodsId, $selectedSkuIndex, 1, $cartId);
         if (!is_null($cart)) {
             $this->throwBusinessException(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
@@ -114,7 +114,7 @@ class CartService extends BaseService
         return [$goods, $skuList];
     }
 
-    public function getExistCart($goodsId, $selectedSkuIndex, $id = 0, $columns = ['*'])
+    public function getExistCart($goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])
     {
         $query = Cart::query();
         if ($id != 0) {
@@ -123,6 +123,7 @@ class CartService extends BaseService
         return $query
             ->where('goods_id', $goodsId)
             ->where('selected_sku_index', $selectedSkuIndex)
+            ->where('scene', $scene)
             ->first($columns);
     }
 
