@@ -79,6 +79,7 @@ Route::prefix('goods')->group(function () {
 Route::prefix('cart')->group(function () {
     Route::get('goods_number', 'CartController@goodsNumber');
     Route::get('list', 'CartController@list');
+    Route::post('fast_add', 'CartController@fastAdd');
     Route::post('add', 'CartController@add');
     Route::post('edit', 'CartController@edit');
     Route::post('delete', 'CartController@delete');
