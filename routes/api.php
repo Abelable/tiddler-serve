@@ -85,6 +85,14 @@ Route::prefix('cart')->group(function () {
     Route::post('delete', 'CartController@delete');
 });
 
+Route::prefix('address')->group(function () {
+    Route::get('list', 'AddressController@list');
+    Route::get('detail', 'AddressController@detail');
+    Route::get('add', 'AddressController@add');
+    Route::get('edit', 'AddressController@edit');
+    Route::get('delete', 'AddressController@delete');
+});
+
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
 });

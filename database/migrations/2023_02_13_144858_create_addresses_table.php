@@ -15,6 +15,7 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id')->comment('用户id');
             $table->integer('is_default')->default(0)->comment('是否为默认地址');
             $table->string('name')->comment('联系人姓名');
             $table->string('mobile')->comment('手机号');
