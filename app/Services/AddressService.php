@@ -22,8 +22,10 @@ class AddressService extends BaseService
     public function resetDefault()
     {
         $address = Address::query()->where('is_default', 1)->first();
-        $address->is_default = 0;
-        $address->save();
-        return $address;
+        if (!is_null($address)) {
+            $address->is_default = 0;
+            $address->save();
+            return $address;
+        }
     }
 }

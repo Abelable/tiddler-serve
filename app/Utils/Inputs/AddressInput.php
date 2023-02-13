@@ -5,7 +5,7 @@ namespace App\Utils\Inputs;
 class AddressInput extends BaseInput
 {
     public $id;
-    public $isDefault;
+    public $isDefault = 0;
     public $name;
     public $mobile;
     public $regionDesc;

@@ -20,11 +20,12 @@ class AddressController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'is_default', 'name', 'mobile', 'region_code_list', 'address_detail'];
+        $columns = ['id', 'is_default', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
         $address = AddressService::getInstance()->getById($id, $columns);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '收货地址不存在');
         }
+        $address->region_code_list = json_decode($address->region_code_list);
         return $this->success($address);
     }
 
@@ -61,10 +62,10 @@ class AddressController extends Controller
         $address->region_desc = $input->regionDesc;
         $address->region_code_list = $input->regionCodeList;
         $address->address_detail = $input->addressDetail;
-        if ($input->isDefault == 1) {
-            $address->is_default = 1;
+        if ($input->isDefault == 1 && $address->is_default == 0) {
             AddressService::getInstance()->resetDefault();
         }
+        $address->is_default = $input->isDefault;
         $address->save();
         return $address;
     }

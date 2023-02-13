@@ -88,9 +88,9 @@ Route::prefix('cart')->group(function () {
 Route::prefix('address')->group(function () {
     Route::get('list', 'AddressController@list');
     Route::get('detail', 'AddressController@detail');
-    Route::get('add', 'AddressController@add');
-    Route::get('edit', 'AddressController@edit');
-    Route::get('delete', 'AddressController@delete');
+    Route::post('add', 'AddressController@add');
+    Route::post('edit', 'AddressController@edit');
+    Route::post('delete', 'AddressController@delete');
 });
 
 Route::prefix('wx')->group(function () {
