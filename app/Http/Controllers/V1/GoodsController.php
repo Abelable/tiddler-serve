@@ -75,7 +75,7 @@ class GoodsController extends Controller
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
-            $shopInfo['goods_list'] = GoodsService::getInstance()->getTopListByShopId($id, $goods->shop_id, 6, ['id', 'image', 'name', 'price']);
+            $shopInfo['goods_list'] = GoodsService::getInstance()->getShopTopList($id, $goods->shop_id, 6, ['id', 'image', 'name', 'price']);
             $goods['shop_info'] = $shopInfo;
         }
         unset($goods->shop_id);
@@ -88,7 +88,7 @@ class GoodsController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $input = PageInput::new();
         $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $list = GoodsService::getInstance()->getGoodsListByShopId($shopId, $input, $columns);
+        $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
         return $this->successPaginate($list);
     }
 
