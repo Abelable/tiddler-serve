@@ -13,7 +13,8 @@ class UserController extends Controller
             'avatar' => $user->avatar,
             'nickname' => $user->nickname,
             'gender' => $user->gender,
-            'mobile' => $user->mobile
+            'mobile' => $user->mobile,
+            'shopId' => $user->shop_id,
         ]);
     }
 }
