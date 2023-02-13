@@ -63,7 +63,7 @@ class AddressController extends Controller
         $address->region_code_list = $input->regionCodeList;
         $address->address_detail = $input->addressDetail;
         if ($input->isDefault == 1 && $address->is_default == 0) {
-            AddressService::getInstance()->resetDefault();
+            AddressService::getInstance()->resetDefaultAddress($this->userId());
         }
         $address->is_default = $input->isDefault;
         $address->save();
