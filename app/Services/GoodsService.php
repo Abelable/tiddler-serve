@@ -64,11 +64,6 @@ class GoodsService extends BaseService
             ->get($columns);
     }
 
-    public function getListTotal($userId, $status)
-    {
-        return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
-    }
-
     public function getShopGoodsList($shopId, PageInput $input, $columns=['*'])
     {
         return Goods::query()
@@ -78,6 +73,11 @@ class GoodsService extends BaseService
             ->orderBy('commission_rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getListTotal($userId, $status)
+    {
+        return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
     public function getGoodsListByStatus($userId, MerchantGoodsListInput $input, $columns=['*'])
