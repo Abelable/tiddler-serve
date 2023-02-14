@@ -66,7 +66,7 @@ trait VerifyRequestInput
         $value = request()->input($key, $default);
         $validator = Validator::make([$key => $value], [$key => $rule]);
         if (is_null($default) && is_null($value)) {
-            throw new BusinessException(CodeResponse::PARAM_MISSING);
+            return $value;
         }
         if ($validator->fails()) {
             throw new BusinessException(CodeResponse::PARAM_VALUE_INVALID);

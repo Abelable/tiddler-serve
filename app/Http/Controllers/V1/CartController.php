@@ -162,8 +162,6 @@ class CartController extends Controller
         ]);
     }
 
-
-
     public function delete()
     {
         $ids = $this->verifyArrayNotEmpty('ids', []);

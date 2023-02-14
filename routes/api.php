@@ -93,6 +93,10 @@ Route::prefix('address')->group(function () {
     Route::post('delete', 'AddressController@delete');
 });
 
+Route::prefix('order')->group(function () {
+    Route::get('pre_order_info', 'OrderController@preOrderInfo');
+});
+
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
 });

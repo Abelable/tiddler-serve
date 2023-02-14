@@ -21,7 +21,7 @@ class AddressController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'is_default', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
-        $address = AddressService::getInstance()->getById($id, $columns);
+        $address = AddressService::getInstance()->getById($this->userId(), $id, $columns);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '收货地址不存在');
         }
@@ -46,7 +46,7 @@ class AddressController extends Controller
         /** @var AddressInput $input */
         $input = AddressInput::new();
 
-        $address = AddressService::getInstance()->getById($input->id);
+        $address = AddressService::getInstance()->getById($this->userId(), $input->id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '收货地址不存在');
         }
@@ -73,7 +73,7 @@ class AddressController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        $address = AddressService::getInstance()->getById($id);
+        $address = AddressService::getInstance()->getById($this->userId(), $id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '收货地址不存在');
         }

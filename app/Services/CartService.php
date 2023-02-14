@@ -19,6 +19,11 @@ class CartService extends BaseService
         return Cart::query()->where('user_id', $userId)->where('scene', '1')->get($columns);
     }
 
+    public function getCartListByIds(array $ids, $columns = ['*'])
+    {
+        return Cart::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function addCart($userId, CartAddInput $input, $scene = 1)
     {
         $goodsId = $input->goodsId;
@@ -29,7 +34,7 @@ class CartService extends BaseService
 
         $cart = $this->getExistCart($goodsId, $selectedSkuIndex, $scene);
         if (!is_null($cart)) {
-            $cart->number = $cart->number + $number;
+            $cart->number = $scene == 1 ? ($cart->number + $number) : $number;
         } else {
             $cart = Cart::new();
             $cart->scene = $scene;
