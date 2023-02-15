@@ -28,11 +28,14 @@ class OrderController extends Controller
 
         $freightPrice = 0;
         $totalPrice = 0;
+        $totalNumber = 0;
         foreach ($cartList as $cart) {
             $price = bcmul($cart->price, $cart->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
+            $totalNumber = $totalNumber + $cart->number;
             // todo 计算运费
         }
+        $paymentAmount = bcadd($totalPrice, $freightPrice, 2);
 
         $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
@@ -62,7 +65,9 @@ class OrderController extends Controller
             'addressInfo' => $address,
             'goodsLists' => $goodsLists,
             'freightPrice' => $freightPrice,
-            'totalPrice' => $totalPrice
+            'totalPrice' => $totalPrice,
+            'totalNumber' => $totalNumber,
+            'paymentAmount' => $paymentAmount
         ]);
     }
 }
