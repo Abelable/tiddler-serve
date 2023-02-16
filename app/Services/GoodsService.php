@@ -94,6 +94,11 @@ class GoodsService extends BaseService
         return Goods::query()->find($id, $columns);
     }
 
+    public function getOnSaleGoods($id, $columns=['*'])
+    {
+        return Goods::query()->where('status', 1)->find($id, $columns);
+    }
+
     public function getGoodsListByIds($ids, $columns=['*'])
     {
         return Goods::query()->whereIn('id', $ids)->get($columns);

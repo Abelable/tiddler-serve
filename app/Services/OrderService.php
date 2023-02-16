@@ -24,4 +24,9 @@ class OrderService extends BaseService
     {
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
+
+    public function createOrder()
+    {
+
+    }
 }

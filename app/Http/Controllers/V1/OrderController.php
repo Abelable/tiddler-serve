@@ -80,7 +80,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function createOrder()
+    public function submit()
     {
         /** @var CreateOrderInput $input */
         $input = CreateOrderInput::new();
@@ -113,15 +113,16 @@ class OrderController extends Controller
             $orderGoodsList = $cartList->filter(function (Cart $cart) use ($shop) {
                 return $cart->shop_id == $shop->id;
             })->map(function (Cart $cart) use (&$goodsPrice, $goodsList) {
-                $number = $cart->number;
-                $selectedSkuIndex  = $cart->selected_sku_index;
                 /** @var Goods $goods */
                 $goods = $goodsList->get($cart->goods_id);
-                $skuList = json_decode($goods->sku_list);
-
                 if (is_null($goods) || $goods->status != 1) {
                     return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
                 }
+
+                $skuList = json_decode($goods->sku_list);
+                $number = $cart->number;
+                $selectedSkuIndex  = $cart->selected_sku_index;
+
                 if (count($skuList) != 0 && $selectedSkuIndex != -1) {
                     $stock = $skuList[$selectedSkuIndex]->stock;
                     if ($stock == 0 || $number > $stock) {

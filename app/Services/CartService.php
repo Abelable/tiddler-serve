@@ -100,12 +100,14 @@ class CartService extends BaseService
 
     public function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
     {
-        $goods = GoodsService::getInstance()->getGoodsById($goodsId);
-        $skuList = json_decode($goods->sku_list);
+        $goods = GoodsService::getInstance()->getOnSaleGoods($goodsId);
 
-        if (is_null($goods) || $goods->status != 1) {
+        if (is_null($goods)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
+
+        $skuList = json_decode($goods->sku_list);
+
         if (count($skuList) != 0 && $selectedSkuIndex != -1) {
             $stock = $skuList[$selectedSkuIndex]->stock;
             if ($stock == 0 || $number > $stock) {
