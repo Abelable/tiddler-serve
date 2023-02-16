@@ -19,9 +19,9 @@ class CartService extends BaseService
         return Cart::query()->where('user_id', $userId)->where('scene', '1')->get($columns);
     }
 
-    public function getCartListByIds(array $ids, $columns = ['*'])
+    public function getCartListByIds($userId, array $ids, $columns = ['*'])
     {
-        return Cart::query()->whereIn('id', $ids)->get($columns);
+        return Cart::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
     }
 
     public function addCart($userId, CartAddInput $input, $scene = 1)

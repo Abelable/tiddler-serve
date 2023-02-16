@@ -7,7 +7,12 @@ use App\Models\Cart;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\GoodsService;
 use App\Services\ShopService;
+use App\Utils\CodeResponse;
+use App\Utils\Inputs\CreateOrderInput;
+use Illuminate\Support\Facades\Cache;
+use function Sodium\add;
 
 class OrderController extends Controller
 {
@@ -24,7 +29,7 @@ class OrderController extends Controller
         }
 
         $cartListColumns = ['shop_id', 'goods_image', 'goods_name', 'selected_sku_name', 'price', 'number'];
-        $cartList = CartService::getInstance()->getCartListByIds($cartIds, $cartListColumns);
+        $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $cartIds, $cartListColumns);
 
         $freightPrice = 0;
         $totalPrice = 0;
@@ -69,5 +74,49 @@ class OrderController extends Controller
             'totalNumber' => $totalNumber,
             'paymentAmount' => $paymentAmount
         ]);
+    }
+
+    public function createOrder()
+    {
+        /** @var CreateOrderInput $input */
+        $input = CreateOrderInput::new();
+
+        // 分布式锁，防止重复请求
+        $lockKey = sprintf('create_order_%s_%s', $this->userId(), md5(serialize($input)));
+        $lock = Cache::lock($lockKey, 5);
+        if (!$lock->get()) {
+            $this->fail(CodeResponse::FAIL, '请勿重复请求');
+        }
+
+        // 1.获取地址
+        $address = AddressService::getInstance()->getById($this->userId(), $input->addressId);
+        if (is_null($address)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+        }
+
+        // 2.获取购物车商品
+        $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $input->cartIds);
+        $goodsIds = array_unique($cartList->pluck('goods_id')->toArray());
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds);
+
+        // 3.按商家进行订单拆分，生成对应订单
+        $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
+        $orderList = $shopList->map(function (Shop $shop) use ($cartList) {
+            $filterCartList = $cartList->filter(function (Cart $cart) use ($shop) {
+                return $cart->shop_id == $shop->id;
+            });
+        });
+
+
+        // 4.清空购物车
+
+        // 5.商品减库存
+
+        // 6.设置订单支付超时任务
+
+
+
+
     }
 }
