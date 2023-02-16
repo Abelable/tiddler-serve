@@ -8,7 +8,6 @@ namespace App\Models;
  * @property int $id
  * @property string $order_sn 订单编号
  * @property int $status 订单状态
- * @property string $status_desc 订单状态描述
  * @property string $remarks 订单备注
  * @property int $user_id 用户id
  * @property string $consignee 收件人姓名
@@ -66,7 +65,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereShopName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereStatusDesc($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|Order withTrashed()

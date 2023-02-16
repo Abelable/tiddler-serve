@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Order;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartService;
@@ -106,6 +107,8 @@ class OrderController extends Controller
             $filterCartList = $cartList->filter(function (Cart $cart) use ($shop) {
                 return $cart->shop_id == $shop->id;
             });
+            $order = Order::new();
+            $order->user_id = $this->userId();
         });
 
 
