@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Goods;
 use App\Models\Shop;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\GoodsAllListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
@@ -162,5 +163,52 @@ class GoodsService extends BaseService
             return $goods;
         });
         return $list;
+    }
+
+    public function reduceStock($id, $number, $selectedSkuIndex = -1)
+    {
+        $goods = $this->getOnSaleGoods($id);
+        if (is_null($goods)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '商品不存在');
+        }
+
+        $skuList = json_decode($goods->sku_list);
+
+        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
+            $stock = $skuList[$selectedSkuIndex]->stock;
+            if ($stock == 0 || $number > $stock) {
+                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '所选规格库存不足');
+            }
+            // 减规格库存
+            $skuList[$selectedSkuIndex]->stock = $skuList[$selectedSkuIndex]->stock - $number;
+            $goods->sku_list = json_encode($skuList);
+        } else {
+            if ($goods->stock == 0 || $number > $goods->stock) {
+                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '商品库存不足');
+            }
+        }
+        $goods->stock = $goods->stock - $number;
+        $goods->cas();
+
+        return $goods;
+    }
+
+    public function addStock($id, $number, $selectedSkuIndex = -1)
+    {
+        $goods = $this->getOnSaleGoods($id);
+        if (is_null($goods)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '商品不存在');
+        }
+
+        $skuList = json_decode($goods->sku_list);
+
+        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
+            $skuList[$selectedSkuIndex]->stock = $skuList[$selectedSkuIndex]->stock + $number;
+            $goods->sku_list = json_encode($skuList);
+        }
+        $goods->stock = $goods->stock + $number;
+        $goods->cas();
+
+        return $goods;
     }
 }
