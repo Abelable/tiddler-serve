@@ -63,4 +63,7 @@ namespace App\Models;
  */
 class Goods extends BaseModel
 {
+    /**
+     * @var int|mixed
+     */
 }
