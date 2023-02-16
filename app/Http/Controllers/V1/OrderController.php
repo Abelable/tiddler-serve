@@ -111,20 +111,18 @@ class OrderController extends Controller
                 $filterCartList = $cartList->filter(function (Cart $cart) use ($shop) {
                     return $cart->shop_id == $shop->id;
                 });
-                return OrderService::getInstance()->createOrder($filterCartList, $address, $shop);
+                return OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address, $shop);
             });
             if (in_array(0, $shopIds)) {
                 $filterCartList = $cartList->filter(function (Cart $cart) {
                     return $cart->shop_id == 0;
                 });
-                $orderId = OrderService::getInstance()->createOrder($filterCartList, $address);
+                $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address);
                 $orderIds->push($orderId);
             }
 
             // 4.清空购物车
             CartService::getInstance()->deleteCartList($this->userId(), $input->cartIds);
-
-            // todo 5.设置订单支付超时任务
 
             return $orderIds;
         });

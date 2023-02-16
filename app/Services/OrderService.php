@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Jobs\OverTimeCancelOrder;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\OrderEnums;
 use Illuminate\Support\Facades\Log;
 
 class OrderService extends BaseService
@@ -28,7 +30,7 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($cartList,  Address $address, Shop $shopInfo = null)
+    public function createOrder($userId, $cartList,  Address $address, Shop $shopInfo = null)
     {
         $goodsPrice = 0;
         $freightPrice = 0;
@@ -55,7 +57,7 @@ class OrderService extends BaseService
         $order = Order::new();
         $order->order_sn = OrderService::getInstance()->generateOrderSn();
         $order->status = OrderEnums::STATUS_CREATE;
-        $order->user_id = $this->userId();
+        $order->user_id = $userId;
         $order->consignee = $address->name;
         $order->mobile = $address->mobile;
         $order->address = $address->region_desc . ' ' . $address->address_detail;
@@ -72,6 +74,15 @@ class OrderService extends BaseService
         $order->payment_amount = bcadd($goodsPrice, $freightPrice, 2);
         $order->refund_amount = $order->payment_amount;
         $order->save();
+
+        // 设置订单支付超时任务
+        dispatch(new OverTimeCancelOrder($userId, $order->id));
+
         return $order->id;
+    }
+
+    public function SystemCancel($userId, $orderId)
+    {
+
     }
 }
