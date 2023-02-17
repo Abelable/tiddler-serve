@@ -169,14 +169,15 @@ class OrderController extends Controller
         $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
         $orderList = collect($page->items());
         $orderIds = $orderList->pluck('id')->toArray();
-        $goodsListColumns = ['goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->keyBy('order_id');
+        $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns);
         $list = $orderList->map(function (Order $order) use ($goodsList) {
             $filterGoodsList = $goodsList->filter(function (OrderGoods $goods) use ($order) {
                 return $goods->order_id == $order->id;
             });
             return [
                 'id' => $order->id,
+                'status' => $order->status,
                 'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopAvatar' => $order->shop_avatar,
@@ -186,6 +187,13 @@ class OrderController extends Controller
             ];
         });
 
-        return $this->successPaginate($list);
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function cancel()
+    {
+        $id = $this->verifyRequiredId('id');
+        OrderService::getInstance()->userCancel($this->userId(), $id);
+        return $this->success();
     }
 }

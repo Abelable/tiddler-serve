@@ -24,7 +24,7 @@ class CreateOrdersTable extends Migration
             $table->string('address')->comment('具体收货地址');
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->string('shop_avatar')->default('')->comment('店铺头像');
-            $table->string('shop_name')->comment('店铺名称');
+            $table->string('shop_name')->default('')->comment('店铺名称');
             $table->float('goods_price')->comment('商品总价格');
             $table->float('freight_price')->comment('运费');
             $table->float('payment_amount')->comment('支付金额');

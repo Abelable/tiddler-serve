@@ -22,7 +22,9 @@ class OrderService extends BaseService
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
-        return $query->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getOrderById($userId, $id, $columns = ['*'])
@@ -93,8 +95,6 @@ class OrderService extends BaseService
             $order->shop_id = $shopInfo->id;
             $order->shop_avatar = $shopInfo->avatar;
             $order->shop_name = $shopInfo->name;
-        } else {
-            $order->shop_name = '官方自营';
         }
         $order->goods_price = $goodsPrice;
         $order->freight_price = $freightPrice;
@@ -111,7 +111,7 @@ class OrderService extends BaseService
         return $order->id;
     }
 
-    public function createWxPayOrder(int $userId, array $orderIds, int $openid)
+    public function createWxPayOrder($userId, array $orderIds, $openid)
     {
         $orderList = $this->getUnpaidList($userId, $orderIds);
         if (count($orderList) == 0) {
@@ -167,7 +167,14 @@ class OrderService extends BaseService
         return $orderList;
     }
 
-    public function SystemCancel($userId, $orderId)
+    public function userCancel($userId, $orderId)
+    {
+        return DB::transaction(function () use ($userId, $orderId) {
+            return $this->cancel($userId, $orderId);
+        });
+    }
+
+    public function systemCancel($userId, $orderId)
     {
         return DB::transaction(function () use ($userId, $orderId) {
             return $this->cancel($userId, $orderId, 'system');
@@ -203,7 +210,7 @@ class OrderService extends BaseService
         /** @var OrderGoods $goods */
         foreach ($goodsList as $goods)
         {
-            $row = GoodsService::getInstance()->addStock($goods->goods_id, $goods->selected_sku_index, $goods->number);
+            $row = GoodsService::getInstance()->addStock($goods->goods_id, $goods->number, $goods->selected_sku_index);
             if ($row == 0) {
                 $this->throwUpdateFail();
             }
