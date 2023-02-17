@@ -15,6 +15,7 @@ class CodeResponse
 
     const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
     const CART_INVALID_OPERATION = [200, 10010, '购物车操作失败'];
+    const GOODS_NO_STOCK = [200, 10011, '商品库存不足'];
 
     const PARAM_MISSING = [400, 10004, '缺少参数'];
     const UNAUTHORIZED = [401, 10001, '未授权'];

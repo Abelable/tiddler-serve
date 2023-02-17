@@ -5,14 +5,37 @@ namespace App\Services;
 use App\Jobs\OverTimeCancelOrder;
 use App\Models\Address;
 use App\Models\Cart;
+use App\Models\Goods;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderService extends BaseService
 {
+    public function getOrderById($userId, $id, $columns = ['*'])
+    {
+        return Order::query()->where('user_id', $userId)->find($id, $columns);
+    }
+    public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
+    {
+        return Order::query()
+            ->where('user_id', $userId)
+            ->whereIn('id', $orderIds)
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->get($columns);
+    }
+
+    public function getUnpaidListBySn(array $orderSnList, $columns = ['*'])
+    {
+        return Order::query()
+            ->whereIn('order_sn', $orderSnList)
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->get($columns);
+    }
+
     public function generateOrderSn()
     {
         return retry(5, function () {
@@ -41,7 +64,10 @@ class OrderService extends BaseService
             // todo 计算运费
 
             // 商品减库存
-            GoodsService::getInstance()->reduceStock($cart->goods_id, $cart->number, $cart->selected_sku_index);
+            $row = GoodsService::getInstance()->reduceStock($cart->goods_id, $cart->number, $cart->selected_sku_index);
+            if ($row == 0) {
+                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
+            }
 
             return [
                 'id' => $cart->goods_id,
@@ -81,22 +107,7 @@ class OrderService extends BaseService
         return $order->id;
     }
 
-    public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
-    {
-        return Order::query()
-            ->where('user_id', $userId)
-            ->whereIn('id', $orderIds)
-            ->where('status', OrderEnums::STATUS_CREATE)
-            ->get($columns);
-    }
 
-    public function getUnpaidListBySn(array $orderSnList, $columns = ['*'])
-    {
-        return Order::query()
-            ->whereIn('order_sn', $orderSnList)
-            ->where('status', OrderEnums::STATUS_CREATE)
-            ->get($columns);
-    }
 
     public function createWxPayOrder(int $userId, array $orderIds, int $openid)
     {
@@ -156,6 +167,45 @@ class OrderService extends BaseService
 
     public function SystemCancel($userId, $orderId)
     {
+        return DB::transaction(function () use ($userId, $orderId) {
+            return $this->cancel($userId, $orderId, 'system');
+        });
+    }
 
+    public function cancel($userId, $orderId, $role = 'user')
+    {
+        $order = $this->getOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if ($order->status != OrderEnums::STATUS_CREATE) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
+        }
+        switch ($role) {
+            case 'system':
+                $order->status = OrderEnums::STATUS_AUTO_CANCEL;
+                break;
+            case 'admin':
+                $order->status = OrderEnums::STATUS_ADMIN_CANCEL;
+                break;
+            case 'user':
+                $order->status = OrderEnums::STATUS_CANCEL;
+                break;
+        }
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        // 返还库存
+        $goodsList = json_decode($order->goods_list);
+        foreach ($goodsList as $goods)
+        {
+            $row = GoodsService::getInstance()->addStock($goods->id, $goods->selected_sku_index, $goods->number);
+            if ($row == 0) {
+                $this->throwUpdateFail();
+            }
+        }
+
+        return $order;
     }
 }

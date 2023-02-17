@@ -177,20 +177,19 @@ class GoodsService extends BaseService
         if (count($skuList) != 0 && $selectedSkuIndex != -1) {
             $stock = $skuList[$selectedSkuIndex]->stock;
             if ($stock == 0 || $number > $stock) {
-                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '所选规格库存不足');
+                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK, '所选规格库存不足');
             }
             // 减规格库存
             $skuList[$selectedSkuIndex]->stock = $skuList[$selectedSkuIndex]->stock - $number;
             $goods->sku_list = json_encode($skuList);
         } else {
             if ($goods->stock == 0 || $number > $goods->stock) {
-                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '商品库存不足');
+                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK, '商品库存不足');
             }
         }
         $goods->stock = $goods->stock - $number;
-        $goods->cas();
 
-        return $goods;
+        return $goods->cas();
     }
 
     public function addStock($id, $number, $selectedSkuIndex = -1)
@@ -207,8 +206,7 @@ class GoodsService extends BaseService
             $goods->sku_list = json_encode($skuList);
         }
         $goods->stock = $goods->stock + $number;
-        $goods->cas();
 
-        return $goods;
+        return $goods->cas();
     }
 }
