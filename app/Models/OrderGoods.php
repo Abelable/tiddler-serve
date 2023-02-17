@@ -7,6 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $order_id 订单id
+ * @property int $goods_id 商品id
  * @property string $image 列表图片
  * @property string $name 商品名称
  * @property float $price 商品价格
@@ -22,6 +23,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereName($value)

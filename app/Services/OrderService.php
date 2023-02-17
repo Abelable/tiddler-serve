@@ -6,6 +6,7 @@ use App\Jobs\OverTimeCancelOrder;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
@@ -187,10 +188,11 @@ class OrderService extends BaseService
         }
 
         // 返还库存
-        $goodsList = json_decode($order->goods_list);
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+        /** @var OrderGoods $goods */
         foreach ($goodsList as $goods)
         {
-            $row = GoodsService::getInstance()->addStock($goods->id, $goods->selected_sku_index, $goods->number);
+            $row = GoodsService::getInstance()->addStock($goods->goods_id, $goods->selected_sku_index, $goods->number);
             if ($row == 0) {
                 $this->throwUpdateFail();
             }
