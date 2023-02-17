@@ -16,7 +16,7 @@ class OrderService extends BaseService
     public function generateOrderSn()
     {
         return retry(5, function () {
-            $orderSn = date('YmdHis') . rand(100000,999999);
+            $orderSn = date('YmdHis') . rand(100000, 999999);
             if ($this->isOrderSnExists($orderSn)) {
                 Log::warning('当前订单号已存在，orderSn：' . $orderSn);
                 $this->throwBusinessException(CodeResponse::FAIL, '订单号生成失败');
@@ -30,7 +30,7 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, $cartList,  Address $address, Shop $shopInfo = null)
+    public function createOrder($userId, $cartList, Address $address, Shop $shopInfo = null)
     {
         $goodsPrice = 0;
         $freightPrice = 0;
