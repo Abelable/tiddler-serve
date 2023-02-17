@@ -68,6 +68,7 @@ class OrderService extends BaseService
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
 
+            // 生成订单快照
             return [
                 'id' => $cart->goods_id,
                 'image' => $cart->goods_image,
