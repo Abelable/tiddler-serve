@@ -168,13 +168,12 @@ class OrderController extends Controller
 
         $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
         $orderList = collect($page->items());
+
         $orderIds = $orderList->pluck('id')->toArray();
         $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns);
-        $list = $orderList->map(function (Order $order) use ($goodsList) {
-            $filterGoodsList = $goodsList->filter(function (OrderGoods $goods) use ($order) {
-                return $goods->order_id == $order->id;
-            });
+        $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
+        $list = $orderList->map(function (Order $order) use ($groupedGoodsList) {
+            $goodsList = $groupedGoodsList->get($order->id);
             return [
                 'id' => $order->id,
                 'status' => $order->status,
@@ -182,7 +181,7 @@ class OrderController extends Controller
                 'shopId' => $order->shop_id,
                 'shopAvatar' => $order->shop_avatar,
                 'shopName' => $order->shop_name,
-                'goodsList' => $filterGoodsList,
+                'goodsList' => $goodsList,
                 'paymentAmount' => $order->payment_amount
             ];
         });
