@@ -94,7 +94,10 @@ Route::prefix('address')->group(function () {
 });
 
 Route::prefix('order')->group(function () {
-    Route::get('pre_order_info', 'OrderController@preOrderInfo');
+    Route::post('pre_order_info', 'OrderController@preOrderInfo');
+    Route::post('submit', 'OrderController@submit');
+    Route::post('pay_params', 'OrderController@payParams');
+    Route::get('list', 'OrderController@list');
 });
 
 Route::prefix('wx')->group(function () {

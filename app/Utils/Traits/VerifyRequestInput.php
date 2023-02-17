@@ -40,6 +40,11 @@ trait VerifyRequestInput
     {
         return $this->verifyData($key, $default, 'integer');
     }
+    
+    public function verifyRequiredInteger($key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'required|integer');
+    }
 
     public function verifyPositiveInteger($key, $default = null)
     {

@@ -11,7 +11,7 @@ class CreateOrderInput extends BaseInput
     public function rules()
     {
         return [
-            'addressId' => 'required|integer|in:1,2',
+            'addressId' => 'required|integer|digits_between:1,20',
             'cartIds' => 'required|array|min:1',
             'remarks' => 'string'
         ];

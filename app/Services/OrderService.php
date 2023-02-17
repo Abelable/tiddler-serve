@@ -10,15 +10,26 @@ use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderService extends BaseService
 {
+    public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
+    {
+        $query = Order::query()->where('user_id', $userId);
+        if (count($statusList) != 0) {
+            $query = $query->whereIn('status', $statusList);
+        }
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getOrderById($userId, $id, $columns = ['*'])
     {
         return Order::query()->where('user_id', $userId)->find($id, $columns);
     }
+
     public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
     {
         return Order::query()

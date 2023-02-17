@@ -4,13 +4,18 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Order;
+use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartService;
+use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -20,9 +25,9 @@ class OrderController extends Controller
     public function preOrderInfo()
     {
         $addressId = $this->verifyId('addressId');
-        $cartIds = json_decode($this->verifyRequiredString('cartIds'));
+        $cartIds = $this->verifyArrayNotEmpty('cartIds');
 
-        $addressColumns = ['name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
+        $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
         if (is_null($addressId)) {
             $address = AddressService::getInstance()->getDefautlAddress($this->userId(), $addressColumns);
         } else {
@@ -132,5 +137,55 @@ class OrderController extends Controller
         $order = OrderService::getInstance()->createWxPayOrder($this->userId(), $orderIds, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
+    }
+
+    public function list()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $status = $this->verifyRequiredInteger('status');
+
+        switch ($status) {
+            case 1:
+                $statusList = [OrderEnums::STATUS_CREATE];
+                break;
+            case 2:
+                $statusList = [OrderEnums::STATUS_PAY];
+                break;
+            case 3:
+                $statusList = [OrderEnums::STATUS_SHIP];
+                break;
+            case 4:
+                $statusList = [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM];
+                break;
+            case 5:
+                $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
+                break;
+            default:
+                $statusList = [];
+                break;
+        }
+
+        $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
+        $orderList = collect($page->items());
+        $orderIds = $orderList->pluck('id')->toArray();
+        $goodsListColumns = ['goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->keyBy('order_id');
+        $list = $orderList->map(function (Order $order) use ($goodsList) {
+            $filterGoodsList = $goodsList->filter(function (OrderGoods $goods) use ($order) {
+                return $goods->order_id == $order->id;
+            });
+            return [
+                'id' => $order->id,
+                'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
+                'shopId' => $order->shop_id,
+                'shopAvatar' => $order->shop_avatar,
+                'shopName' => $order->shop_name,
+                'goodsList' => $filterGoodsList,
+                'paymentAmount' => $order->payment_amount
+            ];
+        });
+
+        return $this->successPaginate($list);
     }
 }

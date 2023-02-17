@@ -7,7 +7,7 @@ use App\Models\OrderGoods;
 
 class OrderGoodsService extends BaseService
 {
-    public function createList(array $cartList, $orderId)
+    public function createList($cartList, $orderId)
     {
         /** @var Cart $cart */
         foreach ($cartList as $cart) {
@@ -29,5 +29,8 @@ class OrderGoodsService extends BaseService
         return OrderGoods::query()->where('order_id', $orderId)->get($columns);
     }
 
-
+    public function getListByOrderIds(array $orderIds, $columns = ['*'])
+    {
+        return OrderGoods::query()->whereIn('order_id', $orderIds)->get($columns);
+    }
 }
