@@ -106,8 +106,6 @@ class OrderService extends BaseService
         return $order->id;
     }
 
-
-
     public function createWxPayOrder(int $userId, array $orderIds, int $openid)
     {
         $orderList = $this->getUnpaidList($userId, $orderIds);
