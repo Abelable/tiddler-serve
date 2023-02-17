@@ -16,7 +16,6 @@ namespace App\Models;
  * @property int $shop_id 店铺id
  * @property string $shop_avatar 店铺头像
  * @property string $shop_name 店铺名称
- * @property string $goods_list 订单商品列表，以json数组格式保存
  * @property float $goods_price 商品总价格
  * @property float $freight_price 运费
  * @property float $payment_amount 支付金额
@@ -45,7 +44,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereFinishTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereFreightPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Order whereGoodsList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereGoodsPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereMobile($value)

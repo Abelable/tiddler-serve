@@ -57,7 +57,8 @@ class OrderService extends BaseService
         $goodsPrice = 0;
         $freightPrice = 0;
 
-        $goodsList = $cartList->map(function (Cart $cart) use (&$goodsPrice) {
+        /** @var Cart $cart */
+        foreach ($cartList as $cart) {
             $price = bcmul($cart->price, $cart->number, 2);
             $goodsPrice = bcadd($goodsPrice, $price, 2);
             // todo 计算运费
@@ -67,18 +68,7 @@ class OrderService extends BaseService
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
-
-            // 生成订单快照
-            return [
-                'id' => $cart->goods_id,
-                'image' => $cart->goods_image,
-                'name' => $cart->goods_name,
-                'selected_sku_name' => $cart->selected_sku_name,
-                'selected_sku_index' => $cart->selected_sku_index,
-                'price' => $cart->price,
-                'number' => $cart->number,
-            ];
-        });
+        }
 
         $order = Order::new();
         $order->order_sn = OrderService::getInstance()->generateOrderSn();
@@ -94,12 +84,14 @@ class OrderService extends BaseService
         } else {
             $order->shop_name = '官方自营';
         }
-        $order->goods_list = json_encode($goodsList);
         $order->goods_price = $goodsPrice;
         $order->freight_price = $freightPrice;
         $order->payment_amount = bcadd($goodsPrice, $freightPrice, 2);
         $order->refund_amount = $order->payment_amount;
         $order->save();
+
+        // 生成订单商品快照
+        OrderGoodsService::getInstance()->createList($cartList, $order->id);
 
         // 设置订单支付超时任务
         dispatch(new OverTimeCancelOrder($userId, $order->id));
