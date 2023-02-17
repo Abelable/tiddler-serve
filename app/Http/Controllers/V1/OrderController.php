@@ -13,6 +13,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\CreateOrderInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
 {
@@ -123,5 +124,13 @@ class OrderController extends Controller
         });
 
         return $this->success($orderIds);
+    }
+
+    public function payParams()
+    {
+        $orderIds = $this->verifyArrayNotEmpty('orderIds');
+        $order = OrderService::getInstance()->createWxPayOrder($this->userId(), $orderIds, $this->user()->openid);
+        $payParams = Pay::wechat()->miniapp($order);
+        return $this->success($payParams);
     }
 }

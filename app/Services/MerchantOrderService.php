@@ -56,11 +56,11 @@ class MerchantOrderService extends BaseService
         ];
     }
 
-    public function handleWxPayNotify(array $data)
+    public function wxPaySuccess(array $data)
     {
         $orderSn = $data['body'] ? str_replace('merchant_order_sn:', '', $data['body']) : '';
         $payId = $data['transaction_id'] ?? '';
-        $actualPaymentAmount = $data['total_price'] ? bcdiv($data['total_price'], 100, 2) : 0;
+        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
         $order = $this->getOrderByOrderSn($orderSn);
         if (is_null($order)) {

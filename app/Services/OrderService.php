@@ -81,6 +81,79 @@ class OrderService extends BaseService
         return $order->id;
     }
 
+    public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
+    {
+        return Order::query()
+            ->where('user_id', $userId)
+            ->whereIn('id', $orderIds)
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->get($columns);
+    }
+
+    public function getUnpaidListBySn(array $orderSnList, $columns = ['*'])
+    {
+        return Order::query()
+            ->whereIn('order_sn', $orderSnList)
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->get($columns);
+    }
+
+    public function createWxPayOrder(int $userId, array $orderIds, int $openid)
+    {
+        $orderList = $this->getUnpaidList($userId, $orderIds);
+        if (count($orderList) == 0) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+
+        $orderSnList = $orderList->pluck('order_sn')->toArray();
+
+        $paymentAmount = 0;
+        foreach ($orderList as $order) {
+            $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
+        }
+
+        return [
+            'out_trade_no' => time(),
+            'body' => 'order_sn_list:' . json_encode($orderSnList),
+            'total_fee' => bcmul($paymentAmount, 100),
+            'openid' => $openid
+        ];
+    }
+
+    public function wxPaySuccess(array $data)
+    {
+        $orderSnList = $data['body'] ?
+            json_encode(str_replace('order_sn_list:', '', $data['body'])) : [];
+        $payId = $data['transaction_id'] ?? '';
+        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
+
+        $orderList = $this->getUnpaidListBySn($orderSnList);
+
+        $paymentAmount = 0;
+        foreach ($orderList as $order) {
+            $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
+        }
+        if (bccomp($actualPaymentAmount, $paymentAmount, 2) != 0) {
+            $errMsg = "支付回调，订单{$data['body']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
+            Log::error($errMsg);
+            $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
+        }
+
+        $orderList = $orderList->map(function (Order $order) use ($payId) {
+            $order->pay_id = $payId;
+            $order->pay_time = now()->toDateTimeString();
+            $order->status = OrderEnums::STATUS_PAY;
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+            // todo 通知（邮件或钉钉）管理员、
+            // todo 通知（短信、系统消息）商家
+            return $order;
+        });
+
+        return $orderList;
+    }
+
     public function SystemCancel($userId, $orderId)
     {
 
