@@ -195,4 +195,11 @@ class OrderController extends Controller
         OrderService::getInstance()->userCancel($this->userId(), $id);
         return $this->success();
     }
+
+    public function confirm()
+    {
+        $id = $this->verifyRequiredId('id');
+        OrderService::getInstance()->confirm($this->userId(), $id);
+        return $this->success();
+    }
 }

@@ -98,6 +98,7 @@ Route::prefix('order')->group(function () {
     Route::post('submit', 'OrderController@submit');
     Route::post('pay_params', 'OrderController@payParams');
     Route::get('list', 'OrderController@list');
+    Route::post('confirm', 'OrderController@confirm');
     Route::post('cancel', 'OrderController@cancel');
 });
 

@@ -152,7 +152,7 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
 
-        $orderList = $orderList->map(function (Order $order) use ($payId) {
+        return $orderList->map(function (Order $order) use ($payId) {
             $order->pay_id = $payId;
             $order->pay_time = now()->toDateTimeString();
             $order->status = OrderEnums::STATUS_PAY;
@@ -163,8 +163,6 @@ class OrderService extends BaseService
             // todo 通知（短信、系统消息）商家
             return $order;
         });
-
-        return $orderList;
     }
 
     public function userCancel($userId, $orderId)
@@ -215,6 +213,27 @@ class OrderService extends BaseService
                 $this->throwUpdateFail();
             }
         }
+
+        return $order;
+    }
+
+    public function confirm($userId, $orderId, $isAuto = false)
+    {
+        $order = $this->getOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if ($order->status != OrderEnums::STATUS_SHIP) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能被确认收货');
+        }
+
+        $order->status = $isAuto ? OrderEnums::STATUS_AUTO_CONFIRM : OrderEnums::STATUS_CONFIRM;
+        $order->confirm_time = now()->toDateTimeString();
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
         return $order;
     }
