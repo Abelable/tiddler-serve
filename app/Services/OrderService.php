@@ -106,7 +106,7 @@ class OrderService extends BaseService
         OrderGoodsService::getInstance()->createList($cartList, $order->id);
 
         // 设置订单支付超时任务
-        dispatch(new OverTimeCancelOrder($userId, $order->id));
+        // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
         return $order->id;
     }

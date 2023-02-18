@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Order;
-use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartService;
@@ -217,5 +216,37 @@ class OrderController extends Controller
         $id = $this->verifyRequiredId('id');
         OrderService::getInstance()->refund($this->userId(), $id);
         return $this->success();
+    }
+
+    public function detail()
+    {
+        $id = $this->verifyRequiredId('id');
+        $columns = [
+            'id',
+            'order_sn',
+            'status',
+            'remarks',
+            'consignee',
+            'mobile',
+            'address',
+            'shop_id',
+            'shop_avatar',
+            'shop_name',
+            'goods_price',
+            'freight_price',
+            'payment_amount',
+            'pay_time',
+            'ship_time',
+            'confirm_time',
+            'created_at',
+            'updated_at',
+        ];
+        $order = OrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+        $order['goods_list'] = $goodsList;
+        return $this->success($order);
     }
 }
