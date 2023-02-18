@@ -33,4 +33,9 @@ class OrderGoodsService extends BaseService
     {
         return OrderGoods::query()->whereIn('order_id', $orderIds)->get($columns);
     }
+
+    public function delete($orderId)
+    {
+        return OrderGoods::query()->where('order_id', $orderId)->delete();
+    }
 }

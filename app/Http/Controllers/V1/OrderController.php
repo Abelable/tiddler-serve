@@ -202,4 +202,13 @@ class OrderController extends Controller
         OrderService::getInstance()->confirm($this->userId(), $id);
         return $this->success();
     }
+
+    public function delete()
+    {
+        $id = $this->verifyRequiredId('id');
+        DB::transaction(function () use ($id) {
+            OrderService::getInstance()->delete($this->userId(), $id);
+        });
+        return $this->success();
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\OrderStatusTrait;
+
 /**
  * App\Models\Order
  *
@@ -71,4 +73,5 @@ namespace App\Models;
  */
 class Order extends BaseModel
 {
+    use OrderStatusTrait;
 }

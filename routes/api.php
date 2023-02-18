@@ -100,6 +100,7 @@ Route::prefix('order')->group(function () {
     Route::get('list', 'OrderController@list');
     Route::post('confirm', 'OrderController@confirm');
     Route::post('cancel', 'OrderController@cancel');
+    Route::post('delete', 'OrderController@delete');
 });
 
 Route::prefix('wx')->group(function () {
