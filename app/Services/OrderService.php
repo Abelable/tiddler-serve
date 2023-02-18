@@ -204,7 +204,14 @@ class OrderService extends BaseService
         }
 
         // 返还库存
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+        $this->returnStock($order->id);
+
+        return $order;
+    }
+
+    public function returnStock($orderId)
+    {
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($orderId);
         /** @var OrderGoods $goods */
         foreach ($goodsList as $goods)
         {
@@ -213,8 +220,6 @@ class OrderService extends BaseService
                 $this->throwUpdateFail();
             }
         }
-
-        return $order;
     }
 
     public function confirm($userId, $orderId, $isAuto = false)
@@ -250,5 +255,27 @@ class OrderService extends BaseService
 
         OrderGoodsService::getInstance()->delete($order->id);
         $order->delete();
+    }
+
+    public function refund($userId, $orderId)
+    {
+        $order = $this->getOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canRefundHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+        }
+
+        $order->status = OrderEnums::STATUS_REFUND;
+
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        // todo 通知商家
+        // todo 开启自动退款定时任务
+
+        return $order;
     }
 }

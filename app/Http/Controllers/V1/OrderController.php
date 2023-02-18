@@ -211,4 +211,11 @@ class OrderController extends Controller
         });
         return $this->success();
     }
+
+    public function refund()
+    {
+        $id = $this->verifyRequiredId('id');
+        OrderService::getInstance()->refund($this->userId(), $id);
+        return $this->success();
+    }
 }
