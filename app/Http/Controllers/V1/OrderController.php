@@ -143,6 +143,7 @@ class OrderController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $status = $this->verifyRequiredInteger('status');
+        $shopId = $this->verifyId('shopId');
 
         switch ($status) {
             case 1:
@@ -165,7 +166,12 @@ class OrderController extends Controller
                 break;
         }
 
-        $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
+        if ($shopId) {
+            $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
+        } else {
+            $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
+        }
+
         $orderList = collect($page->items());
 
         $orderIds = $orderList->pluck('id')->toArray();
@@ -181,7 +187,9 @@ class OrderController extends Controller
                 'shopAvatar' => $order->shop_avatar,
                 'shopName' => $order->shop_name,
                 'goodsList' => $goodsList,
-                'paymentAmount' => $order->payment_amount
+                'paymentAmount' => $order->payment_amount,
+                'address' => $order->address,
+                'orderSn' => $order->order_sn
             ];
         });
 
