@@ -188,6 +188,8 @@ class OrderController extends Controller
                 'shopName' => $order->shop_name,
                 'goodsList' => $goodsList,
                 'paymentAmount' => $order->payment_amount,
+                'consignee' => $order->consignee,
+                'mobile' => $order->mobile,
                 'address' => $order->address,
                 'orderSn' => $order->order_sn
             ];
