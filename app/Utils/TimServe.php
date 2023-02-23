@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Utils\Libs\Tim;
+namespace App\Utils;
 
+use App\Utils\Libs\Tim\TimRestInterface;
+use App\Utils\Libs\Tim\TLSSigAPI;
 use Exception;
 
-class TimRestAPI extends TimRestInterface
+class TimServe extends TimRestInterface
 {
     #app基本信息
     protected $sdkappid = 0;
