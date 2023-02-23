@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\LiveGoods;
-use App\Models\LiveRoom;
 use App\Services\LiveRoomService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\LiveRoomInput;
@@ -49,6 +48,8 @@ class LiveRoomController extends Controller
         $room->start_time = now()->toDateTimeString();
 
         // 创建群聊，获取群组id
+        $groupId = LiveRoomService::getInstance()->createChatGroup($room->id);
+        $room->group_id = $groupId;
 
         // 获取推、拉流地址
     }

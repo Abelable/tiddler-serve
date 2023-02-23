@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\LiveRoom;
 use App\Utils\Inputs\LiveRoomInput;
+use App\Utils\TimServe;
 
 class LiveRoomService extends BaseService
 {
@@ -30,13 +31,7 @@ class LiveRoomService extends BaseService
 
     public function createChatGroup($roomId)
     {
-        $info = [
-            'group_id' => $roomId,
-            'introduction' => null,
-            'notification' => null,
-            'face_url' => null,
-            'max_member_num' => 500,
-        ];
-
+        $ret = TimServe::new()->group_create_group3('AVChatRoom', '' . $roomId, env('TIM_ADMIN'), $roomId);
+        return $ret['GroupId'];
     }
 }
