@@ -13,6 +13,7 @@ class CodeResponse
     const PARAM_VALUE_INVALID = [200, 10008, '参数值类型错误'];
     const PARAM_VALUE_ILLEGAL = [200, 10009, '参数值错误'];
 
+    const INVALID_OPERATION = [200, 10008, '操作失败'];
     const ORDER_INVALID_OPERATION = [200, 10009, '订单操作失败'];
     const CART_INVALID_OPERATION = [200, 10010, '购物车操作失败'];
     const GOODS_NO_STOCK = [200, 10011, '商品库存不足'];

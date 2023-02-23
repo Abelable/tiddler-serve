@@ -16,11 +16,12 @@ class CreateLiveRoomsTable extends Migration
         Schema::create('live_rooms', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('直播创建者id');
-            $table->integer('status')->default(0)->comment('直播状态：0-待开播(预告)，1-直播中，2-直播结束');
+            $table->integer('status')->default(0)->comment('直播状态：0-待开播(预告)，1-直播中，2-直播结束, 3-直播预告');
             $table->string('name')->comment('直播间名称');
             $table->string('cover')->comment('直播封面');
             $table->string('share_cover')->comment('直播间分享封面');
             $table->integer('direction')->comment('方向：1-竖屏，2-横屏');
+            $table->string('play_url')->default('')->comment('拉流地址');
             $table->string('playback_url')->default('')->comment('回放地址');
             $table->string('group_id')->default('')->comment('群聊群组id');
             $table->integer('viewers_number')->default(0)->comment('观看人数');
