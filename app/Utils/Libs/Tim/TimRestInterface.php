@@ -195,7 +195,7 @@ abstract class TimRestInterface
      * @param string $receiver 添加的用户，完成之后两者互为好友
      * @return array 通过解析REST接口json返回包得到的关联数组，包含成功与否、错误提示等字段
      */
-    abstract function sns_friend_import($accout_id, $receiver);
+    abstract function sns_friend_import($account_id, $receiver);
 
     /**
      * 解除双方好友关系

@@ -14,7 +14,7 @@ class WxMpServe
     const GET_PHONE_NUMBER_URL = 'https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=%s';
     const GET_OPENID_URL = 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code';
 
-    private $accessToken;
+    protected $accessToken;
 
     public static function new()
     {
