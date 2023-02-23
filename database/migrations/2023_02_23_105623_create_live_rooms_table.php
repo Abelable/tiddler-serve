@@ -21,9 +21,10 @@ class CreateLiveRoomsTable extends Migration
             $table->string('cover')->comment('直播封面');
             $table->string('share_cover')->comment('直播间分享封面');
             $table->integer('direction')->comment('方向：1-竖屏，2-横屏');
-            $table->string('push_url')->default('')->comment('推流地址');
-            $table->string('play_url')->default('')->comment('拉流地址');
+            $table->string('playback_url')->default('')->comment('回放地址');
             $table->string('group_id')->default('')->comment('群聊群组id');
+            $table->integer('viewers_number')->default(0)->comment('观看人数');
+            $table->integer('praise_number')->default(0)->comment('点赞数');
             $table->string('notice_time')->default('')->comment('预告时间');
             $table->string('start_time')->default('')->comment('开播时间');
             $table->string('end_time')->default('')->comment('结束时间');
