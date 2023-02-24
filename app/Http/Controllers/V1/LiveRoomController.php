@@ -7,6 +7,8 @@ use App\Models\LiveGoods;
 use App\Services\LiveRoomService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\LiveRoomInput;
+use App\Utils\TencentLiveServe;
+use App\Utils\TimServe;
 use Illuminate\Support\Facades\DB;
 
 class LiveRoomController extends Controller
@@ -36,30 +38,39 @@ class LiveRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = LiveRoomService::getInstance()->getPushRoom($this->userId(), $id);
+        $columns = ['name', 'cover', 'share_cover', 'viewers_number', 'praise_number', 'group_id', 'push_url', 'play_url'];
+        $room = LiveRoomService::getInstance()->getPushRoom($this->userId(), $id, $columns);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
-        }
-        if ($room->status != 0 || $room->status != 3) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '非正常状态直播间，无法开播');
         }
 
         $room->status = 1;
         $room->start_time = now()->toDateTimeString();
 
         // 创建群聊，获取群组id
-        $groupId = LiveRoomService::getInstance()->createChatGroup($room->id);
-        $room->group_id = $groupId;
+        $ret = TimServe::new()->group_create_group3('AVChatRoom', '' . $id, env('TIM_ADMIN'), $id);
+        $room->group_id = $ret['GroupId'];
 
         // 获取推、拉流地址
+        $pushUrl = TencentLiveServe::new()->getPushUrl($id);
+        $room->push_url = $pushUrl;
+
+        $playUrl = TencentLiveServe::new()->getPlayUrl($id);
+        $room->play_url = $playUrl;
+
+        $room->save();
+
+        // todo 开播通知
+
+        return $this->success($room);
     }
 
     public function getNoticeRoomInfo()
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = LiveRoomService::getInstance()->getPushRoom($this->userId(), $id, ['name', 'cover', 'notice_time']);
-        if (is_null($room) || $room->status != 3) {
+        $room = LiveRoomService::getInstance()->getPushRoom($this->userId(), $id, ['name', 'cover', 'share_cover', 'notice_time'], [3]);
+        if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
         return $this->success($room);

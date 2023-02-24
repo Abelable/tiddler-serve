@@ -24,14 +24,11 @@ class LiveRoomService extends BaseService
         return $room->id;
     }
 
-    public function getPushRoom($userId, $id, $columns = ['*'])
+    public function getPushRoom($userId, $id, $columns = ['*'], $statusList = [0, 3])
     {
-        return LiveRoom::query()->where('user_id', $userId)->find($id, $columns);
-    }
-
-    public function createChatGroup($roomId)
-    {
-        $ret = TimServe::new()->group_create_group3('AVChatRoom', '' . $roomId, env('TIM_ADMIN'), $roomId);
-        return $ret['GroupId'];
+        return LiveRoom::query()
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->find($id, $columns);
     }
 }
