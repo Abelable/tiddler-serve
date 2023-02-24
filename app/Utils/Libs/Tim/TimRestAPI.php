@@ -2,8 +2,6 @@
 
 namespace App\Utils\Libs\Tim;
 
-use Exception;
-
 class TimRestAPI extends TimRestInterface
 {
     const REQUEST_URL = 'https://console.tim.qq.com/v4/%s/%s?usersig=%s&identifier=%s&sdkappid=%s&contenttype=json';
@@ -36,7 +34,7 @@ class TimRestAPI extends TimRestInterface
             $sig = $this->sigApi->genSig($identifier, $expiry_after);
             $this->usersig = $sig;
             return $sig;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
@@ -1138,7 +1136,7 @@ class TimRestAPI extends TimRestInterface
 
         try {
             $ret = curl_exec($ch);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             curl_close($ch);
             return json_encode(array('ret' => 0, 'msg' => 'failure'));
         }
@@ -1195,7 +1193,7 @@ class TimRestAPI extends TimRestInterface
                     $mret = curl_multi_exec($mh, $active);
                 } while ($mret == CURLM_CALL_MULTI_PERFORM);
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             curl_close($ch);
             return json_encode(array('ret' => 0, 'msg' => 'failure'));
         }
