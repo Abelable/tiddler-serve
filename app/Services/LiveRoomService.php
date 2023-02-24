@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\LiveRoom;
+use App\Utils\Enums\LiveStatusEnums;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 
@@ -17,7 +18,7 @@ class LiveRoomService extends BaseService
         $room->share_cover = $input->shareCover;
         $room->direction = $input->direction;
         if (!empty($input->noticeTime)) {
-            $room->status = 3;
+            $room->status = LiveStatusEnums::STATUS_NOTICE;
             $room->notice_time = $input->noticeTime;
         }
         $room->save();

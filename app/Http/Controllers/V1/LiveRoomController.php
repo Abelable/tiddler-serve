@@ -7,8 +7,10 @@ use App\Models\LiveGoods;
 use App\Models\LiveRoom;
 use App\Models\User;
 use App\Services\LiveRoomService;
+use App\Services\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\LiveStatusEnums;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\TencentLiveServe;
@@ -34,6 +36,12 @@ class LiveRoomController extends Controller
                     $liveGoods->save();
                 }
             }
+
+            // 如为预告，则添加一条媒体数据
+            if (!empty($input->noticeTime)) {
+                MediaService::getInstance()->newMedia($roomId, 1);
+            }
+
             return $roomId;
         });
 
@@ -69,18 +77,42 @@ class LiveRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 3]);
-        if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
-        }
+        DB::transaction(function () use ($id) {
+            $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 3]);
+            if (is_null($room)) {
+                return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+            }
 
-        $room->status = 1;
-        $room->start_time = now()->toDateTimeString();
-        $room->save();
+            $room->status = LiveStatusEnums::STATUS_LIVE;
+            $room->start_time = now()->toDateTimeString();
+            $room->save();
+
+            // 添加媒体数据
+            MediaService::getInstance()->newMedia($id, 1);
+        });
+
 
         // todo 开播通知
 
         return $this->success();
+    }
+
+    public function stopLive()
+    {
+        $id = $this->verifyRequiredId('id');
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        DB::transaction(function () use ($id, $room) {
+            $room->status = LiveStatusEnums::STATUS_STOP;
+            $room->end_time = now()->toDateTimeString();
+            $room->save();
+
+            // 删除媒体数据
+            MediaService::getInstance()->deleteMedia($id);
+        });
     }
 
     public function getNoticeRoomInfo()
