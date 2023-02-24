@@ -113,6 +113,8 @@ class LiveRoomController extends Controller
             // 删除媒体数据
             MediaService::getInstance()->deleteMedia($id);
         });
+
+        return $this->success();
     }
 
     public function getNoticeRoomInfo()
@@ -158,7 +160,7 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        $anchorInfo = UserService::getInstance()->getUserById($room->user_id, ['id', 'avatar', 'nickname', 'shop_id']);
+        $anchorInfo = UserService::getInstance()->getUserById($room->user_id, ['id', 'avatar', 'nickname']);
         $room['anchor_info'] = $anchorInfo;
         unset($room->user_id);
 
