@@ -45,8 +45,8 @@ class LiveRoomController extends Controller
         }
 
         // 创建群聊，获取群组id
-        $ret = TimServe::new()->group_create_group3('AVChatRoom', '' . $id, env('TIM_ADMIN'), $id);
-        $room->group_id = $ret['GroupId'];
+        $groupId = TimServe::new()->createChatGroup($id);
+        $room->group_id = $groupId;
 
         // 获取推、拉流地址
         $pushUrl = TencentLiveServe::new()->getPushUrl($id);
