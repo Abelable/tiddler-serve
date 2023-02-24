@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\LiveRoom;
 use App\Utils\Inputs\LiveRoomInput;
-use App\Utils\TimServe;
+use App\Utils\Inputs\PageInput;
 
 class LiveRoomService extends BaseService
 {
@@ -24,7 +24,17 @@ class LiveRoomService extends BaseService
         return $room->id;
     }
 
-    public function getPushRoom($userId, $id, $columns = ['*'], $statusList = [0, 3])
+    public function list(PageInput $input, $columns = ['*'])
+    {
+        return LiveRoom::query()
+            ->whereIn('status', [1, 2, 3])
+            ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
+            ->orderBy('viewers_number', 'desc')
+            ->orderBy('praise_number', 'desc')
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getRoom($userId, $id, $statusList, $columns = ['*'])
     {
         return LiveRoom::query()
             ->where('user_id', $userId)
