@@ -34,7 +34,7 @@ class LiveRoomController extends Controller
         return $this->success($roomId);
     }
 
-    public function startLive()
+    public function getPushRoomInfo()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -44,25 +44,37 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        $room->status = 1;
-        $room->start_time = now()->toDateTimeString();
-
         // 创建群聊，获取群组id
         $ret = TimServe::new()->group_create_group3('AVChatRoom', '' . $id, env('TIM_ADMIN'), $id);
         $room->group_id = $ret['GroupId'];
 
         // 获取推、拉流地址
         $pushUrl = TencentLiveServe::new()->getPushUrl($id);
-        $room->push_url = $pushUrl;
-
         $playUrl = TencentLiveServe::new()->getPlayUrl($id);
+        $room->push_url = $pushUrl;
         $room->play_url = $playUrl;
 
         $room->save();
 
+        return $this->success($room);
+    }
+
+    public function startLive()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $room = LiveRoomService::getInstance()->getPushRoom($this->userId(), $id);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $room->status = 1;
+        $room->start_time = now()->toDateTimeString();
+        $room->save();
+
         // todo 开播通知
 
-        return $this->success($room);
+        return $this->success();
     }
 
     public function getNoticeRoomInfo()
