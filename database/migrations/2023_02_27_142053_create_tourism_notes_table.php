@@ -21,6 +21,7 @@ class CreateTourismNotesTable extends Migration
             $table->longText('content')->comment('内容');
             $table->integer('viewers_number')->default(0)->comment('观看人数');
             $table->integer('praise_number')->default(0)->comment('点赞数');
+            $table->integer('comments_number')->default(0)->comment('评论数');
             $table->integer('collection_times')->default(0)->comment('收藏次数');
             $table->integer('share_times')->default(0)->comment('分享次数');
             $table->timestamps();
