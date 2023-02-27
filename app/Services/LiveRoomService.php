@@ -42,4 +42,9 @@ class LiveRoomService extends BaseService
             ->whereIn('status', $statusList)
             ->find($id, $columns);
     }
+
+    public function getListByIds($ids, $columns = ['*'])
+    {
+        return LiveRoom::query()->whereIn('id', $ids)->get($columns);
+    }
 }

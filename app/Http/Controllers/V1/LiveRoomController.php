@@ -39,7 +39,7 @@ class LiveRoomController extends Controller
 
             // 如为预告，则添加一条媒体数据
             if (!empty($input->noticeTime)) {
-                MediaService::getInstance()->newMedia($roomId, 1);
+                MediaService::getInstance()->newMedia($this->userId(), $roomId, 1);
             }
 
             return $roomId;
@@ -88,7 +88,7 @@ class LiveRoomController extends Controller
             $room->save();
 
             // 添加媒体数据
-            MediaService::getInstance()->newMedia($id, 1);
+            MediaService::getInstance()->newMedia($this->userId(), $id, 1);
         });
 
 

@@ -6,7 +6,8 @@ namespace App\Models;
  * App\Models\Media
  *
  * @property int $id
- * @property int $type 媒体类型：1-直播，2视频，3-短图文（攻略），4-长图文（游记）
+ * @property int $user_id 作者id
+ * @property int $type 媒体类型：1-直播（只存直播、预告），2-短视频，3-短图文（攻略）
  * @property int $media_id 媒体id
  * @property int $viewers_number 观看人数
  * @property int $praise_number 点赞数
@@ -24,6 +25,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Media wherePraiseNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Media whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Media whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Media whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Media whereViewersNumber($value)
  * @method static \Illuminate\Database\Query\Builder|Media withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Media withoutTrashed()

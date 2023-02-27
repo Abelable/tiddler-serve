@@ -26,6 +26,7 @@ class GoodsController extends Controller
 
     public function list()
     {
+        /** @var GoodsAllListInput $input */
         $input = GoodsAllListInput::new();
 
         $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];

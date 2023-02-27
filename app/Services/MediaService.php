@@ -8,9 +8,10 @@ use App\Utils\Inputs\PageInput;
 
 class MediaService extends BaseService
 {
-    public function newMedia($mediaId, $type)
+    public function newMedia($userId, $mediaId, $type)
     {
         $media = Media::new();
+        $media->user_id = $userId;
         $media->media_id = $mediaId;
         $media->type = $type;
         $media->save();
