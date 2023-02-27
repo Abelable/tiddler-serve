@@ -93,4 +93,32 @@ class ShortVideoController extends Controller
 
         return $this->success($collectionTimes);
     }
+
+    public function increaseViewersNumber()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        /** @var ShortVideo $video */
+        $video = ShortVideoService::getInstance()->getVideo($id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        DB::transaction(function () use ($id, $video) {
+            $viewersNumber = $video->viewers_number + 1;
+            $video->viewers_number = $viewersNumber;
+            $video->save();
+
+            $media = MediaService::getInstance()->getMedia($id, MediaTypeEnums::VIDEO);
+            $media->viewers_number = $viewersNumber;
+            $media->save();
+        });
+
+        return $this->success();
+    }
+
+    public function share()
+    {
+
+    }
 }
