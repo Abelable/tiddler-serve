@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\LiveGoods;
 use App\Models\LiveRoom;
+use App\Services\LiveGoodsService;
 use App\Services\LiveRoomService;
 use App\Services\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveStatusEnums;
+use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\TencentLiveServe;
@@ -25,26 +26,24 @@ class LiveRoomController extends Controller
         /** @var LiveRoomInput $input */
         $input = LiveRoomInput::new();
 
-        $roomId = DB::transaction(function () use ($input) {
-            $roomId = LiveRoomService::getInstance()->newLiveRoom($input);
+        /** @var LiveRoom $room */
+        $room = DB::transaction(function () use ($input) {
+            $room = LiveRoomService::getInstance()->newLiveRoom($this->userId(), $input);
             if (count($input->goodsIds) != 0) {
                 foreach ($input->goodsIds as $goodsId) {
-                    $liveGoods = LiveGoods::new();
-                    $liveGoods->room_id = $roomId;
-                    $liveGoods->goods_id = $goodsId;
-                    $liveGoods->save();
+                    LiveGoodsService::getInstance()->newGoods($room->id, $goodsId);
                 }
             }
 
             // 如为预告，则添加一条媒体数据
             if (!empty($input->noticeTime)) {
-                MediaService::getInstance()->newMedia($this->userId(), $roomId, 1);
+                MediaService::getInstance()->newMedia($this->userId(), $room->id, MediaTypeEnums::LIVE);
             }
 
-            return $roomId;
+            return $room;
         });
 
-        return $this->success($roomId);
+        return $this->success($room->id);
     }
 
     public function getPushRoomInfo()
@@ -110,7 +109,7 @@ class LiveRoomController extends Controller
             $room->save();
 
             // 删除媒体数据
-            MediaService::getInstance()->deleteMedia($id);
+            MediaService::getInstance()->deleteMedia($id, MediaTypeEnums::LIVE);
         });
 
         return $this->success();

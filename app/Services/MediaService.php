@@ -37,14 +37,14 @@ class MediaService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getMedia($mediaId, $columns = ['*'])
+    public function getMedia($mediaId, $type, $columns = ['*'])
     {
-        return Media::query()->where('media_id', $mediaId)->first($columns);
+        return Media::query()->where('type', $type)->where('media_id', $mediaId)->first($columns);
     }
 
-    public function deleteMedia($mediaId)
+    public function deleteMedia($mediaId, $type)
     {
-        $media = $this->getMedia($mediaId);
+        $media = $this->getMedia($mediaId, $type);
         if (is_null($media)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前媒体不存在');
         }

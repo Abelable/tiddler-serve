@@ -9,10 +9,10 @@ use App\Utils\Inputs\PageInput;
 
 class LiveRoomService extends BaseService
 {
-    public function newLiveRoom(LiveRoomInput $input)
+    public function newLiveRoom($userId, LiveRoomInput $input)
     {
         $room = LiveRoom::new();
-        $room->user_id = $this->userId();
+        $room->user_id = $userId;
         $room->title = $input->title;
         $room->cover = $input->cover;
         $room->share_cover = $input->shareCover;
@@ -22,7 +22,7 @@ class LiveRoomService extends BaseService
             $room->notice_time = $input->noticeTime;
         }
         $room->save();
-        return $room->id;
+        return $room;
     }
 
     public function list(PageInput $input, $columns = ['*'])

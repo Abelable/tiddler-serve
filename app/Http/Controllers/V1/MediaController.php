@@ -35,7 +35,7 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $authorIds = FanService::getInstance()->authorList($this->userId())->pluck('author_id')->toArray();
+        $authorIds = FanService::getInstance()->authorIds($this->userId());
         $page = MediaService::getInstance()->followList($authorIds, $input, ['user_id', 'type', 'media_id', 'viewers_number', 'praise_number']);
         $list = $this->fillList($page);
 
