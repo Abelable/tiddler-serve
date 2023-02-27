@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Services\MediaService;
+use App\Services\ShortVideoCollectionService;
 use App\Services\ShortVideoGoodsService;
 use App\Services\ShortVideoPraiseService;
 use App\Services\ShortVideoService;
@@ -63,5 +64,33 @@ class ShortVideoController extends Controller
         });
 
         return $this->success($praiseNumber);
+    }
+
+    public function toggleCollectionStatus()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        /** @var ShortVideo $video */
+        $video = ShortVideoService::getInstance()->getVideo($id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        $collection = ShortVideoCollectionService::getInstance()->getCollection($this->userId(), $id);
+        $collectionTimes = DB::transaction(function () use ($id, $video, $collection) {
+            if (!is_null($collection)) {
+                $collection->delete();
+                $collectionTimes = max($video->collection_times - 1, 0);
+            } else {
+                ShortVideoCollectionService::getInstance()->newCollection($this->userId(), $id);
+                $collectionTimes = $video->collection_times + 1;
+            }
+            $video->collection_times = $collectionTimes;
+            $video->save();
+
+            return $collectionTimes;
+        });
+
+        return $this->success($collectionTimes);
     }
 }
