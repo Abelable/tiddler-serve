@@ -27,6 +27,16 @@ class MediaService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function followList($authorIds, PageInput $input, $columns = ['*'])
+    {
+        return Media::query()
+            ->whereIn('user_id', $authorIds)
+            ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
+            ->orderBy('viewers_number', 'desc')
+            ->orderBy('praise_number', 'desc')
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getMedia($mediaId, $columns = ['*'])
     {
         return Media::query()->where('media_id', $mediaId)->first($columns);

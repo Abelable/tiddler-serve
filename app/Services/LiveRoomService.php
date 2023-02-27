@@ -13,7 +13,7 @@ class LiveRoomService extends BaseService
     {
         $room = LiveRoom::new();
         $room->user_id = $this->userId();
-        $room->name = $input->name;
+        $room->title = $input->title;
         $room->cover = $input->cover;
         $room->share_cover = $input->shareCover;
         $room->direction = $input->direction;

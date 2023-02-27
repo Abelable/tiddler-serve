@@ -4,7 +4,7 @@ namespace App\Utils\Inputs;
 
 class LiveRoomInput extends BaseInput
 {
-    public $name;
+    public $title;
     public $cover;
     public $shareCover;
     public $direction;
@@ -14,7 +14,7 @@ class LiveRoomInput extends BaseInput
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'title' => 'required|string',
             'cover' => 'required|string',
             'shareCover' => 'required|string',
             'direction' => 'required|integer|in:1,2',

@@ -8,7 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 直播创建者id
  * @property int $status 直播状态：0-待开播(预告)，1-直播中，2-直播结束, 3-直播预告
- * @property string $name 直播间名称
+ * @property string $title 直播标题
  * @property string $cover 直播封面
  * @property string $share_cover 直播间分享封面
  * @property int $direction 方向：1-竖屏，2-横屏
@@ -35,7 +35,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereGroupId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereNoticeTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom wherePlayUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom wherePlaybackUrl($value)
@@ -44,6 +43,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereShareCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereViewersNumber($value)

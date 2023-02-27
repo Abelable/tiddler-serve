@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\LiveGoods;
 use App\Models\LiveRoom;
-use App\Models\User;
 use App\Services\LiveRoomService;
 use App\Services\MediaService;
 use App\Services\UserService;
