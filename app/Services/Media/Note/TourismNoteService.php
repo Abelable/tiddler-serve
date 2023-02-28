@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Media\Note;
 
 use App\Models\TourismNote;
+use App\Services\BaseService;
 
 class TourismNoteService extends BaseService
 {

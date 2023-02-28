@@ -4,11 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
-use App\Services\MediaService;
-use App\Services\ShortVideoCollectionService;
-use App\Services\ShortVideoGoodsService;
-use App\Services\ShortVideoPraiseService;
-use App\Services\ShortVideoService;
+use App\Services\Media\MediaService;
+use App\Services\Media\ShortVideo\ShortVideoCollectionService;
+use App\Services\Media\ShortVideo\ShortVideoGoodsService;
+use App\Services\Media\ShortVideo\ShortVideoPraiseService;
+use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaTypeEnums;
@@ -146,5 +146,10 @@ class ShortVideoController extends Controller
     public function share()
     {
 
+    }
+
+    public function comment()
+    {
+        // todo: 通知用户评论被回复
     }
 }

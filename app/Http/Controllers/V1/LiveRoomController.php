@@ -4,9 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\LiveRoom;
-use App\Services\LiveGoodsService;
-use App\Services\LiveRoomService;
-use App\Services\MediaService;
+use App\Services\Media\Live\LiveGoodsService;
+use App\Services\Media\Live\LiveRoomService;
+use App\Services\Media\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveStatusEnums;

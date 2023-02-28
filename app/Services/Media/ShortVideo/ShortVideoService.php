@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Media\ShortVideo;
 
 use App\Models\ShortVideo;
+use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShortVideoInput;
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Media\ShortVideo;
 
 use App\Models\ShortVideoGoods;
+use App\Services\BaseService;
 
 class ShortVideoGoodsService extends BaseService
 {

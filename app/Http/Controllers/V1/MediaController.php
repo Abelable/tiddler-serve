@@ -8,10 +8,10 @@ use App\Models\Media;
 use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\FanService;
-use App\Services\LiveRoomService;
-use App\Services\MediaService;
-use App\Services\ShortVideoService;
-use App\Services\TourismNoteService;
+use App\Services\Media\Live\LiveRoomService;
+use App\Services\Media\MediaService;
+use App\Services\Media\Note\TourismNoteService;
+use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\Inputs\PageInput;
 

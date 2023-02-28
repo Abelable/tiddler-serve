@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Media\Live;
 
 use App\Models\LiveGoods;
+use App\Services\BaseService;
 
 class LiveGoodsService extends BaseService
 {
