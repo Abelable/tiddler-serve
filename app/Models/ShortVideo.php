@@ -12,6 +12,7 @@ namespace App\Models;
  * @property string $title 视频标题
  * @property int $viewers_number 观看人数
  * @property int $praise_number 点赞数
+ * @property int $comments_number 评论数
  * @property int $collection_times 收藏次数
  * @property int $share_times 分享次数
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -22,6 +23,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ShortVideo onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo query()
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCollectionTimes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCommentsNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereDeletedAt($value)
