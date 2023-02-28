@@ -9,13 +9,39 @@ use App\Services\ShortVideoCollectionService;
 use App\Services\ShortVideoGoodsService;
 use App\Services\ShortVideoPraiseService;
 use App\Services\ShortVideoService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaTypeEnums;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShortVideoInput;
 use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
+    protected $except = ['list'];
+
+    public function list()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyRequiredId('id');
+
+        $page = ShortVideoService::getInstance()->pageList($id, $input);
+        $videoList = collect($page->items());
+
+        $authorIds = $videoList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getUserListByIds($authorIds, ['id', 'name', 'avatar'])->keyBy('id');
+
+        $list = $videoList->map(function (ShortVideo $video) use ($authorList) {
+            $authorInfo = $authorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
+            unset($video->user_id);
+            return $video;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
     public function createVideo()
     {
         /** @var ShortVideoInput $input */

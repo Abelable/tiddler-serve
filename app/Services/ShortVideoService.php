@@ -3,10 +3,19 @@
 namespace App\Services;
 
 use App\Models\ShortVideo;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
+    public function pageList($currentVideoId, PageInput $input, $columns = ['*'])
+    {
+        return ShortVideo::query()
+            ->orderByRaw("CASE WHEN id = " . $currentVideoId ." THEN 0 ELSE 1 END")
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getListByIds($ids, $columns = ['*'])
     {
         return ShortVideo::query()->whereIn('id', $ids)->get($columns);
