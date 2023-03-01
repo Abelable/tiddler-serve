@@ -10,7 +10,6 @@ namespace App\Models;
  * @property string $image_list 主图图片列表
  * @property string $title 标题
  * @property string $content 内容
- * @property int $viewers_number 观看人数
  * @property int $praise_number 点赞数
  * @property int $comments_number 评论数
  * @property int $collection_times 收藏次数

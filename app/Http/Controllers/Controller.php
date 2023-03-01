@@ -92,13 +92,12 @@ class Controller extends BaseController
             return $page;
         }
 
-        $total = count($page);
         return [
-            'total' => $total,
-            'page' => $total == 0 ? 0 : 1,
-            'limit' => $total,
-            'pages' => $total == 0 ? 0 : 1,
-            'list' => $page
+            'total' => $page['total'] ?? 0,
+            'page' => $page['page'] ?? 0,
+            'limit' => $page['limit'] ?? 0,
+            'pages' => $page['total'] ?? 0,
+            'list' => $list ?? $page['list'] ?? []
         ];
     }
 

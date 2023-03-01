@@ -10,7 +10,6 @@ namespace App\Models;
  * @property string $cover 封面
  * @property string $video_url 视频地址
  * @property string $title 视频标题
- * @property int $viewers_number 观看人数
  * @property int $praise_number 点赞数
  * @property int $comments_number 评论数
  * @property int $collection_times 收藏次数
@@ -41,4 +40,8 @@ namespace App\Models;
  */
 class ShortVideo extends BaseModel
 {
+    public function authorInfo()
+    {
+        return $this->belongsTo(User::class)->select('id', 'nickname', 'avatar');
+    }
 }

@@ -48,6 +48,14 @@ class TourismNoteController extends Controller
                     $note['is_follow'] = 1;
                 }
             }
+
+            $note['commentList'] = $note['commentList']->map(function ($comment) {
+                return [
+                    'nickname' => $comment['userInfo']->nickname,
+                    'content' => $comment['content']
+                ];
+            });
+
             return $note;
         });
 
@@ -102,6 +110,6 @@ class TourismNoteController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
         }
 
-        
+
     }
 }

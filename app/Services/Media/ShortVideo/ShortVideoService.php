@@ -9,10 +9,21 @@ use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
-    public function pageList($currentVideoId, PageInput $input, $columns = ['*'])
+    public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
     {
-        return ShortVideo::query()
-            ->orderByRaw("CASE WHEN id = " . $currentVideoId ." THEN 0 ELSE 1 END")
+        $query = ShortVideo::query();
+        if (!is_null($authorIds)) {
+            $query = $query->whereIn('user_id', $authorIds);
+        }
+        if ($curVideoId != 0) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $curVideoId . " THEN 0 ELSE 1 END");
+        }
+        return $query
+            ->with('authorInfo')
+            ->orderBy('praise_number', 'desc')
+            ->orderBy('comments_number', 'desc')
+            ->orderBy('collection_times', 'desc')
+            ->orderBy('share_times', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

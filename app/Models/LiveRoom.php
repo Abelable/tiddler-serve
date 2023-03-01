@@ -53,4 +53,8 @@ namespace App\Models;
  */
 class LiveRoom extends BaseModel
 {
+    public function anchorInfo()
+    {
+        return $this->belongsTo(User::class)->select('id', 'avatar', 'nickname');
+    }
 }
