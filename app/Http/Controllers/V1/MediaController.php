@@ -8,6 +8,7 @@ use App\Services\FanService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoService;
+use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\PageInput;
 
 class MediaController extends Controller
@@ -44,7 +45,7 @@ class MediaController extends Controller
         $liveColumns = ['id', 'status', 'title', 'cover', 'play_url', 'notice_time'];
         $livePage = LiveRoomService::getInstance()->pageList($liveInput, $liveColumns, [1, 3], $authorIds);
         $liveList = collect($livePage->items())->map(function ($live) {
-            $live['type'] = 1;
+            $live['type'] = MediaTypeEnums::LIVE;
             return $live;
         });
 
@@ -55,7 +56,7 @@ class MediaController extends Controller
         $videoColumns = ['id', 'cover', 'video_url', 'title', 'praise_number'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
         $videoList = collect($videoPage->items())->map(function ($video) {
-            $video['type'] = 2;
+            $video['type'] = MediaTypeEnums::VIDEO;
             return $video;
         });
 
@@ -65,7 +66,7 @@ class MediaController extends Controller
         ], (array)$input);
         $notePage = TourismNoteService::getInstance()->pageList($noteInput, ['id', 'image_list', 'title', 'praise_number'], $authorIds);
         $noteList = collect($notePage->items())->map(function (TourismNote $note) {
-            $note['type'] = 3;
+            $note['type'] = MediaTypeEnums::NOTE;
             $note->image_list = json_decode($note->image_list);
             return $note;
         });

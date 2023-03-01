@@ -5,8 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoComment;
-use App\Models\User;
-use App\Services\Media\MediaService;
+use App\Models\TourismNoteComment;
+use App\Services\FanService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoGoodsService;
@@ -14,7 +14,6 @@ use App\Services\Media\ShortVideo\ShortVideoPraiseService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
@@ -31,30 +30,22 @@ class ShortVideoController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $page = ShortVideoService::getInstance()->pageList($id, $input);
+        $columns = ['id', 'user_id', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times', 'created_at'];
+        $page = ShortVideoService::getInstance()->pageList($input, $columns, null, $id);
         $videoList = collect($page->items());
 
         $authorIds = $videoList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListWithFanList($authorIds)->keyBy('id');
+        $fansGroup = FanService::getInstance()->fansGroup($authorIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($authorList) {
-            /** @var User $author */
-            $author = $authorList->get($video->user_id);
-            $video['author_info'] = [
-                'id' => $author->id,
-                'avatar' => $author->avatar,
-                'nickname' => $author->nickname,
-            ];
-            unset($video->user_id);
-
+        $list = $videoList->map(function (ShortVideo $video) use ($fansGroup) {
             $video['is_follow'] = 0;
             if ($this->isLogin()) {
-                $fansIds = $author['fanList']->pluck('fan_id')->toArray();
+                $fansIds = collect($fansGroup->get($video->user_id))->pluck('fan_id')->toArray();
                 if (in_array($this->userId(), $fansIds)) {
                     $video['is_follow'] = 1;
                 }
             }
-
+            unset($video->user_id);
             return $video;
         });
 
@@ -72,8 +63,6 @@ class ShortVideoController extends Controller
             if (!empty($input->goodsId)) {
                 ShortVideoGoodsService::getInstance()->newGoods($video->id, $input->goodsId);
             }
-
-            MediaService::getInstance()->newMedia($this->userId(), $video->id, MediaTypeEnums::VIDEO);
         });
 
         return $this->success();
@@ -92,9 +81,6 @@ class ShortVideoController extends Controller
             $video->delete();
 
             ShortVideoGoodsService::getInstance()->deleteList($video->id);
-
-            $media = MediaService::getInstance()->getMedia($video->id, MediaTypeEnums::VIDEO);
-            $media->delete();
         });
 
         return $this->success();
@@ -110,8 +96,8 @@ class ShortVideoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
         }
 
-        $praise = ShortVideoPraiseService::getInstance()->getPraise($this->userId(), $id);
-        $praiseNumber = DB::transaction(function () use ($video, $id, $praise) {
+        $praiseNumber = DB::transaction(function () use ($video, $id) {
+            $praise = ShortVideoPraiseService::getInstance()->getPraise($this->userId(), $id);
             if (!is_null($praise)) {
                 $praise->delete();
                 $praiseNumber = max($video->praise_number - 1, 0);
@@ -121,10 +107,6 @@ class ShortVideoController extends Controller
             }
             $video->praise_number = $praiseNumber;
             $video->save();
-
-            $media = MediaService::getInstance()->getMedia($id, MediaTypeEnums::VIDEO);
-            $media->praise_number = $praiseNumber;
-            $media->save();
 
             return $praiseNumber;
         });
@@ -154,37 +136,10 @@ class ShortVideoController extends Controller
             $video->collection_times = $collectionTimes;
             $video->save();
 
-            $media = MediaService::getInstance()->getMedia($id, MediaTypeEnums::VIDEO);
-            $media->collection_times = $collectionTimes;
-            $media->save();
-
             return $collectionTimes;
         });
 
         return $this->success($collectionTimes);
-    }
-
-    public function increaseViewersNumber()
-    {
-        $id = $this->verifyRequiredId('id');
-
-        /** @var ShortVideo $video */
-        $video = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
-        }
-
-        DB::transaction(function () use ($id, $video) {
-            $viewersNumber = $video->viewers_number + 1;
-            $video->viewers_number = $viewersNumber;
-            $video->save();
-
-            $media = MediaService::getInstance()->getMedia($id, MediaTypeEnums::VIDEO);
-            $media->viewers_number = $viewersNumber;
-            $media->save();
-        });
-
-        return $this->success();
     }
 
     public function share()
@@ -197,20 +152,26 @@ class ShortVideoController extends Controller
         /** @var CommentListInput $input */
         $input = CommentListInput::new();
 
-        $page = ShortVideoCommentService::getInstance()->pageList($input);
+        $page = ShortVideoCommentService::getInstance()->pageList($input, ['id', 'content']);
         $commentList = collect($page->items());
 
-        $userIds = $commentList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'name', 'avatar'])->keyBy('id');
+        $ids = $commentList->pluck('id')->toArray();
+        $repliesCountList = ShortVideoCommentService::getInstance()->repliesCountList($ids);
 
-        $list = $commentList->map(function (ShortVideoComment $comment) use ($userList) {
-            $userInfo = $userList->get($comment->user_id);
-            $comment['user_info'] = $userInfo;
-            unset($comment->user_id);
+        $list = $commentList->map(function (TourismNoteComment $comment) use ($repliesCountList) {
+            $comment['replies_count'] = $repliesCountList[$comment->id] ?? 0;
             return $comment;
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function getReplyCommentList()
+    {
+        /** @var CommentListInput $input */
+        $input = CommentListInput::new();
+        $list = ShortVideoCommentService::getInstance()->pageList($input, ['id', 'content']);
+        return $this->successPaginate($list);
     }
 
     public function comment()
@@ -225,10 +186,6 @@ class ShortVideoController extends Controller
             $commentsNumber = $video->comments_number + 1;
             $video->comments_number = $commentsNumber;
             $video->save();
-
-            $media = MediaService::getInstance()->getMedia($input->mediaId, MediaTypeEnums::VIDEO);
-            $media->comments_number = $commentsNumber;
-            $media->save();
         });
 
         // todo: 通知用户评论被回复
@@ -252,10 +209,6 @@ class ShortVideoController extends Controller
             $commentsNumber = max($video->comments_number - 1, 0);
             $video->comments_number = $commentsNumber;
             $video->save();
-
-            $media = MediaService::getInstance()->getMedia($comment->video_id, MediaTypeEnums::VIDEO);
-            $media->comments_number = $commentsNumber;
-            $media->save();
         });
 
         return $this->success();

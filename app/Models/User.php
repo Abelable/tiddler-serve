@@ -85,9 +85,4 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     {
         return [];
     }
-
-    public function fanList()
-    {
-        return $this->hasMany(Fan::class, 'author_id');
-    }
 }

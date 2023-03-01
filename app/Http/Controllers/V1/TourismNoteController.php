@@ -5,8 +5,11 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\TourismNote;
 use App\Models\User;
+use App\Services\FanService;
 use App\Services\Media\MediaService;
+use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteGoodsService;
+use App\Services\Media\Note\TourismNotePraiseService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -25,29 +28,22 @@ class TourismNoteController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $page = TourismNoteService::getInstance()->pageList($id, $input);
+        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'praise_number', 'comments_number', 'collection_times', 'share_times', 'created_at'];
+        $page = TourismNoteService::getInstance()->pageList($input, $columns, null, $id, true);
         $noteList = collect($page->items());
 
         $authorIds = $noteList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListWithFanList($authorIds)->keyBy('id');
+        $fansGroup = FanService::getInstance()->fansGroup($authorIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($authorList) {
-            /** @var User $author */
-            $author = $authorList->get($note->user_id);
-            $note['author_info'] = [
-                'id' => $author->id,
-                'avatar' => $author->avatar,
-                'nickname' => $author->nickname,
-            ];
-            unset($note->user_id);
-
+        $list = $noteList->map(function (TourismNote $note) use ($fansGroup) {
             $note['is_follow'] = 0;
             if ($this->isLogin()) {
-                $fansIds = $author['fanList']->pluck('fan_id')->toArray();
+                $fansIds = collect($fansGroup->get($note->user_id))->pluck('fan_id')->toArray();
                 if (in_array($this->userId(), $fansIds)) {
                     $note['is_follow'] = 1;
                 }
             }
+            unset($note->user_id);
 
             $note['commentList'] = $note['commentList']->map(function ($comment) {
                 return [
@@ -73,8 +69,6 @@ class TourismNoteController extends Controller
             if (!empty($input->goodsId)) {
                 TourismNoteGoodsService::getInstance()->newGoods($note->id, $input->goodsId);
             }
-
-            MediaService::getInstance()->newMedia($this->userId(), $note->id, MediaTypeEnums::NOTE);
         });
 
         return $this->success();
@@ -93,23 +87,64 @@ class TourismNoteController extends Controller
             $note->delete();
 
             TourismNoteGoodsService::getInstance()->deleteList($note->id);
-
-            $media = MediaService::getInstance()->getMedia($note->id, MediaTypeEnums::NOTE);
-            $media->delete();
         });
 
         return $this->success();
+    }
+
+    public function togglePraiseStatus()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        /** @var TourismNote $note */
+        $note = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($note)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
+        }
+
+        $praiseNumber = DB::transaction(function () use ($note, $id) {
+            $praise = TourismNotePraiseService::getInstance()->getPraise($this->userId(), $id);
+            if (!is_null($praise)) {
+                $praise->delete();
+                $praiseNumber = max($note->praise_number - 1, 0);
+            } else {
+                TourismNotePraiseService::getInstance()->newPraise($this->userId(), $id);
+                $praiseNumber = $note->praise_number + 1;
+            }
+            $note->praise_number = $praiseNumber;
+            $note->save();
+
+            return $praiseNumber;
+        });
+
+        return $this->success($praiseNumber);
     }
 
     public function toggleCollectionStatus()
     {
         $id = $this->verifyRequiredId('id');
 
-        $note = TourismNoteService::getInstance()->getUserNote($this->userId(), $id);
+        /** @var TourismNote $note */
+        $note = TourismNoteService::getInstance()->getNote($id);
         if (is_null($note)) {
             return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
         }
 
+        $collectionTimes = DB::transaction(function () use ($id, $note) {
+            $collection = TourismNoteCollectionService::getInstance()->getCollection($this->userId(), $id);
+            if (!is_null($collection)) {
+                $collection->delete();
+                $collectionTimes = max($note->collection_times - 1, 0);
+            } else {
+                TourismNoteCollectionService::getInstance()->newCollection($this->userId(), $id);
+                $collectionTimes = $note->collection_times + 1;
+            }
+            $note->collection_times = $collectionTimes;
+            $note->save();
 
+            return $collectionTimes;
+        });
+
+        return $this->success($collectionTimes);
     }
 }

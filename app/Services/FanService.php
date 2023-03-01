@@ -16,4 +16,9 @@ class FanService extends BaseService
         $list = $this->authorList($fanId);
         return $list->pluck('author_id')->toArray();
     }
+
+    public function fansGroup($authorIds, $columns = ['*'])
+    {
+        return Fan::query()->whereIn('author_id', $authorIds)->get($columns)->groupBy('author_id');
+    }
 }

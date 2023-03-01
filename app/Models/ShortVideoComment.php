@@ -28,7 +28,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ShortVideoComment withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShortVideoComment withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\User|null $userInfo
  */
 class ShortVideoComment extends BaseModel
 {
+    public function userInfo()
+    {
+        return $this->belongsTo(User::class)->select('id', 'nickname', 'avatar');
+    }
 }
