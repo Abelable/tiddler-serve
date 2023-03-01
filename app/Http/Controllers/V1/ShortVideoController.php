@@ -5,14 +5,12 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoComment;
-use App\Models\TourismNoteComment;
 use App\Services\FanService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoGoodsService;
 use App\Services\Media\ShortVideo\ShortVideoPraiseService;
 use App\Services\Media\ShortVideo\ShortVideoService;
-use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
@@ -158,7 +156,7 @@ class ShortVideoController extends Controller
         $ids = $commentList->pluck('id')->toArray();
         $repliesCountList = ShortVideoCommentService::getInstance()->repliesCountList($ids);
 
-        $list = $commentList->map(function (TourismNoteComment $comment) use ($repliesCountList) {
+        $list = $commentList->map(function (ShortVideoComment $comment) use ($repliesCountList) {
             $comment['replies_count'] = $repliesCountList[$comment->id] ?? 0;
             return $comment;
         });
@@ -183,8 +181,7 @@ class ShortVideoController extends Controller
             ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
 
             $video = ShortVideoService::getInstance()->getVideo($input->mediaId);
-            $commentsNumber = $video->comments_number + 1;
-            $video->comments_number = $commentsNumber;
+            $video->comments_number = $video->comments_number + 1;
             $video->save();
         });
 
@@ -206,8 +203,7 @@ class ShortVideoController extends Controller
             $comment->delete();
 
             $video = ShortVideoService::getInstance()->getVideo($comment->video_id);
-            $commentsNumber = max($video->comments_number - 1, 0);
-            $video->comments_number = $commentsNumber;
+            $video->comments_number = max($video->comments_number - 1, 0);
             $video->save();
         });
 

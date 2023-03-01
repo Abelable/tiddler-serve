@@ -4,16 +4,16 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\TourismNote;
-use App\Models\User;
+use App\Models\TourismNoteComment;
 use App\Services\FanService;
-use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
+use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteGoodsService;
 use App\Services\Media\Note\TourismNotePraiseService;
 use App\Services\Media\Note\TourismNoteService;
-use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\MediaTypeEnums;
+use App\Utils\Inputs\CommentInput;
+use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\TourismNoteInput;
 use Illuminate\Support\Facades\DB;
@@ -146,5 +146,75 @@ class TourismNoteController extends Controller
         });
 
         return $this->success($collectionTimes);
+    }
+
+    public function share()
+    {
+
+    }
+
+    public function getCommentList()
+    {
+        /** @var CommentListInput $input */
+        $input = CommentListInput::new();
+
+        $page = TourismNoteCommentService::getInstance()->pageList($input, ['id', 'content']);
+        $commentList = collect($page->items());
+
+        $ids = $commentList->pluck('id')->toArray();
+        $repliesCountList = TourismNoteCommentService::getInstance()->repliesCountList($ids);
+
+        $list = $commentList->map(function (TourismNoteComment $comment) use ($repliesCountList) {
+            $comment['replies_count'] = $repliesCountList[$comment->id] ?? 0;
+            return $comment;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function getReplyCommentList()
+    {
+        /** @var CommentListInput $input */
+        $input = CommentListInput::new();
+        $list = TourismNoteCommentService::getInstance()->pageList($input, ['id', 'content']);
+        return $this->successPaginate($list);
+    }
+
+    public function comment()
+    {
+        /** @var CommentInput $input */
+        $input = CommentInput::new();
+
+        DB::transaction(function () use ($input) {
+            TourismNoteCommentService::getInstance()->newComment($this->userId(), $input);
+
+            $note = TourismNoteService::getInstance()->getNote($input->mediaId);
+            $note->comments_number = $note->comments_number + 1;
+            $note->save();
+        });
+
+        // todo: 通知用户评论被回复
+
+        return $this->success();
+    }
+
+    public function deleteComment()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $comment = TourismNoteCommentService::getInstance()->getComment($this->userId(), $id);
+        if (is_null($comment)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '评论不存在');
+        }
+
+        DB::transaction(function () use ($comment) {
+            $comment->delete();
+
+            $note = TourismNoteService::getInstance()->getNote($comment->note_id);
+            $note->comments_number = max($note->comments_number - 1, 0);
+            $note->save();
+        });
+
+        return $this->success();
     }
 }
