@@ -17,6 +17,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $authorInfo
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo newQuery()
  * @method static \Illuminate\Database\Query\Builder|ShortVideo onlyTrashed()
@@ -33,7 +34,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereVideoUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereViewersNumber($value)
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withoutTrashed()
  * @mixin \Eloquent

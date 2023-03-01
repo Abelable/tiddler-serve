@@ -17,6 +17,9 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $authorInfo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TourismNoteComment[] $commentList
+ * @property-read int|null $comment_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote newQuery()
  * @method static \Illuminate\Database\Query\Builder|TourismNote onlyTrashed()
@@ -33,13 +36,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereViewersNumber($value)
  * @method static \Illuminate\Database\Query\Builder|TourismNote withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TourismNote withoutTrashed()
  * @mixin \Eloquent
- * @property-read \App\Models\User|null $authorInfo
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TourismNoteComment[] $commentList
- * @property-read int|null $comment_list_count
  */
 class TourismNote extends BaseModel
 {

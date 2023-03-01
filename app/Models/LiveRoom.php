@@ -50,6 +50,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|LiveRoom withTrashed()
  * @method static \Illuminate\Database\Query\Builder|LiveRoom withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\User|null $anchorInfo
  */
 class LiveRoom extends BaseModel
 {
