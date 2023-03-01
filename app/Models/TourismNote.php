@@ -38,7 +38,19 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|TourismNote withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TourismNote withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\User|null $authorInfo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TourismNoteComment[] $commentList
+ * @property-read int|null $comment_list_count
  */
 class TourismNote extends BaseModel
 {
+    public function commentList()
+    {
+        return $this->hasMany(TourismNoteComment::class);
+    }
+
+    public function authorInfo()
+    {
+        return $this->belongsTo(User::class)->select('id', 'nickname', 'avatar');
+    }
 }

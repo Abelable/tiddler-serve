@@ -20,6 +20,9 @@ class CreateMediaTable extends Migration
             $table->integer('media_id')->comment('媒体id');
             $table->integer('viewers_number')->default(0)->comment('观看人数');
             $table->integer('praise_number')->default(0)->comment('点赞数');
+            $table->integer('comments_number')->default(0)->comment('评论数');
+            $table->integer('collection_times')->default(0)->comment('收藏次数');
+            $table->integer('share_times')->default(0)->comment('分享次数');
             $table->timestamps();
             $table->softDeletes();
         });

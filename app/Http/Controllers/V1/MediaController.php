@@ -47,7 +47,7 @@ class MediaController extends Controller
         $mediaList = collect($page->items());
 
         $userIds = $mediaList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getUserListByIds($userIds, ['avatar', 'nickname'])->keyBy('id');
+        $userList = UserService::getInstance()->getListByIds($userIds, ['avatar', 'nickname'])->keyBy('id');
 
         $liveIds = $mediaList->where('type', 1)->pluck('media_id')->toArray();
         $liveList = LiveRoomService::getInstance()->getListByIds($liveIds)->keyBy('id');

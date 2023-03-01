@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Services\Media\ShortVideo;
+namespace App\Services\Media\Note;
 
-use App\Models\ShortVideoComment;
+use App\Models\TourismNoteComment;
 use App\Services\BaseService;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 
-class ShortVideoCommentService extends BaseService
+class TourismNoteCommentService extends BaseService
 {
     public function pageList(CommentListInput $input, $columns = ['*'])
     {
-        $query = ShortVideoComment::query()->where('video_id', $input->mediaId);
+        $query = TourismNoteComment::query()->where('note_id', $input->mediaId);
         if (!empty($input->commentId)) {
             $query->where('comment_id', $input->commentId);
         }
@@ -20,9 +20,9 @@ class ShortVideoCommentService extends BaseService
 
     public function newComment($userId, CommentInput $input)
     {
-        $comment = ShortVideoComment::new();
+        $comment = TourismNoteComment::new();
         $comment->user_id = $userId;
-        $comment->video_id = $input->mediaId;
+        $comment->note_id = $input->mediaId;
         $comment->content = $input->content;
         if (!empty($input->commentId)) {
             $comment->comment_id = $input->commentId;
@@ -33,6 +33,6 @@ class ShortVideoCommentService extends BaseService
 
     public function getComment($userId, $id, $columns = ['*'])
     {
-        return ShortVideoComment::query()->where('user_id', $userId)->find($id, $columns);
+        return TourismNoteComment::query()->where('user_id', $userId)->find($id, $columns);
     }
 }

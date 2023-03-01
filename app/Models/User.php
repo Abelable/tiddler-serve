@@ -45,6 +45,8 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Fan[] $fanList
+ * @property-read int|null $fan_list_count
  */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
@@ -82,5 +84,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function fanList()
+    {
+        return $this->hasMany(Fan::class, 'author_id');
     }
 }

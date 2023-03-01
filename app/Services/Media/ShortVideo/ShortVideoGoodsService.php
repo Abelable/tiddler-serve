@@ -26,4 +26,9 @@ class ShortVideoGoodsService extends BaseService
         $list = $this->list($videoId);
         return $list->pluck('goods_id')->toArray();
     }
+
+    public function deleteList($videoId)
+    {
+        ShortVideoGoods::query()->where('video_id', $videoId)->delete();
+    }
 }

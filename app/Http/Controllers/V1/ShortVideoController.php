@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoComment;
+use App\Models\User;
 use App\Services\Media\MediaService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
@@ -34,12 +35,26 @@ class ShortVideoController extends Controller
         $videoList = collect($page->items());
 
         $authorIds = $videoList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getUserListByIds($authorIds, ['id', 'name', 'avatar'])->keyBy('id');
+        $authorList = UserService::getInstance()->getListWithFanList($authorIds)->keyBy('id');
 
         $list = $videoList->map(function (ShortVideo $video) use ($authorList) {
-            $authorInfo = $authorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
+            /** @var User $author */
+            $author = $authorList->get($video->user_id);
+            $video['author_info'] = [
+                'id' => $author->id,
+                'avatar' => $author->avatar,
+                'nickname' => $author->nickname,
+            ];
             unset($video->user_id);
+
+            $video['is_follow'] = 0;
+            if ($this->isLogin()) {
+                $fansIds = $author['fanList']->pluck('fan_id')->toArray();
+                if (in_array($this->userId(), $fansIds)) {
+                    $video['is_follow'] = 1;
+                }
+            }
+
             return $video;
         });
 
@@ -75,6 +90,8 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($video) {
             $video->delete();
+
+            ShortVideoGoodsService::getInstance()->deleteList($video->id);
 
             $media = MediaService::getInstance()->getMedia($video->id, MediaTypeEnums::VIDEO);
             $media->delete();
@@ -137,6 +154,10 @@ class ShortVideoController extends Controller
             $video->collection_times = $collectionTimes;
             $video->save();
 
+            $media = MediaService::getInstance()->getMedia($id, MediaTypeEnums::VIDEO);
+            $media->collection_times = $collectionTimes;
+            $media->save();
+
             return $collectionTimes;
         });
 
@@ -180,7 +201,7 @@ class ShortVideoController extends Controller
         $commentList = collect($page->items());
 
         $userIds = $commentList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getUserListByIds($userIds, ['id', 'name', 'avatar'])->keyBy('id');
+        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'name', 'avatar'])->keyBy('id');
 
         $list = $commentList->map(function (ShortVideoComment $comment) use ($userList) {
             $userInfo = $userList->get($comment->user_id);
@@ -201,8 +222,13 @@ class ShortVideoController extends Controller
             ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
 
             $video = ShortVideoService::getInstance()->getVideo($input->mediaId);
-            $video->comments_number = $video->comments_number + 1;
+            $commentsNumber = $video->comments_number + 1;
+            $video->comments_number = $commentsNumber;
             $video->save();
+
+            $media = MediaService::getInstance()->getMedia($input->mediaId, MediaTypeEnums::VIDEO);
+            $media->comments_number = $commentsNumber;
+            $media->save();
         });
 
         // todo: 通知用户评论被回复
@@ -223,8 +249,13 @@ class ShortVideoController extends Controller
             $comment->delete();
 
             $video = ShortVideoService::getInstance()->getVideo($comment->video_id);
-            $video->comments_number = max($video->comments_number - 1, 0);
+            $commentsNumber = max($video->comments_number - 1, 0);
+            $video->comments_number = $commentsNumber;
             $video->save();
+
+            $media = MediaService::getInstance()->getMedia($comment->video_id, MediaTypeEnums::VIDEO);
+            $media->comments_number = $commentsNumber;
+            $media->save();
         });
 
         return $this->success();

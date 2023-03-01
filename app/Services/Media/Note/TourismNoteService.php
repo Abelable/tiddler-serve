@@ -16,7 +16,10 @@ class TourismNoteService extends BaseService
     public function pageList($curNoteId, $input, $columns = ['*'])
     {
         return TourismNote::query()
-            ->orderByRaw("CASE WHEN id = " . $curNoteId ." THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN id = " . $curNoteId . " THEN 0 ELSE 1 END")
+            ->with(['commentList' => function ($query) {
+                $query->orderBy('create_at', 'desc')->take(2)->with('userInfo');
+            }])
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

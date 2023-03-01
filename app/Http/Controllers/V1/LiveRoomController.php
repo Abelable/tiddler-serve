@@ -136,7 +136,7 @@ class LiveRoomController extends Controller
         $roomList = collect($page->items());
 
         $userIds = $roomList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getUserListByIds($userIds, ['avatar', 'nickname'])->keyBy('id');
+        $userList = UserService::getInstance()->getListByIds($userIds, ['avatar', 'nickname'])->keyBy('id');
 
         $list = $roomList->map(function (LiveRoom $room) use ($userList) {
             $anchorInfo = $userList->get($room->user_id);

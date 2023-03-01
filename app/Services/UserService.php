@@ -43,8 +43,13 @@ class UserService extends BaseService
         return User::query()->find($id, $columns);
     }
 
-    public function getUserListByIds($ids, $columns = ['*'])
+    public function getListByIds($ids, $columns = ['*'])
     {
         return User::query()->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getListWithFanList($ids, $columns = ['*'])
+    {
+        return User::query()->whereIn('id', $ids)->with('fanList')->get($columns);
     }
 }
