@@ -118,6 +118,33 @@ Route::prefix('media')->group(function () {
         Route::get('room_info', 'LiveRoomController@getRoomInfo');
         Route::post('start', 'LiveRoomController@startLive');
         Route::post('stop', 'LiveRoomController@stopLive');
+        Route::post('share', 'LiveRoomController@share');
+    });
+
+    Route::prefix('short_video')->group(function () {
+        Route::get('list', 'ShortVideoController@getRoomList');
+        Route::post('create', 'ShortVideoController@createVideo');
+        Route::post('delete', 'ShortVideoController@deleteVideo');
+        Route::post('toggle_praise', 'ShortVideoController@togglePraiseStatus');
+        Route::post('toggle_collection', 'ShortVideoController@toggleCollectionStatus');
+        Route::post('share', 'ShortVideoController@share');
+        Route::get('comment_list', 'ShortVideoController@getCommentList');
+        Route::get('reply_comment_list', 'ShortVideoController@getReplyCommentList');
+        Route::post('comment', 'ShortVideoController@comment');
+        Route::post('delete_comment', 'ShortVideoController@deleteComment');
+    });
+
+    Route::prefix('tourism_note')->group(function () {
+        Route::get('list', 'TourismNoteController@getRoomList');
+        Route::post('create', 'TourismNoteController@createVideo');
+        Route::post('delete', 'TourismNoteController@deleteVideo');
+        Route::post('toggle_praise', 'TourismNoteController@togglePraiseStatus');
+        Route::post('toggle_collection', 'TourismNoteController@toggleCollectionStatus');
+        Route::post('share', 'TourismNoteController@share');
+        Route::get('comment_list', 'TourismNoteController@getCommentList');
+        Route::get('reply_comment_list', 'TourismNoteController@getReplyCommentList');
+        Route::post('comment', 'TourismNoteController@comment');
+        Route::post('delete_comment', 'TourismNoteController@deleteComment');
     });
 });
 
