@@ -7,6 +7,7 @@ use App\Services\BaseService;
 use App\Utils\Enums\LiveStatusEnums;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 
 class LiveRoomService extends BaseService
 {
@@ -55,5 +56,62 @@ class LiveRoomService extends BaseService
     public function getListByIds($ids, $columns = ['*'])
     {
         return LiveRoom::query()->whereIn('id', $ids)->get($columns);
+    }
+
+    public function cachePraiseNumber($roomId, $number)
+    {
+        return Cache::increment('live_room_praise_number' . $roomId, $number);
+    }
+
+    public function getPraiseNumber($roomId)
+    {
+        return Cache::get('live_room_praise_number' . $roomId) ?? 0;
+    }
+
+    public function clearPraiseNumber($roomId)
+    {
+        Cache::forget('live_room_praise_number' . $roomId);
+    }
+
+    public function cacheViewersNumber($roomId)
+    {
+        return Cache::increment('live_room_viewers_number' . $roomId);
+    }
+
+    public function getViewersNumber($roomId)
+    {
+        return Cache::get('live_room_viewers_number' . $roomId) ?? 0;
+    }
+
+    public function clearViewersNumber($roomId)
+    {
+        Cache::forget('live_room_viewers_number' . $roomId);
+    }
+
+    public function cacheChatMsg($roomId, $msg)
+    {
+        $msgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
+        if (count($msgList) >= 80) {
+            array_shift($msgList);
+        }
+        $msgList[] = $msg;
+        Cache::put('live_room_chat_msg_list' . $roomId, $msgList);
+        return $msgList;
+    }
+
+    public function getChatMsgList($roomId, PageInput $input)
+    {
+        $chatMsgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
+
+        $chatMsgList = collect($chatMsgList)->map(function ($item) {
+            return json_encode($item);
+        });
+
+        return $chatMsgList->sortBy($input->sort, SORT_REGULAR, $input->order === 'desc')->values()->forPage($input->page, $input->limit)->all();
+    }
+
+    public function clearChatMsgList($roomId)
+    {
+        Cache::forget('live_room_chat_msg_list' . $roomId);
     }
 }

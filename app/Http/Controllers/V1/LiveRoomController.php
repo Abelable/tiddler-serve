@@ -71,7 +71,7 @@ class LiveRoomController extends Controller
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'push_url', 'play_url'];
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 1, 2, 3], $columns);
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 1, 3], $columns);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
