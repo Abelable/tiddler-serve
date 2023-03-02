@@ -28,7 +28,7 @@ class ShortVideoController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'user_id', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times', 'created_at'];
+        $columns = ['id', 'user_id', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, null, $id);
         $videoList = collect($page->items());
 

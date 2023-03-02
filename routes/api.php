@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::prefix('wx')->group(function () {
+    Route::post('pay_notify', 'CommonController@wxPayNotify');
+});
 
 Route::prefix('auth')->group(function () {
     Route::prefix('wx_mp')->group(function () {
@@ -105,8 +108,17 @@ Route::prefix('order')->group(function () {
     Route::post('delete', 'OrderController@delete');
 });
 
-Route::prefix('wx')->group(function () {
-    Route::post('pay_notify', 'CommonController@wxPayNotify');
+Route::prefix('media')->group(function () {
+    Route::get('list', 'MediaController@getList');
+    Route::get('follow_list', 'MediaController@getFollowList');
+
+    Route::prefix('live')->group(function () {
+        Route::get('list', 'LiveRoomController@getRoomList');
+        Route::post('create', 'LiveRoomController@createLiveRoom');
+        Route::get('room_info', 'LiveRoomController@getRoomInfo');
+        Route::post('start', 'LiveRoomController@startLive');
+        Route::post('stop', 'LiveRoomController@stopLive');
+    });
 });
 
 
