@@ -114,7 +114,7 @@ Route::prefix('media')->group(function () {
 
     Route::prefix('live')->group(function () {
         Route::get('list', 'LiveRoomController@getRoomList');
-        Route::post('create', 'LiveRoomController@createLiveRoom');
+        Route::post('create', 'LiveRoomController@createLive');
         Route::get('room_info', 'LiveRoomController@getRoomInfo');
         Route::post('start', 'LiveRoomController@startLive');
         Route::post('stop', 'LiveRoomController@stopLive');

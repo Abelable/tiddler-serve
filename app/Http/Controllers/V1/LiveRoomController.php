@@ -25,7 +25,7 @@ class LiveRoomController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'user_id', 'status', 'cover', 'share_cover', 'name', 'group_id', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
+        $columns = ['id', 'user_id', 'status', 'cover', 'share_cover', 'title', 'group_id', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
         $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
         $roomList = collect($page->items());
 
@@ -47,7 +47,7 @@ class LiveRoomController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function createLiveRoom()
+    public function createLive()
     {
         /** @var LiveRoomInput $input */
         $input = LiveRoomInput::new();
@@ -69,12 +69,27 @@ class LiveRoomController extends Controller
     public function getRoomInfo()
     {
         $id = $this->verifyRequiredId('id');
+        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'push_url', 'play_url'];
 
-        $columns = ['name', 'cover', 'share_cover', 'notice_time'];
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 3], $columns);
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 1, 2, 3], $columns);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
+
+        if ($room->status == LiveStatusEnums::STATUS_UN_START || $room->status == LiveStatusEnums::STATUS_NOTICE) {
+            // 创建群聊，获取群组id
+            $groupId = TimServe::new()->createChatGroup($id);
+            $room->group_id = $groupId;
+
+            // 获取推、拉流地址
+            $pushUrl = TencentLiveServe::new()->getPushUrl($id);
+            $playUrl = TencentLiveServe::new()->getPlayUrl($id);
+            $room->push_url = $pushUrl;
+            $room->play_url = $playUrl;
+
+            $room->save();
+        }
+
         return $this->success($room);
     }
 
