@@ -33,12 +33,12 @@ class TourismNoteController extends Controller
         $noteList = collect($page->items());
 
         $authorIds = $noteList->pluck('user_id')->toArray();
-        $fansGroup = FanService::getInstance()->fansGroup($authorIds);
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($fansGroup) {
+        $list = $noteList->map(function (TourismNote $note) use ($fanIdsGroup) {
             $note['is_follow'] = 0;
             if ($this->isLogin()) {
-                $fansIds = collect($fansGroup->get($note->user_id))->pluck('fan_id')->toArray();
+                $fansIds = $fanIdsGroup->get($note->user_id);
                 if (in_array($this->userId(), $fansIds)) {
                     $note['is_follow'] = 1;
                 }

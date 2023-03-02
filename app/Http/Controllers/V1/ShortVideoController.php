@@ -33,12 +33,12 @@ class ShortVideoController extends Controller
         $videoList = collect($page->items());
 
         $authorIds = $videoList->pluck('user_id')->toArray();
-        $fansGroup = FanService::getInstance()->fansGroup($authorIds);
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($fansGroup) {
+        $list = $videoList->map(function (ShortVideo $video) use ($fanIdsGroup) {
             $video['is_follow'] = 0;
             if ($this->isLogin()) {
-                $fansIds = collect($fansGroup->get($video->user_id))->pluck('fan_id')->toArray();
+                $fansIds = $fanIdsGroup->get($video->user_id);
                 if (in_array($this->userId(), $fansIds)) {
                     $video['is_follow'] = 1;
                 }

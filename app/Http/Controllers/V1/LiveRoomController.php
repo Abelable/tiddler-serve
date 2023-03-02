@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\LiveRoom;
+use App\Services\FanService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
@@ -24,10 +25,26 @@ class LiveRoomController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'status', 'cover', 'share_cover', 'name', 'group_id', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
+        $columns = ['id', 'user_id', 'status', 'cover', 'share_cover', 'name', 'group_id', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
+        $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
+        $roomList = collect($page->items());
 
-        return $this->successPaginate($list);
+        $anchorIds = $roomList->pluck('user_id')->toArray();
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($anchorIds);
+
+        $list = $roomList->map(function (LiveRoom $room) use ($fanIdsGroup) {
+            $room['is_follow'] = 0;
+            if ($this->isLogin()) {
+                $fansIds = $fanIdsGroup->get($room->user_id);
+                if (in_array($this->userId(), $fansIds)) {
+                    $room['is_follow'] = 1;
+                }
+            }
+            unset($room->user_id);
+            return $room;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function createLiveRoom()
@@ -106,6 +123,10 @@ class LiveRoomController extends Controller
         $room->status = LiveStatusEnums::STATUS_STOP;
         $room->end_time = now()->toDateTimeString();
         $room->save();
+
+        // todo: 生成回放地址
+        // todo: 发送关闭直播间的即时通讯消息
+        // todo: 解散聊天群组
 
         return $this->success();
     }
