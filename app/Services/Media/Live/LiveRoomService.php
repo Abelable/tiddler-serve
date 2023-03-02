@@ -91,7 +91,7 @@ class LiveRoomService extends BaseService
     public function cacheChatMsg($roomId, $msg)
     {
         $msgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
-        if (count($msgList) >= 80) {
+        if (count($msgList) >= 20) {
             array_shift($msgList);
         }
         $msgList[] = $msg;
@@ -101,13 +101,7 @@ class LiveRoomService extends BaseService
 
     public function getChatMsgList($roomId, PageInput $input)
     {
-        $chatMsgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
-
-        $chatMsgList = collect($chatMsgList)->map(function ($item) {
-            return json_encode($item);
-        });
-
-        return $chatMsgList->sortBy($input->sort, SORT_REGULAR, $input->order === 'desc')->values()->forPage($input->page, $input->limit)->all();
+        return Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
     }
 
     public function clearChatMsgList($roomId)

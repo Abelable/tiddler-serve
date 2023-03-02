@@ -25,26 +25,10 @@ class LiveRoomController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'user_id', 'status', 'cover', 'share_cover', 'title', 'group_id', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
-        $roomList = collect($page->items());
+        $columns = ['id', 'status', 'cover', 'group_id', 'play_url', 'notice_time'];
+        $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
 
-        $anchorIds = $roomList->pluck('user_id')->toArray();
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($anchorIds);
-
-        $list = $roomList->map(function (LiveRoom $room) use ($fanIdsGroup) {
-            $room['is_follow'] = 0;
-            if ($this->isLogin()) {
-                $fansIds = $fanIdsGroup->get($room->user_id);
-                if (in_array($this->userId(), $fansIds)) {
-                    $room['is_follow'] = 1;
-                }
-            }
-            unset($room->user_id);
-            return $room;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        return $this->successPaginate($list);
     }
 
     public function createLive()
@@ -142,6 +126,37 @@ class LiveRoomController extends Controller
         // todo: 生成回放地址
         // todo: 发送关闭直播间的即时通讯消息
         // todo: 解散聊天群组
+
+        return $this->success();
+    }
+
+    public function joinRoom()
+    {
+        $id = $this->verifyRequiredId('id');
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        // 增加直播间人数
+
+        // 发送即时通讯消息（用户进入直播间）
+
+        // 将缓存中的实时点赞数及观看人数，保存到数据库中
+
+        // 返回
+        // 实时数据：点赞数、观看人数、历史评论列表、商品列表
+        // 用户状态：是否关注直播间
+    }
+
+    public function praise()
+    {
+        $id = $this->verifyRequiredId('id');
+        $count = $this->verifyRequiredInteger('count');
+
+        LiveRoomService::getInstance()->cachePraiseNumber($id, $count);
+
+        // 发送及时通讯消息（点赞）
 
         return $this->success();
     }
