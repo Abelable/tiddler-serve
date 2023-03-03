@@ -50,13 +50,13 @@ class LiveRoomController extends Controller
         $room->save();
 
         // 发送即时通讯消息（用户进入直播间）
-        $msgContent = [
+        $msg = [
             'type' => LiveGroupMsgType::JOIN_ROOM,
             'data' => [
                 'nickname' => $this->user()->nickname
             ]
         ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, json_decode($msgContent));
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
 
         // 获取历史聊天消息列表
         $historyChatMsgList = LiveRoomService::getInstance()->getChatMsgList($id);
@@ -150,6 +150,10 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
+        // 保存点赞数
+        $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
+        $room->praise_number = $praiseNumber;
+
         $room->status = LiveStatusEnums::STATUS_STOP;
         $room->end_time = now()->toDateTimeString();
         $room->save();
@@ -158,24 +162,59 @@ class LiveRoomController extends Controller
         // todo: 发送关闭直播间的即时通讯消息
         // todo: 解散聊天群组
 
+        // 清空缓存数据
+        LiveRoomService::getInstance()->clearChatMsgList($id);
+        LiveRoomService::getInstance()->clearPraiseNumber($id);
+
         return $this->success();
     }
-
-
 
     public function praise()
     {
         $id = $this->verifyRequiredId('id');
         $count = $this->verifyRequiredInteger('count');
 
-        LiveRoomService::getInstance()->cachePraiseNumber($id, $count);
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
 
-        // 发送及时通讯消息（点赞）
+        $praiseNumber = LiveRoomService::getInstance()->cachePraiseNumber($id, $count);
+
+        // 发送及时通讯消息（点赞数更新）
+        $msg = [
+            'type' => LiveGroupMsgType::PRAISE,
+            'data' => [
+                'praiseNumber' => $praiseNumber
+            ]
+        ];
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
 
         return $this->success();
     }
 
     public function comment()
+    {
+        $id = $this->verifyRequiredId('id');
+        $content = $this->verifyRequiredString('content');
+
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $chatMsg = [
+            'userId' => $this->userId(),
+            'avatar' => $this->user()->avatar,
+            'nickname' => $this->user()->nickname,
+            'content' => $content
+        ];
+        LiveRoomService::getInstance()->cacheChatMsg($id, $chatMsg);
+
+        return $this->success();
+    }
+
+    public function share()
     {
 
     }
