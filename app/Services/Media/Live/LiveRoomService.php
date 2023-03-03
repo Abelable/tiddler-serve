@@ -45,9 +45,13 @@ class LiveRoomService extends BaseService
         return $room;
     }
 
-    public function getRoom($userId, $id, $statusList, $columns = ['*'])
+    public function getRoom($userId, $id, $statusList, $columns = ['*'], $withGoodsList = false)
     {
-        return LiveRoom::query()
+        $query = LiveRoom::query();
+        if ($withGoodsList) {
+            $query = $query->with('goodsList');
+        }
+        return $query
             ->where('user_id', $userId)
             ->whereIn('status', $statusList)
             ->find($id, $columns);
@@ -73,35 +77,23 @@ class LiveRoomService extends BaseService
         Cache::forget('live_room_praise_number' . $roomId);
     }
 
-    public function cacheViewersNumber($roomId)
-    {
-        return Cache::increment('live_room_viewers_number' . $roomId);
-    }
-
-    public function getViewersNumber($roomId)
-    {
-        return Cache::get('live_room_viewers_number' . $roomId) ?? 0;
-    }
-
-    public function clearViewersNumber($roomId)
-    {
-        Cache::forget('live_room_viewers_number' . $roomId);
-    }
-
     public function cacheChatMsg($roomId, $msg)
     {
         $msgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
         if (count($msgList) >= 20) {
             array_shift($msgList);
         }
-        $msgList[] = $msg;
+        $msgList[] = json_decode($msg);
         Cache::put('live_room_chat_msg_list' . $roomId, $msgList);
         return $msgList;
     }
 
-    public function getChatMsgList($roomId, PageInput $input)
+    public function getChatMsgList($roomId)
     {
-        return Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
+        $chatMsgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
+        return collect($chatMsgList)->map(function ($msg) {
+            return json_encode($msg);
+        });
     }
 
     public function clearChatMsgList($roomId)

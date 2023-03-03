@@ -51,11 +51,18 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|LiveRoom withoutTrashed()
  * @mixin \Eloquent
  * @property-read \App\Models\User|null $anchorInfo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Goods[] $goodsList
+ * @property-read int|null $goods_list_count
  */
 class LiveRoom extends BaseModel
 {
     public function anchorInfo()
     {
         return $this->belongsTo(User::class)->select('id', 'avatar', 'nickname');
+    }
+
+    public function goodsList()
+    {
+        return $this->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id');
     }
 }
