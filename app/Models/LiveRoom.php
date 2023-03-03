@@ -63,6 +63,8 @@ class LiveRoom extends BaseModel
 
     public function goodsList()
     {
-        return $this->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id');
+        return $this
+            ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
+            ->select('id', 'image', 'name', 'price', 'market_price', 'stock');
     }
 }

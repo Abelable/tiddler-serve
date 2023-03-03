@@ -134,7 +134,7 @@ class LiveRoomController extends Controller
         }
 
         $room->status = LiveStatusEnums::STATUS_LIVE;
-        $room->start_time = now()->toDateTimeString();
+        $room->start_time = time();
         $room->save();
 
         // todo 开播通知（微信模板消息）
@@ -150,21 +150,35 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
+        $endTime = time();
+        $room->end_time = $endTime;
+        $room->status = LiveStatusEnums::STATUS_STOP;
+
         // 保存点赞数
         $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
         $room->praise_number = $praiseNumber;
 
-        $room->status = LiveStatusEnums::STATUS_STOP;
-        $room->end_time = now()->toDateTimeString();
-        $room->save();
+        // 发送即时通讯消息（关闭直播间）
+        $msg = [
+            'type' => LiveGroupMsgType::STOP,
+            'data' => [
+                'endTime' => $endTime
+            ]
+        ];
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
 
-        // todo: 生成回放地址
-        // todo: 发送关闭直播间的即时通讯消息
-        // todo: 解散聊天群组
+        // 解散聊天群组
+        TimServe::new()->destroyChatGroup($room->group_id);
 
         // 清空缓存数据
         LiveRoomService::getInstance()->clearChatMsgList($id);
         LiveRoomService::getInstance()->clearPraiseNumber($id);
+
+        // 生成回放地址
+        $playbackUrl = TencentLiveServe::new()->liveRealTimeClip($id, $room->start_time, $room->end_time);
+        $room->playback_url = $playbackUrl;
+
+        $room->save();
 
         return $this->success();
     }
@@ -217,5 +231,19 @@ class LiveRoomController extends Controller
     public function share()
     {
 
+    }
+
+    public function getGoodsList()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $this->success([
+            'goodsList' => $room->goodsList
+        ]);
     }
 }

@@ -55,9 +55,17 @@ class TimServe
     {
         $ret = $this->api->group_create_group3('AVChatRoom', '' . $roomId, env('TIM_ADMIN'), $roomId);
         if ($ret['ActionStatus'] != 'OK') {
-            throw new \Exception('云通讯房间创建失败', $ret, 312);
+            throw new \Exception('云通讯群组创建失败', $ret, 312);
         }
         return $ret['GroupId'];
+    }
+
+    public function destroyChatGroup($groupId)
+    {
+        $ret = $this->api->group_destroy_group($groupId);
+        if ($ret['ActionStatus'] != 'OK') {
+            throw new \Exception('云通讯群组删除失败', $ret, 312);
+        }
     }
 
     public function sendGroupSystemNotification($groupId, $content)
