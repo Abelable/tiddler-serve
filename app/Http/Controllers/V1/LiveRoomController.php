@@ -170,15 +170,15 @@ class LiveRoomController extends Controller
         // 解散聊天群组
         TimServe::new()->destroyChatGroup($room->group_id);
 
-        // 清空缓存数据
-        LiveRoomService::getInstance()->clearChatMsgList($id);
-        LiveRoomService::getInstance()->clearPraiseNumber($id);
-
         // 生成回放地址
         $playbackUrl = TencentLiveServe::new()->liveRealTimeClip($id, $room->start_time, $room->end_time);
         $room->playback_url = $playbackUrl;
 
         $room->save();
+
+        // 清空缓存数据
+        LiveRoomService::getInstance()->clearChatMsgList($id);
+        LiveRoomService::getInstance()->clearPraiseNumber($id);
 
         return $this->success();
     }
