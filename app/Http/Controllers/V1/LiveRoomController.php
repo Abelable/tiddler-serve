@@ -132,7 +132,7 @@ class LiveRoomController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'status', 'cover', 'direction', 'group_id', 'play_url', 'notice_time'];
+        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'play_url', 'notice_time'];
         $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
 
         return $this->successPaginate($list);
@@ -230,7 +230,7 @@ class LiveRoomController extends Controller
 
     public function share()
     {
-
+        $id = $this->verifyRequiredId('id');
     }
 
     public function getGoodsList()

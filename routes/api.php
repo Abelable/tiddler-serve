@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
+    Route::get('qrcode', 'CommonController@wxQRCode');
 });
 
 Route::prefix('auth')->group(function () {

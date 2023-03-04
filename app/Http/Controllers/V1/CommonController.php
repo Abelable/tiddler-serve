@@ -8,6 +8,7 @@ use App\Services\MerchantService;
 use App\Services\OrderService;
 use App\Services\ShopService;
 use App\Utils\AliOssServe;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -46,5 +47,17 @@ class CommonController extends Controller
         }
 
         return Pay::wechat()->success();
+    }
+
+    public function wxQRCode()
+    {
+        $scene = $this->verifyRequiredString('scene');
+        $page = $this->verifyRequiredString('page');
+
+        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+
+        return response($imageData)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline');
     }
 }

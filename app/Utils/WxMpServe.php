@@ -42,7 +42,8 @@ class WxMpServe
     {
         $result = $this->httpPost(sprintf(self::GET_PHONE_NUMBER_URL, $this->accessToken), ['code' => $code]);
         if ($result['errcode'] != 0) {
-            // // 目前有出现access_token在缓存有效期内失效的问题，暂未定位到问题原因，在此作重置处理
+            // 由于有播+会刷新access_token，就会出现access_token在缓存有效期内失效的问题，
+            // 如果失效，执行下面的重置逻辑即可
             // if ($result['errcode'] == 40001) {
             //     Cache::forget(self::ACCESS_TOKEN_KEY);
             //     $this->accessToken = $this->getAccessToken();
@@ -64,10 +65,6 @@ class WxMpServe
 
     public function getQRCode($scene, $page)
     {
-        $result = $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page]);
-        if ($result['errcode'] != 0) {
-            throw new \Exception('获取微信小程序二维码异常：' . $result['errcode'] . $result['errmsg']);
-        }
-        return $result;
+        return $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
     }
 }
