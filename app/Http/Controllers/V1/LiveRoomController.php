@@ -228,11 +228,6 @@ class LiveRoomController extends Controller
         return $this->success();
     }
 
-    public function share()
-    {
-        $id = $this->verifyRequiredId('id');
-    }
-
     public function getGoodsList()
     {
         $id = $this->verifyRequiredId('id');
