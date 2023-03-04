@@ -237,7 +237,7 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        $this->success([
+        return $this->success([
             'goodsList' => $room->goodsList
         ]);
     }
