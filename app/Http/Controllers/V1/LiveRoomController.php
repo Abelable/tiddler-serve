@@ -20,63 +20,6 @@ class LiveRoomController extends Controller
 {
     protected $except = ['getRoomList'];
 
-    public function getRoomList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyRequiredId('id');
-
-        $columns = ['id', 'status', 'cover', 'direction', 'group_id', 'play_url', 'notice_time'];
-        $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
-
-        return $this->successPaginate($list);
-    }
-
-    public function joinRoom()
-    {
-        $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1], ['*'], true);
-        if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
-        }
-
-        // 增加直播间人数
-        $room->viewers_number = $room->viewers_number + 1;
-
-        // 将缓存中的实时点赞数，保存到数据库中
-        $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
-        $room->praise_number = $praiseNumber;
-
-        $room->save();
-
-        // 发送即时通讯消息（用户进入直播间）
-        $msg = [
-            'type' => LiveGroupMsgType::JOIN_ROOM,
-            'data' => [
-                'nickname' => $this->user()->nickname
-            ]
-        ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
-
-        // 获取历史聊天消息列表
-        $historyChatMsgList = LiveRoomService::getInstance()->getChatMsgList($id);
-
-        // 获取当前用户关注状态
-        $fanIds = FanService::getInstance()->fanIds($room->user_id);
-        $isFollow = in_array($this->userId(), $fanIds) ? 1 : 0;
-
-        // 返回
-        // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
-        // 用户状态：是否关注直播间、用户粉丝等级（待开发）
-        return $this->success([
-            'viewersNumber' => $room->viewers_number,
-            'praiseNumber' => $room->praise_number,
-            'goodsList' => $room->goodsList,
-            'historyChatMsgList' => $historyChatMsgList,
-            'isFollow' => $isFollow
-        ]);
-    }
-
     public function createLive()
     {
         /** @var LiveRoomInput $input */
@@ -181,6 +124,63 @@ class LiveRoomController extends Controller
         LiveRoomService::getInstance()->clearPraiseNumber($id);
 
         return $this->success();
+    }
+
+    public function getRoomList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyRequiredId('id');
+
+        $columns = ['id', 'status', 'cover', 'direction', 'group_id', 'play_url', 'notice_time'];
+        $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
+
+        return $this->successPaginate($list);
+    }
+
+    public function joinRoom()
+    {
+        $id = $this->verifyRequiredId('id');
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1], ['*'], true);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        // 增加直播间人数
+        $room->viewers_number = $room->viewers_number + 1;
+
+        // 将缓存中的实时点赞数，保存到数据库中
+        $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
+        $room->praise_number = $praiseNumber;
+
+        $room->save();
+
+        // 发送即时通讯消息（用户进入直播间）
+        $msg = [
+            'type' => LiveGroupMsgType::JOIN_ROOM,
+            'data' => [
+                'nickname' => $this->user()->nickname
+            ]
+        ];
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
+
+        // 获取历史聊天消息列表
+        $historyChatMsgList = LiveRoomService::getInstance()->getChatMsgList($id);
+
+        // 获取当前用户关注状态
+        $fanIds = FanService::getInstance()->fanIds($room->user_id);
+        $isFollow = in_array($this->userId(), $fanIds) ? 1 : 0;
+
+        // 返回
+        // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
+        // 用户状态：是否关注直播间、用户粉丝等级（待开发）
+        return $this->success([
+            'viewersNumber' => $room->viewers_number,
+            'praiseNumber' => $room->praise_number,
+            'goodsList' => $room->goodsList,
+            'historyChatMsgList' => $historyChatMsgList,
+            'isFollow' => $isFollow
+        ]);
     }
 
     public function praise()
