@@ -24,6 +24,9 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $anchorInfo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Goods[] $goodsList
+ * @property-read int|null $goods_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom newQuery()
  * @method static \Illuminate\Database\Query\Builder|LiveRoom onlyTrashed()
@@ -50,9 +53,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|LiveRoom withTrashed()
  * @method static \Illuminate\Database\Query\Builder|LiveRoom withoutTrashed()
  * @mixin \Eloquent
- * @property-read \App\Models\User|null $anchorInfo
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Goods[] $goodsList
- * @property-read int|null $goods_list_count
  */
 class LiveRoom extends BaseModel
 {

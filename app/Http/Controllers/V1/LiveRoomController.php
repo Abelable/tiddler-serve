@@ -41,10 +41,30 @@ class LiveRoomController extends Controller
 
     public function getUserRoom()
     {
-        $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'status'];
+        $columns = ['id', 'status', 'direction'];
         $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 1, 3], $columns);
         return $this->success($room);
+    }
+
+    public function getUserNoticeRoom()
+    {
+        $columns = ['id', 'title', 'cover', 'share_cover', 'notice_time'];
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [3], $columns);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+        return $this->success($room);
+    }
+
+    public function deleteNoticeRoom()
+    {
+        $id = $this->verifyRequiredId('id');
+        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [3]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+        $room->delete();
+        return $this->success();
     }
 
     public function preLive()

@@ -18,7 +18,7 @@ class LiveRoomInput extends BaseInput
             'cover' => 'required|string',
             'shareCover' => 'required|string',
             'direction' => 'required|integer|in:1,2',
-            'goodsIds' => 'array|min:1',
+            'goodsIds' => 'array',
             'noticeTime' => 'string',
         ];
     }
