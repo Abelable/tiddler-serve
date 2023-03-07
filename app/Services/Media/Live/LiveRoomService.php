@@ -45,6 +45,15 @@ class LiveRoomService extends BaseService
         return $room;
     }
 
+    public function getUserRoom($userId, $statusList, $columns = ['*'])
+    {
+        $query = LiveRoom::query();
+        return $query
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->first($columns);
+    }
+
     public function getRoom($userId, $id, $statusList, $columns = ['*'], $withGoodsList = false)
     {
         $query = LiveRoom::query();

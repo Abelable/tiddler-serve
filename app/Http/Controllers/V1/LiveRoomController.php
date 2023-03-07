@@ -39,7 +39,15 @@ class LiveRoomController extends Controller
         return $this->success($room->id);
     }
 
-    public function getRoomInfo()
+    public function getUserRoom()
+    {
+        $id = $this->verifyRequiredId('id');
+        $columns = ['id', 'status'];
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 1, 3], $columns);
+        return $this->success($room);
+    }
+
+    public function preLive()
     {
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'push_url', 'play_url'];

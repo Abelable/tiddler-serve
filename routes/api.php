@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::prefix('wx')->group(function () {
-    Route::post('pay_notify', 'CommonController@wxPayNotify');
-    Route::get('qrcode', 'CommonController@wxQRCode');
-});
-
 Route::prefix('auth')->group(function () {
     Route::prefix('wx_mp')->group(function () {
         Route::post('mobile', 'AuthController@getWxMpUserMobile');
@@ -30,6 +25,11 @@ Route::prefix('auth')->group(function () {
 Route::get('user_info', 'UserController@getUserInfo');
 
 Route::get('oss_config', 'CommonController@ossConfig');
+
+Route::prefix('wx')->group(function () {
+    Route::post('pay_notify', 'CommonController@wxPayNotify');
+    Route::get('qrcode', 'CommonController@wxQRCode');
+});
 
 Route::prefix('shop')->group(function () {
     Route::get('category_options', 'ShopController@categoryOptions');
@@ -115,7 +115,7 @@ Route::prefix('media')->group(function () {
 
     Route::prefix('live')->group(function () {
         Route::post('create', 'LiveRoomController@createLive');
-        Route::get('room_info', 'LiveRoomController@getRoomInfo');
+        Route::get('user_room', 'LiveRoomController@getUserRoom');
         Route::post('start', 'LiveRoomController@startLive');
         Route::post('stop', 'LiveRoomController@stopLive');
         Route::get('list', 'LiveRoomController@getRoomList');

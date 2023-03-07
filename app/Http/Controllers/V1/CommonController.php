@@ -15,12 +15,24 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class CommonController extends Controller
 {
-    protected $only = ['getOssConfig'];
+    protected $except = ['wxPayNotify'];
 
     public function ossConfig()
     {
         $config = AliOssServe::new()->getOssConfig();
         return $this->success($config);
+    }
+
+    public function wxQRCode()
+    {
+        $scene = $this->verifyRequiredString('scene');
+        $page = $this->verifyRequiredString('page');
+
+        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+
+        return response($imageData)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline');
     }
 
     public function wxPayNotify()
@@ -47,17 +59,5 @@ class CommonController extends Controller
         }
 
         return Pay::wechat()->success();
-    }
-
-    public function wxQRCode()
-    {
-        $scene = $this->verifyRequiredString('scene');
-        $page = $this->verifyRequiredString('page');
-
-        $imageData = WxMpServe::new()->getQRCode($scene, $page);
-
-        return response($imageData)
-            ->header('Content-Type', 'image/png')
-            ->header('Content-Disposition', 'inline');
     }
 }
