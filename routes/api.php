@@ -23,7 +23,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('user_info', 'UserController@getUserInfo');
-
+Route::get('tim_login_info', 'UserController@getTimLoginInfo');
 Route::get('oss_config', 'CommonController@ossConfig');
 
 Route::prefix('wx')->group(function () {

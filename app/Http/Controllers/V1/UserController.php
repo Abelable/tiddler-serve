@@ -11,6 +11,7 @@ class UserController extends Controller
     {
         $user = $this->user();
         return $this->success([
+            'id' => $user->id,
             'avatar' => $user->avatar,
             'nickname' => $user->nickname,
             'gender' => $user->gender,
@@ -23,7 +24,7 @@ class UserController extends Controller
     {
         $timServe = TimServe::new();
         $timServe->updateUserInfo($this->userId(), $this->user()->nickname, $this->user()->avatar);
-        $loginInfo = $timServe->getLoginInfo($this->user());
+        $loginInfo = $timServe->getLoginInfo($this->userId());
         return $this->success($loginInfo);
     }
 }

@@ -224,13 +224,13 @@ class LiveRoomController extends Controller
         $praiseNumber = LiveRoomService::getInstance()->cachePraiseNumber($id, $count);
 
         // 发送及时通讯消息（点赞数更新）
-        $msg = [
+        $content = [
             'type' => LiveGroupMsgType::PRAISE,
             'data' => [
                 'praiseNumber' => $praiseNumber
             ]
         ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $content);
 
         return $this->success();
     }

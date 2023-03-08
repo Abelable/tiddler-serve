@@ -25,15 +25,18 @@ class TimRestAPI extends TimRestInterface
         $this->sigApi->setPublicKey($sigPublicKey);
     }
 
+    public function setUserSig($identifier, $expiry_after)
+    {
+        $this->usersig = $this->generate_user_sig($identifier, $expiry_after);
+    }
+
     /**
      * @inheritDoc
      */
     public function generate_user_sig($identifier, $expiry_after)
     {
         try {
-            $sig = $this->sigApi->genSig($identifier, $expiry_after);
-            $this->usersig = $sig;
-            return $sig;
+            return $this->sigApi->genSig($identifier, $expiry_after);
         } catch (\Exception $e) {
             return null;
         }

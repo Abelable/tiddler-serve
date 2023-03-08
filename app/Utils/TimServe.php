@@ -41,12 +41,12 @@ class TimServe
     {
         $sdkappid = env('TIM_APPID');
         $identifier = env('TIM_ADMIN');
-        $sigPrivateKey = storage_path('app/tim/private_key.pem');
-        $sigPublicKey = storage_path('app/tim/public_key.pem');
+        $sigPrivateKey = file_get_contents(storage_path('app/tim/private_key.pem'));
+        $sigPublicKey = file_get_contents(storage_path('app/tim/public_key.pem'));
 
         $api = new TimRestAPI();
         $api->init($sdkappid, $identifier, $sigPrivateKey, $sigPublicKey);
-        $api->generate_user_sig($identifier, 604800);
+        $api->setUserSig($identifier, 604800);
 
         $this->api = $api;
     }
@@ -74,13 +74,10 @@ class TimServe
 
     public function getLoginInfo($userId)
     {
-        $ret = $this->api->generate_user_sig($userId, 31536000);
-        if ($ret['ActionStatus'] != 'OK') {
-            throw new \Exception('云通讯用户签名生成失败', $ret, 312);
-        }
+        $userSig = $this->api->generate_user_sig($userId, 31536000);
         return [
             'sdkAppId' => env('TIM_APPID'),
-            'userSig' => $ret['userSig']
+            'userSig' => $userSig
         ];
     }
 
