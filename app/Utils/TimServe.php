@@ -46,9 +46,42 @@ class TimServe
 
         $api = new TimRestAPI();
         $api->init($sdkappid, $identifier, $sigPrivateKey, $sigPublicKey);
-        $api->generate_user_sig($identifier, '604800');
+        $api->generate_user_sig($identifier, 604800);
 
         $this->api = $api;
+    }
+
+    public function updateUserInfo($userId, $nickname, $avatar)
+    {
+        $profileList = [
+            'profile_nick' => [
+                "Tag" => "Tag_Profile_IM_Nick",
+                "Value" => $nickname,
+            ],
+            'profile_img' => [
+                "Tag" => "Tag_Profile_IM_Image",
+                "Value" => $avatar,
+            ]
+        ];
+        $ret = $this->api->profile_portrait_set2($userId, $profileList);
+        if ($ret['ErrorCode'] != 0) {
+            $ret = $this->api->account_import($userId, $nickname, $avatar);
+            if ($ret['ErrorCode'] != 0) {
+                throw new \Exception('云通讯用户信息更新失败', $ret, 312);
+            }
+        }
+    }
+
+    public function getLoginInfo($userId)
+    {
+        $ret = $this->api->generate_user_sig($userId, 31536000);
+        if ($ret['ActionStatus'] != 'OK') {
+            throw new \Exception('云通讯用户签名生成失败', $ret, 312);
+        }
+        return [
+            'sdkAppId' => env('TIM_APPID'),
+            'userSig' => $ret['userSig']
+        ];
     }
 
     public function createChatGroup($roomId)

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Utils\TimServe;
 
 class UserController extends Controller
 {
@@ -16,5 +17,13 @@ class UserController extends Controller
             'mobile' => $user->mobile,
             'shopId' => $user->shop_id,
         ]);
+    }
+
+    public function getTimLoginInfo()
+    {
+        $timServe = TimServe::new();
+        $timServe->updateUserInfo($this->userId(), $this->user()->nickname, $this->user()->avatar);
+        $loginInfo = $timServe->getLoginInfo($this->user());
+        return $this->success($loginInfo);
     }
 }
