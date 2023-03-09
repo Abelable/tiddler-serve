@@ -69,7 +69,7 @@ class LiveRoomController extends Controller
 
     public function pushRoomInfo()
     {
-        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'group_id', 'push_url'];
+        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'group_id', 'push_url', 'viewers_number', 'praise_number'];
 
         $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 1, 3], $columns);
         if (is_null($room)) {
@@ -90,15 +90,24 @@ class LiveRoomController extends Controller
             $room->save();
         }
 
+        if ($room->status == LiveStatus::LIVE) {
+            // 将缓存中的实时点赞数，保存到数据库中
+            $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($room->id);
+            $room->praise_number = $praiseNumber;
+            $room->save();
+
+            // 获取历史聊天消息列表
+            $historyChatMsgList = LiveRoomService::getInstance()->getChatMsgList($room->id);
+            $room['historyChatMsgList'] = $historyChatMsgList;
+        }
+
         return $this->success($room);
     }
 
     public function startLive()
     {
-        $id = $this->verifyRequiredId('id');
-
         /** @var LiveRoom $room */
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 3]);
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 3]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
