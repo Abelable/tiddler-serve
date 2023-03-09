@@ -20,6 +20,7 @@ class CreateLiveRoomsTable extends Migration
             $table->string('title')->comment('直播标题');
             $table->string('cover')->comment('直播封面');
             $table->string('share_cover')->comment('直播间分享封面');
+            $table->integer('resolution')->comment('分辨率：0-标清，1-高清，2-超清');
             $table->integer('direction')->comment('方向：1-竖屏，2-横屏');
             $table->string('push_url')->default('')->comment('推流地址');
             $table->string('play_url')->default('')->comment('拉流地址');
