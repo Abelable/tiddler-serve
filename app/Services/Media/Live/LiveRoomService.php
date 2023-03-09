@@ -36,6 +36,7 @@ class LiveRoomService extends BaseService
         $room->title = $input->title;
         $room->cover = $input->cover;
         $room->share_cover = $input->shareCover;
+        $room->resolution = $input->resolution;
         $room->direction = $input->direction;
         if (!empty($input->noticeTime)) {
             $room->status = LiveStatusEnums::STATUS_NOTICE;
