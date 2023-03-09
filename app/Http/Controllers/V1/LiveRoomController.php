@@ -9,7 +9,7 @@ use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveGroupMsgType;
-use App\Utils\Enums\LiveStatusEnums;
+use App\Utils\Enums\LiveStatus;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\TencentLiveServe;
@@ -20,7 +20,7 @@ class LiveRoomController extends Controller
 {
     protected $except = ['getRoomList'];
 
-    public function createLive()
+    public function createRoom()
     {
         /** @var LiveRoomInput $input */
         $input = LiveRoomInput::new();
@@ -39,14 +39,14 @@ class LiveRoomController extends Controller
         return $this->success($room->id);
     }
 
-    public function getUserRoom()
+    public function roomStatus()
     {
-        $columns = ['id', 'status', 'direction'];
+        $columns = ['status', 'direction'];
         $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 1, 3], $columns);
         return $this->success($room);
     }
 
-    public function getUserNoticeRoom()
+    public function noticeRoomInfo()
     {
         $columns = ['id', 'title', 'cover', 'share_cover', 'notice_time'];
         $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [3], $columns);
@@ -67,24 +67,23 @@ class LiveRoomController extends Controller
         return $this->success();
     }
 
-    public function preLive()
+    public function pushRoomInfo()
     {
-        $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'push_url', 'play_url'];
+        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'group_id', 'push_url'];
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [0, 1, 3], $columns);
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [0, 1, 3], $columns);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        if ($room->status == LiveStatusEnums::STATUS_UN_START || $room->status == LiveStatusEnums::STATUS_NOTICE) {
+        if ($room->status == LiveStatus::UN_START || $room->status == LiveStatus::NOTICE) {
             // 创建群聊，获取群组id
-            $groupId = TimServe::new()->createChatGroup($id);
+            $groupId = TimServe::new()->createChatGroup($room->id);
             $room->group_id = $groupId;
 
             // 获取推、拉流地址
-            $pushUrl = TencentLiveServe::new()->getPushUrl($id);
-            $playUrl = TencentLiveServe::new()->getPlayUrl($id);
+            $pushUrl = TencentLiveServe::new()->getPushUrl($room->id);
+            $playUrl = TencentLiveServe::new()->getPlayUrl($room->id);
             $room->push_url = $pushUrl;
             $room->play_url = $playUrl;
 
@@ -104,7 +103,7 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        $room->status = LiveStatusEnums::STATUS_LIVE;
+        $room->status = LiveStatus::LIVE;
         $room->start_time = time();
         $room->save();
 
@@ -123,7 +122,7 @@ class LiveRoomController extends Controller
 
         $endTime = time();
         $room->end_time = $endTime;
-        $room->status = LiveStatusEnums::STATUS_STOP;
+        $room->status = LiveStatus::STOP;
 
         // 保存点赞数
         $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
@@ -154,7 +153,7 @@ class LiveRoomController extends Controller
         return $this->success();
     }
 
-    public function getRoomList()
+    public function roomList()
     {
         /** @var PageInput $input */
         $input = PageInput::new();
@@ -256,7 +255,7 @@ class LiveRoomController extends Controller
         return $this->success();
     }
 
-    public function getGoodsList()
+    public function roomGoodsList()
     {
         $id = $this->verifyRequiredId('id');
 

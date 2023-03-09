@@ -4,7 +4,7 @@ namespace App\Services\Media\Live;
 
 use App\Models\LiveRoom;
 use App\Services\BaseService;
-use App\Utils\Enums\LiveStatusEnums;
+use App\Utils\Enums\LiveStatus;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -39,7 +39,7 @@ class LiveRoomService extends BaseService
         $room->resolution = $input->resolution;
         $room->direction = $input->direction;
         if (!empty($input->noticeTime)) {
-            $room->status = LiveStatusEnums::STATUS_NOTICE;
+            $room->status = LiveStatus::NOTICE;
             $room->notice_time = $input->noticeTime;
         }
         $room->save();
