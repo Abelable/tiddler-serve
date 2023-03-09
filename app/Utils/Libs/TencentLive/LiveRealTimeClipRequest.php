@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: huangangui
- * Date: 2020/3/18
- * Time: 10:04 AM
- */
 
 namespace App\Utils\Libs\TencentLive;
 
