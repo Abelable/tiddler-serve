@@ -55,6 +55,7 @@ class TencentLiveServe
             $res = $client->LiveRealTimeClip($request);
             return $res['Url'];
         } catch (TencentCloudSDKException $ex) {
+            dd($ex);
             throw new \Exception('直播回放生成失败', $ex, 312);
         }
     }

@@ -98,12 +98,25 @@ class TimServe
         }
     }
 
-    public function sendGroupSystemNotification($groupId, $content)
+    public function sendGroupSystemNotification($groupId, $data)
     {
+        $content = $this->generateContent($data);
         $ret = $this->api->group_send_group_system_notification($groupId, $content, null);
         if ($ret['ActionStatus'] != 'OK') {
             throw new \Exception('云通讯群消息发送失败', $ret, 312);
         }
         return $ret;
+    }
+
+    private function generateContent($data)
+    {
+        $data['__time'] = time();
+        $sc_content = json_encode($data) . env('TIM_MESSAGE_SECRET');
+        $sign = md5(md5($sc_content));
+        $content = [
+            'data' => $data,
+            'sign' => $sign
+        ];
+        return json_encode($content);
     }
 }

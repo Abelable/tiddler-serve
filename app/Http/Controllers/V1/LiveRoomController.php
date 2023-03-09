@@ -76,7 +76,7 @@ class LiveRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        if ($room->status == LiveStatus::UN_START || $room->status == LiveStatus::NOTICE) {
+        if (($room->status == LiveStatus::UN_START || $room->status == LiveStatus::NOTICE) && !$room->group_id) {
             // 创建群聊，获取群组id
             $groupId = TimServe::new()->createChatGroup($room->id);
             $room->group_id = $groupId;
@@ -123,8 +123,7 @@ class LiveRoomController extends Controller
 
     public function stopLive()
     {
-        $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -134,30 +133,30 @@ class LiveRoomController extends Controller
         $room->status = LiveStatus::STOP;
 
         // 保存点赞数
-        $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
+        $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($room->id);
         $room->praise_number = $praiseNumber;
 
+        $timServe = TimServe::new();
         // 发送即时通讯消息（关闭直播间）
-        $msg = [
+        $data = [
             'type' => LiveGroupMsgType::STOP,
             'data' => [
                 'endTime' => $endTime
             ]
         ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
-
+        $timServe->sendGroupSystemNotification($room->group_id, $data);
         // 解散聊天群组
-        TimServe::new()->destroyChatGroup($room->group_id);
+        $timServe->destroyChatGroup($room->group_id);
 
         // 生成回放地址
-        $playbackUrl = TencentLiveServe::new()->liveRealTimeClip($id, $room->start_time, $room->end_time);
+        $playbackUrl = TencentLiveServe::new()->liveRealTimeClip($room->id, $room->start_time, $room->end_time);
         $room->playback_url = $playbackUrl;
 
         $room->save();
 
         // 清空缓存数据
-        LiveRoomService::getInstance()->clearChatMsgList($id);
-        LiveRoomService::getInstance()->clearPraiseNumber($id);
+        LiveRoomService::getInstance()->clearChatMsgList($room->id);
+        LiveRoomService::getInstance()->clearPraiseNumber($room->id);
 
         return $this->success();
     }
@@ -192,13 +191,13 @@ class LiveRoomController extends Controller
         $room->save();
 
         // 发送即时通讯消息（用户进入直播间）
-        $msg = [
+        $data = [
             'type' => LiveGroupMsgType::JOIN_ROOM,
             'data' => [
                 'nickname' => $this->user()->nickname
             ]
         ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, $msg);
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $data);
 
         // 获取历史聊天消息列表
         $historyChatMsgList = LiveRoomService::getInstance()->getChatMsgList($id);
@@ -232,13 +231,13 @@ class LiveRoomController extends Controller
         $praiseNumber = LiveRoomService::getInstance()->cachePraiseNumber($id, $count);
 
         // 发送及时通讯消息（点赞数更新）
-        $content = [
+        $data = [
             'type' => LiveGroupMsgType::PRAISE,
             'data' => [
                 'praiseNumber' => $praiseNumber
             ]
         ];
-        TimServe::new()->sendGroupSystemNotification($room->group_id, $content);
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $data);
 
         return $this->success();
     }
