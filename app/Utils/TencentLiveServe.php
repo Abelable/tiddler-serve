@@ -2,11 +2,11 @@
 
 namespace App\Utils;
 
-use App\Utils\Libs\TencentLive\LiveRealTimeClipRequest;
 use TencentCloud\Common\Credential;
 use TencentCloud\Common\Exception\TencentCloudSDKException;
 use TencentCloud\Common\Profile\ClientProfile;
 use TencentCloud\Common\Profile\HttpProfile;
+use TencentCloud\Vod\V20180717\Models\LiveRealTimeClipRequest;
 use TencentCloud\Vod\V20180717\VodClient;
 
 class TencentLiveServe
@@ -53,7 +53,6 @@ class TencentLiveServe
             $request->EndTime = $this->utcToIso($endTime);
             $request->Host = env('TENCENT_LIVE_VIDEO_HOST');
             $res = $client->LiveRealTimeClip($request);
-            dd($res);
             return $res['Url'];
         } catch (TencentCloudSDKException $ex) {
             throw new \Exception('直播回放生成失败', $ex, 312);
