@@ -53,7 +53,7 @@ class TencentLiveServe
             $request->EndTime = $this->utcToIso($endTime);
             $request->Host = env('TENCENT_LIVE_VIDEO_HOST');
             $res = $client->LiveRealTimeClip($request);
-            return $res['Url'];
+            return $res->Url;
         } catch (TencentCloudSDKException $ex) {
             throw new \Exception('直播回放生成失败', $ex, 312);
         }
