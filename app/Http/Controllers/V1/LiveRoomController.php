@@ -58,8 +58,7 @@ class LiveRoomController extends Controller
 
     public function deleteNoticeRoom()
     {
-        $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [3]);
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [3]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -176,7 +175,7 @@ class LiveRoomController extends Controller
     public function joinRoom()
     {
         $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1], ['*'], true);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1], ['*'], true);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -223,7 +222,7 @@ class LiveRoomController extends Controller
         $id = $this->verifyRequiredId('id');
         $count = $this->verifyRequiredInteger('count');
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -247,7 +246,7 @@ class LiveRoomController extends Controller
         $id = $this->verifyRequiredId('id');
         $content = $this->verifyRequiredString('content');
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -267,7 +266,7 @@ class LiveRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = LiveRoomService::getInstance()->getRoom($this->userId(), $id, [1]);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
