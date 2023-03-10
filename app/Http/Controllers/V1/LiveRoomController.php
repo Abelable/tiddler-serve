@@ -245,6 +245,7 @@ class LiveRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $content = $this->verifyRequiredString('content');
+        $identity = $this->verifyRequiredInteger('identity');
 
         $room = LiveRoomService::getInstance()->getRoom($id, [1]);
         if (is_null($room)) {
@@ -252,6 +253,7 @@ class LiveRoomController extends Controller
         }
 
         $chatMsg = [
+            'identity' => $identity,
             'userId' => $this->userId(),
             'avatar' => $this->user()->avatar,
             'nickname' => $this->user()->nickname,

@@ -92,7 +92,7 @@ class LiveRoomService extends BaseService
         if (count($msgList) >= 20) {
             array_shift($msgList);
         }
-        $msgList[] = json_decode($msg);
+        $msgList[] = json_encode($msg);
         Cache::put('live_room_chat_msg_list' . $roomId, $msgList);
         return $msgList;
     }
@@ -101,7 +101,7 @@ class LiveRoomService extends BaseService
     {
         $chatMsgList = Cache::get('live_room_chat_msg_list' . $roomId) ?? [];
         return collect($chatMsgList)->map(function ($msg) {
-            return json_encode($msg);
+            return json_decode($msg);
         });
     }
 
