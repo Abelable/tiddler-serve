@@ -69,4 +69,13 @@ class LiveRoom extends BaseModel
             ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
             ->select('id', 'image', 'name', 'price', 'market_price', 'stock');
     }
+
+    public function hotGoods()
+    {
+        return $this
+            ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
+            ->wherePivot('is_hot', 1)
+            ->select('id', 'image', 'name', 'price', 'market_price', 'stock')
+            ->first();
+    }
 }

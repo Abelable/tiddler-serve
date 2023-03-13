@@ -27,4 +27,8 @@ namespace App\Models;
  */
 class LiveGoods extends BaseModel
 {
+    public function goodsInfo()
+    {
+
+    }
 }

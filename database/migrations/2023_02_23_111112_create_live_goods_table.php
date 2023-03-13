@@ -17,6 +17,7 @@ class CreateLiveGoodsTable extends Migration
             $table->id();
             $table->integer('room_id')->comment('直播间id');
             $table->integer('goods_id')->comment('商品id');
+            $table->integer('is_hot')->default(0)->comment('是否正在热卖：0-非热卖，1-热卖中');
             $table->timestamps();
             $table->softDeletes();
         });

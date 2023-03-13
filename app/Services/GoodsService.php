@@ -76,6 +76,15 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getUserGoodsList($userId, PageInput $input, $columns=['*'])
+    {
+        return Goods::query()
+            ->where('status', 1)
+            ->where('user_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getListTotal($userId, $status)
     {
         return Goods::query()->where('user_id', $userId)->where('status', $status)->count();

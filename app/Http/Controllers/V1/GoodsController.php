@@ -16,7 +16,7 @@ use App\Utils\Inputs\PageInput;
 
 class GoodsController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'detail'];
+    protected $except = ['categoryOptions', 'list', 'detail', 'shopGoodsList'];
 
     public function categoryOptions()
     {
@@ -90,6 +90,14 @@ class GoodsController extends Controller
         $input = PageInput::new();
         $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
+        return $this->successPaginate($list);
+    }
+
+    public function userGoodsList()
+    {
+        $input = PageInput::new();
+        $columns = ['id', 'image', 'name', 'price'];
+        $list = GoodsService::getInstance()->getUserGoodsList($this->userId(), $input, $columns);
         return $this->successPaginate($list);
     }
 

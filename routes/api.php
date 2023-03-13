@@ -114,18 +114,19 @@ Route::prefix('media')->group(function () {
     Route::get('follow_list', 'MediaController@getFollowList');
 
     Route::prefix('live')->group(function () {
-        Route::post('create', 'LiveRoomController@createRoom');
-        Route::get('room_status', 'LiveRoomController@roomStatus');
-        Route::get('notice_room', 'LiveRoomController@noticeRoomInfo');
-        Route::post('delete_notice_room', 'LiveRoomController@deleteNoticeRoom');
-        Route::get('push_room', 'LiveRoomController@pushRoomInfo');
-        Route::post('start', 'LiveRoomController@startLive');
-        Route::post('stop', 'LiveRoomController@stopLive');
-        Route::get('list', 'LiveRoomController@roomList');
-        Route::post('join', 'LiveRoomController@joinRoom');
-        Route::post('praise', 'LiveRoomController@praise');
-        Route::post('comment', 'LiveRoomController@comment');
-        Route::get('goods_list', 'LiveRoomController@roomGoodsList');
+        Route::post('create', 'LivePushController@createRoom');
+        Route::get('room_status', 'LivePushController@roomStatus');
+        Route::get('notice_room', 'LivePushController@noticeRoomInfo');
+        Route::post('delete_notice_room', 'LivePushController@deleteNoticeRoom');
+        Route::get('push_room', 'LivePushController@pushRoomInfo');
+        Route::post('start', 'LivePushController@startLive');
+        Route::post('stop', 'LivePushController@stopLive');
+        Route::get('list', 'LivePlayController@roomList');
+        Route::get('goods_list', 'LivePlayController@roomGoodsList');
+        Route::get('hot_goods', 'LivePlayController@roomHotGoods');
+        Route::post('join', 'LivePlayController@joinRoom');
+        Route::post('praise', 'LivePlayController@praise');
+        Route::post('comment', 'LivePlayController@comment');
     });
 
     Route::prefix('short_video')->group(function () {
