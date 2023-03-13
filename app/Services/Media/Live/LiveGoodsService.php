@@ -21,14 +21,30 @@ class LiveGoodsService extends BaseService
         return LiveGoods::query()->where('room_id', $roomId)->get($columns);
     }
 
+    public function goods($roomId, $goodsId, $columns = ['*'])
+    {
+        return LiveGoods::query()->where('room_id', $roomId)->where('goods_id', $goodsId)->first($columns);
+    }
+
     public function goodsIds($roomId)
     {
         $list = $this->list($roomId);
         return $list->pluck('goods_id')->toArray();
     }
 
-    public function deleteGoods($goodsIds)
+    public function deleteGoods($roomId, $goodsIds)
     {
-        return LiveGoods::query()->whereIn('goods_id', $goodsIds)->delete();
+        return LiveGoods::query()->where('room_id', $roomId)->whereIn('goods_id', $goodsIds)->delete();
+    }
+
+    public function hotGoods($roomId, $columns = ['*'])
+    {
+        return LiveGoods::query()->where('room_id', $roomId)->where('is_hot', 1)->first($columns);
+    }
+
+    public function hotGoodsId($roomId)
+    {
+        $goods = $this->hotGoods($roomId);
+        return $goods->goods_id ?? 0;
     }
 }

@@ -124,7 +124,9 @@ Route::prefix('media')->group(function () {
         Route::get('list', 'LivePlayController@roomList');
         Route::get('push_room_goods_list', 'LivePushController@pushRoomGoodsList');
         Route::post('listing_goods', 'LivePushController@listingGoods');
-        Route::post('de_listing_Goods', 'LivePushController@delistingGoods');
+        Route::post('de_listing_goods', 'LivePushController@delistingGoods');
+        Route::post('set_hot_goods', 'LivePushController@setHotGoods');
+        Route::post('cancel_hot_goods', 'LivePushController@cancelHotGoods');
         Route::get('goods_list', 'LivePlayController@roomGoodsList');
         Route::get('hot_goods', 'LivePlayController@roomHotGoods');
         Route::post('join', 'LivePlayController@joinRoom');

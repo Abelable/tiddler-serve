@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Goods;
 use App\Models\LiveRoom;
 use App\Services\GoodsService;
 use App\Services\Media\Live\LiveGoodsService;
@@ -169,34 +170,36 @@ class LivePushController extends Controller
         }
 
         if ($status == 1) {
-            $goodsList = $room->goodsList;
+            $hotGoodsId = LiveGoodsService::getInstance()->hotGoodsId($room->id);
+            $goodsList = $room->goodsList->map(function (Goods $goods) use ($hotGoodsId) {
+                $goods['is_hot'] = $goods->id == $hotGoodsId;
+                return $goods;
+            });
         } else {
             $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
             $columns = ['id', 'image', 'name', 'price', 'market_price', 'stock'];
             $goodsList = GoodsService::getInstance()->getLiveUnlistedGoodsList($this->userId(), $goodsIds, $columns);
         }
 
-        return $this->success([
-            'goodsList' => $goodsList
-        ]);
+        return $this->success($goodsList);
     }
 
     public function listingGoods()
     {
-        $ids = $this->verifyArrayNotEmpty('ids');
+        $goodsIds = $this->verifyArrayNotEmpty('goodsIds');
 
         $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
+        $listedGoodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
 
-        foreach ($ids as $id) {
-            if (in_array($id, $goodsIds)) {
-                return $this->fail(CodeResponse::INVALID_OPERATION, 'id为' . $id . '的商品已上架');
+        foreach ($goodsIds as $goodsId) {
+            if (in_array($goodsId, $listedGoodsIds)) {
+                return $this->fail(CodeResponse::INVALID_OPERATION, 'id为' . $goodsId . '的商品已上架');
             }
-            LiveGoodsService::getInstance()->newGoods($room->id, $id);
+            LiveGoodsService::getInstance()->newGoods($room->id, $goodsId);
         }
 
         return $this->success();
@@ -204,9 +207,58 @@ class LivePushController extends Controller
 
     public function delistingGoods()
     {
-        $ids = $this->verifyArrayNotEmpty('ids');
+        $goodsIds = $this->verifyArrayNotEmpty('goodsIds');
 
-        LiveGoodsService::getInstance()->deleteGoods($ids);
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        LiveGoodsService::getInstance()->deleteGoods($room->id, $goodsIds);
+
+        return $this->success();
+    }
+
+    public function setHotGoods()
+    {
+        $goodsId = $this->verifyRequiredInteger('goodsId');
+
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        DB::transaction(function () use ($goodsId, $room) {
+            $hotGoods = LiveGoodsService::getInstance()->hotGoods($room->id);
+            if (!is_null($hotGoods) && $hotGoods->goods_id != 0 && $hotGoods->goods_id != $goodsId) {
+                $hotGoods->is_hot = 0;
+                $hotGoods->save();
+            }
+
+            $goods = LiveGoodsService::getInstance()->goods($room->id, $goodsId);
+            $goods->is_hot = 1;
+            $goods->save();
+        });
+
+        // todo 发送im消息
+
+        return $this->success();
+    }
+
+    public function cancelHotGoods()
+    {
+        $goodsId = $this->verifyRequiredInteger('goodsId');
+
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $goods = LiveGoodsService::getInstance()->goods($room->id, $goodsId);
+        $goods->is_hot = 0;
+        $goods->save();
+
+        // todo 发送im消息
 
         return $this->success();
     }
