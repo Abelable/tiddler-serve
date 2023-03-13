@@ -79,10 +79,19 @@ class GoodsService extends BaseService
     public function getUserGoodsList($userId, PageInput $input, $columns=['*'])
     {
         return Goods::query()
-            ->where('status', 1)
             ->where('user_id', $userId)
+            ->where('status', 1)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getLiveUnlistedGoodsList($userId, $goodsIds, $columns=['*'])
+    {
+        return Goods::query()
+            ->where('user_id', $userId)
+            ->where('status', 1)
+            ->whereNotIn('id', $goodsIds)
+            ->get($columns);
     }
 
     public function getListTotal($userId, $status)

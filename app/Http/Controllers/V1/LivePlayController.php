@@ -4,6 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\FanService;
+use App\Services\GoodsService;
+use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveGroupMsgType;
@@ -141,6 +143,6 @@ class LivePlayController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        return $this->success();
+        return $this->success($room->hotGoods());
     }
 }

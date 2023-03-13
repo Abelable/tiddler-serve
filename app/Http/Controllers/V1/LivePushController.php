@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\LiveRoom;
+use App\Services\GoodsService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
@@ -167,10 +168,46 @@ class LivePushController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-
+        if ($status == 1) {
+            $goodsList = $room->goodsList;
+        } else {
+            $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
+            $columns = ['id', 'image', 'name', 'price', 'market_price', 'stock'];
+            $goodsList = GoodsService::getInstance()->getLiveUnlistedGoodsList($this->userId(), $goodsIds, $columns);
+        }
 
         return $this->success([
-            'goodsList' => $room->goodsList
+            'goodsList' => $goodsList
         ]);
+    }
+
+    public function listingGoods()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids');
+
+        $room = LiveRoomService::getInstance()->getUserRoom($this->userId(), [1]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
+
+        foreach ($ids as $id) {
+            if (in_array($id, $goodsIds)) {
+                return $this->fail(CodeResponse::INVALID_OPERATION, 'id为' . $id . '的商品已上架');
+            }
+            LiveGoodsService::getInstance()->newGoods($room->id, $id);
+        }
+
+        return $this->success();
+    }
+
+    public function delistingGoods()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids');
+
+        LiveGoodsService::getInstance()->deleteGoods($ids);
+
+        return $this->success();
     }
 }

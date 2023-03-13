@@ -26,4 +26,9 @@ class LiveGoodsService extends BaseService
         $list = $this->list($roomId);
         return $list->pluck('goods_id')->toArray();
     }
+
+    public function deleteGoods($goodsIds)
+    {
+        return LiveGoods::query()->whereIn('goods_id', $goodsIds)->delete();
+    }
 }
