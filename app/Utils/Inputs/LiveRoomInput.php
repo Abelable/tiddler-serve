@@ -7,7 +7,6 @@ class LiveRoomInput extends BaseInput
     public $title;
     public $cover;
     public $shareCover;
-    public $resolution;
     public $direction;
     public $goodsIds;
     public $noticeTime;
@@ -19,7 +18,6 @@ class LiveRoomInput extends BaseInput
             'cover' => 'required|string',
             'shareCover' => 'required|string',
             'resolution' => 'required|integer|in:1,2,3',
-            'direction' => 'required|integer|in:1,2',
             'goodsIds' => 'array',
             'noticeTime' => 'string',
         ];

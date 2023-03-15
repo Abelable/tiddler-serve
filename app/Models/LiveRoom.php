@@ -11,7 +11,6 @@ namespace App\Models;
  * @property string $title 直播标题
  * @property string $cover 直播封面
  * @property string $share_cover 直播间分享封面
- * @property int $resolution 分辨率：1-标清，2-高清，3-超清
  * @property int $direction 方向：1-竖屏，2-横屏
  * @property string $push_url 推流地址
  * @property string $play_url 拉流地址

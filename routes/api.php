@@ -78,6 +78,7 @@ Route::prefix('goods')->group(function () {
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
     Route::get('detail', 'GoodsController@detail');
+    Route::get('user_goods_list', 'GoodsController@userGoodsList');
 });
 
 Route::prefix('cart')->group(function () {
