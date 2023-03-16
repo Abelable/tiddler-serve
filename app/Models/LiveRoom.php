@@ -56,8 +56,6 @@ namespace App\Models;
  */
 class LiveRoom extends BaseModel
 {
-//    protected $visible = ['anchorInfo'];
-
     public function anchorInfo()
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'avatar', 'nickname');

@@ -22,7 +22,6 @@ class LiveRoomService extends BaseService
         }
         return $query
             ->whereIn('status', $statusList)
-            ->with('anchorInfo')
             ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')

@@ -23,7 +23,6 @@ class TourismNoteService extends BaseService
             }]);
         }
         return $query
-            ->with('authorInfo')
             ->orderBy('praise_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
