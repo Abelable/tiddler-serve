@@ -4,8 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\FanService;
-use App\Services\GoodsService;
-use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveGroupMsgType;
@@ -59,7 +57,6 @@ class LivePlayController extends Controller
 
         // 获取当前用户关注状态
         $fanIds = FanService::getInstance()->fanIds($room->user_id);
-        $isFollow = in_array($this->userId(), $fanIds) ? 1 : 0;
 
         // 返回
         // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
@@ -67,9 +64,24 @@ class LivePlayController extends Controller
         return $this->success([
             'viewersNumber' => $room->viewers_number,
             'praiseNumber' => $room->praise_number,
-            'goodsList' => $room->goodsList,
+            'goodsCount' => $room->goodsCount(),
             'historyChatMsgList' => $historyChatMsgList,
-            'isFollow' => $isFollow
+            'isFollow' => in_array($this->userId(), $fanIds)
+        ]);
+    }
+
+    public function followStatus()
+    {
+        $id = $this->verifyRequiredId('id');
+        $room = LiveRoomService::getInstance()->getRoom($id, [1, 3]);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
+        }
+
+        $fanIds = FanService::getInstance()->fanIds($room->user_id);
+
+        return $this->success([
+            'isFollow' => in_array($this->userId(), $fanIds)
         ]);
     }
 
@@ -144,5 +156,12 @@ class LivePlayController extends Controller
         }
 
         return $this->success($room->hotGoods());
+    }
+
+    public function subscribe()
+    {
+        $anchorId = $this->verifyRequiredId('anchorId');
+        // todo 订阅逻辑
+        return $this->success();
     }
 }

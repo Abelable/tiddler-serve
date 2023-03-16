@@ -54,11 +54,11 @@ class LiveRoomService extends BaseService
             ->first($columns);
     }
 
-    public function getRoom($id, $statusList, $columns = ['*'], $withGoodsList = false)
+    public function getRoom($id, $statusList, $columns = ['*'], $withGoodsCount = false)
     {
         $query = LiveRoom::query();
-        if ($withGoodsList) {
-            $query = $query->with('goodsList');
+        if ($withGoodsCount) {
+            $query = $query->with('goodsCount');
         }
         return $query
             ->whereIn('status', $statusList)

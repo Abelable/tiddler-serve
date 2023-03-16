@@ -6,6 +6,15 @@ use App\Models\Fan;
 
 class FanService extends BaseService
 {
+    public function newFan($authorId, $fanId)
+    {
+        $fan = Fan::new();
+        $fan->author_id = $authorId;
+        $fan->fan_id = $fanId;
+        $fan->save();
+        return $fan;
+    }
+
     public function authorList($fanId, $columns = ['*'])
     {
         return Fan::query()->where('fan_id', $fanId)->get($columns);

@@ -31,6 +31,10 @@ Route::prefix('wx')->group(function () {
     Route::get('qrcode', 'CommonController@wxQRCode');
 });
 
+Route::prefix('fan')->group(function () {
+    Route::post('follow', 'FanController@follow');
+});
+
 Route::prefix('shop')->group(function () {
     Route::get('category_options', 'ShopController@categoryOptions');
 
@@ -133,6 +137,8 @@ Route::prefix('media')->group(function () {
         Route::post('join', 'LivePlayController@joinRoom');
         Route::post('praise', 'LivePlayController@praise');
         Route::post('comment', 'LivePlayController@comment');
+        Route::get('follow_status', 'LivePlayController@followStatus');
+        Route::post('subscribe', 'LivePlayController@subscribe');
     });
 
     Route::prefix('short_video')->group(function () {

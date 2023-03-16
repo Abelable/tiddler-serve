@@ -43,7 +43,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom wherePlaybackUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom wherePraiseNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom wherePushUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereResolution($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereShareCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereStartTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LiveRoom whereStatus($value)
@@ -68,6 +67,14 @@ class LiveRoom extends BaseModel
             ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
             ->whereNull('live_goods.deleted_at')
             ->select('goods.id', 'goods.image', 'goods.name', 'goods.price', 'goods.market_price', 'goods.stock');
+    }
+
+    public function goodsCount()
+    {
+        return $this
+            ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
+            ->whereNull('live_goods.deleted_at')
+            ->count();
     }
 
     public function hotGoods()
