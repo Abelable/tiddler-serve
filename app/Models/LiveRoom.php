@@ -69,14 +69,6 @@ class LiveRoom extends BaseModel
             ->select('goods.id', 'goods.image', 'goods.name', 'goods.price', 'goods.market_price', 'goods.stock');
     }
 
-    public function goodsCount()
-    {
-        return $this
-            ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
-            ->whereNull('live_goods.deleted_at')
-            ->count();
-    }
-
     public function hotGoods()
     {
         return $this

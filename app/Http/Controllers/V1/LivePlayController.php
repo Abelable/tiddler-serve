@@ -64,7 +64,7 @@ class LivePlayController extends Controller
         return $this->success([
             'viewersNumber' => $room->viewers_number,
             'praiseNumber' => $room->praise_number,
-            'goodsCount' => $room->goodsCount(),
+            'goodsCount' => $room->goods_list_count,
             'historyChatMsgList' => $historyChatMsgList,
             'isFollow' => in_array($this->userId(), $fanIds)
         ]);
