@@ -38,21 +38,19 @@ class MediaController extends Controller
 
     private function getMediaList(PageInput $input, $authorIds = null)
     {
-        /** @var PageInput $liveInput */
-        $liveInput = array_merge([
-            'limit' => intval($input->limit / 3)
-        ], (array)$input);
-        $liveColumns = ['id', 'status', 'title', 'cover', 'play_url', 'notice_time'];
+        $liveInput = array_merge((array)$input, [
+            'limit' => (string)intval($input->limit / 3)
+        ]);
+        $liveColumns = ['id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
         $livePage = LiveRoomService::getInstance()->pageList($liveInput, $liveColumns, [1, 3], $authorIds);
         $liveList = collect($livePage->items())->map(function ($live) {
             $live['type'] = MediaTypeEnums::LIVE;
             return $live;
         });
 
-        /** @var PageInput $videoInput */
-        $videoInput = array_merge([
-            'limit' => $liveList->count() < $liveInput->limit ? $liveInput->limit - $liveList->count() + intval($input->limit / 3) : intval($input->limit / 3)
-        ], (array)$input);
+        $videoInput = array_merge((array)$input, [
+            'limit' => (string)$liveList->count() < $liveInput['limit'] ? $liveInput['limit'] - $liveList->count() + intval($input->limit / 3) : intval($input->limit / 3)
+        ]);
         $videoColumns = ['id', 'cover', 'video_url', 'title', 'praise_number'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
         $videoList = collect($videoPage->items())->map(function ($video) {
@@ -60,10 +58,9 @@ class MediaController extends Controller
             return $video;
         });
 
-        /** @var PageInput $noteInput */
-        $noteInput = array_merge([
-            'limit' => $videoList->count() < $videoInput->limit ? $input->limit - $liveInput->limit - $videoList->count() : $input->limit - $liveInput->limit - $videoInput->limit
-        ], (array)$input);
+        $noteInput = array_merge((array)$input, [
+            'limit' => (string)$videoList->count() < $videoInput['limit'] ? $input->limit - $liveInput['limit'] - $videoList->count() : $input->limit - $liveInput['limit'] - $videoInput['limit']
+        ]);
         $notePage = TourismNoteService::getInstance()->pageList($noteInput, ['id', 'image_list', 'title', 'praise_number'], $authorIds);
         $noteList = collect($notePage->items())->map(function (TourismNote $note) {
             $note['type'] = MediaTypeEnums::NOTE;

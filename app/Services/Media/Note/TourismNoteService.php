@@ -28,8 +28,8 @@ class TourismNoteService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+            ->orderBy($input['sort'], $input['order'])
+            ->paginate($input['limit'], $columns, 'page', $input['page']);
     }
 
     public function getListByIds($ids, $columns = ['*'])
