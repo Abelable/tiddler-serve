@@ -95,6 +95,6 @@ class MediaController extends Controller
             return $note;
         });
 
-        return $noteList->merge($videoList)->merge($liveList)->sortByDesc('created_at');
+        return $liveList->merge($noteList)->merge($videoList)->sortByDesc('created_at');
     }
 }
