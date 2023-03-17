@@ -142,7 +142,8 @@ Route::prefix('media')->group(function () {
     });
 
     Route::prefix('short_video')->group(function () {
-        Route::get('list', 'ShortVideoController@getRoomList');
+        Route::get('list', 'ShortVideoController@list');
+        Route::get('user_list', 'ShortVideoController@userVideoList');
         Route::post('create', 'ShortVideoController@createVideo');
         Route::post('delete', 'ShortVideoController@deleteVideo');
         Route::post('toggle_praise', 'ShortVideoController@togglePraiseStatus');
@@ -155,7 +156,8 @@ Route::prefix('media')->group(function () {
     });
 
     Route::prefix('tourism_note')->group(function () {
-        Route::get('list', 'TourismNoteController@getRoomList');
+        Route::get('list', 'TourismNoteController@list');
+        Route::get('user_list', 'TourismNoteController@userNoteList');
         Route::post('create', 'TourismNoteController@createVideo');
         Route::post('delete', 'TourismNoteController@deleteVideo');
         Route::post('toggle_praise', 'TourismNoteController@togglePraiseStatus');

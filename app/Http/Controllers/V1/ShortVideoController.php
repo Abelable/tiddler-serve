@@ -73,6 +73,7 @@ class ShortVideoController extends Controller
                 'nickname' => $this->user()->nickname
             ];
             $video['is_owner'] = true;
+            return $video;
         });
 
         return $this->success($this->paginate($page, $list));

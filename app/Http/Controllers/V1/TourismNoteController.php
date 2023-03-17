@@ -11,6 +11,7 @@ use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteGoodsService;
 use App\Services\Media\Note\TourismNotePraiseService;
 use App\Services\Media\Note\TourismNoteService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
@@ -26,16 +27,18 @@ class TourismNoteController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        $id = $this->verifyRequiredId('id');
+        $id = $this->verifyId('id', 0);
+        $authorId = $this->verifyId('authorId', 0);
 
         $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'praise_number', 'comments_number', 'collection_times', 'share_times', 'created_at'];
-        $page = TourismNoteService::getInstance()->pageList($input, $columns, null, $id, true);
+        $page = TourismNoteService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id, true);
         $noteList = collect($page->items());
 
         $authorIds = $noteList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($fanIdsGroup) {
+        $list = $noteList->map(function (TourismNote $note) use ($authorList, $fanIdsGroup) {
             $note['is_follow'] = 0;
             if ($this->isLogin()) {
                 $fansIds = $fanIdsGroup->get($note->user_id);
@@ -43,8 +46,40 @@ class TourismNoteController extends Controller
                     $note['is_follow'] = 1;
                 }
             }
+
+            $authorInfo = $authorList->get($note->user_id);
+            $note['author_info'] = $authorInfo;
             unset($note->user_id);
 
+            $note['commentList'] = $note['commentList']->map(function ($comment) {
+                return [
+                    'nickname' => $comment['userInfo']->nickname,
+                    'content' => $comment['content']
+                ];
+            });
+
+            return $note;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function userNoteList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $columns = ['id', 'cover', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
+        $page = TourismNoteService::getInstance()->pageList($input, $columns, [$this->userId()], $id, true);
+        $list = collect($page->items())->map(function (TourismNote $note) {
+            $note['is_follow'] = true;
+            $note['author_info'] = [
+                'id' => $this->userId(),
+                'avatar' => $this->user()->avatar,
+                'nickname' => $this->user()->nickname
+            ];
+            $note['is_owner'] = true;
             $note['commentList'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
