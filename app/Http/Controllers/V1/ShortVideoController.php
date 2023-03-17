@@ -11,6 +11,7 @@ use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoGoodsService;
 use App\Services\Media\ShortVideo\ShortVideoPraiseService;
 use App\Services\Media\ShortVideo\ShortVideoService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
@@ -26,25 +27,52 @@ class ShortVideoController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        $id = $this->verifyRequiredId('id');
+        $id = $this->verifyId('id', 0);
+        $authorId = $this->verifyId('authorId', 0);
 
-        $columns = ['id', 'user_id', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
-        $page = ShortVideoService::getInstance()->pageList($input, $columns, null, $id);
+        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
+        $page = ShortVideoService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id);
         $videoList = collect($page->items());
 
         $authorIds = $videoList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($fanIdsGroup) {
-            $video['is_follow'] = 0;
+        $list = $videoList->map(function (ShortVideo $video) use ($fanIdsGroup, $authorList) {
+            $video['is_follow'] = false;
             if ($this->isLogin()) {
                 $fansIds = $fanIdsGroup->get($video->user_id);
                 if (in_array($this->userId(), $fansIds)) {
-                    $video['is_follow'] = 1;
+                    $video['is_follow'] = true;
                 }
             }
+
+            $authorInfo = $authorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
             unset($video->user_id);
+
             return $video;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function userVideoList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $columns = ['id', 'cover', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
+        $page = ShortVideoService::getInstance()->pageList($input, $columns, [$this->userId()], $id);
+        $list = collect($page->items())->map(function (ShortVideo $video) {
+            $video['is_follow'] = true;
+            $video['author_info'] = [
+                'id' => $this->userId(),
+                'avatar' => $this->user()->avatar,
+                'nickname' => $this->user()->nickname
+            ];
+            $video['is_owner'] = true;
         });
 
         return $this->success($this->paginate($page, $list));
