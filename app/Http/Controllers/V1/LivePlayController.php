@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\LiveRoom;
 use App\Services\FanService;
 use App\Services\Media\Live\LiveRoomService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveGroupMsgType;
 use App\Utils\Inputs\PageInput;
@@ -20,10 +22,19 @@ class LivePlayController extends Controller
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'play_url', 'notice_time'];
-        $list = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
+        $columns = ['id', 'user_id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'play_url', 'notice_time'];
+        $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
+        $roomList = collect($page->items());
+        $anchorIds = $roomList->pluck('user_id')->toArray();
+        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $list = $roomList->map(function (LiveRoom $room) use ($anchorList) {
+            $anchorInfo = $anchorList->get($room->user_id);
+            $room['anchor_info'] = $anchorInfo;
+            unset($room->user_id);
+            return $room;
+        });
 
-        return $this->successPaginate($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function joinRoom()
@@ -66,21 +77,6 @@ class LivePlayController extends Controller
             'praiseNumber' => $room->praise_number,
             'goodsList' => $room->goodsList,
             'historyChatMsgList' => $historyChatMsgList,
-            'isFollow' => in_array($this->userId(), $fanIds)
-        ]);
-    }
-
-    public function followStatus()
-    {
-        $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($id, [1, 3]);
-        if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
-        }
-
-        $fanIds = FanService::getInstance()->fanIds($room->user_id);
-
-        return $this->success([
             'isFollow' => in_array($this->userId(), $fanIds)
         ]);
     }

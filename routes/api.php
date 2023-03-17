@@ -33,6 +33,7 @@ Route::prefix('wx')->group(function () {
 
 Route::prefix('fan')->group(function () {
     Route::post('follow', 'FanController@follow');
+    Route::get('follow_status', 'FanController@followStatus');
 });
 
 Route::prefix('shop')->group(function () {
@@ -137,7 +138,6 @@ Route::prefix('media')->group(function () {
         Route::post('join_room', 'LivePlayController@joinRoom');
         Route::post('praise', 'LivePlayController@praise');
         Route::post('comment', 'LivePlayController@comment');
-        Route::get('follow_status', 'LivePlayController@followStatus');
         Route::post('subscribe', 'LivePlayController@subscribe');
     });
 
