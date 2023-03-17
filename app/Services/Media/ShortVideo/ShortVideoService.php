@@ -29,7 +29,7 @@ class ShortVideoService extends BaseService
 
     public function getListByIds($ids, $columns = ['*'])
     {
-        return ShortVideo::query()->whereIn('id', $ids)->get($columns);
+        return ShortVideo::query()->whereIn('id', $ids)->with('authorInfo')->get($columns);
     }
 
     public function newVideo($userId, ShortVideoInput $input)

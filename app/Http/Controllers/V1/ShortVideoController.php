@@ -9,7 +9,7 @@ use App\Services\FanService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoGoodsService;
-use App\Services\Media\ShortVideo\ShortVideoPraiseService;
+use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -124,12 +124,12 @@ class ShortVideoController extends Controller
         }
 
         $praiseNumber = DB::transaction(function () use ($video, $id) {
-            $praise = ShortVideoPraiseService::getInstance()->getPraise($this->userId(), $id);
+            $praise = ShortVideoLikeService::getInstance()->getPraise($this->userId(), $id);
             if (!is_null($praise)) {
                 $praise->delete();
                 $praiseNumber = max($video->praise_number - 1, 0);
             } else {
-                ShortVideoPraiseService::getInstance()->newPraise($this->userId(), $id);
+                ShortVideoLikeService::getInstance()->newPraise($this->userId(), $id);
                 $praiseNumber = $video->praise_number + 1;
             }
             $video->praise_number = $praiseNumber;

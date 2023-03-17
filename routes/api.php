@@ -116,8 +116,10 @@ Route::prefix('order')->group(function () {
 });
 
 Route::prefix('media')->group(function () {
-    Route::get('list', 'MediaController@getList');
-    Route::get('follow_list', 'MediaController@getFollowList');
+    Route::get('list', 'MediaController@list');
+    Route::get('follow_list', 'MediaController@followList');
+    Route::get('collect_list', 'MediaController@collectList');
+    Route::get('like_list', 'MediaController@likeList');
 
     Route::prefix('live')->group(function () {
         Route::post('create', 'LivePushController@createRoom');

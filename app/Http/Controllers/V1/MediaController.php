@@ -5,10 +5,15 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\LiveRoom;
 use App\Models\ShortVideo;
+use App\Models\ShortVideoCollection;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\Media\Live\LiveRoomService;
+use App\Services\Media\Note\TourismNoteCollectionService;
+use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
+use App\Services\Media\ShortVideo\ShortVideoCollectionService;
+use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaTypeEnums;
@@ -18,7 +23,7 @@ class MediaController extends Controller
 {
     protected $except = ['getList'];
 
-    public function getList()
+    public function list()
     {
         /** @var PageInput $input */
         $input = PageInput::new();
@@ -28,13 +33,65 @@ class MediaController extends Controller
         return $this->success($list);
     }
 
-    public function getFollowList()
+    public function followList()
     {
         /** @var PageInput $input */
         $input = PageInput::new();
 
         $authorIds = FanService::getInstance()->authorIds($this->userId());
         $list = $this->getMediaList($input, $authorIds);
+
+        return $this->success($list);
+    }
+
+    public function collectList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $videoInput = $input->fill([
+            'limit' => (string)intval($input->limit / 2)
+        ]);
+        $videoPage = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $videoInput);
+        $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
+        $videoColumns = ['id', 'cover', 'video_url', 'title', 'praise_number', 'author_info'];
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
+
+        $noteInput = $input->fill([
+            'limit' => (string)$input->limit - $videoList->count()
+        ]);
+        $notePage = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $noteInput);
+        $noteIds = collect($notePage->items())->pluck('note_id')->toArray();
+        $noteColumns = ['id', 'image_list', 'title', 'praise_number'];
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns);
+
+        $list = $videoList->merge($noteList)->sortByDesc('created_at');
+
+        return $this->success($list);
+    }
+
+    public function likeList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $videoInput = $input->fill([
+            'limit' => (string)intval($input->limit / 2)
+        ]);
+        $videoPage = ShortVideoLikeService::getInstance()->pageList($this->userId(), $videoInput);
+        $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
+        $videoColumns = ['id', 'cover', 'video_url', 'title', 'praise_number', 'author_info'];
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
+
+        $noteInput = $input->fill([
+            'limit' => (string)$input->limit - $videoList->count()
+        ]);
+        $notePage = TourismNoteLikeService::getInstance()->pageList($this->userId(), $noteInput);
+        $noteIds = collect($notePage->items())->pluck('note_id')->toArray();
+        $noteColumns = ['id', 'image_list', 'title', 'praise_number'];
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns);
+
+        $list = $videoList->merge($noteList)->sortByDesc('created_at');
 
         return $this->success($list);
     }
@@ -60,7 +117,9 @@ class MediaController extends Controller
         });
 
         $videoInput = $input->fill([
-            'limit' => (string)$liveList->count() < $liveInput->limit ? $liveInput->limit - $liveList->count() + intval($input->limit / 3) : intval($input->limit / 3)
+            'limit' => (string)$liveList->count() < $liveInput->limit
+                ? $liveInput->limit - $liveList->count() + intval($input->limit / 3)
+                : intval($input->limit / 3)
         ]);
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'praise_number'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
@@ -78,9 +137,10 @@ class MediaController extends Controller
         });
 
         $noteInput = $input->fill([
-            'limit' => (string)$videoList->count() < $videoInput->limit ? $input->limit - $liveInput->limit - $videoList->count() : $input->limit - $liveInput->limit - $videoInput->limit
+            'limit' => (string)$input->limit - $liveList->count() - $videoList->count()
         ]);
-        $notePage = TourismNoteService::getInstance()->pageList($noteInput, ['id', 'user_id', 'image_list', 'title', 'praise_number'], $authorIds);
+        $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
+        $notePage = TourismNoteService::getInstance()->pageList($noteInput, $noteColumns, $authorIds);
         $noteListCollect = collect($notePage->items());
         $noteAuthorIds = $noteListCollect->pluck('user_id')->toArray();
         $noteAuthorList = UserService::getInstance()->getListByIds($noteAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShortVideoPraisesTable extends Migration
+class CreateTourismNoteLikesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateShortVideoPraisesTable extends Migration
      */
     public function up()
     {
-        Schema::create('short_video_praises', function (Blueprint $table) {
+        Schema::create('tourism_note_likes', function (Blueprint $table) {
             $table->id();
-            $table->integer('video_id')->comment('视频id');
+            $table->integer('note_id')->comment('攻略笔记id');
             $table->integer('user_id')->comment('用户id');
             $table->timestamps();
             $table->softDeletes();
@@ -29,6 +29,6 @@ class CreateShortVideoPraisesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('short_video_praises');
+        Schema::dropIfExists('tourism_note_likes');
     }
 }

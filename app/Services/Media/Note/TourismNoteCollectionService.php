@@ -4,6 +4,7 @@ namespace App\Services\Media\Note;
 
 use App\Models\TourismNoteCollection;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 
 class TourismNoteCollectionService extends BaseService
 {
@@ -20,4 +21,12 @@ class TourismNoteCollectionService extends BaseService
         $collection->save();
         return $collection;
      }
+
+    public function pageList($userId, PageInput $input, $columns = ['*'])
+    {
+        return TourismNoteCollection::query()
+            ->where('user_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
 }

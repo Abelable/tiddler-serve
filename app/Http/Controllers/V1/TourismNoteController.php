@@ -9,7 +9,7 @@ use App\Services\FanService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteGoodsService;
-use App\Services\Media\Note\TourismNotePraiseService;
+use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -138,12 +138,12 @@ class TourismNoteController extends Controller
         }
 
         $praiseNumber = DB::transaction(function () use ($note, $id) {
-            $praise = TourismNotePraiseService::getInstance()->getPraise($this->userId(), $id);
+            $praise = TourismNoteLikeService::getInstance()->getPraise($this->userId(), $id);
             if (!is_null($praise)) {
                 $praise->delete();
                 $praiseNumber = max($note->praise_number - 1, 0);
             } else {
-                TourismNotePraiseService::getInstance()->newPraise($this->userId(), $id);
+                TourismNoteLikeService::getInstance()->newPraise($this->userId(), $id);
                 $praiseNumber = $note->praise_number + 1;
             }
             $note->praise_number = $praiseNumber;
