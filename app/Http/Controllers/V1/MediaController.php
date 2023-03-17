@@ -41,7 +41,7 @@ class MediaController extends Controller
 
     private function getMediaList(PageInput $input, $authorIds = null)
     {
-        $liveInput = array_merge((array)$input, [
+        $liveInput = $input->fill([
             'limit' => (string)intval($input->limit / 3)
         ]);
         $liveColumns = ['id', 'user_id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
@@ -59,8 +59,8 @@ class MediaController extends Controller
             return $live;
         });
 
-        $videoInput = array_merge((array)$input, [
-            'limit' => (string)$liveList->count() < $liveInput['limit'] ? $liveInput['limit'] - $liveList->count() + intval($input->limit / 3) : intval($input->limit / 3)
+        $videoInput = $input->fill([
+            'limit' => (string)$liveList->count() < $liveInput->limit ? $liveInput->limit - $liveList->count() + intval($input->limit / 3) : intval($input->limit / 3)
         ]);
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'praise_number'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
@@ -77,8 +77,8 @@ class MediaController extends Controller
             return $video;
         });
 
-        $noteInput = array_merge((array)$input, [
-            'limit' => (string)$videoList->count() < $videoInput['limit'] ? $input->limit - $liveInput['limit'] - $videoList->count() : $input->limit - $liveInput['limit'] - $videoInput['limit']
+        $noteInput = $input->fill([
+            'limit' => (string)$videoList->count() < $videoInput->limit ? $input->limit - $liveInput->limit - $videoList->count() : $input->limit - $liveInput->limit - $videoInput->limit
         ]);
         $notePage = TourismNoteService::getInstance()->pageList($noteInput, ['id', 'user_id', 'image_list', 'title', 'praise_number'], $authorIds);
         $noteListCollect = collect($notePage->items());

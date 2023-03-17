@@ -4,11 +4,12 @@ namespace App\Services\Media\ShortVideo;
 
 use App\Models\ShortVideo;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
-    public function pageList($input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
+    public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
     {
         $query = ShortVideo::query();
         if (!is_null($authorIds)) {
@@ -22,8 +23,8 @@ class ShortVideoService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
-            ->orderBy($input['sort'], $input['order'])
-            ->paginate($input['limit'], $columns, 'page', $input['page']);
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getListByIds($ids, $columns = ['*'])

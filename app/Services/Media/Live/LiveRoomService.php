@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 
 class LiveRoomService extends BaseService
 {
-    public function pageList($input, $columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
+    public function pageList(PageInput $input, $columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
     {
         $query = LiveRoom::query();
         if (!is_null($anchorIds)) {
@@ -25,7 +25,7 @@ class LiveRoomService extends BaseService
             ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')
-            ->paginate($input['limit'], $columns, 'page', $input['page']);
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function newLiveRoom($userId, LiveRoomInput $input)

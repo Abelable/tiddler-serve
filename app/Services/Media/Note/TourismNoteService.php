@@ -4,11 +4,12 @@ namespace App\Services\Media\Note;
 
 use App\Models\TourismNote;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\TourismNoteInput;
 
 class TourismNoteService extends BaseService
 {
-    public function pageList($input, $columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
+    public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
     {
         $query = TourismNote::query();
         if (!is_null($authorIds)) {
@@ -27,8 +28,8 @@ class TourismNoteService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
-            ->orderBy($input['sort'], $input['order'])
-            ->paginate($input['limit'], $columns, 'page', $input['page']);
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getListByIds($ids, $columns = ['*'])
