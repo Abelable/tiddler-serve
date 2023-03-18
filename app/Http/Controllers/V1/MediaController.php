@@ -95,9 +95,9 @@ class MediaController extends Controller
         $list = collect($page->items())->map(function ($media) use ($authorList) {
             $authorInfo = $authorList->get($media['user_id']);
             if ($media['type'] == 1) {
-                $media['anchor_info'] = $authorInfo;
+                $media['anchorInfo'] = $authorInfo;
             } else {
-                $media['author_info'] = $authorInfo;
+                $media['authorInfo'] = $authorInfo;
             }
             unset($media['user_id']);
             return $media;
