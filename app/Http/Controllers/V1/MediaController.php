@@ -124,20 +124,9 @@ class MediaController extends Controller
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
         $videoListCollect = collect($videoPage->items());
-        $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
-        $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $videoList = $videoListCollect->map(function (ShortVideo $video) use ($videoAuthorList) {
-            $video['type'] = MediaTypeEnums::VIDEO;
-
-            $authorInfo = $videoAuthorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
-            unset($video->user_id);
-
-            return $video;
-        });
 
         $noteInput = (clone $input)->fill([
-            'limit' => (string)$input->limit - $liveList->count() - $videoList->count()
+            'limit' => (string)$input->limit - $liveList->count() - $videoListCollect->count()
         ]);
         $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
         $notePage = TourismNoteService::getInstance()->pageList($noteInput, $noteColumns, $authorIds);
@@ -153,6 +142,26 @@ class MediaController extends Controller
             unset($note->user_id);
 
             return $note;
+        });
+
+        // 如果noteList数量不够，需要尝试从videoList找补
+        if ($noteList->count() < $noteInput->limit) {
+            $videoInput = (clone $input)->fill([
+                'limit' => (string)$input->limit - $liveList->count() - $noteList->count()
+            ]);
+            $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
+            $videoListCollect = collect($videoPage->items());
+        }
+        $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
+        $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $videoList = $videoListCollect->map(function (ShortVideo $video) use ($videoAuthorList) {
+            $video['type'] = MediaTypeEnums::VIDEO;
+
+            $authorInfo = $videoAuthorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
+            unset($video->user_id);
+
+            return $video;
         });
 
         return $liveList->merge($noteList)->merge($videoList)->sortByDesc('created_at');
