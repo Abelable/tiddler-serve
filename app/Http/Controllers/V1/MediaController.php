@@ -98,11 +98,9 @@ class MediaController extends Controller
 
     private function getMediaList(PageInput $input, $authorIds = null)
     {
-
         $liveInput = (clone $input)->fill([
             'limit' => (string)intval($input->limit / 3)
         ]);
-
         $liveColumns = ['id', 'user_id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
         $livePage = LiveRoomService::getInstance()->pageList($liveInput, $liveColumns, [1, 3], $authorIds);
         $liveListCollect = collect($livePage->items());
@@ -123,7 +121,6 @@ class MediaController extends Controller
                 ? $liveInput->limit - $liveList->count() + intval($input->limit / 3)
                 : intval($input->limit / 3)
         ]);
-
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
         $videoListCollect = collect($videoPage->items());
