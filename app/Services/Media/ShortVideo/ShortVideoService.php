@@ -19,7 +19,7 @@ class ShortVideoService extends BaseService
             $query = $query->orderByRaw("CASE WHEN id = " . $curVideoId . " THEN 0 ELSE 1 END");
         }
         return $query
-            ->orderBy('praise_number', 'desc')
+            ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')

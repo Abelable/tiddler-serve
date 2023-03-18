@@ -54,7 +54,7 @@ class MediaController extends Controller
         ]);
         $videoPage = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $videoInput);
         $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
-        $videoColumns = ['id', 'cover', 'video_url', 'title', 'praise_number'];
+        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number'];
         $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
 
         $noteInput = $input->fill([
@@ -121,7 +121,7 @@ class MediaController extends Controller
                 ? $liveInput->limit - $liveList->count() + intval($input->limit / 3)
                 : intval($input->limit / 3)
         ]);
-        $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'praise_number'];
+        $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
         $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
         $videoListCollect = collect($videoPage->items());
         $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
