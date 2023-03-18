@@ -98,11 +98,8 @@ class MediaController extends Controller
 
     private function getMediaList(PageInput $input, $authorIds = null)
     {
-        $liveInput = $input->fill([
-            'limit' => (string)intval($input->limit / 3)
-        ]);
         $liveColumns = ['id', 'user_id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $livePage = LiveRoomService::getInstance()->pageList($liveInput, $liveColumns, [1, 3], $authorIds);
+        $livePage = LiveRoomService::getInstance()->pageList($input, $liveColumns, [1, 3], $authorIds);
         $liveListCollect = collect($livePage->items());
         $liveAnchorIds = $liveListCollect->pluck('user_id')->toArray();
         $anchorList = UserService::getInstance()->getListByIds($liveAnchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -116,13 +113,8 @@ class MediaController extends Controller
             return $live;
         });
 
-        $videoInput = $input->fill([
-            'limit' => (string)$liveList->count() < $liveInput->limit
-                ? $liveInput->limit - $liveList->count() + intval($input->limit / 3)
-                : intval($input->limit / 3)
-        ]);
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
-        $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
+        $videoPage = ShortVideoService::getInstance()->pageList($input, $videoColumns, $authorIds);
         $videoListCollect = collect($videoPage->items());
         $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
         $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -136,11 +128,8 @@ class MediaController extends Controller
             return $video;
         });
 
-        $noteInput = $input->fill([
-            'limit' => (string)$input->limit - $liveList->count() - $videoList->count()
-        ]);
         $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
-        $notePage = TourismNoteService::getInstance()->pageList($noteInput, $noteColumns, $authorIds);
+        $notePage = TourismNoteService::getInstance()->pageList($input, $noteColumns, $authorIds);
         $noteListCollect = collect($notePage->items());
         $noteAuthorIds = $noteListCollect->pluck('user_id')->toArray();
         $noteAuthorList = UserService::getInstance()->getListByIds($noteAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
