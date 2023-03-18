@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\LiveRoom;
-use App\Models\ShortVideo;
-use App\Models\TourismNote;
 use App\Services\FanService;
-use App\Services\Media\Live\LiveRoomService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -16,9 +12,7 @@ use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
-use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\PageInput;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
@@ -29,7 +23,20 @@ class MediaController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
+        return $this->getMediaList($input);
+    }
 
+    public function followList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $authorIds = FanService::getInstance()->authorIds($this->userId());
+        return $this->getMediaList($input, $authorIds);
+    }
+
+    private function getMediaList(PageInput $input, $authorIds = null)
+    {
         $videoColumns = [
             'id',
             'user_id',
@@ -88,7 +95,7 @@ class MediaController extends Controller
             'created_at',
         ];
 
-        $page = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns);
+        $page = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns, true, $authorIds);
         $mediaList = collect($page->items());
         $authorIds = $mediaList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -104,17 +111,6 @@ class MediaController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
-    }
-
-    public function followList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-
-        $authorIds = FanService::getInstance()->authorIds($this->userId());
-        $list = $this->getMediaList($input, $authorIds);
-
-        return $this->success($list);
     }
 
     public function collectList()
@@ -167,60 +163,5 @@ class MediaController extends Controller
         $list = $videoList->merge($noteList)->sortByDesc('created_at');
 
         return $this->success($list);
-    }
-
-    private function getMediaList(PageInput $input, $authorIds = null)
-    {
-        $liveColumns = ['id', 'user_id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $livePage = LiveRoomService::getInstance()->pageList($input, $liveColumns, [1, 3], $authorIds);
-        $liveListCollect = collect($livePage->items());
-        $liveAnchorIds = $liveListCollect->pluck('user_id')->toArray();
-        $anchorList = UserService::getInstance()->getListByIds($liveAnchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $liveList = $liveListCollect->map(function (LiveRoom $live) use ($anchorList) {
-            $live['type'] = MediaTypeEnums::LIVE;
-
-            $anchorInfo = $anchorList->get($live->user_id);
-            $live['anchor_info'] = $anchorInfo;
-            unset($live->user_id);
-
-            return $live;
-        });
-
-        $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
-        $videoPage = ShortVideoService::getInstance()->pageList($input, $videoColumns, $authorIds);
-        $videoListCollect = collect($videoPage->items());
-        $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
-        $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $videoList = $videoListCollect->map(function (ShortVideo $video) use ($videoAuthorList) {
-            $video['type'] = MediaTypeEnums::VIDEO;
-
-            $authorInfo = $videoAuthorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
-            unset($video->user_id);
-
-            return $video;
-        });
-
-        $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
-        $notePage = TourismNoteService::getInstance()->pageList($input, $noteColumns, $authorIds);
-        $noteListCollect = collect($notePage->items());
-        $noteAuthorIds = $noteListCollect->pluck('user_id')->toArray();
-        $noteAuthorList = UserService::getInstance()->getListByIds($noteAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $noteList = $noteListCollect->map(function (TourismNote $note) use ($noteAuthorList) {
-            $note['type'] = MediaTypeEnums::NOTE;
-            $note->image_list = json_decode($note->image_list);
-
-            $authorInfo = $noteAuthorList->get($note->user_id);
-            $note['author_info'] = $authorInfo;
-            unset($note->user_id);
-
-            return $note;
-        });
-
-        $totalList = $liveList->concat($videoList)->concat($noteList);
-        $sortedList = $totalList->sortByDesc('created_at');
-        $paginatedList = $sortedList->forPage($input->page, $input->limit);
-
-        return new LengthAwarePaginator($paginatedList, $sortedList->count(), $input->limit, $input->page);
     }
 }
