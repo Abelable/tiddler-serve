@@ -8,6 +8,10 @@ class ShortVideoInput extends BaseInput
     public $cover;
     public $videoUrl;
     public $goodsId;
+    public $longitude;
+    public $latitude;
+    public $address;
+    public $isPrivate;
 
     public function rules()
     {

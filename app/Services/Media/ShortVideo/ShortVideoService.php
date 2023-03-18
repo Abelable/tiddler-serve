@@ -37,10 +37,19 @@ class ShortVideoService extends BaseService
         $video = ShortVideo::new();
         $video->user_id = $userId;
         $video->title = $input->title;
-        if (!empty($input->cover)) {
-            $video->cover = $input->cover;
-        }
+        $video->cover = $input->cover;
         $video->video_url = $input->videoUrl;
+        if (!empty($input->goodsId)) {
+            $video->goods_id = $input->goodsId;
+        }
+        if (!empty($input->address)) {
+            $video->longitude = $input->longitude;
+            $video->latitude = $input->latitude;
+            $video->address = $input->address;
+        }
+        if (!empty($input->isPrivate)) {
+            $video->is_private = $input->isPrivate;
+        }
         $video->save();
         return $video;
     }
