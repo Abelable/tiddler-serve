@@ -21,7 +21,7 @@ class LiveRoomService extends BaseService
 
     public function liveQuery($columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
     {
-        $query = LiveRoom::query()->select($columns);
+        $query = LiveRoom::query();
         if (!is_null($anchorIds)) {
             $query = $query->whereIn('user_id', $anchorIds);
         }
@@ -33,7 +33,8 @@ class LiveRoomService extends BaseService
             ->whereIn('status', $statusList)
             ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
             ->orderBy('viewers_number', 'desc')
-            ->orderBy('praise_number', 'desc');
+            ->orderBy('praise_number', 'desc')
+            ->select($columns);
     }
 
     public function newLiveRoom($userId, LiveRoomInput $input)

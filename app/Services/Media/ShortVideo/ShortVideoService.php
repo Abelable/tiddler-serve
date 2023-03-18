@@ -19,7 +19,7 @@ class ShortVideoService extends BaseService
 
     public function videoQuery($columns = ['*'], $authorIds = null, $curVideoId = 0)
     {
-        $query = ShortVideo::query()->select($columns);
+        $query = ShortVideo::query();
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }
@@ -31,7 +31,8 @@ class ShortVideoService extends BaseService
             ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
-            ->orderBy('share_times', 'desc');
+            ->orderBy('share_times', 'desc')
+            ->select($columns);
     }
 
     public function getListByIds($ids, $columns = ['*'])

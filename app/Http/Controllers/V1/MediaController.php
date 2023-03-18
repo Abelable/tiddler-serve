@@ -19,6 +19,7 @@ use App\Services\UserService;
 use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
@@ -29,14 +30,80 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-//        $list = $this->getMediaList($input);
+        $videoColumns = [
+            'id',
+            'user_id',
+            DB::raw('NULL as status'),
+            'title',
+            'cover',
+            'video_url',
+            DB::raw('NULL as image_list'),
+            DB::raw('NULL as play_url'),
+            'address',
+            'like_number',
+            'comments_number',
+            'collection_times',
+            'share_times',
+            DB::raw('NULL as viewers_number'),
+            DB::raw('NULL as praise_number'),
+            DB::raw('NULL as notice_time'),
+            'created_at',
+        ];
+        $noteColumns = [
+            'id',
+            'user_id',
+            DB::raw('NULL as status'),
+            'title',
+            DB::raw('NULL as cover'),
+            DB::raw('NULL as video_url'),
+            'image_list',
+            DB::raw('NULL as play_url'),
+            'address',
+            'like_number',
+            'comments_number',
+            'collection_times',
+            'share_times',
+            DB::raw('NULL as viewers_number'),
+            DB::raw('NULL as praise_number'),
+            DB::raw('NULL as notice_time'),
+            'created_at',
+        ];
+        $liveColumns = [
+            'id',
+            'user_id',
+            'status',
+            'title',
+            'cover',
+            DB::raw('NULL as video_url'),
+            DB::raw('NULL as image_list'),
+            'play_url',
+            DB::raw('NULL as address'),
+            DB::raw('NULL as like_number'),
+            DB::raw('NULL as comments_number'),
+            DB::raw('NULL as collection_times'),
+            DB::raw('NULL as share_times'),
+            'viewers_number',
+            'praise_number',
+            'notice_time',
+            'created_at',
+        ];
 
-        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number', 'address'];
-        $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
-        $liveColumns = ['id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $list = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns);
+        $page = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns);
+        $mediaList = collect($page->items());
+        $authorIds = $mediaList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $list = collect($page->items())->map(function ($media) use ($authorList) {
+            $authorInfo = $authorList->get($media['user_id']);
+            if ($media['type'] == 1) {
+                $media['anchor_info'] = $authorInfo;
+            } else {
+                $media['author_info'] = $authorInfo;
+            }
+            unset($media['user_id']);
+            return $media;
+        });
 
-        return $this->successPaginate($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function followList()

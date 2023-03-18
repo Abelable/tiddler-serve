@@ -19,7 +19,7 @@ class TourismNoteService extends BaseService
 
     public function noteQuery($columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
     {
-        $query = TourismNote::query()->select($columns);
+        $query = TourismNote::query();
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }
@@ -32,11 +32,11 @@ class TourismNoteService extends BaseService
             }]);
         }
         return $query
-            ->with('authorInfo')
-            ->orderBy('praise_number', 'desc')
+            ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
-            ->orderBy('share_times', 'desc');
+            ->orderBy('share_times', 'desc')
+            ->select($columns);
     }
 
     public function getListByIds($ids, $columns = ['*'])
