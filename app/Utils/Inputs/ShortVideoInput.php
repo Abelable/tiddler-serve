@@ -13,9 +13,13 @@ class ShortVideoInput extends BaseInput
     {
         return [
             'title' => 'required|string',
-            'cover' => 'string',
+            'cover' => 'required|string',
             'videoUrl' => 'required|string',
             'goodsId' => 'integer|digits_between:1,20',
+            'longitude' => 'numeric',
+            'latitude' => 'numeric',
+            'address' => 'string',
+            'isPrivate' => 'integer|in:0,1'
         ];
     }
 }
