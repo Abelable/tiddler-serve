@@ -11,7 +11,15 @@ class TourismNoteService extends BaseService
 {
     public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
     {
-        $query = TourismNote::query();
+        $query = $this->noteQuery($columns, $authorIds, $curNoteId, $withComments);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function noteQuery($columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
+    {
+        $query = TourismNote::query()->select($columns);
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }
@@ -24,12 +32,11 @@ class TourismNoteService extends BaseService
             }]);
         }
         return $query
+            ->with('authorInfo')
             ->orderBy('praise_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
-            ->orderBy('share_times', 'desc')
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+            ->orderBy('share_times', 'desc');
     }
 
     public function getListByIds($ids, $columns = ['*'])

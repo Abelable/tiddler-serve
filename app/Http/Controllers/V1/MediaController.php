@@ -5,10 +5,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\LiveRoom;
 use App\Models\ShortVideo;
-use App\Models\ShortVideoCollection;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\Media\Live\LiveRoomService;
+use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
@@ -18,6 +18,7 @@ use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaTypeEnums;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class MediaController extends Controller
 {
@@ -28,9 +29,14 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $list = $this->getMediaList($input);
+//        $list = $this->getMediaList($input);
 
-        return $this->success($list);
+        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number', 'address'];
+        $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
+        $liveColumns = ['id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
+        $list = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns);
+
+        return $this->successPaginate($list);
     }
 
     public function followList()
@@ -98,11 +104,8 @@ class MediaController extends Controller
 
     private function getMediaList(PageInput $input, $authorIds = null)
     {
-        $liveInput = (clone $input)->fill([
-            'limit' => (string)intval($input->limit / 3)
-        ]);
         $liveColumns = ['id', 'user_id', 'status', 'title', 'cover', 'play_url', 'notice_time', 'viewers_number', 'praise_number'];
-        $livePage = LiveRoomService::getInstance()->pageList($liveInput, $liveColumns, [1, 3], $authorIds);
+        $livePage = LiveRoomService::getInstance()->pageList($input, $liveColumns, [1, 3], $authorIds);
         $liveListCollect = collect($livePage->items());
         $liveAnchorIds = $liveListCollect->pluck('user_id')->toArray();
         $anchorList = UserService::getInstance()->getListByIds($liveAnchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -116,20 +119,23 @@ class MediaController extends Controller
             return $live;
         });
 
-        $videoInput = (clone $input)->fill([
-            'limit' => (string)$liveList->count() < $liveInput->limit
-                ? $liveInput->limit - $liveList->count() + intval($input->limit / 3)
-                : intval($input->limit / 3)
-        ]);
         $videoColumns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'address'];
-        $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
+        $videoPage = ShortVideoService::getInstance()->pageList($input, $videoColumns, $authorIds);
         $videoListCollect = collect($videoPage->items());
+        $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
+        $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $videoList = $videoListCollect->map(function (ShortVideo $video) use ($videoAuthorList) {
+            $video['type'] = MediaTypeEnums::VIDEO;
 
-        $noteInput = (clone $input)->fill([
-            'limit' => (string)$input->limit - $liveList->count() - $videoListCollect->count()
-        ]);
+            $authorInfo = $videoAuthorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
+            unset($video->user_id);
+
+            return $video;
+        });
+
         $noteColumns = ['id', 'user_id', 'image_list', 'title', 'praise_number'];
-        $notePage = TourismNoteService::getInstance()->pageList($noteInput, $noteColumns, $authorIds);
+        $notePage = TourismNoteService::getInstance()->pageList($input, $noteColumns, $authorIds);
         $noteListCollect = collect($notePage->items());
         $noteAuthorIds = $noteListCollect->pluck('user_id')->toArray();
         $noteAuthorList = UserService::getInstance()->getListByIds($noteAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -144,26 +150,10 @@ class MediaController extends Controller
             return $note;
         });
 
-        // 如果noteList数量不够，需要尝试从videoList找补
-        if ($noteList->count() < $noteInput->limit) {
-            $videoInput = (clone $input)->fill([
-                'limit' => (string)$input->limit - $liveList->count() - $noteList->count()
-            ]);
-            $videoPage = ShortVideoService::getInstance()->pageList($videoInput, $videoColumns, $authorIds);
-            $videoListCollect = collect($videoPage->items());
-        }
-        $videoAuthorIds = $videoListCollect->pluck('user_id')->toArray();
-        $videoAuthorList = UserService::getInstance()->getListByIds($videoAuthorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $videoList = $videoListCollect->map(function (ShortVideo $video) use ($videoAuthorList) {
-            $video['type'] = MediaTypeEnums::VIDEO;
+        $totalList = $liveList->concat($videoList)->concat($noteList);
+        $sortedList = $totalList->sortByDesc('created_at');
+        $paginatedList = $sortedList->forPage($input->page, $input->limit);
 
-            $authorInfo = $videoAuthorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
-            unset($video->user_id);
-
-            return $video;
-        });
-
-        return $liveList->merge($noteList)->merge($videoList)->sortByDesc('created_at');
+        return new LengthAwarePaginator($paginatedList, $sortedList->count(), $input->limit, $input->page);
     }
 }

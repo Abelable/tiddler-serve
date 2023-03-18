@@ -11,7 +11,15 @@ class ShortVideoService extends BaseService
 {
     public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
     {
-        $query = ShortVideo::query();
+        $query = $this->videoQuery($columns, $authorIds, $curVideoId);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, ['*'], 'page', $input->page);
+    }
+
+    public function videoQuery($columns = ['*'], $authorIds = null, $curVideoId = 0)
+    {
+        $query = ShortVideo::query()->select($columns);
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }
@@ -19,12 +27,11 @@ class ShortVideoService extends BaseService
             $query = $query->orderByRaw("CASE WHEN id = " . $curVideoId . " THEN 0 ELSE 1 END");
         }
         return $query
+            ->with('authorInfo')
             ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
-            ->orderBy('share_times', 'desc')
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+            ->orderBy('share_times', 'desc');
     }
 
     public function getListByIds($ids, $columns = ['*'])
