@@ -7,7 +7,6 @@ use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
-use function PHPUnit\Framework\isNull;
 
 class MediaService extends BaseService
 {
