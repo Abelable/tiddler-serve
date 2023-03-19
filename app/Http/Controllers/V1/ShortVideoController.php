@@ -63,7 +63,7 @@ class ShortVideoController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
 
-        $columns = ['id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address'];
+        $columns = ['id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, [$this->userId()], $id);
         $list = collect($page->items())->map(function (ShortVideo $video) {
             $video['is_follow'] = true;
@@ -72,7 +72,6 @@ class ShortVideoController extends Controller
                 'avatar' => $this->user()->avatar,
                 'nickname' => $this->user()->nickname
             ];
-            $video['is_owner'] = true;
             return $video;
         });
 
