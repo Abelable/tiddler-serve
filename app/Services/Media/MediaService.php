@@ -3,22 +3,34 @@
 namespace App\Services\Media;
 
 use App\Models\LiveRoom;
+use App\Models\ShortVideo;
+use App\Models\TourismNote;
 use App\Services\BaseService;
-use App\Services\Media\Live\LiveRoomService;
-use App\Services\Media\Note\TourismNoteService;
-use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Utils\Inputs\PageInput;
+use function PHPUnit\Framework\isNull;
 
 class MediaService extends BaseService
 {
     public function mediaPageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $withLiveList = true, $authorIds = null)
     {
-        $videoQuery = ShortVideoService::getInstance()->videoQuery($videoColumns, $authorIds)->selectRaw("2 as type");
-        $noteQuery = TourismNoteService::getInstance()->noteQuery($noteColumns, $authorIds)->selectRaw("3 as type");
+        $videoQuery = ShortVideo::query()->select($videoColumns)->selectRaw("2 as type");
+        if (!is_null($authorIds)) {
+            $videoQuery = $videoQuery->whereIn('user_id', $authorIds);
+        }
+
+        $noteQuery = TourismNote::query()->select($noteColumns)->selectRaw("3 as type");
+        if (!is_null($authorIds)) {
+            $noteQuery = $noteQuery->whereIn('user_id', $authorIds);
+        }
+
         $mediaQuery = $videoQuery->union($noteQuery);
 
         if ($withLiveList) {
-            $liveQuery = LiveRoomService::getInstance()->liveQuery($liveColumns, [1, 3], $authorIds)->selectRaw("1 as type");
+            $liveQuery = LiveRoom::query()->select($liveColumns)->whereIn('status', [1, 3])->selectRaw("1 as type");
+            if (!is_null($authorIds)) {
+                $liveQuery = $liveQuery->whereIn('user_id', $authorIds);
+            }
+
             $mediaQuery = $mediaQuery->union($liveQuery);
         }
 

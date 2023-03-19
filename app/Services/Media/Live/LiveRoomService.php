@@ -13,14 +13,6 @@ class LiveRoomService extends BaseService
 {
     public function pageList(PageInput $input, $columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
     {
-        $query = $this->liveQuery($columns, $statusList, $anchorIds, $curRoomId);
-        return $query
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, ['*'], 'page', $input->page);
-    }
-
-    public function liveQuery($columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
-    {
         $query = LiveRoom::query();
         if (!is_null($anchorIds)) {
             $query = $query->whereIn('user_id', $anchorIds);
@@ -29,12 +21,12 @@ class LiveRoomService extends BaseService
             $query = $query->orderByRaw("CASE WHEN id = " . $curRoomId . " THEN 0 ELSE 1 END");
         }
         return $query
-            ->with('anchorInfo')
             ->whereIn('status', $statusList)
             ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')
-            ->select($columns);
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function newLiveRoom($userId, LiveRoomInput $input)
