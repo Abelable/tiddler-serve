@@ -38,12 +38,26 @@ class ShortVideoController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($fanIdsGroup, $authorList) {
+        $videoIds = $videoList->pluck('id')->toArray();
+        $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
+        $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
+
+        $list = $videoList->map(function (ShortVideo $video) use ($collectedUserIdsGroup, $likeUserIdsGroup, $fanIdsGroup, $authorList) {
             $video['is_follow'] = false;
             if ($this->isLogin()) {
-                $fansIds = $fanIdsGroup->get($video->user_id);
-                if (in_array($this->userId(), $fansIds)) {
+                $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
+                if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
                     $video['is_follow'] = true;
+                }
+
+                $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
+                if (in_array($this->userId(), $likeUserIds)) {
+                    $video['is_like'] = true;
+                }
+
+                $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
+                if (in_array($this->userId(), $collectedUserIds)) {
+                    $video['is_collected'] = true;
                 }
             }
 
@@ -112,7 +126,7 @@ class ShortVideoController extends Controller
         return $this->success();
     }
 
-    public function togglePraiseStatus()
+    public function toggleLikeStatus()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -122,25 +136,25 @@ class ShortVideoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
         }
 
-        $praiseNumber = DB::transaction(function () use ($video, $id) {
-            $praise = ShortVideoLikeService::getInstance()->getPraise($this->userId(), $id);
-            if (!is_null($praise)) {
-                $praise->delete();
-                $praiseNumber = max($video->praise_number - 1, 0);
+        $likeNumber = DB::transaction(function () use ($video, $id) {
+            $like = ShortVideoLikeService::getInstance()->getLike($this->userId(), $id);
+            if (!is_null($like)) {
+                $like->delete();
+                $likeNumber = max($video->like_number - 1, 0);
             } else {
-                ShortVideoLikeService::getInstance()->newPraise($this->userId(), $id);
-                $praiseNumber = $video->praise_number + 1;
+                ShortVideoLikeService::getInstance()->newLike($this->userId(), $id);
+                $likeNumber = $video->like_number + 1;
             }
-            $video->praise_number = $praiseNumber;
+            $video->like_number = $likeNumber;
             $video->save();
 
-            return $praiseNumber;
+            return $likeNumber;
         });
 
-        return $this->success($praiseNumber);
+        return $this->success($likeNumber);
     }
 
-    public function toggleCollectionStatus()
+    public function toggleCollectStatus()
     {
         $id = $this->verifyRequiredId('id');
 

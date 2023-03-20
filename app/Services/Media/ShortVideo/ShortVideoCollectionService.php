@@ -29,4 +29,16 @@ class ShortVideoCollectionService extends BaseService
              ->orderBy($input->sort, $input->order)
              ->paginate($input->limit, $columns, 'page', $input->page);
      }
+
+    public function collectedUserIdsGroup($videoIds)
+    {
+        return ShortVideoCollection::query()
+            ->whereIn('video_id', $videoIds)
+            ->select(['video_id', 'user_id'])
+            ->get()
+            ->groupBy('video_id')
+            ->map(function ($fan) {
+                return $fan->pluck('user_id')->toArray();
+            });
+    }
 }

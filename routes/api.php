@@ -148,8 +148,8 @@ Route::prefix('media')->group(function () {
         Route::get('user_list', 'ShortVideoController@userVideoList');
         Route::post('create', 'ShortVideoController@createVideo');
         Route::post('delete', 'ShortVideoController@deleteVideo');
-        Route::post('toggle_praise', 'ShortVideoController@togglePraiseStatus');
-        Route::post('toggle_collection', 'ShortVideoController@toggleCollectionStatus');
+        Route::post('toggle_like', 'ShortVideoController@toggleLikeStatus');
+        Route::post('toggle_collect', 'ShortVideoController@toggleCollectStatus');
         Route::post('share', 'ShortVideoController@share');
         Route::get('comment_list', 'ShortVideoController@getCommentList');
         Route::get('reply_comment_list', 'ShortVideoController@getReplyCommentList');
