@@ -14,7 +14,7 @@ class ShortVideoCommentService extends BaseService
     {
         $query = ShortVideoComment::query();
         if (!empty($input->commentId)) {
-            $query->where('comment_id', $input->commentId);
+            $query->where('parent_id', $input->commentId);
         }
         return $query
             ->with('authorInfo')
@@ -30,7 +30,7 @@ class ShortVideoCommentService extends BaseService
         $comment->video_id = $input->mediaId;
         $comment->content = $input->content;
         if (!empty($input->commentId)) {
-            $comment->comment_id = $input->commentId;
+            $comment->parent_id = $input->commentId;
         }
         $comment->save();
         return $comment;
@@ -44,10 +44,10 @@ class ShortVideoCommentService extends BaseService
     public function repliesCountList($ids)
     {
         return ShortVideoComment::query()
-            ->select('comment_id', DB::raw('count(*) as count'))
-            ->whereIn('comment_id', $ids)
-            ->groupBy('comment_id')
-            ->pluck('count', 'comment_id')
+            ->select('parent_id', DB::raw('count(*) as count'))
+            ->whereIn('parent_id', $ids)
+            ->groupBy('parent_id')
+            ->pluck('count', 'parent_id')
             ->toArray();
     }
 }

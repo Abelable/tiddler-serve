@@ -150,10 +150,10 @@ Route::prefix('media')->group(function () {
         Route::post('delete', 'ShortVideoController@deleteVideo');
         Route::post('toggle_like', 'ShortVideoController@toggleLikeStatus');
         Route::post('toggle_collect', 'ShortVideoController@toggleCollectStatus');
-        Route::post('share', 'ShortVideoController@share');
+        Route::post('comment', 'ShortVideoController@comment');
         Route::get('comment_list', 'ShortVideoController@getCommentList');
         Route::get('reply_comment_list', 'ShortVideoController@getReplyCommentList');
-        Route::post('comment', 'ShortVideoController@comment');
+        Route::post('share', 'ShortVideoController@share');
         Route::post('delete_comment', 'ShortVideoController@deleteComment');
     });
 
@@ -164,10 +164,10 @@ Route::prefix('media')->group(function () {
         Route::post('delete', 'TourismNoteController@deleteVideo');
         Route::post('toggle_praise', 'TourismNoteController@togglePraiseStatus');
         Route::post('toggle_collection', 'TourismNoteController@toggleCollectionStatus');
-        Route::post('share', 'TourismNoteController@share');
+        Route::post('comment', 'TourismNoteController@comment');
         Route::get('comment_list', 'TourismNoteController@getCommentList');
         Route::get('reply_comment_list', 'TourismNoteController@getReplyCommentList');
-        Route::post('comment', 'TourismNoteController@comment');
+        Route::post('share', 'TourismNoteController@share');
         Route::post('delete_comment', 'TourismNoteController@deleteComment');
     });
 });

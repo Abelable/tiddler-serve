@@ -182,9 +182,27 @@ class ShortVideoController extends Controller
         return $this->success($collectionTimes);
     }
 
-    public function share()
+    public function comment()
     {
+        /** @var CommentInput $input */
+        $input = CommentInput::new();
 
+        /** @var ShortVideo $video */
+        $video = ShortVideoService::getInstance()->getVideo($input->mediaId);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        DB::transaction(function () use ($video, $input) {
+            ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
+
+            $video->comments_number = $video->comments_number + 1;
+            $video->save();
+        });
+
+        // todo: 通知用户评论被回复
+
+        return $this->success();
     }
 
     public function getCommentList()
@@ -192,15 +210,20 @@ class ShortVideoController extends Controller
         /** @var CommentListInput $input */
         $input = CommentListInput::new();
 
-        $page = ShortVideoCommentService::getInstance()->pageList($input, ['id', 'content']);
+        $page = ShortVideoCommentService::getInstance()->pageList($input);
         $commentList = collect($page->items());
 
         $ids = $commentList->pluck('id')->toArray();
         $repliesCountList = ShortVideoCommentService::getInstance()->repliesCountList($ids);
 
         $list = $commentList->map(function (ShortVideoComment $comment) use ($repliesCountList) {
-            $comment['replies_count'] = $repliesCountList[$comment->id] ?? 0;
-            return $comment;
+            return [
+                'id' => $comment->id,
+                'userInfo' => $comment->userInfo,
+                'content' => $comment->content,
+                'replies_count' =>  $repliesCountList[$comment->id] ?? 0,
+                'createdAt' => $comment->created_at
+            ];
         });
 
         return $this->success($this->paginate($page, $list));
@@ -210,26 +233,22 @@ class ShortVideoController extends Controller
     {
         /** @var CommentListInput $input */
         $input = CommentListInput::new();
-        $list = ShortVideoCommentService::getInstance()->pageList($input, ['id', 'content']);
-        return $this->successPaginate($list);
-    }
-
-    public function comment()
-    {
-        /** @var CommentInput $input */
-        $input = CommentInput::new();
-
-        DB::transaction(function () use ($input) {
-            ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
-
-            $video = ShortVideoService::getInstance()->getVideo($input->mediaId);
-            $video->comments_number = $video->comments_number + 1;
-            $video->save();
+        $page = ShortVideoCommentService::getInstance()->pageList($input);
+        $list = collect($page->items())->map(function (ShortVideoComment $comment) {
+            return [
+                'id' => $comment->id,
+                'userInfo' => $comment->userInfo,
+                'content' => $comment->content,
+                'createdAt' => $comment->created_at
+            ];
         });
 
-        // todo: 通知用户评论被回复
+        return $this->success($this->paginate($page, $list));
+    }
 
-        return $this->success();
+    public function share()
+    {
+
     }
 
     public function deleteComment()
