@@ -16,7 +16,7 @@ class CreateTourismNoteCommentsTable extends Migration
         Schema::create('tourism_note_comments', function (Blueprint $table) {
             $table->id();
             $table->integer('note_id')->comment('攻略笔记id');
-            $table->integer('comment_id')->default(0)->comment('回复评论id');
+            $table->integer('parent_id')->default(0)->comment('回复评论id');
             $table->integer('user_id')->comment('用户id');
             $table->string('content')->comment('评论内容');
             $table->timestamps();
