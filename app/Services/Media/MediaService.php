@@ -12,12 +12,12 @@ class MediaService extends BaseService
 {
     public function mediaPageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $withLiveList = true, $authorIds = null)
     {
-        $videoQuery = ShortVideo::query()->select($videoColumns)->selectRaw("2 as type");
+        $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
         if (!is_null($authorIds)) {
             $videoQuery = $videoQuery->whereIn('user_id', $authorIds);
         }
 
-        $noteQuery = TourismNote::query()->select($noteColumns)->selectRaw("3 as type");
+        $noteQuery = TourismNote::query()->select($noteColumns)->where('is_private', 0)->selectRaw("3 as type");
         if (!is_null($authorIds)) {
             $noteQuery = $noteQuery->whereIn('user_id', $authorIds);
         }
@@ -34,8 +34,8 @@ class MediaService extends BaseService
         }
 
         return $mediaQuery
-            ->orderBy('type')
-            ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
+            ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END")
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')
             ->orderBy('like_number', 'desc')
