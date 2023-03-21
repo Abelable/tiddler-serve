@@ -13,11 +13,9 @@ class ShortVideoCommentService extends BaseService
     public function pageList(CommentListInput $input, $columns = ['*'])
     {
         $query = ShortVideoComment::query();
-        if (!empty($input->commentId)) {
-            $query->where('parent_id', $input->commentId);
-        }
         return $query
-            ->with('authorInfo')
+            ->where('parent_id', $input->commentId ?? 0)
+            ->with('userInfo')
             ->where('video_id', $input->mediaId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -49,5 +47,15 @@ class ShortVideoCommentService extends BaseService
             ->groupBy('parent_id')
             ->pluck('count', 'parent_id')
             ->toArray();
+    }
+
+    public function deleteReplies($userId, $commentId)
+    {
+        $replies = ShortVideoComment::query()
+            ->where('user_id', $userId)
+            ->whereIn('parent_id', $commentId);
+        $count = $replies->count();
+        $replies->delete();
+        return $count;
     }
 }

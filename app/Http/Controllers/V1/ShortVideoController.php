@@ -30,7 +30,7 @@ class ShortVideoController extends Controller
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
 
-        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address'];
+        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id);
         $videoList = collect($page->items());
 
@@ -104,6 +104,21 @@ class ShortVideoController extends Controller
                 ShortVideoGoodsService::getInstance()->newGoods($video->id, $input->goodsId);
             }
         });
+
+        return $this->success();
+    }
+
+    public function togglePrivate()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $video = ShortVideoService::getInstance()->getUserVideo($this->userId(), $id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        $video->is_private = $video->is_private ? 0 : 1;
+        $video->save();
 
         return $this->success();
     }
@@ -221,7 +236,7 @@ class ShortVideoController extends Controller
                 'id' => $comment->id,
                 'userInfo' => $comment->userInfo,
                 'content' => $comment->content,
-                'replies_count' =>  $repliesCountList[$comment->id] ?? 0,
+                'repliesCount' =>  $repliesCountList[$comment->id] ?? 0,
                 'createdAt' => $comment->created_at
             ];
         });
@@ -260,14 +275,17 @@ class ShortVideoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '评论不存在');
         }
 
-        DB::transaction(function () use ($comment) {
+        $commentsNumber = DB::transaction(function () use ($comment) {
             $comment->delete();
 
+            $count = ShortVideoCommentService::getInstance()->deleteReplies($this->userId(), $comment->id);
+
             $video = ShortVideoService::getInstance()->getVideo($comment->video_id);
-            $video->comments_number = max($video->comments_number - 1, 0);
+            $video->comments_number = max($video->comments_number - 1 - $count, 0);
             $video->save();
+            return $video->comments_number;
         });
 
-        return $this->success();
+        return $this->success($commentsNumber);
     }
 }

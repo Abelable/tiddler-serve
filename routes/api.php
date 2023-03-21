@@ -147,6 +147,7 @@ Route::prefix('media')->group(function () {
         Route::get('list', 'ShortVideoController@list');
         Route::get('user_list', 'ShortVideoController@userVideoList');
         Route::post('create', 'ShortVideoController@createVideo');
+        Route::post('toggle_private', 'ShortVideoController@togglePrivate');
         Route::post('delete', 'ShortVideoController@deleteVideo');
         Route::post('toggle_like', 'ShortVideoController@toggleLikeStatus');
         Route::post('toggle_collect', 'ShortVideoController@toggleCollectStatus');
