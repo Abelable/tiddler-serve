@@ -39,6 +39,13 @@ class ShortVideoCommentService extends BaseService
         return ShortVideoComment::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function repliesCount($id)
+    {
+        return ShortVideoComment::query()
+            ->whereIn('parent_id', $id)
+            ->count();
+    }
+
     public function repliesCountList($ids)
     {
         return ShortVideoComment::query()
@@ -53,7 +60,7 @@ class ShortVideoCommentService extends BaseService
     {
         $replies = ShortVideoComment::query()
             ->where('user_id', $userId)
-            ->whereIn('parent_id', $commentId);
+            ->where('parent_id', $commentId);
         $count = $replies->count();
         $replies->delete();
         return $count;

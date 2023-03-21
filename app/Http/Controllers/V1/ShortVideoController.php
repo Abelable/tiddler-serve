@@ -208,16 +208,24 @@ class ShortVideoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
         }
 
-        DB::transaction(function () use ($video, $input) {
-            ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
+        /** @var ShortVideoComment $comment */
+        $comment = DB::transaction(function () use ($video, $input) {
+            $comment = ShortVideoCommentService::getInstance()->newComment($this->userId(), $input);
 
             $video->comments_number = $video->comments_number + 1;
             $video->save();
+
+            return $comment;
         });
 
         // todo: 通知用户评论被回复
 
-        return $this->success();
+        return $this->success([
+            'id' => $comment->id,
+            'userInfo' => $comment->userInfo,
+            'content' => $comment->content,
+            'createdAt' => $comment->created_at
+        ]);
     }
 
     public function getCommentList()
@@ -236,7 +244,7 @@ class ShortVideoController extends Controller
                 'id' => $comment->id,
                 'userInfo' => $comment->userInfo,
                 'content' => $comment->content,
-                'repliesCount' =>  $repliesCountList[$comment->id] ?? 0,
+                'repliesCount' => $repliesCountList[$comment->id] ?? 0,
                 'createdAt' => $comment->created_at
             ];
         });
