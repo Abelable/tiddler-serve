@@ -34,7 +34,6 @@ class MediaService extends BaseService
         }
 
         return $mediaQuery
-            ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END")
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')
