@@ -79,7 +79,7 @@ class TourismNoteController extends Controller
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
         $list = $noteList->map(function (TourismNote $note) use ($collectedUserIdsGroup, $likeUserIdsGroup) {
-            $note->image_list = json_encode($note->image_list);
+            $note->image_list = json_decode($note->image_list);
 
             $note['is_follow'] = true;
 

@@ -56,7 +56,7 @@ class TourismNote extends BaseModel
 {
     public function commentList()
     {
-        return $this->hasMany(TourismNoteComment::class);
+        return $this->hasMany(TourismNoteComment::class, 'note_id');
     }
 
     public function authorInfo()
