@@ -56,12 +56,12 @@ class TourismNoteController extends Controller
 
                 $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
                 if (in_array($this->userId(), $likeUserIds)) {
-                    $video['is_like'] = true;
+                    $note['is_like'] = true;
                 }
 
                 $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
                 if (in_array($this->userId(), $collectedUserIds)) {
-                    $video['is_collected'] = true;
+                    $note['is_collected'] = true;
                 }
             }
 
@@ -138,7 +138,7 @@ class TourismNoteController extends Controller
         $page = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $input, $id);
         $collectNoteList = collect($page->items());
 
-        $noteIds = $collectNoteList->pluck('video_id')->toArray();
+        $noteIds = $collectNoteList->pluck('note_id')->toArray();
         $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
 
