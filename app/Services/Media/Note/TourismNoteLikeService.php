@@ -29,4 +29,15 @@ class TourismNoteLikeService extends BaseService
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function likeUserIdsGroup($noteIds)
+    {
+        return TourismNoteLike::query()
+            ->whereIn('note_id', $noteIds)
+            ->get()
+            ->groupBy('note_id')
+            ->map(function ($fan) {
+                return $fan->pluck('user_id')->toArray();
+            });
+    }
 }

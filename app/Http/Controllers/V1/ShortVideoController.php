@@ -211,7 +211,7 @@ class ShortVideoController extends Controller
 
         $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
 
-        return $this->success();
+        return $this->success($video);
     }
 
     public function togglePrivate()

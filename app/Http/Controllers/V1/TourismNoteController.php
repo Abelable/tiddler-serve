@@ -70,16 +70,35 @@ class TourismNoteController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
 
-        $columns = ['id', 'cover', 'video_url', 'title', 'praise_number', 'comments_number', 'collection_times', 'share_times'];
+        $columns = ['id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = TourismNoteService::getInstance()->pageList($input, $columns, [$this->userId()], $id, true);
-        $list = collect($page->items())->map(function (TourismNote $note) {
+        $noteList = collect($page->items());
+
+        $noteIds = $noteList->pluck('id')->toArray();
+        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
+        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
+
+        $list = $noteList->map(function (TourismNote $note) use ($collectedUserIdsGroup, $likeUserIdsGroup) {
+            $note->image_list = json_encode($note->image_list);
+
             $note['is_follow'] = true;
+
+            $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
+            if (in_array($this->userId(), $likeUserIds)) {
+                $video['is_like'] = true;
+            }
+
+            $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
+            if (in_array($this->userId(), $collectedUserIds)) {
+                $video['is_collected'] = true;
+            }
+
             $note['author_info'] = [
                 'id' => $this->userId(),
                 'avatar' => $this->user()->avatar,
                 'nickname' => $this->user()->nickname
             ];
-            $note['is_owner'] = true;
+
             $note['commentList'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
@@ -98,15 +117,9 @@ class TourismNoteController extends Controller
         /** @var TourismNoteInput $input */
         $input = TourismNoteInput::new();
 
-        DB::transaction(function () use ($input) {
-            $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
+        $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
 
-            if (!empty($input->goodsId)) {
-                TourismNoteGoodsService::getInstance()->newGoods($note->id, $input->goodsId);
-            }
-        });
-
-        return $this->success();
+        return $this->success($note);
     }
 
     public function deleteNote()

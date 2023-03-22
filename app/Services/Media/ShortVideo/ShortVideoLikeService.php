@@ -35,7 +35,6 @@ class ShortVideoLikeService extends BaseService
     {
         return ShortVideoLike::query()
             ->whereIn('video_id', $videoIds)
-            ->select(['video_id', 'user_id'])
             ->get()
             ->groupBy('video_id')
             ->map(function ($fan) {
