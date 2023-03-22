@@ -41,4 +41,9 @@ class ShortVideoLikeService extends BaseService
                 return $fan->pluck('user_id')->toArray();
             });
     }
+
+    public function deleteList($videoId)
+    {
+        return ShortVideoLike::query()->where('video_id', $videoId)->delete();
+    }
 }

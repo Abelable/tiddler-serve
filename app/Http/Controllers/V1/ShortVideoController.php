@@ -97,13 +97,7 @@ class ShortVideoController extends Controller
         /** @var ShortVideoInput $input */
         $input = ShortVideoInput::new();
 
-        DB::transaction(function () use ($input) {
-            $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
-
-            if (!empty($input->goodsId)) {
-                ShortVideoGoodsService::getInstance()->newGoods($video->id, $input->goodsId);
-            }
-        });
+        $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
 
         return $this->success();
     }
@@ -134,8 +128,8 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($video) {
             $video->delete();
-
-            ShortVideoGoodsService::getInstance()->deleteList($video->id);
+            ShortVideoCollectionService::getInstance()->deleteList($video->id);
+            ShortVideoLikeService::getInstance()->deleteList($video->id);
         });
 
         return $this->success();

@@ -4,13 +4,16 @@ namespace App\Services\Media;
 
 use App\Models\LiveRoom;
 use App\Models\ShortVideo;
+use App\Models\ShortVideoCollection;
 use App\Models\TourismNote;
+use App\Models\TourismNoteCollection;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class MediaService extends BaseService
 {
-    public function mediaPageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $withLiveList = true, $authorIds = null)
+    public function pageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $withLiveList = true, $authorIds = null)
     {
         $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
         if (!is_null($authorIds)) {
@@ -41,6 +44,17 @@ class MediaService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, ['*'], 'page', $input->page);
+    }
+
+    public function collectPageList($userId, PageInput $input)
+    {
+        $videoQuery = ShortVideoCollection::query()->where('user_id', $userId);
+        $noteQuery = TourismNoteCollection::query()->where('user_id', $userId);
+        $mediaQuery = $videoQuery->union($noteQuery);
+
+        return $mediaQuery
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }

@@ -98,7 +98,7 @@ class MediaController extends Controller
             'created_at',
         ];
 
-        $page = MediaService::getInstance()->mediaPageList($input, $videoColumns, $noteColumns, $liveColumns, true, $authorIds);
+        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, true, $authorIds);
         $mediaList = collect($page->items());
         $authorIds = $mediaList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -121,25 +121,52 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $videoInput = (clone $input)->fill([
-            'limit' => (string)intval($input->limit / 2)
-        ]);
-        $videoPage = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $videoInput);
-        $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
+        $page = MediaService::getInstance()->collectPageList($this->userId(), $input);
+        $mediaList = collect($page->items());
+
+        $videoIds = $mediaList->pluck('video_id')->toArray();
         $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number'];
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns)->keyBy('id');
 
-        $noteInput = (clone $input)->fill([
-            'limit' => (string)$input->limit - $videoList->count()
-        ]);
-        $notePage = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $noteInput);
-        $noteIds = collect($notePage->items())->pluck('note_id')->toArray();
+        $noteIds = $mediaList->pluck('note_id')->toArray();
         $noteColumns = ['id', 'image_list', 'title', 'like_number'];
-        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns);
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns)->keyBy('id');
 
-        $list = $videoList->merge($noteList)->sortByDesc('created_at');
+        $list = $mediaList->map(function ($media) use ($noteList, $videoList) {
+            if ($media['video_id']) {
+                $video = $videoList->get($media['video_id']);
+                $video['type'] = 2;
+                return $video;
+            } else {
+                $note = $noteList->get($media['note_id']);
+                $note['type'] = 3;
+                return $noteList->get($media['note_id']);
+            }
+        });
 
-        return $this->success($list);
+        return $this->success($this->paginate($page, $list));
+
+
+
+//        $videoInput = (clone $input)->fill([
+//            'limit' => (string)intval($input->limit / 2)
+//        ]);
+//        $videoPage = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $videoInput);
+//        $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
+//        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number'];
+//        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
+//
+//        $noteInput = (clone $input)->fill([
+//            'limit' => (string)$input->limit - $videoList->count()
+//        ]);
+//        $notePage = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $noteInput);
+//        $noteIds = collect($notePage->items())->pluck('note_id')->toArray();
+//        $noteColumns = ['id', 'image_list', 'title', 'like_number'];
+//        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns);
+//
+//        $list = $videoList->merge($noteList)->sortByDesc('created_at');
+
+//        return $this->success($list);
     }
 
     public function likeList()
