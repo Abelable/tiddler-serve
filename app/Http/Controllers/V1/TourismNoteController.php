@@ -69,12 +69,13 @@ class TourismNoteController extends Controller
             $note['author_info'] = $authorInfo;
             unset($note->user_id);
 
-            $note['commentList'] = $note['commentList']->map(function ($comment) {
+            $note['comments'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
                     'content' => $comment['content']
                 ];
             });
+            unset($note['commentList']);
 
             return $note;
         });
@@ -117,12 +118,13 @@ class TourismNoteController extends Controller
                 'nickname' => $this->user()->nickname
             ];
 
-            $note['commentList'] = $note['commentList']->map(function ($comment) {
+            $note['comments'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
                     'content' => $comment['content']
                 ];
             });
+            unset($note['commentList']);
 
             return $note;
         });
@@ -170,12 +172,13 @@ class TourismNoteController extends Controller
             $note['author_info'] = $authorInfo;
             unset($note->user_id);
 
-            $note['commentList'] = $note['commentList']->map(function ($comment) {
+            $note['comments'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
                     'content' => $comment['content']
                 ];
             });
+            unset($note['commentList']);
 
             return $note;
         });
@@ -223,12 +226,13 @@ class TourismNoteController extends Controller
             $note['author_info'] = $authorInfo;
             unset($note->user_id);
 
-            $note['commentList'] = $note['commentList']->map(function ($comment) {
+            $note['comments'] = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
                     'content' => $comment['content']
                 ];
             });
+            unset($note['commentList']);
 
             return $note;
         });
