@@ -4,7 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\TourismNote;
+use App\Models\TourismNoteCollection;
 use App\Models\TourismNoteComment;
+use App\Models\TourismNoteLike;
 use App\Services\FanService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
@@ -114,6 +116,108 @@ class TourismNoteController extends Controller
                 'avatar' => $this->user()->avatar,
                 'nickname' => $this->user()->nickname
             ];
+
+            $note['commentList'] = $note['commentList']->map(function ($comment) {
+                return [
+                    'nickname' => $comment['userInfo']->nickname,
+                    'content' => $comment['content']
+                ];
+            });
+
+            return $note;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function collectNoteList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $input, $id);
+        $collectNoteList = collect($page->items());
+
+        $noteIds = $collectNoteList->pluck('video_id')->toArray();
+        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
+
+        $authorIds = $noteList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+
+        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
+
+        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use ($authorList, $likeUserIdsGroup, $fanIdsGroup, $noteList) {
+            /** @var TourismNote $note */
+            $note = $noteList->get($collect->note_id);
+
+            $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
+            if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
+                $note['is_follow'] = true;
+            }
+
+            $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
+            if (in_array($this->userId(), $likeUserIds)) {
+                $note['is_like'] = true;
+            }
+
+            $note['is_collected'] = true;
+
+            $authorInfo = $authorList->get($note->user_id);
+            $note['author_info'] = $authorInfo;
+            unset($note->user_id);
+
+            $note['commentList'] = $note['commentList']->map(function ($comment) {
+                return [
+                    'nickname' => $comment['userInfo']->nickname,
+                    'content' => $comment['content']
+                ];
+            });
+
+            return $note;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function likeNoteList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = TourismNoteLikeService::getInstance()->pageList($this->userId(), $input, $id);
+        $likeNoteList = collect($page->items());
+
+        $noteIds = $likeNoteList->pluck('note_id')->toArray();
+        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
+
+        $authorIds = $noteList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+
+        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
+
+        $list = $likeNoteList->map(function (TourismNoteLike $collect) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
+            /** @var TourismNote $note */
+            $note = $noteList->get($collect->note_id);
+
+            $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
+            if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
+                $note['is_follow'] = true;
+            }
+
+            $note['is_like'] = true;
+
+            $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
+            if (in_array($this->userId(), $collectedUserIds)) {
+                $note['is_collected'] = true;
+            }
+
+            $authorInfo = $authorList->get($note->user_id);
+            $note['author_info'] = $authorInfo;
+            unset($note->user_id);
 
             $note['commentList'] = $note['commentList']->map(function ($comment) {
                 return [

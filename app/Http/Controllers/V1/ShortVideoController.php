@@ -199,11 +199,6 @@ class ShortVideoController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    private function fillList($page)
-    {
-
-    }
-
     public function createVideo()
     {
         /** @var ShortVideoInput $input */
