@@ -334,15 +334,20 @@ class TourismNoteController extends Controller
         /** @var CommentListInput $input */
         $input = CommentListInput::new();
 
-        $page = TourismNoteCommentService::getInstance()->pageList($input, ['id', 'content']);
+        $page = TourismNoteCommentService::getInstance()->pageList($input);
         $commentList = collect($page->items());
 
         $ids = $commentList->pluck('id')->toArray();
         $repliesCountList = TourismNoteCommentService::getInstance()->repliesCountList($ids);
 
         $list = $commentList->map(function (TourismNoteComment $comment) use ($repliesCountList) {
-            $comment['replies_count'] = $repliesCountList[$comment->id] ?? 0;
-            return $comment;
+            return [
+                'id' => $comment->id,
+                'userInfo' => $comment->userInfo,
+                'content' => $comment->content,
+                'repliesCount' => $repliesCountList[$comment->id] ?? 0,
+                'createdAt' => $comment->created_at
+            ];
         });
 
         return $this->success($this->paginate($page, $list));
@@ -352,8 +357,17 @@ class TourismNoteController extends Controller
     {
         /** @var CommentListInput $input */
         $input = CommentListInput::new();
-        $list = TourismNoteCommentService::getInstance()->pageList($input, ['id', 'content']);
-        return $this->successPaginate($list);
+        $page = TourismNoteCommentService::getInstance()->pageList($input);
+        $list = collect($page->items())->map(function (TourismNoteComment $comment) {
+            return [
+                'id' => $comment->id,
+                'userInfo' => $comment->userInfo,
+                'content' => $comment->content,
+                'createdAt' => $comment->created_at
+            ];
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function comment()

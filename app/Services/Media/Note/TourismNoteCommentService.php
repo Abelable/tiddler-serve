@@ -13,11 +13,9 @@ class TourismNoteCommentService extends BaseService
     public function pageList(CommentListInput $input, $columns = ['*'])
     {
         $query = TourismNoteComment::query();
-        if (!empty($input->commentId)) {
-            $query->where('comment_id', $input->commentId);
-        }
         return $query
-            ->with('authorInfo')
+            ->where('parent_id', $input->commentId ?? 0)
+            ->with('userInfo')
             ->where('note_id', $input->mediaId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -44,10 +42,10 @@ class TourismNoteCommentService extends BaseService
     public function repliesCountList($ids)
     {
         return TourismNoteComment::query()
-            ->select('comment_id', DB::raw('count(*) as count'))
-            ->whereIn('comment_id', $ids)
-            ->groupBy('comment_id')
-            ->pluck('count', 'comment_id')
+            ->select('parent_id', DB::raw('count(*) as count'))
+            ->whereIn('parent_id', $ids)
+            ->groupBy('parent_id')
+            ->pluck('count', 'parent_id')
             ->toArray();
     }
 }
