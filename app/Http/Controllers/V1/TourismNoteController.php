@@ -85,12 +85,12 @@ class TourismNoteController extends Controller
 
             $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
             if (in_array($this->userId(), $likeUserIds)) {
-                $video['is_like'] = true;
+                $note['is_like'] = true;
             }
 
             $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
             if (in_array($this->userId(), $collectedUserIds)) {
-                $video['is_collected'] = true;
+                $note['is_collected'] = true;
             }
 
             $note['author_info'] = [
@@ -133,8 +133,8 @@ class TourismNoteController extends Controller
 
         DB::transaction(function () use ($note) {
             $note->delete();
-
-            TourismNoteGoodsService::getInstance()->deleteList($note->id);
+            TourismNoteCollectionService::getInstance()->deleteList($note->id);
+            TourismNoteLikeService::getInstance()->deleteList($note->id);
         });
 
         return $this->success();

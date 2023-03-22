@@ -18,11 +18,11 @@ class TourismNoteService extends BaseService
         if ($curNoteId != 0) {
             $query = $query->orderByRaw("CASE WHEN id = " . $curNoteId . " THEN 0 ELSE 1 END");
         }
-//        if ($withComments) {
-//            $query = $query->with(['commentList' => function ($query) {
-//                $query->orderBy('create_at', 'desc')->take(2)->with('userInfo');
-//            }]);
-//        }
+        if ($withComments) {
+            $query = $query->with(['commentList' => function ($query) {
+                $query->orderBy('create_at', 'desc')->take(2)->with('userInfo');
+            }]);
+        }
         return $query
             ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')

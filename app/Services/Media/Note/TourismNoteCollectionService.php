@@ -40,4 +40,9 @@ class TourismNoteCollectionService extends BaseService
                 return $fan->pluck('user_id')->toArray();
             });
     }
+
+    public function deleteList($noteId)
+    {
+        return TourismNoteCollection::query()->where('note_id', $noteId)->delete();
+    }
 }

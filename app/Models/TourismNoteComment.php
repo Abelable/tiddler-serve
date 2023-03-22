@@ -34,6 +34,6 @@ class TourismNoteComment extends BaseModel
 {
     public function userInfo()
     {
-        return $this->belongsTo(User::class)->select('id', 'nickname', 'avatar');
+        return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
     }
 }

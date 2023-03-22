@@ -40,4 +40,9 @@ class TourismNoteLikeService extends BaseService
                 return $fan->pluck('user_id')->toArray();
             });
     }
+
+    public function deleteList($noteId)
+    {
+        return TourismNoteLike::query()->where('note_id', $noteId)->delete();
+    }
 }
