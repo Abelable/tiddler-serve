@@ -8,25 +8,27 @@ use App\Utils\Inputs\PageInput;
 
 class TourismNoteCollectionService extends BaseService
 {
-     public function getCollection($userId, $noteId)
-     {
-         return TourismNoteCollection::query()->where('note_id', $noteId)->where('user_id', $userId)->first();
-     }
+    public function getCollection($userId, $noteId)
+    {
+        return TourismNoteCollection::query()->where('note_id', $noteId)->where('user_id', $userId)->first();
+    }
 
-     public function newCollection($userId, $noteId)
-     {
+    public function newCollection($userId, $noteId)
+    {
         $collection = TourismNoteCollection::new();
         $collection->user_id = $userId;
         $collection->note_id = $noteId;
         $collection->save();
         return $collection;
-     }
+    }
 
-    public function pageList($userId, PageInput $input, $columns = ['*'])
+    public function pageList($userId, PageInput $input, $curNoteId = 0, $columns = ['*'])
     {
-        return TourismNoteCollection::query()
-            ->where('user_id', $userId)
-            ->orderBy($input->sort, $input->order)
+        $query = TourismNoteCollection::query()->where('user_id', $userId);
+        if ($curNoteId != 0) {
+            $query = $query->orderByRaw("CASE WHEN note_id = " . $curNoteId . " THEN 0 ELSE 1 END");
+        }
+        return $query->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 

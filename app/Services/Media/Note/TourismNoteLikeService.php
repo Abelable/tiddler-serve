@@ -22,11 +22,13 @@ class TourismNoteLikeService extends BaseService
         return $praise;
     }
 
-    public function pageList($userId, PageInput $input, $columns = ['*'])
+    public function pageList($userId, PageInput $input, $curNoteId = 0, $columns = ['*'])
     {
-        return TourismNoteLike::query()
-            ->where('user_id', $userId)
-            ->orderBy($input->sort, $input->order)
+        $query = TourismNoteLike::query()->where('user_id', $userId);
+        if ($curNoteId != 0) {
+            $query = $query->orderByRaw("CASE WHEN note_id = " . $curNoteId . " THEN 0 ELSE 1 END");
+        }
+        return $query->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 

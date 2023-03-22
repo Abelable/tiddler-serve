@@ -152,6 +152,8 @@ class TourismNoteController extends Controller
             /** @var TourismNote $note */
             $note = $noteList->get($collect->note_id);
 
+            $note->image_list = json_decode($note->image_list);
+
             $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
             if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
                 $note['is_follow'] = true;
@@ -202,6 +204,8 @@ class TourismNoteController extends Controller
         $list = $likeNoteList->map(function (TourismNoteLike $collect) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
             $note = $noteList->get($collect->note_id);
+
+            $note->image_list = json_decode($note->image_list);
 
             $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
             if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
