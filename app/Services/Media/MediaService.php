@@ -5,8 +5,10 @@ namespace App\Services\Media;
 use App\Models\LiveRoom;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoCollection;
+use App\Models\ShortVideoLike;
 use App\Models\TourismNote;
 use App\Models\TourismNoteCollection;
+use App\Models\TourismNoteLike;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,17 @@ class MediaService extends BaseService
     {
         $videoQuery = ShortVideoCollection::query()->where('user_id', $userId);
         $noteQuery = TourismNoteCollection::query()->where('user_id', $userId);
+        $mediaQuery = $videoQuery->union($noteQuery);
+
+        return $mediaQuery
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, ['*'], 'page', $input->page);
+    }
+
+    public function likePageList($userId, PageInput $input)
+    {
+        $videoQuery = ShortVideoLike::query()->where('user_id', $userId);
+        $noteQuery = TourismNoteLike::query()->where('user_id', $userId);
         $mediaQuery = $videoQuery->union($noteQuery);
 
         return $mediaQuery

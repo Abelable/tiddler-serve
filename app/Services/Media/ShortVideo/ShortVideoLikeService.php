@@ -22,12 +22,13 @@ class ShortVideoLikeService extends BaseService
         return $praise;
     }
 
-    public function pageList($userId, PageInput $input, $columns = ['*'])
+    public function pageList($userId, PageInput $input, $curVideoId = 0, $columns = ['*'])
     {
-        return ShortVideoLike::query()
-            ->where('user_id', $userId)
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+        $query = ShortVideoLike::query()->where('user_id', $userId);
+        if ($curVideoId != 0) {
+            $query = $query->orderByRaw("CASE WHEN video_id = " . $curVideoId . " THEN 0 ELSE 1 END");
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function likeUserIdsGroup($videoIds)

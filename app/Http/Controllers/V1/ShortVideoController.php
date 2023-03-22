@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
+use App\Models\ShortVideoCollection;
 use App\Models\ShortVideoComment;
 use App\Services\FanService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
@@ -90,6 +91,54 @@ class ShortVideoController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function collectVideoList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $input, $id);
+        $list = $this->fillList($page);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function likeVideoList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = ShortVideoLikeService::getInstance()->pageList($this->userId(), $input, $id);
+        $list = $this->fillList($page);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function fillList($page)
+    {
+        $collectVideoList = collect($page->items());
+
+        $videoIds = $collectVideoList->pluck('video_id')->toArray();
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
+
+        return $collectVideoList->map(function (ShortVideoCollection $collect) use ($videoList) {
+            /** @var ShortVideo $video */
+            $video = $videoList->get($collect->video_id);
+            return [
+                'id' => $video->id,
+                'cover' => $video->cover,
+                'videoUrl' => $video->video_url,
+                'title' => $video->title,
+                'likeNumber' => $video->like_number,
+                'commentsNumber' => $video->comments_number,
+                'collectionTimes' => $video->collection_times,
+                'shareTimes' => $video->share_times,
+                'address' => $video->address,
+                'isPrivate' => $video->is_private,
+                'authorInfo' => $video->authorInfo
+            ];
+        });
     }
 
     public function createVideo()
