@@ -260,7 +260,7 @@ class TourismNoteController extends Controller
         return $this->success();
     }
 
-    public function togglePraiseStatus()
+    public function toggleLikeStatus()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -270,22 +270,22 @@ class TourismNoteController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
         }
 
-        $praiseNumber = DB::transaction(function () use ($note, $id) {
-            $praise = TourismNoteLikeService::getInstance()->getPraise($this->userId(), $id);
-            if (!is_null($praise)) {
-                $praise->delete();
-                $praiseNumber = max($note->praise_number - 1, 0);
+        $likeNumber = DB::transaction(function () use ($note, $id) {
+            $like = TourismNoteLikeService::getInstance()->getLike($this->userId(), $id);
+            if (!is_null($like)) {
+                $like->delete();
+                $likeNumber = max($note->like_number - 1, 0);
             } else {
-                TourismNoteLikeService::getInstance()->newPraise($this->userId(), $id);
-                $praiseNumber = $note->praise_number + 1;
+                TourismNoteLikeService::getInstance()->newLike($this->userId(), $id);
+                $likeNumber = $note->like_number + 1;
             }
-            $note->praise_number = $praiseNumber;
+            $note->like_number = $likeNumber;
             $note->save();
 
-            return $praiseNumber;
+            return $likeNumber;
         });
 
-        return $this->success($praiseNumber);
+        return $this->success($likeNumber);
     }
 
     public function toggleCollectionStatus()

@@ -167,7 +167,7 @@ Route::prefix('media')->group(function () {
         Route::get('like_list', 'TourismNoteController@likeNoteList');
         Route::post('create', 'TourismNoteController@createNote');
         Route::post('delete', 'TourismNoteController@deleteNote');
-        Route::post('toggle_praise', 'TourismNoteController@togglePraiseStatus');
+        Route::post('toggle_like', 'TourismNoteController@toggleLikeStatus');
         Route::post('toggle_collection', 'TourismNoteController@toggleCollectionStatus');
         Route::post('comment', 'TourismNoteController@comment');
         Route::get('comment_list', 'TourismNoteController@getCommentList');

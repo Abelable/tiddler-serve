@@ -8,12 +8,12 @@ use App\Utils\Inputs\PageInput;
 
 class TourismNoteLikeService extends BaseService
 {
-    public function getPraise($userId, $noteId)
+    public function getLike($userId, $noteId)
     {
         return TourismNoteLike::query()->where('user_id', $userId)->where('note_id', $noteId)->first();
     }
 
-    public function newPraise($userId, $noteId)
+    public function newLike($userId, $noteId)
     {
         $praise = TourismNoteLike::new();
         $praise->user_id = $userId;
