@@ -20,7 +20,7 @@ class TourismNoteService extends BaseService
         }
         if ($withComments) {
             $query = $query->with(['commentList' => function ($query) {
-                $query->orderBy('create_at', 'desc')->take(2)->with('userInfo');
+                $query->orderBy('created_at', 'desc')->take(2)->with('userInfo');
             }]);
         }
         return $query
