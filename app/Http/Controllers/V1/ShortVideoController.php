@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoCollection;
 use App\Models\ShortVideoComment;
+use App\Models\ShortVideoLike;
 use App\Services\FanService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
@@ -80,8 +81,25 @@ class ShortVideoController extends Controller
 
         $columns = ['id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, [$this->userId()], $id);
-        $list = collect($page->items())->map(function (ShortVideo $video) {
+        $videoList = collect($page->items());
+
+        $videoIds = $videoList->pluck('id')->toArray();
+        $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
+        $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
+
+        $list = $videoList->map(function (ShortVideo $video) use ($collectedUserIdsGroup, $likeUserIdsGroup) {
             $video['is_follow'] = true;
+
+            $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
+            if (in_array($this->userId(), $likeUserIds)) {
+                $video['is_like'] = true;
+            }
+
+            $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
+            if (in_array($this->userId(), $collectedUserIds)) {
+                $video['is_collected'] = true;
+            }
+
             $video['author_info'] = [
                 'id' => $this->userId(),
                 'avatar' => $this->user()->avatar,
@@ -99,7 +117,40 @@ class ShortVideoController extends Controller
         $id = $this->verifyId('id', 0);
 
         $page = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $input, $id);
-        $list = $this->fillList($page);
+        $collectVideoList = collect($page->items());
+
+        $videoIds = $collectVideoList->pluck('video_id')->toArray();
+        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
+
+        $authorIds = $videoList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+
+        $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
+
+        $list = $collectVideoList->map(function (ShortVideoCollection $collect) use ($authorList, $likeUserIdsGroup, $fanIdsGroup, $videoList) {
+            /** @var ShortVideo $video */
+            $video = $videoList->get($collect->video_id);
+
+            $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
+            if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
+                $video['is_follow'] = true;
+            }
+
+            $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
+            if (in_array($this->userId(), $likeUserIds)) {
+                $video['is_like'] = true;
+            }
+
+            $video['is_collected'] = true;
+
+            $authorInfo = $authorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
+            unset($video->user_id);
+
+            return $video;
+        });
 
         return $this->success($this->paginate($page, $list));
     }
@@ -110,35 +161,47 @@ class ShortVideoController extends Controller
         $id = $this->verifyId('id', 0);
 
         $page = ShortVideoLikeService::getInstance()->pageList($this->userId(), $input, $id);
-        $list = $this->fillList($page);
+        $likeVideoList = collect($page->items());
+
+        $videoIds = $likeVideoList->pluck('video_id')->toArray();
+        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
+
+        $authorIds = $videoList->pluck('user_id')->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+
+        $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
+
+        $list = $likeVideoList->map(function (ShortVideoLike $collect) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
+            /** @var ShortVideo $video */
+            $video = $videoList->get($collect->video_id);
+
+            $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
+            if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
+                $video['is_follow'] = true;
+            }
+
+            $video['is_like'] = true;
+
+            $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
+            if (in_array($this->userId(), $collectedUserIds)) {
+                $video['is_collected'] = true;
+            }
+
+            $authorInfo = $authorList->get($video->user_id);
+            $video['author_info'] = $authorInfo;
+            unset($video->user_id);
+
+            return $video;
+        });
 
         return $this->success($this->paginate($page, $list));
     }
 
     private function fillList($page)
     {
-        $collectVideoList = collect($page->items());
 
-        $videoIds = $collectVideoList->pluck('video_id')->toArray();
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
-
-        return $collectVideoList->map(function (ShortVideoCollection $collect) use ($videoList) {
-            /** @var ShortVideo $video */
-            $video = $videoList->get($collect->video_id);
-            return [
-                'id' => $video->id,
-                'cover' => $video->cover,
-                'videoUrl' => $video->video_url,
-                'title' => $video->title,
-                'likeNumber' => $video->like_number,
-                'commentsNumber' => $video->comments_number,
-                'collectionTimes' => $video->collection_times,
-                'shareTimes' => $video->share_times,
-                'address' => $video->address,
-                'isPrivate' => $video->is_private,
-                'authorInfo' => $video->authorInfo
-            ];
-        });
     }
 
     public function createVideo()
