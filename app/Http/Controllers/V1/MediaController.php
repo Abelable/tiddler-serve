@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
+use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
@@ -128,7 +129,10 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $page = MediaService::getInstance()->collectPageList($this->userId(), $input);
+        $videoColumns = ['video_id', DB::raw('NULL as note_id'), 'user_id', 'created_at'];
+        $noteColumns = [DB::raw('NULL as video_id'), 'note_id', 'user_id', 'created_at'];
+
+        $page = MediaService::getInstance()->collectPageList($this->userId(), $input, $videoColumns, $noteColumns);
         $mediaList = collect($page->items());
 
         $videoIds = $mediaList->pluck('video_id')->toArray();
@@ -141,7 +145,6 @@ class MediaController extends Controller
             if ($media['video_id']) {
                 /** @var ShortVideo $video */
                 $video = $videoList->get($media['video_id']);
-                $video['type'] = 2;
                 return [
                     'type' => 2,
                     'id' => $video->id,
@@ -153,11 +156,12 @@ class MediaController extends Controller
                     'authorInfo' => $video->authorInfo
                 ];
             } else {
+                /** @var TourismNote $note */
                 $note = $noteList->get($media['note_id']);
                 return [
                     'type' => 3,
                     'id' => $note->id,
-                    'imageList' => json_encode($note->image_list),
+                    'imageList' => json_decode($note->image_list),
                     'title' => $note->title,
                     'likeNumber' => $note->like_number,
                     'address' => $note->address,
@@ -174,7 +178,10 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $page = MediaService::getInstance()->likePageList($this->userId(), $input);
+        $videoColumns = ['video_id', DB::raw('NULL as note_id'), 'user_id', 'created_at'];
+        $noteColumns = [DB::raw('NULL as video_id'), 'note_id', 'user_id', 'created_at'];
+
+        $page = MediaService::getInstance()->likePageList($this->userId(), $input, $videoColumns, $noteColumns);
         $mediaList = collect($page->items());
 
         $videoIds = $mediaList->pluck('video_id')->toArray();
@@ -199,11 +206,12 @@ class MediaController extends Controller
                     'authorInfo' => $video->authorInfo
                 ];
             } else {
+                /** @var TourismNote $note */
                 $note = $noteList->get($media['note_id']);
                 return [
                     'type' => 3,
                     'id' => $note->id,
-                    'imageList' => json_encode($note->image_list),
+                    'imageList' => json_decode($note->image_list),
                     'title' => $note->title,
                     'likeNumber' => $note->like_number,
                     'address' => $note->address,

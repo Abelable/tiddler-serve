@@ -51,10 +51,11 @@ class MediaService extends BaseService
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }
 
-    public function collectPageList($userId, PageInput $input)
+
+    public function collectPageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
     {
-        $videoQuery = ShortVideoCollection::query()->where('user_id', $userId);
-        $noteQuery = TourismNoteCollection::query()->where('user_id', $userId);
+        $videoQuery = ShortVideoCollection::query()->select($videoColumns)->where('user_id', $userId);
+        $noteQuery = TourismNoteCollection::query()->select($noteColumns)->where('user_id', $userId);
         $mediaQuery = $videoQuery->union($noteQuery);
 
         return $mediaQuery
@@ -62,10 +63,10 @@ class MediaService extends BaseService
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }
 
-    public function likePageList($userId, PageInput $input)
+    public function likePageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
     {
-        $videoQuery = ShortVideoLike::query()->where('user_id', $userId);
-        $noteQuery = TourismNoteLike::query()->where('user_id', $userId);
+        $videoQuery = ShortVideoLike::query()->select($videoColumns)->where('user_id', $userId);
+        $noteQuery = TourismNoteLike::query()->select($noteColumns)->where('user_id', $userId);
         $mediaQuery = $videoQuery->union($noteQuery);
 
         return $mediaQuery

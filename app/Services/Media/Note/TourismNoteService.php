@@ -35,10 +35,10 @@ class TourismNoteService extends BaseService
     public function getListByIds($ids, $columns = ['*'])
     {
         return TourismNote::query()
+            ->whereIn('id', $ids)
             ->with(['commentList' => function ($query) {
                 $query->orderBy('created_at', 'desc')->take(2)->with('userInfo');
             }])
-            ->whereIn('id', $ids)
             ->with('authorInfo')
             ->get($columns);
     }
