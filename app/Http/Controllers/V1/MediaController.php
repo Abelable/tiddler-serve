@@ -114,7 +114,9 @@ class MediaController extends Controller
             if ($media['type'] == 3) {
                 $media['image_list'] = json_decode($media['image_list']);
             }
+
             unset($media['user_id']);
+
             return $media;
         });
 
