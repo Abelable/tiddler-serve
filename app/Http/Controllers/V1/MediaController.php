@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ShortVideo;
 use App\Services\FanService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
@@ -125,48 +126,41 @@ class MediaController extends Controller
         $mediaList = collect($page->items());
 
         $videoIds = $mediaList->pluck('video_id')->toArray();
-        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number'];
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns)->keyBy('id');
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
 
         $noteIds = $mediaList->pluck('note_id')->toArray();
-        $noteColumns = ['id', 'image_list', 'title', 'like_number'];
-        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns)->keyBy('id');
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds)->keyBy('id');
 
         $list = $mediaList->map(function ($media) use ($noteList, $videoList) {
             if ($media['video_id']) {
+                /** @var ShortVideo $video */
                 $video = $videoList->get($media['video_id']);
                 $video['type'] = 2;
-                return $video;
+                return [
+                    'type' => 2,
+                    'id' => $video->id,
+                    'cover' => $video->cover,
+                    'videoUrl' => $video->video_url,
+                    'title' => $video->title,
+                    'likeNumber' => $video->like_number,
+                    'address' => $video->address,
+                    'authorInfo' => $video->authorInfo
+                ];
             } else {
                 $note = $noteList->get($media['note_id']);
-                $note['type'] = 3;
-                return $noteList->get($media['note_id']);
+                return [
+                    'type' => 3,
+                    'id' => $note->id,
+                    'imageList' => json_encode($note->image_list),
+                    'title' => $note->title,
+                    'likeNumber' => $note->like_number,
+                    'address' => $note->address,
+                    'authorInfo' => $note->authorInfo
+                ];
             }
         });
 
         return $this->success($this->paginate($page, $list));
-
-
-
-//        $videoInput = (clone $input)->fill([
-//            'limit' => (string)intval($input->limit / 2)
-//        ]);
-//        $videoPage = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $videoInput);
-//        $videoIds = collect($videoPage->items())->pluck('video_id')->toArray();
-//        $videoColumns = ['id', 'cover', 'video_url', 'title', 'like_number'];
-//        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $videoColumns);
-//
-//        $noteInput = (clone $input)->fill([
-//            'limit' => (string)$input->limit - $videoList->count()
-//        ]);
-//        $notePage = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $noteInput);
-//        $noteIds = collect($notePage->items())->pluck('note_id')->toArray();
-//        $noteColumns = ['id', 'image_list', 'title', 'like_number'];
-//        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $noteColumns);
-//
-//        $list = $videoList->merge($noteList)->sortByDesc('created_at');
-
-//        return $this->success($list);
     }
 
     public function likeList()

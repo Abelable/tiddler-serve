@@ -54,6 +54,6 @@ class ShortVideo extends BaseModel
 {
     public function authorInfo()
     {
-        return $this->belongsTo(User::class)->select('id', 'nickname', 'avatar');
+        return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
     }
 }
