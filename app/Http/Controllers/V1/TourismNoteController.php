@@ -32,7 +32,7 @@ class TourismNoteController extends Controller
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
 
-        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'created_at'];
+        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'created_at'];
         $page = TourismNoteService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id, true);
         $noteList = collect($page->items());
 
@@ -132,7 +132,8 @@ class TourismNoteController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function collectNoteList() {
+    public function collectNoteList()
+    {
         /** @var PageInput $input */
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
@@ -186,7 +187,8 @@ class TourismNoteController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function likeNoteList() {
+    public function likeNoteList()
+    {
         /** @var PageInput $input */
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
@@ -390,17 +392,23 @@ class TourismNoteController extends Controller
         /** @var CommentInput $input */
         $input = CommentInput::new();
 
-        DB::transaction(function () use ($input) {
-            TourismNoteCommentService::getInstance()->newComment($this->userId(), $input);
+        /** @var TourismNoteComment $comment */
+        $comment = DB::transaction(function () use ($input) {
+            $comment = TourismNoteCommentService::getInstance()->newComment($this->userId(), $input);
 
             $note = TourismNoteService::getInstance()->getNote($input->mediaId);
             $note->comments_number = $note->comments_number + 1;
             $note->save();
+
+            return $comment;
         });
 
         // todo: 通知用户评论被回复
 
-        return $this->success();
+        return $this->success([
+            'nickname' => $comment->userInfo->nickname,
+            'content' => $comment->content,
+        ]);
     }
 
     public function deleteComment()
