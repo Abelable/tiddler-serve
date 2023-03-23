@@ -173,9 +173,9 @@ class ShortVideoController extends Controller
 
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
 
-        $list = $likeVideoList->map(function (ShortVideoLike $collect) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
+        $list = $likeVideoList->map(function (ShortVideoLike $like) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
             /** @var ShortVideo $video */
-            $video = $videoList->get($collect->video_id);
+            $video = $videoList->get($like->video_id);
 
             $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
             if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {

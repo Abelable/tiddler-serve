@@ -206,9 +206,9 @@ class TourismNoteController extends Controller
 
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $list = $likeNoteList->map(function (TourismNoteLike $collect) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
+        $list = $likeNoteList->map(function (TourismNoteLike $like) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
-            $note = $noteList->get($collect->note_id);
+            $note = $noteList->get($like->note_id);
 
             $note->image_list = json_decode($note->image_list);
 
