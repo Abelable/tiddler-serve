@@ -68,6 +68,7 @@ class LivePlayController extends Controller
 
         // 获取当前用户关注状态
         $fanIds = FanService::getInstance()->fanIds($room->user_id);
+        $isFollow = in_array($this->userId(), $fanIds) || $this->userId() == $room->anchorInfo->id;
 
         // 返回
         // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
@@ -77,7 +78,7 @@ class LivePlayController extends Controller
             'praiseNumber' => $room->praise_number,
             'goodsList' => $room->goodsList,
             'historyChatMsgList' => $historyChatMsgList,
-            'isFollow' => in_array($this->userId(), $fanIds)
+            'isFollow' => $isFollow
         ]);
     }
 
