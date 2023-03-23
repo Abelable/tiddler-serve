@@ -250,6 +250,21 @@ class TourismNoteController extends Controller
         return $this->success($note);
     }
 
+    public function togglePrivate()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $note = TourismNoteService::getInstance()->getUserNote($this->userId(), $id);
+        if (is_null($note)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        $note->is_private = $note->is_private ? 0 : 1;
+        $note->save();
+
+        return $this->success();
+    }
+
     public function deleteNote()
     {
         $id = $this->verifyRequiredId('id');
