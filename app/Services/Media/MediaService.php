@@ -11,7 +11,6 @@ use App\Models\TourismNoteCollection;
 use App\Models\TourismNoteLike;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
-use Illuminate\Support\Facades\DB;
 
 class MediaService extends BaseService
 {
