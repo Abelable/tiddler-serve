@@ -267,7 +267,6 @@ class LivePushController extends Controller
         $goods->is_hot = 0;
         $goods->save();
 
-        // todo 发送im消息
         // 发送即时通讯消息
         $data = [
             'type' => LiveGroupMsgType::HOT_GOODS,
