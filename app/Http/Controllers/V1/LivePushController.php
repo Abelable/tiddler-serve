@@ -138,9 +138,9 @@ class LivePushController extends Controller
         $timServe = TimServe::new();
         // 发送即时通讯消息（关闭直播间）
         $data = [
-            'type' => LiveGroupMsgType::STOP,
+            'type' => LiveGroupMsgType::LIVE_END,
             'data' => [
-                'endTime' => $endTime
+                'liveDuration' => $endTime - $room->start_time
             ]
         ];
         $timServe->sendGroupSystemNotification($room->group_id, $data);
