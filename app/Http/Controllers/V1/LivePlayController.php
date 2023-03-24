@@ -85,7 +85,7 @@ class LivePlayController extends Controller
         return $this->success([
             'viewersNumber' => $room->viewers_number,
             'praiseNumber' => $room->praise_number,
-            'hotGoods' => $hotGoods ?? null,
+            'hotGoods' => $room->hotGoods(),
             'historyChatMsgList' => $historyChatMsgList,
             'isFollow' => $isFollow
         ]);
@@ -140,16 +140,26 @@ class LivePlayController extends Controller
 
     public function roomGoodsList()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
 
-        $room = LiveRoomService::getInstance()->getRoom($id, [1]);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1], ['*'], true);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
 
-        return $this->success([
-            'goodsList' => $room->goodsList
-        ]);
+        $page = LiveGoodsService::getInstance()->pageList($id, $input, ['goods_id', 'is_hot']);
+        $liveGoodsList = collect($page->items());
+        $goodsIds = $liveGoodsList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $list = $liveGoodsList->map(function (LiveGoods $liveGoods) use ($goodsList) {
+            $goodsInfo = $goodsList->get($liveGoods->goods_id);
+            $goodsInfo['is_hot'] = $liveGoods->is_hot;
+            return $goodsInfo;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function roomHotGoods()

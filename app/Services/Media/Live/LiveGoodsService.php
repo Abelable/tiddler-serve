@@ -4,6 +4,7 @@ namespace App\Services\Media\Live;
 
 use App\Models\LiveGoods;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 
 class LiveGoodsService extends BaseService
 {
@@ -19,6 +20,14 @@ class LiveGoodsService extends BaseService
     public function list($roomId, $columns = ['*'])
     {
         return LiveGoods::query()->where('room_id', $roomId)->get($columns);
+    }
+
+    public function pageList($roomId, PageInput $input, $columns = ['*'])
+    {
+        return LiveGoods::query()
+            ->where('room_id', $roomId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function goods($roomId, $goodsId, $columns = ['*'])
