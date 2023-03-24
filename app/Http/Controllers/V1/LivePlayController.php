@@ -29,7 +29,7 @@ class LivePlayController extends Controller
         $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
         $roomList = collect($page->items());
         $anchorIds = $roomList->pluck('user_id')->toArray();
-        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname', 'shop_id'])->keyBy('id');
         $list = $roomList->map(function (LiveRoom $room) use ($anchorList) {
             $anchorInfo = $anchorList->get($room->user_id);
             $room['anchor_info'] = $anchorInfo;
@@ -72,12 +72,6 @@ class LivePlayController extends Controller
         // 获取当前用户关注状态
         $fanIds = FanService::getInstance()->fanIds($room->user_id);
         $isFollow = in_array($this->userId(), $fanIds) || $this->userId() == $room->anchorInfo->id;
-
-        // 获取直播间热门商品
-        $hotGoodsId = LiveGoodsService::getInstance()->hotGoodsId($id);
-        if ($hotGoodsId) {
-            $hotGoods = GoodsService::getInstance()->getGoodsById($hotGoodsId, ['id', 'name', 'image', 'price']);
-        }
 
         // 返回
         // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表

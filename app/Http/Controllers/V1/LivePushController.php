@@ -240,7 +240,16 @@ class LivePushController extends Controller
             $goods->save();
         });
 
-        // todo 发送im消息
+        $goodsInfo = GoodsService::getInstance()->getGoodsById($goodsId, ['id', 'name', 'price', 'market_price', 'stock']);
+
+        // 发送即时通讯消息
+        $data = [
+            'type' => LiveGroupMsgType::HOT_GOODS,
+            'data' => [
+                'hotGoods' => $goodsInfo
+            ]
+        ];
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $data);
 
         return $this->success();
     }
@@ -259,6 +268,14 @@ class LivePushController extends Controller
         $goods->save();
 
         // todo 发送im消息
+        // 发送即时通讯消息
+        $data = [
+            'type' => LiveGroupMsgType::HOT_GOODS,
+            'data' => [
+                'hotGoods' => null
+            ]
+        ];
+        TimServe::new()->sendGroupSystemNotification($room->group_id, $data);
 
         return $this->success();
     }
