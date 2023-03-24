@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\LiveGoods;
 use App\Models\LiveRoom;
 use App\Services\FanService;
+use App\Services\GoodsService;
+use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -40,7 +43,7 @@ class LivePlayController extends Controller
     public function joinRoom()
     {
         $id = $this->verifyRequiredId('id');
-        $room = LiveRoomService::getInstance()->getRoom($id, [1], ['*'], true);
+        $room = LiveRoomService::getInstance()->getRoom($id, [1], ['*']);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '直播间不存在');
         }
@@ -70,13 +73,19 @@ class LivePlayController extends Controller
         $fanIds = FanService::getInstance()->fanIds($room->user_id);
         $isFollow = in_array($this->userId(), $fanIds) || $this->userId() == $room->anchorInfo->id;
 
+        // 获取直播间热门商品
+        $hotGoodsId = LiveGoodsService::getInstance()->hotGoodsId($id);
+        if ($hotGoodsId) {
+            $hotGoods = GoodsService::getInstance()->getGoodsById($hotGoodsId, ['id', 'name', 'image', 'price']);
+        }
+
         // 返回
         // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
         // 用户状态：是否关注直播间、用户粉丝等级（待开发）
         return $this->success([
             'viewersNumber' => $room->viewers_number,
             'praiseNumber' => $room->praise_number,
-            'goodsList' => $room->goodsList,
+            'hotGoods' => $hotGoods ?? null,
             'historyChatMsgList' => $historyChatMsgList,
             'isFollow' => $isFollow
         ]);
