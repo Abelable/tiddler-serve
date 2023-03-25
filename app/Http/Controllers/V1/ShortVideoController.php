@@ -8,6 +8,7 @@ use App\Models\ShortVideoCollection;
 use App\Models\ShortVideoComment;
 use App\Models\ShortVideoLike;
 use App\Services\FanService;
+use App\Services\GoodsService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoGoodsService;
@@ -32,7 +33,7 @@ class ShortVideoController extends Controller
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
 
-        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $columns = ['id', 'user_id', 'goods_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id);
         $videoList = collect($page->items());
 
@@ -40,11 +41,14 @@ class ShortVideoController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
+        $goodsIds = $videoList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
         $videoIds = $videoList->pluck('id')->toArray();
         $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($collectedUserIdsGroup, $likeUserIdsGroup, $fanIdsGroup, $authorList) {
+        $list = $videoList->map(function (ShortVideo $video) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $fanIdsGroup, $authorList) {
             $video['is_follow'] = false;
             if ($this->isLogin()) {
                 $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
@@ -63,6 +67,10 @@ class ShortVideoController extends Controller
                 }
             }
 
+            $goods = $goodsList->get($video->goods_id);
+            $video['goods_info'] = $goods;
+            unset($video->goods_id);
+
             $authorInfo = $authorList->get($video->user_id);
             $video['author_info'] = $authorInfo;
             unset($video->user_id);
@@ -79,7 +87,7 @@ class ShortVideoController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
 
-        $columns = ['id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $columns = ['id', 'goods_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $page = ShortVideoService::getInstance()->pageList($input, $columns, [$this->userId()], $id);
         $videoList = collect($page->items());
 
@@ -87,7 +95,10 @@ class ShortVideoController extends Controller
         $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
 
-        $list = $videoList->map(function (ShortVideo $video) use ($collectedUserIdsGroup, $likeUserIdsGroup) {
+        $goodsIds = $videoList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $videoList->map(function (ShortVideo $video) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
             $video['is_follow'] = true;
 
             $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
@@ -105,6 +116,11 @@ class ShortVideoController extends Controller
                 'avatar' => $this->user()->avatar,
                 'nickname' => $this->user()->nickname
             ];
+
+            $goods = $goodsList->get($video->goods_id);
+            $video['goods_info'] = $goods;
+            unset($video->goods_id);
+
             return $video;
         });
 
@@ -120,7 +136,7 @@ class ShortVideoController extends Controller
         $collectVideoList = collect($page->items());
 
         $videoIds = $collectVideoList->pluck('video_id')->toArray();
-        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $columns = ['id', 'goods_id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
 
         $authorIds = $videoList->pluck('user_id')->toArray();
@@ -129,7 +145,10 @@ class ShortVideoController extends Controller
 
         $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
 
-        $list = $collectVideoList->map(function (ShortVideoCollection $collect) use ($authorList, $likeUserIdsGroup, $fanIdsGroup, $videoList) {
+        $goodsIds = $videoList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $collectVideoList->map(function (ShortVideoCollection $collect) use ($goodsList, $authorList, $likeUserIdsGroup, $fanIdsGroup, $videoList) {
             /** @var ShortVideo $video */
             $video = $videoList->get($collect->video_id);
 
@@ -149,6 +168,10 @@ class ShortVideoController extends Controller
             $video['author_info'] = $authorInfo;
             unset($video->user_id);
 
+            $goods = $goodsList->get($video->goods_id);
+            $video['goods_info'] = $goods;
+            unset($video->goods_id);
+
             return $video;
         });
 
@@ -164,7 +187,7 @@ class ShortVideoController extends Controller
         $likeVideoList = collect($page->items());
 
         $videoIds = $likeVideoList->pluck('video_id')->toArray();
-        $columns = ['id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
+        $columns = ['id', 'goods_id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
         $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
 
         $authorIds = $videoList->pluck('user_id')->toArray();
@@ -173,7 +196,10 @@ class ShortVideoController extends Controller
 
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
 
-        $list = $likeVideoList->map(function (ShortVideoLike $like) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
+        $goodsIds = $videoList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $likeVideoList->map(function (ShortVideoLike $like) use ($goodsList, $authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
             /** @var ShortVideo $video */
             $video = $videoList->get($like->video_id);
 
@@ -192,6 +218,10 @@ class ShortVideoController extends Controller
             $authorInfo = $authorList->get($video->user_id);
             $video['author_info'] = $authorInfo;
             unset($video->user_id);
+
+            $goods = $goodsList->get($video->goods_id);
+            $video['goods_info'] = $goods;
+            unset($video->goods_id);
 
             return $video;
         });
