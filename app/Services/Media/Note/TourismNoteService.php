@@ -20,7 +20,7 @@ class TourismNoteService extends BaseService
         }
         if ($withComments) {
             $query = $query->with(['commentList' => function ($query) {
-                $query->orderBy('created_at', 'desc')->take(2)->with('userInfo');
+                $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
             }]);
         }
         return $query
@@ -37,7 +37,7 @@ class TourismNoteService extends BaseService
         return TourismNote::query()
             ->whereIn('id', $ids)
             ->with(['commentList' => function ($query) {
-                $query->orderBy('created_at', 'desc')->take(2)->with('userInfo');
+                $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
             }])
             ->with('authorInfo')
             ->get($columns);

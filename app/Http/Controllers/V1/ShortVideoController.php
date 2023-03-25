@@ -422,6 +422,7 @@ class ShortVideoController extends Controller
             $video = ShortVideoService::getInstance()->getVideo($comment->video_id);
             $video->comments_number = max($video->comments_number - 1 - $count, 0);
             $video->save();
+
             return $video->comments_number;
         });
 

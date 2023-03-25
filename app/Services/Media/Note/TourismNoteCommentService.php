@@ -48,4 +48,14 @@ class TourismNoteCommentService extends BaseService
             ->pluck('count', 'parent_id')
             ->toArray();
     }
+
+    public function deleteReplies($userId, $commentId)
+    {
+        $replies = TourismNoteComment::query()
+            ->where('user_id', $userId)
+            ->where('parent_id', $commentId);
+        $count = $replies->count();
+        $replies->delete();
+        return $count;
+    }
 }

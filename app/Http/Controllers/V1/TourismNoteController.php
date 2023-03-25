@@ -42,7 +42,7 @@ class TourismNoteController extends Controller
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
         $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
         $noteIds = $noteList->pluck('id')->toArray();
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
@@ -97,7 +97,7 @@ class TourismNoteController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
 
-        $columns = ['id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $columns = ['id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $page = TourismNoteService::getInstance()->pageList($input, $columns, [$this->userId()], $id, true);
         $noteList = collect($page->items());
 
@@ -106,7 +106,7 @@ class TourismNoteController extends Controller
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
         $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
         $list = $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
             $note->image_list = json_decode($note->image_list);
@@ -157,7 +157,7 @@ class TourismNoteController extends Controller
         $collectNoteList = collect($page->items());
 
         $noteIds = $collectNoteList->pluck('note_id')->toArray();
-        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
 
         $authorIds = $noteList->pluck('user_id')->toArray();
@@ -167,7 +167,7 @@ class TourismNoteController extends Controller
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
 
         $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
         $list = $collectNoteList->map(function (TourismNoteCollection $collect) use ($goodsList, $authorList, $likeUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
@@ -219,7 +219,7 @@ class TourismNoteController extends Controller
         $likeNoteList = collect($page->items());
 
         $noteIds = $likeNoteList->pluck('note_id')->toArray();
-        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
 
         $authorIds = $noteList->pluck('user_id')->toArray();
@@ -229,7 +229,7 @@ class TourismNoteController extends Controller
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
         $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
         $list = $likeNoteList->map(function (TourismNoteLike $like) use ($goodsList, $authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
@@ -302,7 +302,7 @@ class TourismNoteController extends Controller
 
         $note = TourismNoteService::getInstance()->getUserNote($this->userId(), $id);
         if (is_null($note)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
         DB::transaction(function () use ($note) {
@@ -321,7 +321,7 @@ class TourismNoteController extends Controller
         /** @var TourismNote $note */
         $note = TourismNoteService::getInstance()->getNote($id);
         if (is_null($note)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
         $likeNumber = DB::transaction(function () use ($note, $id) {
@@ -349,7 +349,7 @@ class TourismNoteController extends Controller
         /** @var TourismNote $note */
         $note = TourismNoteService::getInstance()->getNote($id);
         if (is_null($note)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '旅游攻略不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
         $collectionTimes = DB::transaction(function () use ($id, $note) {
@@ -421,6 +421,12 @@ class TourismNoteController extends Controller
         /** @var CommentInput $input */
         $input = CommentInput::new();
 
+        /** @var TourismNote $note */
+        $note = TourismNoteService::getInstance()->getNote($input->mediaId);
+        if (is_null($note)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
+        }
+
         /** @var TourismNoteComment $comment */
         $comment = DB::transaction(function () use ($input) {
             $comment = TourismNoteCommentService::getInstance()->newComment($this->userId(), $input);
@@ -435,8 +441,10 @@ class TourismNoteController extends Controller
         // todo: 通知用户评论被回复
 
         return $this->success([
-            'nickname' => $comment->userInfo->nickname,
+            'id' => $comment->id,
+            'userInfo' => $comment->userInfo,
             'content' => $comment->content,
+            'createdAt' => $comment->created_at
         ]);
     }
 
@@ -449,14 +457,18 @@ class TourismNoteController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '评论不存在');
         }
 
-        DB::transaction(function () use ($comment) {
+        $commentsNumber = DB::transaction(function () use ($comment) {
             $comment->delete();
 
+            $count = TourismNoteCommentService::getInstance()->deleteReplies($this->userId(), $comment->id);
+
             $note = TourismNoteService::getInstance()->getNote($comment->note_id);
-            $note->comments_number = max($note->comments_number - 1, 0);
+            $note->comments_number = max($note->comments_number - 1 - $count, 0);
             $note->save();
+
+            return $note->comments_number;
         });
 
-        return $this->success();
+        return $this->success($commentsNumber);
     }
 }
