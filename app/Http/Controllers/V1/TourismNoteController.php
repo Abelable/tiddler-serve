@@ -8,6 +8,7 @@ use App\Models\TourismNoteCollection;
 use App\Models\TourismNoteComment;
 use App\Models\TourismNoteLike;
 use App\Services\FanService;
+use App\Services\GoodsService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteGoodsService;
