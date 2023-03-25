@@ -32,7 +32,7 @@ class TourismNoteController extends Controller
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
 
-        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'created_at'];
+        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'created_at'];
         $page = TourismNoteService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id, true);
         $noteList = collect($page->items());
 
@@ -40,11 +40,14 @@ class TourismNoteController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
+        $goodsIds = $noteList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
         $noteIds = $noteList->pluck('id')->toArray();
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
+        $list = $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
             $note->image_list = json_decode($note->image_list);
 
             $note['is_follow'] = false;
@@ -64,6 +67,10 @@ class TourismNoteController extends Controller
                     $note['is_collected'] = true;
                 }
             }
+
+            $goods = $goodsList->get($note->goods_id);
+            $note['goods_info'] = $goods;
+            unset($note->goods_id);
 
             $authorInfo = $authorList->get($note->user_id);
             $note['author_info'] = $authorInfo;
@@ -97,7 +104,10 @@ class TourismNoteController extends Controller
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($collectedUserIdsGroup, $likeUserIdsGroup) {
+        $goodsIds = $noteList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
             $note->image_list = json_decode($note->image_list);
 
             $note['is_follow'] = true;
@@ -126,6 +136,10 @@ class TourismNoteController extends Controller
             });
             unset($note['commentList']);
 
+            $goods = $goodsList->get($note->goods_id);
+            $note['goods_info'] = $goods;
+            unset($note->goods_id);
+
             return $note;
         });
 
@@ -151,7 +165,10 @@ class TourismNoteController extends Controller
 
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
 
-        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use ($authorList, $likeUserIdsGroup, $fanIdsGroup, $noteList) {
+        $goodsIds = $noteList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use ($goodsList, $authorList, $likeUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
             $note = $noteList->get($collect->note_id);
 
@@ -181,6 +198,10 @@ class TourismNoteController extends Controller
             });
             unset($note['commentList']);
 
+            $goods = $goodsList->get($note->goods_id);
+            $note['goods_info'] = $goods;
+            unset($note->goods_id);
+
             return $note;
         });
 
@@ -206,7 +227,10 @@ class TourismNoteController extends Controller
 
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $list = $likeNoteList->map(function (TourismNoteLike $like) use ($authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
+        $goodsIds = $noteList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+
+        $list = $likeNoteList->map(function (TourismNoteLike $like) use ($goodsList, $authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
             /** @var TourismNote $note */
             $note = $noteList->get($like->note_id);
 
@@ -235,6 +259,10 @@ class TourismNoteController extends Controller
                 ];
             });
             unset($note['commentList']);
+
+            $goods = $goodsList->get($note->goods_id);
+            $note['goods_info'] = $goods;
+            unset($note->goods_id);
 
             return $note;
         });

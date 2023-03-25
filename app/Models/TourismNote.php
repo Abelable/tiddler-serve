@@ -63,4 +63,9 @@ class TourismNote extends BaseModel
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
     }
+
+    public function goodsInfo()
+    {
+        return $this->belongsTo(Goods::class, 'goods_id')->select('id', 'name', 'image', 'price', 'market_price', 'stock');
+    }
 }
