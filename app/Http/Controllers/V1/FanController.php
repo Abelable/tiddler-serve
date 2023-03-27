@@ -19,6 +19,20 @@ class FanController extends Controller
         return $this->success();
     }
 
+    public function cancelFollow()
+    {
+        $authorId = $this->verifyRequiredId('authorId');
+
+        $fan = FanService::getInstance()->fan($authorId, $this->userId());
+        if (is_null($fan)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '您未关注该主播');
+        }
+
+        $fan->delete();
+
+        return $this->success();
+    }
+
     public function followStatus()
     {
         $authorId = $this->verifyRequiredId('authorId');

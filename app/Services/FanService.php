@@ -6,6 +6,11 @@ use App\Models\Fan;
 
 class FanService extends BaseService
 {
+    public function fan($authorId, $userId)
+    {
+        return Fan::query()->where('author_id', $authorId)->where('fan_id', $userId)->first();
+    }
+
     public function newFan($authorId, $fanId)
     {
         $fan = Fan::new();

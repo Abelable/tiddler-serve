@@ -34,6 +34,7 @@ Route::prefix('wx')->group(function () {
 
 Route::prefix('fan')->group(function () {
     Route::post('follow', 'FanController@follow');
+    Route::post('cancel_follow', 'FanController@cancelFollow');
     Route::get('follow_status', 'FanController@followStatus');
 });
 
