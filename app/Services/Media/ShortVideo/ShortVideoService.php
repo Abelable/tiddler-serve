@@ -11,7 +11,7 @@ class ShortVideoService extends BaseService
 {
     public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
     {
-        $query = ShortVideo::query();
+        $query = ShortVideo::query()->where('is_private', 0);
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }

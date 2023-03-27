@@ -221,6 +221,4 @@ class MediaController extends Controller
 
         return $this->success($this->paginate($page, $list));
     }
-
-
 }

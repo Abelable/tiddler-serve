@@ -48,4 +48,14 @@ class FanService extends BaseService
                 return $fan->pluck('fan_id')->toArray();
             });
     }
+
+    public function followedAuthorNumber($userId)
+    {
+        return Fan::query()->where('fan_id', $userId)->count();
+    }
+
+    public function fansNumber($authorId)
+    {
+        return Fan::query()->where('author_id', $authorId)->count();
+    }
 }

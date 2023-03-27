@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\FanService;
+use App\Services\Media\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\TimServe;
@@ -34,12 +36,22 @@ class UserController extends Controller
 
     public function authorInfo()
     {
-        $id = $this->verifyRequiredId('id');
+        $authorId = $this->verifyRequiredId('authorId');
 
-        $authorInfo = UserService::getInstance()->getUserById($id, ['id', 'avatar', 'nickname', 'gender', 'shop_id']);
+        $authorInfo = UserService::getInstance()->getUserById($authorId, ['id', 'avatar', 'nickname', 'gender', 'shop_id']);
         if (is_null($authorInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前用户不存在');
         }
+
+        $beLikedTimes = MediaService::getInstance()->beLikedTimes($authorId);
+        $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($authorId);
+        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($authorId);
+        $fansNumber = FanService::getInstance()->fansNumber($authorId);
+
+        $authorInfo['be_liked_times'] = $beLikedTimes;
+        $authorInfo['be_collected_times'] = $beCollectedTimes;
+        $authorInfo['followed_author_number'] = $followedAuthorNumbers;
+        $authorInfo['fans_number'] = $fansNumber;
 
         return $this->success($authorInfo);
     }

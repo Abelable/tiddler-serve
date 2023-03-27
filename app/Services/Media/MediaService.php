@@ -72,4 +72,26 @@ class MediaService extends BaseService
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }
+
+    public function beLikedTimes($authorId)
+    {
+        $videoIds = ShortVideo::query()->where('user_id', $authorId)->get()->pluck('id')->toArray();
+        $videoTimes = ShortVideoLike::query()->whereIn('video_id', $videoIds)->count();
+
+        $noteIds = TourismNote::query()->where('user_id', $authorId)->get()->pluck('id')->toArray();
+        $noteTimes = TourismNoteLike::query()->whereIn('note_id', $noteIds)->count();
+
+        return $videoTimes + $noteTimes;
+    }
+
+    public function beCollectedTimes($authorId)
+    {
+        $videoIds = ShortVideo::query()->where('user_id', $authorId)->get()->pluck('id')->toArray();
+        $videoTimes = ShortVideoCollection::query()->whereIn('video_id', $videoIds)->count();
+
+        $noteIds = TourismNote::query()->where('user_id', $authorId)->get()->pluck('id')->toArray();
+        $noteTimes = TourismNoteCollection::query()->whereIn('note_id', $noteIds)->count();
+
+        return $videoTimes + $noteTimes;
+    }
 }

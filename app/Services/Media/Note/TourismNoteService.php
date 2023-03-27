@@ -11,7 +11,7 @@ class TourismNoteService extends BaseService
 {
     public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
     {
-        $query = TourismNote::query();
+        $query = TourismNote::query()->where('is_private', 0);
         if (!is_null($authorIds)) {
             $query = $query->whereIn('user_id', $authorIds);
         }
