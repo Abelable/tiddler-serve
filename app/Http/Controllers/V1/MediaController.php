@@ -7,11 +7,7 @@ use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\Media\MediaService;
-use App\Services\Media\Note\TourismNoteCollectionService;
-use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
-use App\Services\Media\ShortVideo\ShortVideoCollectionService;
-use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\Inputs\PageInput;
@@ -19,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['getList', 'authorInfo'];
+    protected $except = ['getList'];
 
     public function list()
     {
@@ -226,10 +222,5 @@ class MediaController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function authorInfo()
-    {
-        $id = $this->verifyRequiredId('id');
 
-        $authorInfo = UserService::getInstance()->getUserById($id, ['id', 'avatar', 'nickname', 'gender', 'shop_id']);
-    }
 }

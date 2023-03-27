@@ -22,8 +22,9 @@ Route::prefix('auth')->group(function () {
     Route::get('token_refresh', 'AuthController@refreshToken');
 });
 
-Route::get('user_info', 'UserController@getUserInfo');
-Route::get('tim_login_info', 'UserController@getTimLoginInfo');
+Route::get('user_info', 'UserController@userInfo');
+Route::get('tim_login_info', 'UserController@timLoginInfo');
+Route::get('author_info', 'UserController@authorInfo');
 Route::get('oss_config', 'CommonController@ossConfig');
 
 Route::prefix('wx')->group(function () {
