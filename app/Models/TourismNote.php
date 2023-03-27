@@ -51,6 +51,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|TourismNote withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TourismNote withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\Goods|null $goodsInfo
  */
 class TourismNote extends BaseModel
 {

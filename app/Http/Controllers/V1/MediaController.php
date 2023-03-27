@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['getList'];
+    protected $except = ['getList', 'authorInfo'];
 
     public function list()
     {
@@ -224,5 +224,12 @@ class MediaController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function authorInfo()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $authorInfo = UserService::getInstance()->getUserById($id, ['id', 'avatar', 'nickname', 'gender', 'shop_id']);
     }
 }

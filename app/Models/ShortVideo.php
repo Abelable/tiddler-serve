@@ -49,6 +49,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\Goods|null $goodsInfo
  */
 class ShortVideo extends BaseModel
 {
