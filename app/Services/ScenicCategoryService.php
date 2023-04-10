@@ -14,7 +14,7 @@ class ScenicCategoryService extends BaseService
 
     public function getCategoryById($id, $columns = ['*'])
     {
-        return ScenicCategory::query()->find($id, $columns = ['*']);
+        return ScenicCategory::query()->find($id, $columns);
     }
 
     public function getCategoryByName($name, $columns = ['*'])

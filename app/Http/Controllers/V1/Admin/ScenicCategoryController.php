@@ -14,6 +14,7 @@ class ScenicCategoryController extends Controller
 
     public function list()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $list = ScenicCategoryService::getInstance()->getCategoryList($input);
         return $this->successPaginate($list);
@@ -71,7 +72,7 @@ class ScenicCategoryController extends Controller
         $id = $this->verifyRequiredId('id');
         $category = ScenicCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品分类不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
         }
         $category->delete();
         return $this->success();
