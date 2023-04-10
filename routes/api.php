@@ -117,7 +117,43 @@ Route::prefix('order')->group(function () {
     Route::post('delete', 'OrderController@delete');
 });
 
+Route::prefix('scenic')->group(function () {
+    Route::prefix('provider')->group(function () {
+        Route::post('settle_in', 'ScenicProviderController@addMerchant');
+        Route::get('status', 'ScenicProviderController@merchantStatusInfo');
+        Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
+        Route::post('delete', 'ScenicProviderController@deleteMerchant');
+    });
 
+    Route::prefix('shop')->group(function () {
+        Route::post('info', 'ScenicShopController@info');
+        Route::get('my_shop', 'ScenicShopController@myShopInfo');
+        Route::post('pay_deposit', 'ScenicShopController@payDeposit');
+        Route::post('delete', 'ScenicShopController@deleteMerchant');
+    });
+
+    Route::prefix('ticket')->group(function () {
+        Route::get('totals', 'ScenicTicketController@goodsListTotals');
+        Route::get('list', 'ScenicTicketController@merchantGoodsList');
+        Route::get('info', 'ScenicTicketController@goodsInfo');
+        Route::post('add', 'ScenicTicketController@add');
+        Route::post('edit', 'ScenicTicketController@edit');
+        Route::post('up', 'ScenicTicketController@up');
+        Route::post('down', 'ScenicTicketController@down');
+        Route::post('delete', 'ScenicTicketController@delete');
+    });
+
+    Route::prefix('joint_ticket')->group(function () {
+        Route::get('totals', 'ScenicJointTicketController@goodsListTotals');
+        Route::get('list', 'ScenicJointTicketController@merchantGoodsList');
+        Route::get('info', 'ScenicJointTicketController@goodsInfo');
+        Route::post('add', 'ScenicJointTicketController@add');
+        Route::post('edit', 'ScenicJointTicketController@edit');
+        Route::post('up', 'ScenicJointTicketController@up');
+        Route::post('down', 'ScenicJointTicketController@down');
+        Route::post('delete', 'ScenicJointTicketController@delete');
+    });
+});
 
 Route::prefix('media')->group(function () {
     Route::get('list', 'MediaController@list');

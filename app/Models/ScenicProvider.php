@@ -8,7 +8,6 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $status 申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败
- * @property int $order_id 商家订单id
  * @property string $failure_reason 审核失败原因
  * @property string $company_name 企业名称
  * @property string $region_desc 省市区描述
@@ -50,7 +49,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereIdCardNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereRegionCodeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereRegionDesc($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereShopName($value)

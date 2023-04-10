@@ -17,7 +17,6 @@ class CreateScenicProvidersTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
-            $table->integer('order_id')->default(0)->comment('商家订单id');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->string('company_name')->default('')->comment('企业名称');
             $table->string('region_desc')->comment('省市区描述');
