@@ -23,6 +23,7 @@ class UserController extends Controller
             'gender' => $user->gender,
             'mobile' => $user->mobile,
             'shopId' => $user->shop->id,
+            'scenicProviderId' => $user->scenicShop->id,
         ]);
     }
 

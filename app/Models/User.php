@@ -27,6 +27,7 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property-read \App\Models\ScenicShop|null $scenicShop
  * @property-read \App\Models\Shop|null $shop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
@@ -90,5 +91,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shop()
     {
         return $this->hasOne(Shop::class, 'user_id');
+    }
+
+    public function scenicShop()
+    {
+        return $this->hasOne(ScenicShop::class, 'user_id');
     }
 }
