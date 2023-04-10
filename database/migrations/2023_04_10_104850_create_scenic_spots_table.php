@@ -15,7 +15,7 @@ class CreateScenicSpotsTable extends Migration
     {
         Schema::create('scenic_spots', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(1)->comment('状态（用户编辑提交的景区）：0-待审核，1-审核通过');
+            $table->integer('status')->default(0)->comment('状态：0-待审核，1-审核通过');
             $table->integer('category_id')->comment('景区分类id');
             $table->string('name')->comment('景区名称');
             $table->float('longitude')->default(0)->comment('经度');

@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\ScenicSpot
  *
  * @property int $id
- * @property int $status 状态（用户编辑提交的景区）：0-待审核，1-审核通过
+ * @property int $status 状态：0-待审核，1-审核通过
  * @property int $category_id 景区分类id
  * @property string $name 景区名称
  * @property float $longitude 经度
