@@ -44,10 +44,7 @@ class CommonController extends Controller
             DB::transaction(function () use ($data) {
                 $order = MerchantOrderService::getInstance()->wxPaySuccess($data);
                 $merchant = MerchantService::getInstance()->paySuccess($order->merchant_id);
-                $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $merchant->type, $merchant->shop_name, $merchant->shop_category_id);
-                $user = $this->user();
-                $user->shop_id = $shop->id;
-                $user->save();
+                ShopService::getInstance()->createShop($this->userId(), $merchant->id, $merchant->type, $merchant->shop_name, $merchant->shop_category_id);
             });
         }
 

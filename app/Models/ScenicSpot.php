@@ -48,6 +48,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicOpenTime[] $openTimeList
+ * @property-read int|null $open_time_list_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicProject[] $projectList
+ * @property-read int|null $project_list_count
  */
 class ScenicSpot extends BaseModel
 {

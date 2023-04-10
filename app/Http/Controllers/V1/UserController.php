@@ -22,7 +22,7 @@ class UserController extends Controller
             'nickname' => $user->nickname,
             'gender' => $user->gender,
             'mobile' => $user->mobile,
-            'shopId' => $user->shop_id,
+            'shopId' => $user->shop->id,
         ]);
     }
 

@@ -44,7 +44,6 @@ class MerchantController extends Controller
         DB::transaction(function () use ($merchant) {
             $order = MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->type == 1 ? '1000' : '10000');
             $merchant->status = 1;
-            $merchant->order_id = $order->id;
             $merchant->save();
         });
 

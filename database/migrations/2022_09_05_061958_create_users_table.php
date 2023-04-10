@@ -22,7 +22,8 @@ class CreateUsersTable extends Migration
             $table->string('openid')->unique()->comment('小程序openid');
             $table->string('unionid')->unique()->comment('微信unionid');
             $table->integer('gender')->default(0)->comment('性别：0-未知，1-男，2-女');
-            $table->integer('shop_id')->default(0)->comment('店铺id');
+            $table->string('signature')->default('')->comment('签名');
+            $table->string('bg')->default('')->comment('背景图');
             $table->timestamps();
             $table->softDeletes();
         });
