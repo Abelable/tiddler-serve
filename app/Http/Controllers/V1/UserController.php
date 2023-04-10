@@ -22,8 +22,8 @@ class UserController extends Controller
             'nickname' => $user->nickname,
             'gender' => $user->gender,
             'mobile' => $user->mobile,
-            'shopId' => $user->shop->id,
-            'scenicProviderId' => $user->scenicShop->id,
+            'shopId' => $user->shop->id ?? 0,
+            'scenicShopId' => $user->scenicShop->id ?? 0,
         ]);
     }
 
