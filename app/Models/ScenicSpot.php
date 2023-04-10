@@ -51,4 +51,13 @@ namespace App\Models;
  */
 class ScenicSpot extends BaseModel
 {
+    public function projectList()
+    {
+        return $this->hasMany(ScenicProject::class, 'scenic_id');
+    }
+
+    public function openTimeList()
+    {
+        return $this->hasMany(ScenicOpenTime::class, 'scenic_id');
+    }
 }

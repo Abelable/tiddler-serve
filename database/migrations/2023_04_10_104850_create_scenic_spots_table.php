@@ -25,10 +25,10 @@ class CreateScenicSpotsTable extends Migration
             $table->string('video')->default('')->comment('视频');
             $table->longText('image_list')->comment('图片列表');
             $table->longText('brief')->comment('简介');
-            $table->string('policy_list')->default('')->comment('优待政策');
-            $table->string('hotline_list')->default('')->comment('景区热线');
-            $table->string('facility_list')->default('')->comment('景区设施');
-            $table->string('tips_list')->default('')->comment('游玩贴士');
+            $table->longText('policy_list')->comment('优待政策');
+            $table->longText('hotline_list')->comment('景区热线');
+            $table->longText('facility_list')->comment('景区设施');
+            $table->longText('tips_list')->comment('游玩贴士');
             $table->timestamps();
             $table->softDeletes();
         });

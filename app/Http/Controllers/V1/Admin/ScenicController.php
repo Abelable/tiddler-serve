@@ -3,16 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
-use App\Services\GoodsService;
-use App\Services\MerchantService;
+use App\Models\ScenicSpot;
 use App\Services\ScenicService;
-use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\Admin\ScenicListInput;
-use App\Utils\Inputs\GoodsAddInput;
-use App\Utils\Inputs\GoodsEditInput;
+use App\Utils\Inputs\ScenicAddInput;
 
 class ScenicController extends Controller
 {
@@ -20,6 +15,7 @@ class ScenicController extends Controller
 
     public function list()
     {
+        /** @var ScenicListInput $input */
         $input = ScenicListInput::new();
         $columns = [
             'id',
@@ -39,87 +35,70 @@ class ScenicController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goodsColumns = [
-            'id',
-            'shop_id',
-            'image',
-            'name',
-            'category_id',
-            'price',
-            'stock',
-            'commission_rate',
-            'sales_volume',
-            'status',
-            'failure_reason',
-            'created_at',
-            'updated_at'
-        ];
-        $goods = GoodsService::getInstance()->getGoodsById($id, $goodsColumns);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        $scenic = ScenicService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
 
-        $shopColumns = [
-            'id',
-            'merchant_id',
-            'avatar',
-            'name',
-            'category_id',
-            'created_at',
-            'updated_at'
-        ];
-        $shop = ShopService::getInstance()->getShopById($goods->shop_id, $shopColumns);
-        if (is_null($shop)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
-        }
+        $scenic->policy_list = json_decode($scenic->policy_list);
+        $scenic->hotline_list = json_decode($scenic->hotline_list);
+        $scenic->facility_list = json_decode($scenic->facility_list);
+        $scenic->tips_list = json_decode($scenic->tips_list);
 
-        $merchantColumns = [
-            'id',
-            'type',
-            'name',
-            'mobile',
-            'created_at',
-            'updated_at'
-        ];
-        $merchant = MerchantService::getInstance()->getMerchantById($shop->merchant_id, $merchantColumns);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
-        }
-
-        unset($shop->merchant_id);
-        unset($goods->shop_id);
-        $goods['shop_info'] = $shop;
-        $goods['merchant_info'] = $merchant;
-
-        return $this->success($goods);
+        return $this->success($scenic);
     }
 
-    public function up()
+    public function add()
     {
-        $id = $this->verifyRequiredId('id');
+        /** @var ScenicAddInput $input */
+        $input = ScenicAddInput::new();
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        $scenic = ScenicSpot::new();
+        $scenic->status = 1;
+        if (!empty($input->video)) {
+            $scenic->video = $input->video;
         }
-        $goods->status = 1;
-        $goods->save();
+        $scenic->image_list = $input->imageList;
+        $scenic->name = $input->name;
+        $scenic->category_id = $input->categoryId;
+        $scenic->latitude = $input->latitude;
+        $scenic->longitude = $input->longitude;
+        $scenic->address = $input->address;
+        $scenic->policy_list = json_encode($input->policy_list);
+        $scenic->hotline_list = json_encode($input->hotline_list);
+        $scenic->facility_list = json_encode($input->facility_list);
+        $scenic->tips_list = json_encode($input->tips_list);
+
+        $scenic->save();
 
         return $this->success();
     }
 
-    public function reject()
+    public function edit()
     {
-        $id = $this->verifyRequiredId('id');
-        $reason = $this->verifyRequiredString('failureReason');
+        /** @var ScenicEditInput $input */
+        $input = ScenicEditInput::new();
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        $scenic = ScenicService::getInstance()->getScenicById($input->id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
-        $goods->status = 2;
-        $goods->failure_reason = $reason;
-        $goods->save();
+
+        if (!empty($input->video)) {
+            $scenic->video = $input->video;
+        }
+        $scenic->image_list = $input->imageList;
+        $scenic->name = $input->name;
+        $scenic->category_id = $input->categoryId;
+        $scenic->latitude = $input->latitude;
+        $scenic->longitude = $input->longitude;
+        $scenic->address = $input->address;
+        $scenic->policy_list = json_encode($input->policy_list);
+        $scenic->hotline_list = json_encode($input->hotline_list);
+        $scenic->facility_list = json_encode($input->facility_list);
+        $scenic->tips_list = json_encode($input->tips_list);
+
+        $scenic->save();
 
         return $this->success();
     }
@@ -128,108 +107,11 @@ class ScenicController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        $scenic = ScenicService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
-        $goods->delete();
-
-        return $this->success();
-    }
-
-    public function ownerList()
-    {
-        $input = GoodsListInput::new();
-        $columns = ['id', 'image', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
-        $list = GoodsService::getInstance()->getOwnerGoodsList($input, $columns);
-        return $this->successPaginate($list);
-    }
-
-    public function down()
-    {
-        $id = $this->verifyRequiredId('id');
-
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        $goods->status = 3;
-        $goods->save();
-
-        return $this->success();
-    }
-
-    public function ownerDetail()
-    {
-        $id = $this->verifyRequiredId('id');
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        return $this->success($goods);
-    }
-
-    public function add()
-    {
-        /** @var GoodsAddInput $input */
-        $input = GoodsAddInput::new();
-
-        $goods = Goods::new();
-        $goods->status = 1;
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->commission_rate = $input->commissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
-
-        return $this->success();
-    }
-
-    public function edit()
-    {
-        /** @var GoodsEditInput $input */
-        $input = GoodsEditInput::new();
-
-        $goods = GoodsService::getInstance()->getGoodsById($input->id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->commission_rate = $input->commissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
+        $scenic->delete();
 
         return $this->success();
     }

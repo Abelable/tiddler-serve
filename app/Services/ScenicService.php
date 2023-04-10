@@ -17,7 +17,7 @@ class ScenicService extends BaseService
 {
     public function getScenicList(ScenicListInput $input, $columns=['*'])
     {
-        $query = Goods::query();
+        $query = ScenicSpot::query();
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
@@ -28,6 +28,11 @@ class ScenicService extends BaseService
             $query = $query->where('status', $input->status);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getScenicById($id, $columns=['*'])
+    {
+        return ScenicSpot::query()->find($id, $columns);
     }
 
     public function getAllList(ScenicAllListInput $input, $columns=['*'])
@@ -126,10 +131,7 @@ class ScenicService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getGoodsById($id, $columns=['*'])
-    {
-        return Goods::query()->find($id, $columns);
-    }
+
 
     public function getOnSaleGoods($id, $columns=['*'])
     {
@@ -140,8 +142,6 @@ class ScenicService extends BaseService
     {
         return Goods::query()->whereIn('id', $ids)->get($columns);
     }
-
-
 
     public function getOwnerGoodsList(GoodsListInput $input, $columns=['*'])
     {
