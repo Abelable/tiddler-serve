@@ -119,17 +119,15 @@ Route::prefix('order')->group(function () {
 
 Route::prefix('scenic')->group(function () {
     Route::prefix('provider')->group(function () {
-        Route::post('settle_in', 'ScenicProviderController@addMerchant');
-        Route::get('status', 'ScenicProviderController@merchantStatusInfo');
+        Route::post('settle_in', 'ScenicProviderController@settleIn');
+        Route::get('status', 'ScenicProviderController@statusInfo');
         Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
-        Route::post('delete', 'ScenicProviderController@deleteMerchant');
+        Route::post('delete', 'ScenicProviderController@deleteProvider');
     });
 
     Route::prefix('shop')->group(function () {
         Route::post('info', 'ScenicShopController@info');
         Route::get('my_shop', 'ScenicShopController@myShopInfo');
-        Route::post('pay_deposit', 'ScenicShopController@payDeposit');
-        Route::post('delete', 'ScenicShopController@deleteMerchant');
     });
 
     Route::prefix('ticket')->group(function () {
