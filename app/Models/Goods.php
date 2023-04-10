@@ -22,7 +22,8 @@ namespace App\Models;
  * @property float $price 商品价格
  * @property float $market_price 市场价格
  * @property int $stock 商品库存
- * @property float $commission_rate 推广佣金比例
+ * @property float $sales_commission_rate 销售佣金比例
+ * @property float $promotion_commission_rate 推广佣金比例
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
  * @property int $sales_volume 商品销量
@@ -34,7 +35,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods query()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCategoryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDefaultSpecImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeletedAt($value)
@@ -47,7 +47,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereReturnAddressId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSkuList($value)
@@ -63,7 +65,4 @@ namespace App\Models;
  */
 class Goods extends BaseModel
 {
-    /**
-     * @var int|mixed
-     */
 }

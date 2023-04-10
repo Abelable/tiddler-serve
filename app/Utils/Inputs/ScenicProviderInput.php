@@ -20,6 +20,7 @@ class ScenicProviderInput extends BaseInput
     public $bankCardNumber;
     public $bankName;
     public $shopName;
+    public $scenicIds;
 
     public function rules()
     {
@@ -40,6 +41,7 @@ class ScenicProviderInput extends BaseInput
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
             'shopName' => 'required|string',
+            'scenicIds' => 'required|string',
         ];
     }
 }

@@ -34,6 +34,7 @@ class CreateScenicProvidersTable extends Migration
             $table->string('bank_card_number')->comment('银行卡号');
             $table->string('bank_name')->comment('开户银行及支行名称');
             $table->string('shop_name')->comment('店铺名称');
+            $table->string('scenic_ids')->comment('景点id列表');
             $table->timestamps();
             $table->softDeletes();
         });

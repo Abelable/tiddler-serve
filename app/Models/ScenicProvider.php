@@ -25,6 +25,7 @@ namespace App\Models;
  * @property string $bank_card_number 银行卡号
  * @property string $bank_name 开户银行及支行名称
  * @property string $shop_name 店铺名称
+ * @property string $scenic_ids 景点id列表
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -51,6 +52,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereRegionCodeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereRegionDesc($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereScenicIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereShopName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereUpdatedAt($value)

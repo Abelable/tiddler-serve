@@ -3,17 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Merchant;
 use App\Models\ScenicProvider;
-use App\Services\ExpressService;
-use App\Services\MerchantOrderService;
-use App\Services\MerchantService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
-use App\Services\ShopCategoryService;
-use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\MerchantSettleInInput;
 use App\Utils\Inputs\ScenicProviderInput;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -47,6 +40,7 @@ class ScenicProviderController extends Controller
         $provider->bank_card_number = $input->bankCardNumber;
         $provider->bank_name = $input->bankName;
         $provider->shop_name = $input->shopName;
+        $provider->scenic_ids = $input->scenicIds;
         $provider->save();
 
         return $this->success();
