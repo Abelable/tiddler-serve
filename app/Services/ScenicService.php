@@ -50,7 +50,8 @@ class ScenicService extends BaseService
             $query = $query
                 ->orderBy('sales_volume', 'desc')
                 ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
-                ->orderBy('commission_rate', 'desc')
+                ->orderBy('sales_commission_rate', 'desc')
+                ->orderBy('promotion_commission_rate', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
@@ -69,7 +70,8 @@ class ScenicService extends BaseService
         return $query
                 ->orderBy('sales_volume', 'desc')
                 ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
-                ->orderBy('commission_rate', 'desc')
+                ->orderBy('sales_commission_rate', 'desc')
+                ->orderBy('promotion_commission_rate', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
                 ->get($columns);
@@ -82,7 +84,8 @@ class ScenicService extends BaseService
             ->where('shop_id', $shopId)
             ->where('id', '!=', $goodsId)
             ->orderBy('sales_volume', 'desc')
-            ->orderBy('commission_rate', 'desc')
+            ->orderBy('sales_commission_rate', 'desc')
+            ->orderBy('promotion_commission_rate', 'desc')
             ->orderBy('created_at', 'desc')
             ->take($limit)
             ->get($columns);
@@ -94,7 +97,8 @@ class ScenicService extends BaseService
             ->where('status', 1)
             ->where('shop_id', $shopId)
             ->orderBy('sales_volume', 'desc')
-            ->orderBy('commission_rate', 'desc')
+            ->orderBy('sales_commission_rate', 'desc')
+            ->orderBy('promotion_commission_rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

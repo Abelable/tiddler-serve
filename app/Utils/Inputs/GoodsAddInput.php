@@ -16,7 +16,8 @@ class GoodsAddInput extends BaseInput
     public $price;
     public $marketPrice;
     public $stock;
-    public $commissionRate;
+    public $salesCommissionRate;
+    public $promotionCommissionRate;
     public $specList;
     public $skuList;
 
@@ -35,7 +36,8 @@ class GoodsAddInput extends BaseInput
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'stock' => 'required|integer',
-            'commissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'required|numeric',
+            'promotionCommissionRate' => 'required|numeric',
             'specList' => 'required|string',
             'skuList' => 'required|string',
         ];

@@ -139,7 +139,7 @@ class GoodsController extends Controller
             'price',
             'market_price',
             'stock',
-            'commission_rate',
+            'promotion_commission_rate',
             'spec_list',
             'sku_list'
         ];
@@ -184,7 +184,8 @@ class GoodsController extends Controller
             $goods->market_price = $input->marketPrice;
         }
         $goods->stock = $input->stock;
-        $goods->commission_rate = $input->commissionRate;
+        $goods->sales_commission_rate = $input->salesCommissionRate;
+        $goods->promotion_commission_rate = $input->promotionCommissionRate;
         $goods->spec_list = $input->specList;
         $goods->sku_list = $input->skuList;
         $goods->save();
@@ -226,7 +227,8 @@ class GoodsController extends Controller
             $goods->market_price = $input->marketPrice;
         }
         $goods->stock = $input->stock;
-        $goods->commission_rate = $input->commissionRate;
+        $goods->sales_commission_rate = $input->salesCommissionRate;
+        $goods->promotion_commission_rate = $input->promotionCommissionRate;
         $goods->spec_list = $input->specList;
         $goods->sku_list = $input->skuList;
         $goods->save();
