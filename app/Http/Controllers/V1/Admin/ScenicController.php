@@ -8,6 +8,7 @@ use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicListInput;
 use App\Utils\Inputs\ScenicAddInput;
+use App\Utils\Inputs\ScenicEditInput;
 
 class ScenicController extends Controller
 {
