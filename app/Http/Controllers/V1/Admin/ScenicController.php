@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Goods;
 use App\Services\GoodsService;
 use App\Services\MerchantService;
+use App\Services\ScenicService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
+use App\Utils\Inputs\Admin\ScenicListInput;
 use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
 
@@ -18,22 +20,18 @@ class ScenicController extends Controller
 
     public function list()
     {
-        $input = GoodsListInput::new();
+        $input = ScenicListInput::new();
         $columns = [
             'id',
             'image',
             'name',
             'category_id',
-            'price',
-            'stock',
-            'commission_rate',
-            'sales_volume',
+            'rate',
             'status',
-            'failure_reason',
             'created_at',
             'updated_at'
         ];
-        $list = GoodsService::getInstance()->getMerchantGoodsList($input, $columns);
+        $list = ScenicService::getInstance()->getScenicList($input, $columns);
         return $this->successPaginate($list);
     }
 
