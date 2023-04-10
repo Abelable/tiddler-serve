@@ -117,6 +117,8 @@ Route::prefix('order')->group(function () {
     Route::post('delete', 'OrderController@delete');
 });
 
+
+
 Route::prefix('media')->group(function () {
     Route::get('list', 'MediaController@list');
     Route::get('follow_list', 'MediaController@followList');
@@ -268,5 +270,22 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GoodsController@delete');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
+    });
+
+    Route::prefix('scenic')->group(function () {
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'ScenicCategoryController@list');
+            Route::get('detail', 'ScenicCategoryController@detail');
+            Route::post('add', 'ScenicCategoryController@add');
+            Route::post('edit', 'ScenicCategoryController@edit');
+            Route::post('delete', 'ScenicCategoryController@delete');
+            Route::get('options', 'ScenicCategoryController@options');
+        });
+
+        Route::post('list', 'ScenicController@list');
+        Route::get('detail', 'ScenicController@detail');
+        Route::post('add', 'ScenicController@add');
+        Route::post('edit', 'ScenicController@edit');
+        Route::post('delete', 'ScenicController@delete');
     });
 });
