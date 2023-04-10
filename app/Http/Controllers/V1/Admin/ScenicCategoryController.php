@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\GoodsCategory;
+use App\Models\ScenicCategory;
 use App\Services\ScenicCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -24,7 +24,7 @@ class ScenicCategoryController extends Controller
         $id = $this->verifyRequiredId('id');
         $category = ScenicCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品分类不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
         }
         return $this->success($category);
     }
@@ -35,10 +35,10 @@ class ScenicCategoryController extends Controller
 
         $category = ScenicCategoryService::getInstance()->getCategoryByName($name);
         if (!is_null($category)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '当前商品分类已存在');
+            return $this->fail(CodeResponse::DATA_EXISTED, '当前景点分类已存在');
         }
 
-        $category = GoodsCategory::new();
+        $category = ScenicCategory::new();
         $category->name = $name;
         $category->save();
 
@@ -52,12 +52,12 @@ class ScenicCategoryController extends Controller
 
         $category = ScenicCategoryService::getInstance()->getCategoryByName($name);
         if (!is_null($category)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '当前商品分类已存在');
+            return $this->fail(CodeResponse::DATA_EXISTED, '当前景点分类已存在');
         }
 
         $category = ScenicCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品分类不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
         }
 
         $category->name = $name;
