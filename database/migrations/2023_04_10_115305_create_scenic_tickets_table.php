@@ -17,7 +17,7 @@ class CreateScenicTicketsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('provider_id')->comment('供应商id');
-            $table->string('scenic_ids')->comment('景点id列表');
+            $table->integer('category_id')->comment('门票分类id');
             $table->integer('type')->default(1)->comment('门票类型：1-单景点门票，2-多景点联票');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
