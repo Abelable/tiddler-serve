@@ -125,11 +125,6 @@ Route::prefix('scenic')->group(function () {
         Route::post('delete', 'ScenicProviderController@deleteProvider');
     });
 
-    Route::prefix('shop')->group(function () {
-        Route::post('info', 'ScenicShopController@info');
-        Route::get('my_shop', 'ScenicShopController@myShopInfo');
-    });
-
     Route::prefix('ticket')->group(function () {
         Route::get('totals', 'ScenicTicketController@goodsListTotals');
         Route::get('list', 'ScenicTicketController@merchantGoodsList');
@@ -321,5 +316,19 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('add', 'ScenicController@add');
         Route::post('edit', 'ScenicController@edit');
         Route::post('delete', 'ScenicController@delete');
+
+        Route::prefix('ticket')->group(function () {
+            Route::prefix('category')->group(function () {
+                Route::post('list', 'ScenicTicketCategoryController@list');
+                Route::get('detail', 'ScenicTicketCategoryController@detail');
+                Route::post('add', 'ScenicTicketCategoryController@add');
+                Route::post('edit', 'ScenicTicketCategoryController@edit');
+                Route::post('delete', 'ScenicTicketCategoryController@delete');
+            });
+
+            Route::post('list', 'ScenicTicketController@list');
+            Route::get('detail', 'ScenicTicketController@detail');
+            Route::post('delete', 'ScenicTicketController@delete');
+        });
     });
 });
