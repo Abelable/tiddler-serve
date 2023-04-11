@@ -39,7 +39,7 @@ class UserController extends Controller
     {
         $authorId = $this->verifyRequiredId('authorId');
 
-        $authorInfo = UserService::getInstance()->getUserById($authorId, ['id', 'avatar', 'nickname', 'gender', 'shop_id']);
+        $authorInfo = UserService::getInstance()->getUserById($authorId, ['id', 'avatar', 'nickname', 'gender']);
         if (is_null($authorInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前用户不存在');
         }

@@ -29,7 +29,7 @@ class LivePlayController extends Controller
         $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
         $roomList = collect($page->items());
         $anchorIds = $roomList->pluck('user_id')->toArray();
-        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname', 'shop_id'])->keyBy('id');
+        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $list = $roomList->map(function (LiveRoom $room) use ($anchorList) {
             $anchorInfo = $anchorList->get($room->user_id);
             $room['anchor_info'] = $anchorInfo;
