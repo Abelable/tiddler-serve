@@ -18,7 +18,10 @@ class CreateScenicProvidersTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
-            $table->string('company_name')->default('')->comment('企业名称');
+            $table->string('company_avatar')->default('')->comment('公司头像');
+            $table->string('company_name')->comment('公司名称');
+            $table->string('company_abbreviation')->default('')->comment('公司简称');
+            $table->integer('company_type')->default(3)->comment('公司类型：1-官方，2-自营，3-普通旅行社');
             $table->string('region_desc')->comment('省市区描述');
             $table->string('region_code_list')->comment('省市区编码');
             $table->string('address_detail')->comment('地址详情');
@@ -33,8 +36,6 @@ class CreateScenicProvidersTable extends Migration
             $table->string('bank_card_owner_name')->comment('持卡人姓名');
             $table->string('bank_card_number')->comment('银行卡号');
             $table->string('bank_name')->comment('开户银行及支行名称');
-            $table->string('shop_name')->comment('店铺名称');
-            $table->string('scenic_ids')->comment('景点id列表');
             $table->timestamps();
             $table->softDeletes();
         });
