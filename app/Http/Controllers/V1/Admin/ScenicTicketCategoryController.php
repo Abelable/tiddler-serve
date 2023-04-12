@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicCategory;
+use App\Models\ScenicTicketCategory;
 use App\Services\ScenicTicketCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -39,7 +39,7 @@ class ScenicTicketCategoryController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '当前景点门票分类已存在');
         }
 
-        $category = ScenicCategory::new();
+        $category = ScenicTicketCategory::new();
         $category->name = $name;
         $category->save();
 
