@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+
 /**
  * App\Models\ScenicSpot
  *
@@ -16,6 +17,7 @@ namespace App\Models;
  * @property string $video 视频
  * @property string $image_list 图片列表
  * @property string $brief 简介
+ * @property string $open_time_list 开放时间
  * @property string $policy_list 优待政策
  * @property string $hotline_list 景区热线
  * @property string $facility_list 景区设施
@@ -23,6 +25,8 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicProject[] $projectList
+ * @property-read int|null $project_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot onlyTrashed()
@@ -39,6 +43,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereLatitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot wherePolicyList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereStatus($value)
@@ -48,20 +53,11 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot withoutTrashed()
  * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicOpenTime[] $openTimeList
- * @property-read int|null $open_time_list_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicProject[] $projectList
- * @property-read int|null $project_list_count
  */
 class ScenicSpot extends BaseModel
 {
     public function projectList()
     {
         return $this->hasMany(ScenicProject::class, 'scenic_id');
-    }
-
-    public function openTimeList()
-    {
-        return $this->hasMany(ScenicOpenTime::class, 'scenic_id');
     }
 }

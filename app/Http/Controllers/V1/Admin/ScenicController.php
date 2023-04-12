@@ -56,12 +56,12 @@ class ScenicController extends Controller
 
         $scenic = ScenicSpot::new();
         $scenic->status = 1;
+        $scenic->name = $input->name;
+        $scenic->category_id = $input->categoryId;
         if (!empty($input->video)) {
             $scenic->video = $input->video;
         }
-        $scenic->image_list = $input->imageList;
-        $scenic->name = $input->name;
-        $scenic->category_id = $input->categoryId;
+        $scenic->image_list = json_encode($input->imageList);
         $scenic->latitude = $input->latitude;
         $scenic->longitude = $input->longitude;
         $scenic->address = $input->address;
