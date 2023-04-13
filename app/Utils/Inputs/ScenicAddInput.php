@@ -14,6 +14,7 @@ class ScenicAddInput extends BaseInput
     public $brief;
     public $policy_list;
     public $hotline_list;
+    public $project_list;
     public $facility_list;
     public $tips_list;
 
@@ -21,17 +22,18 @@ class ScenicAddInput extends BaseInput
     {
         return [
             'video' => 'string',
-            'imageList' => 'required|string',
+            'imageList' => 'required|array|min:1',
             'name' => 'required|string',
             'categoryId' => 'required|integer|digits_between:1,20',
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
             'address' => 'required|string',
             'brief' => 'required|string',
-            'policy_list' => 'required|string',
-            'hotline_list' => 'required|string',
-            'facility_list' => 'required|string',
-            'tips_list' => 'required|string',
+            'policy_list' => 'array',
+            'hotline_list' => 'array',
+            'project_list' => 'array',
+            'facility_list' => 'array',
+            'tips_list' => 'array',
         ];
     }
 }

@@ -17,4 +17,9 @@ class ScenicProjectService extends BaseService
     {
         return ScenicProject::query()->find($id, $columns);
     }
+
+    public function insert($list)
+    {
+        return ScenicProject::query()->insert($list);
+    }
 }

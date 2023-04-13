@@ -6,7 +6,8 @@ namespace App\Models;
  * App\Models\ScenicSpot
  *
  * @property int $id
- * @property int $status 状态：0-待审核，1-审核通过
+ * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过
+ * @property string $failure_reason 审核失败原因
  * @property int $category_id 景区分类id
  * @property string $name 景区名称
  * @property string $level 景区等级
@@ -37,6 +38,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereFacilityList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereHotlineList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereImageList($value)

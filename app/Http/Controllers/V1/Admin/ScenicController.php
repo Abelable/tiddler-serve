@@ -4,11 +4,14 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
+use App\Services\ScenicProjectService;
+use App\Services\ScenicProviderService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicListInput;
 use App\Utils\Inputs\ScenicAddInput;
 use App\Utils\Inputs\ScenicEditInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicController extends Controller
 {
@@ -20,11 +23,12 @@ class ScenicController extends Controller
         $input = ScenicListInput::new();
         $columns = [
             'id',
-            'image',
+            'status',
+            'failure_reason',
             'name',
+            'level',
             'category_id',
             'rate',
-            'status',
             'created_at',
             'updated_at'
         ];
@@ -54,23 +58,31 @@ class ScenicController extends Controller
         /** @var ScenicAddInput $input */
         $input = ScenicAddInput::new();
 
-        $scenic = ScenicSpot::new();
-        $scenic->status = 1;
-        $scenic->name = $input->name;
-        $scenic->category_id = $input->categoryId;
-        if (!empty($input->video)) {
-            $scenic->video = $input->video;
-        }
-        $scenic->image_list = json_encode($input->imageList);
-        $scenic->latitude = $input->latitude;
-        $scenic->longitude = $input->longitude;
-        $scenic->address = $input->address;
-        $scenic->policy_list = json_encode($input->policy_list);
-        $scenic->hotline_list = json_encode($input->hotline_list);
-        $scenic->facility_list = json_encode($input->facility_list);
-        $scenic->tips_list = json_encode($input->tips_list);
+        DB::transaction(function () use ($input) {
+            $scenic = ScenicSpot::new();
+            $scenic->status = 1;
+            $scenic->name = $input->name;
+            $scenic->category_id = $input->categoryId;
+            if (!empty($input->video)) {
+                $scenic->video = $input->video;
+            }
+            $scenic->image_list = json_encode($input->imageList);
+            $scenic->latitude = $input->latitude;
+            $scenic->longitude = $input->longitude;
+            $scenic->address = $input->address;
+            $scenic->policy_list = json_encode($input->policy_list);
+            $scenic->hotline_list = json_encode($input->hotline_list);
+            $scenic->facility_list = json_encode($input->facility_list);
+            $scenic->tips_list = json_encode($input->tips_list);
+            $scenic->save();
 
-        $scenic->save();
+            if (count($input->project_list) != 0) {
+                $projectList = array_map(function ($item) use ($scenic) {
+                    $item['scenic_id'] = $scenic->id;
+                }, $input->project_list);
+                ScenicProjectService::getInstance()->insert($projectList);
+            }
+        });
 
         return $this->success();
     }
