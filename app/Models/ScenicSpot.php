@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 /**
  * App\Models\ScenicSpot
  *
@@ -10,6 +9,7 @@ namespace App\Models;
  * @property int $status 状态：0-待审核，1-审核通过
  * @property int $category_id 景区分类id
  * @property string $name 景区名称
+ * @property string $level 景区等级
  * @property float $longitude 经度
  * @property float $latitude 纬度
  * @property string $address 具体地址
@@ -41,6 +41,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereOpenTimeList($value)
