@@ -61,6 +61,6 @@ class ScenicSpot extends BaseModel
 {
     public function projectList()
     {
-        return $this->hasMany(ScenicProject::class, 'scenic_id');
+        return $this->hasMany(ScenicProject::class, 'scenic_id')->select('id', 'image', 'name');
     }
 }
