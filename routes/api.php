@@ -118,6 +118,10 @@ Route::prefix('order')->group(function () {
 });
 
 Route::prefix('scenic')->group(function () {
+    Route::get('category_options', 'ScenicController@categoryOptions');
+    Route::get('list', 'ScenicController@list');
+    Route::get('detail', 'ScenicController@detail');
+
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'ScenicProviderController@settleIn');
         Route::get('status', 'ScenicProviderController@statusInfo');

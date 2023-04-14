@@ -6,13 +6,13 @@ use App\Models\Goods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
-use App\Utils\Inputs\GoodsAllListInput;
+use App\Utils\Inputs\AllListInput;
 use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
 
 class GoodsService extends BaseService
 {
-    public function getAllList(GoodsAllListInput $input, $columns=['*'])
+    public function getAllList(AllListInput $input, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
         if (!empty($input->name)) {

@@ -39,20 +39,7 @@ class ScenicController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-
         $scenic = ScenicService::getInstance()->getScenicById($id);
-        if (is_null($scenic)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
-        }
-
-        $scenic->image_list = json_decode($scenic->image_list);
-        $scenic->open_time_list = json_decode($scenic->open_time_list);
-        $scenic->policy_list = json_decode($scenic->policy_list);
-        $scenic->hotline_list = json_decode($scenic->hotline_list);
-        $scenic->facility_list = json_decode($scenic->facility_list);
-        $scenic->tips_list = json_decode($scenic->tips_list);
-        $scenic['projectList'] = $scenic->projectList;
-
         return $this->success($scenic);
     }
 

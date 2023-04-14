@@ -4,7 +4,7 @@ namespace App\Utils\Inputs;
 
 use Illuminate\Validation\Rule;
 
-class GoodsAllListInput extends BaseInput
+class AllListInput extends BaseInput
 {
     public $name;
     public $categoryId;
