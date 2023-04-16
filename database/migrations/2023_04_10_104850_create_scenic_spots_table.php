@@ -30,6 +30,7 @@ class CreateScenicSpotsTable extends Migration
             $table->longText('open_time_list')->comment('开放时间');
             $table->longText('policy_list')->comment('优待政策');
             $table->longText('hotline_list')->comment('景区热线');
+            $table->longText('project_list')->comment('景区项目');
             $table->longText('facility_list')->comment('景区设施');
             $table->longText('tips_list')->comment('游玩贴士');
             $table->timestamps();

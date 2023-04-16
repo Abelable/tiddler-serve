@@ -36,7 +36,7 @@ class ScenicService extends BaseService
         $scenic->hotline_list = json_decode($scenic->hotline_list);
         $scenic->facility_list = json_decode($scenic->facility_list);
         $scenic->tips_list = json_decode($scenic->tips_list);
-        $scenic['projectList'] = $scenic->projectList;
+        $scenic->project_list = json_decode($scenic->project_list);
         return $scenic;
     }
 

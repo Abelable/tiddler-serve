@@ -26,8 +26,6 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicProject[] $projectList
- * @property-read int|null $project_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicSpot onlyTrashed()
@@ -59,8 +57,4 @@ namespace App\Models;
  */
 class ScenicSpot extends BaseModel
 {
-    public function projectList()
-    {
-        return $this->hasMany(ScenicProject::class, 'scenic_id')->select('image', 'name');
-    }
 }
