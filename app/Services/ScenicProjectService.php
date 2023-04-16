@@ -22,4 +22,9 @@ class ScenicProjectService extends BaseService
     {
         return ScenicProject::query()->insert($list);
     }
+
+    public function delete($scenicId)
+    {
+        return ScenicProject::query()->where('scenic_id', $scenicId)->delete();
+    }
 }

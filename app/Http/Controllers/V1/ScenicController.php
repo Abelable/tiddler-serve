@@ -4,11 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
-use App\Services\GoodsService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
-use App\Services\ShopService;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\AllListInput;
 
 class ScenicController extends Controller
