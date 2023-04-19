@@ -21,6 +21,7 @@ namespace App\Models;
  * @property string $open_time_list 开放时间
  * @property string $policy_list 优待政策
  * @property string $hotline_list 景区热线
+ * @property string $project_list 景区项目
  * @property string $facility_list 景区设施
  * @property string $tips_list 游玩贴士
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -46,6 +47,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot wherePolicyList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereProjectList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereTipsList($value)
