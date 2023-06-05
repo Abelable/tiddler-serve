@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShopsTable extends Migration
+class CreateScenicShopsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateShopsTable extends Migration
      */
     public function up()
     {
-        Schema::create('shops', function (Blueprint $table) {
+        Schema::create('scenic_shops', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(0)->comment('状态：0-未支付保证金，1-已支付保证金');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('merchant_id')->comment('商家id');
+            $table->integer('provider_id')->comment('服务商id');
             $table->string('name')->comment('店铺名称');
-            $table->integer('category_id')->comment('店铺分类id');
-            $table->integer('type')->comment('店铺类型：1-个人，2-企业');
+            $table->integer('type')->comment('店铺类型：1-景区官方，2-旅行社，3-平台自营');
             $table->string('cover')->comment('店铺封面图片');
             $table->string('avatar')->comment('店铺头像');
             $table->timestamps();
@@ -35,6 +34,6 @@ class CreateShopsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shops');
+        Schema::dropIfExists('scenic_shops');
     }
 }

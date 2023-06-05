@@ -34,8 +34,6 @@ class CreateMerchantsTable extends Migration
             $table->string('bank_card_owner_name')->comment('持卡人姓名');
             $table->string('bank_card_number')->comment('银行卡号');
             $table->string('bank_name')->comment('开户银行及支行名称');
-            $table->string('shop_name')->comment('店铺名称');
-            $table->integer('shop_category_id')->comment('店铺分类id');
             $table->timestamps();
             $table->softDeletes();
         });
