@@ -19,8 +19,10 @@ class ScenicProviderInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
+    public $shopAvatar;
     public $shopName;
-    public $scenicIds;
+    public $shopType;
+    public $shopCover;
 
     public function rules()
     {
@@ -40,8 +42,10 @@ class ScenicProviderInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
+            'shopAvatar' => 'required|string',
             'shopName' => 'required|string',
-            'scenicIds' => 'required|string',
+            'shopType' => 'required|integer|in:1,2,3',
+            'shopCover' => 'string',
         ];
     }
 }

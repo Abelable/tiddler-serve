@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicProvider;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
+use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ScenicProviderInput;
+use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class ScenicProviderController extends Controller
@@ -22,26 +23,10 @@ class ScenicProviderController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '您已提交申请，请勿重复操作');
         }
 
-        $provider = ScenicProvider::new();
-        $provider->user_id = $this->userId();
-        $provider->company_name = $input->companyName;
-        $provider->business_license_photo = $input->businessLicensePhoto;
-        $provider->region_desc = $input->regionDesc;
-        $provider->region_code_list = $input->regionCodeList;
-        $provider->address_detail = $input->addressDetail;
-        $provider->name = $input->name;
-        $provider->mobile = $input->mobile;
-        $provider->email = $input->email;
-        $provider->id_card_number = $input->idCardNumber;
-        $provider->id_card_front_photo = $input->idCardFrontPhoto;
-        $provider->id_card_back_photo = $input->idCardBackPhoto;
-        $provider->hold_id_card_photo = $input->holdIdCardPhoto;
-        $provider->bank_card_owner_name = $input->bankCardOwnerName;
-        $provider->bank_card_number = $input->bankCardNumber;
-        $provider->bank_name = $input->bankName;
-        $provider->shop_name = $input->shopName;
-        $provider->scenic_ids = $input->scenicIds;
-        $provider->save();
+        DB::transaction(function () use ($input) {
+            $provider = ScenicProviderService::getInstance()->createProvider($input, $this->userId());
+            ScenicShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
+        });
 
         return $this->success();
     }
