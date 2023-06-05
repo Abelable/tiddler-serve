@@ -9,10 +9,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $status 申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败
  * @property string $failure_reason 审核失败原因
- * @property string $company_avatar 公司头像
  * @property string $company_name 公司名称
- * @property string $company_abbreviation 公司简称
- * @property int $company_type 公司类型：1-官方，2-自营，3-普通旅行社
  * @property string $region_desc 省市区描述
  * @property string $region_code_list 省市区编码
  * @property string $address_detail 地址详情
@@ -39,10 +36,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereBankCardOwnerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereBankName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereBusinessLicensePhoto($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereCompanyAbbreviation($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereCompanyAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereCompanyName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereCompanyType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicProvider whereEmail($value)
