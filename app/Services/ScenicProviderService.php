@@ -53,9 +53,9 @@ class ScenicProviderService extends BaseService
         return ScenicProvider::query()->find($id, $columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function paySuccess(int $providerId)
     {
-        $provider = $this->getProviderById($merchantId);
+        $provider = $this->getProviderById($providerId);
         if (is_null($provider)) {
             $this->throwBadArgumentValue();
         }

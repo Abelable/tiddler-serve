@@ -40,7 +40,7 @@ class ScenicProviderController extends Controller
     public function payDeposit()
     {
         $orderId = $this->verifyRequiredId('orderId');
-        $order =  ScenicProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $order = ScenicProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }

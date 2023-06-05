@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
+use App\Services\ScenicProviderOrderService;
+use App\Services\ScenicProviderService;
+use App\Services\ScenicShopService;
 use App\Services\ShopService;
 use App\Utils\AliOssServe;
 use App\Utils\WxMpServe;
@@ -45,6 +48,15 @@ class CommonController extends Controller
                 $order = MerchantOrderService::getInstance()->wxPaySuccess($data);
                 MerchantService::getInstance()->paySuccess($order->merchant_id);
                 ShopService::getInstance()->paySuccess($order->merchant_id);
+            });
+        }
+
+        if (strpos($data['body'], 'scenic_provider_order_sn')) {
+            Log::info('scenic_provider_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $order = ScenicProviderOrderService::getInstance()->wxPaySuccess($data);
+                ScenicProviderService::getInstance()->paySuccess($order->provider_id);
+                ScenicShopService::getInstance()->paySuccess($order->provider_id);
             });
         }
 

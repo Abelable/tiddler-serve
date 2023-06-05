@@ -38,9 +38,9 @@ class ScenicShopService extends BaseService
         return ScenicShop::query()->find($id, $columns);
     }
 
-    public function getShopByMerchantId(int $merchantId, $columns = ['*'])
+    public function getShopByProviderId(int $providerId, $columns = ['*'])
     {
-        return ScenicShop::query()->where('merchant_id', $merchantId)->first($columns);
+        return ScenicShop::query()->where('provider_id', $providerId)->first($columns);
     }
 
     public function getShopListByIds(array $ids, $columns = ['*'])
@@ -53,9 +53,9 @@ class ScenicShopService extends BaseService
         return ScenicShop::query()->where('user_id', $userId)->first($columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function paySuccess(int $providerId)
     {
-        $shop = $this->getShopByMerchantId($merchantId);
+        $shop = $this->getShopByProviderId($providerId);
         if (is_null($shop)) {
             $this->throwBadArgumentValue();
         }
