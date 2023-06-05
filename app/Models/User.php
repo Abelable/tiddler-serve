@@ -90,7 +90,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
 
     public function shop()
     {
-        return $this->hasOne(Shop::class, 'user_id');
+        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
     }
 
     public function scenicProvider()
