@@ -43,8 +43,8 @@ class CommonController extends Controller
             Log::info('merchant_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $order = MerchantOrderService::getInstance()->wxPaySuccess($data);
-                $merchant = MerchantService::getInstance()->paySuccess($order->merchant_id);
-                ShopService::getInstance()->createShop($this->userId(), $merchant->id, $merchant->type, $merchant->shop_name, $merchant->shop_category_id);
+                MerchantService::getInstance()->paySuccess($order->merchant_id);
+                ShopService::getInstance()->paySuccess($order->merchant_id);
             });
         }
 

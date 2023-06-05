@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Merchant;
 use App\Services\ExpressService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
@@ -11,6 +10,7 @@ use App\Services\ShopCategoryService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantSettleInInput;
+use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopController extends Controller
@@ -33,29 +33,10 @@ class ShopController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请');
         }
 
-        $merchant = Merchant::new();
-        $merchant->user_id = $this->userId();
-        $merchant->type = $input->type;
-        if ($input->type == 2) {
-            $merchant->company_name = $input->companyName;
-            $merchant->business_license_photo = $input->businessLicensePhoto;
-        }
-        $merchant->region_desc = $input->regionDesc;
-        $merchant->region_code_list = $input->regionCodeList;
-        $merchant->address_detail = $input->addressDetail;
-        $merchant->name = $input->name;
-        $merchant->mobile = $input->mobile;
-        $merchant->email = $input->email;
-        $merchant->id_card_number = $input->idCardNumber;
-        $merchant->id_card_front_photo = $input->idCardFrontPhoto;
-        $merchant->id_card_back_photo = $input->idCardBackPhoto;
-        $merchant->hold_id_card_photo = $input->holdIdCardPhoto;
-        $merchant->bank_card_owner_name = $input->bankCardOwnerName;
-        $merchant->bank_card_number = $input->bankCardNumber;
-        $merchant->bank_name = $input->bankName;
-        $merchant->shop_name = $input->shopName;
-        $merchant->shop_category_id = $input->shopCategoryId;
-        $merchant->save();
+        DB::transaction(function () use ($input) {
+            $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
+            ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
+        });
 
         return $this->success();
     }

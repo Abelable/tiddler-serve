@@ -4,9 +4,37 @@ namespace App\Services;
 
 use App\Models\Merchant;
 use App\Utils\Inputs\MerchantListInput;
+use App\Utils\Inputs\MerchantSettleInInput;
 
 class MerchantService extends BaseService
 {
+    public function createMerchant(MerchantSettleInInput $input, $userId)
+    {
+        $merchant = Merchant::new();
+        $merchant->user_id = $userId;
+        $merchant->type = $input->type;
+        if ($input->type == 2) {
+            $merchant->company_name = $input->companyName;
+            $merchant->business_license_photo = $input->businessLicensePhoto;
+        }
+        $merchant->region_desc = $input->regionDesc;
+        $merchant->region_code_list = $input->regionCodeList;
+        $merchant->address_detail = $input->addressDetail;
+        $merchant->name = $input->name;
+        $merchant->mobile = $input->mobile;
+        $merchant->email = $input->email;
+        $merchant->id_card_number = $input->idCardNumber;
+        $merchant->id_card_front_photo = $input->idCardFrontPhoto;
+        $merchant->id_card_back_photo = $input->idCardBackPhoto;
+        $merchant->hold_id_card_photo = $input->holdIdCardPhoto;
+        $merchant->bank_card_owner_name = $input->bankCardOwnerName;
+        $merchant->bank_card_number = $input->bankCardNumber;
+        $merchant->bank_name = $input->bankName;
+        $merchant->save();
+
+        return $merchant;
+    }
+
     public function getMerchantList(MerchantListInput $input, $columns = ['*'])
     {
         $query = Merchant::query();

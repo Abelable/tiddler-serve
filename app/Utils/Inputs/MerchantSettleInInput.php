@@ -20,8 +20,10 @@ class MerchantSettleInInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
+    public $shopAvatar;
     public $shopName;
     public $shopCategoryId;
+    public $shopCover;
 
     public function rules()
     {
@@ -42,8 +44,10 @@ class MerchantSettleInInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
+            'shopAvatar' => 'required|string',
             'shopName' => 'required|string',
             'shopCategoryId' => 'required|integer|digits_between:1,20',
+            'shopCover' => 'string',
         ];
     }
 }
