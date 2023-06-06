@@ -40,7 +40,6 @@ class ScenicProviderController extends Controller
             'id' => $provider->id,
             'status' => $provider->status,
             'failureReason' => $provider->failure_reason,
-            'type' => $provider->type,
             'orderId' => $providerOrder->id
         ] : null);
     }
