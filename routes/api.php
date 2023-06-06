@@ -321,6 +321,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('edit', 'ScenicController@edit');
         Route::post('delete', 'ScenicController@delete');
 
+        Route::prefix('provider')->group(function () {
+            Route::post('list', 'ScenicProviderController@list');
+            Route::get('detail', 'ScenicProviderController@detail');
+            Route::post('approved', 'ScenicProviderController@approved');
+            Route::post('reject', 'ScenicProviderController@reject');
+            Route::post('order_list', 'ScenicProviderController@orderList');
+        });
+
         Route::prefix('ticket')->group(function () {
             Route::prefix('category')->group(function () {
                 Route::post('list', 'ScenicTicketCategoryController@list');

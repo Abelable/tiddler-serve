@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\MerchantOrderService;
-use App\Services\MerchantService;
+use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -18,7 +17,7 @@ class ScenicProviderController extends Controller
     public function list()
     {
         $input = ScenicProviderListInput::new();
-        $columns = ['id', 'type', 'status', 'failure_reason', 'name', 'mobile', 'created_at', 'updated_at'];
+        $columns = ['id', 'status', 'failure_reason', 'name', 'mobile', 'created_at', 'updated_at'];
         $list = ScenicProviderService::getInstance()->getProviderList($input, $columns);
         return $this->successPaginate($list);
     }
@@ -26,29 +25,29 @@ class ScenicProviderController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $merchant = MerchantService::getInstance()->getMerchantById($id);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
+        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        if (is_null($provider)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
-        return $this->success($merchant);
+        return $this->success($provider);
     }
 
     public function approved()
     {
         $id = $this->verifyRequiredId('id');
 
-        $merchant = MerchantService::getInstance()->getMerchantById($id);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
+        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        if (is_null($provider)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
 
-        DB::transaction(function () use ($merchant) {
-            $order = MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->type == 1 ? '1000' : '10000');
-            $merchant->status = 1;
-            $merchant->save();
+        DB::transaction(function () use ($provider) {
+            ScenicProviderOrderService::getInstance()->createOrder($provider->user_id, $provider->id, '10000');
+            $provider->status = 1;
+            $provider->save();
         });
 
-        // todo：短信通知商家
+        // todo：短信通知景区服务商
 
         return $this->success();
     }
@@ -58,15 +57,15 @@ class ScenicProviderController extends Controller
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
 
-        $merchant = MerchantService::getInstance()->getMerchantById($id);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
+        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        if (is_null($provider)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
 
-        $merchant->status = 3;
-        $merchant->failure_reason = $reason;
-        $merchant->save();
-        // todo：短信通知商家
+        $provider->status = 3;
+        $provider->failure_reason = $reason;
+        $provider->save();
+        // todo：短信通知景区服务商
 
         return $this->success();
     }
@@ -75,7 +74,7 @@ class ScenicProviderController extends Controller
     {
         $input = PageInput::new();
         $columns = ['id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
-        $list = MerchantOrderService::getInstance()->getOrderList($input, $columns);
+        $list = ScenicProviderOrderService::getInstance()->getOrderList($input, $columns);
         return $this->successPaginate($list);
     }
 }
