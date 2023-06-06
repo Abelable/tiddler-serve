@@ -84,6 +84,11 @@ class MerchantOrderService extends BaseService
         return MerchantOrder::query()->where('order_sn', $orderSn)->first();
     }
 
+    public function getMerchantOrderByUserId($userId, $columns = ['*'])
+    {
+        return MerchantOrder::query()->where('user_id', $userId)->first($columns);
+    }
+
     public function getOrderList(PageInput $input, $columns = ['*'])
     {
         return MerchantOrder::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);

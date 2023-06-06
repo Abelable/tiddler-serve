@@ -34,7 +34,15 @@ class ScenicProviderController extends Controller
     public function statusInfo()
     {
         $provider = ScenicProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
-        return $this->success($provider ?: '');
+        $providerOrder = ScenicProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
+
+        return $this->success($provider ? [
+            'id' => $provider->id,
+            'status' => $provider->status,
+            'failureReason' => $provider->failure_reason,
+            'type' => $provider->type,
+            'orderId' => $providerOrder->id
+        ] : null);
     }
 
     public function payDeposit()

@@ -44,7 +44,15 @@ class ShopController extends Controller
     public function merchantStatusInfo()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId(), ['id', 'status', 'failure_reason', 'type']);
-        return $this->success($merchant ?: '');
+        $merchantOrder = MerchantOrderService::getInstance()->getMerchantOrderByUserId($this->userId(), ['id']);
+
+        return $this->success($merchant ? [
+            'id' => $merchant->id,
+            'status' => $merchant->status,
+            'failureReason' => $merchant->failure_reason,
+            'type' => $merchant->type,
+            'orderId' => $merchantOrder->id
+        ] : null);
     }
 
     public function payDeposit()

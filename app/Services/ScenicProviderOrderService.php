@@ -84,6 +84,11 @@ class ScenicProviderOrderService extends BaseService
         return ScenicProviderOrder::query()->where('order_sn', $orderSn)->first();
     }
 
+    public function getOrderByUserId($userId, $columns = ['*'])
+    {
+        return ScenicProviderOrder::query()->where('user_id', $userId)->first($columns);
+    }
+
     public function getOrderList(PageInput $input, $columns = ['*'])
     {
         return ScenicProviderOrder::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
