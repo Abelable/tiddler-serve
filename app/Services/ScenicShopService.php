@@ -16,7 +16,9 @@ class ScenicShopService extends BaseService
         $shop->type = $input->shopType;
         $shop->avatar = $input->shopAvatar;
         $shop->name = $input->shopName;
-        $shop->cover = $input->shopCover;
+        if (!empty($input->shopCover)) {
+            $shop->cover = $input->shopCover;
+        }
         $shop->save();
         return $shop;
     }
