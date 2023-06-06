@@ -17,7 +17,7 @@ class ScenicProviderController extends Controller
     public function list()
     {
         $input = ScenicProviderListInput::new();
-        $columns = ['id', 'status', 'failure_reason', 'name', 'mobile', 'created_at', 'updated_at'];
+        $columns = ['id', 'status', 'failure_reason', 'company_name', 'name', 'mobile', 'created_at', 'updated_at'];
         $list = ScenicProviderService::getInstance()->getProviderList($input, $columns);
         return $this->successPaginate($list);
     }
