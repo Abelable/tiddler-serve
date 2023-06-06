@@ -329,6 +329,11 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('order_list', 'ScenicProviderController@orderList');
         });
 
+        Route::prefix('shop')->group(function () {
+            Route::post('list', 'ScenicShopController@list');
+            Route::get('detail', 'ScenicShopController@detail');
+        });
+
         Route::prefix('ticket')->group(function () {
             Route::prefix('category')->group(function () {
                 Route::post('list', 'ScenicTicketCategoryController@list');
