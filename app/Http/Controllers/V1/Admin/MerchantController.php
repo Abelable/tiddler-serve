@@ -88,11 +88,16 @@ class MerchantController extends Controller
         $page = MerchantOrderService::getInstance()->getOrderList($input, $columns);
         $orderList = collect($page->items());
         $merchantIds = $orderList->pluck('merchant_id')->toArray();
-        $merchantList =  MerchantService::getInstance()->getMerchantListByIds($merchantIds, ['id', 'company_name'])->keyBy('id');
+        $merchantList = MerchantService::getInstance()->getMerchantListByIds($merchantIds, ['id', 'type', 'company_name', 'name'])->keyBy('id');
         $list = $orderList->map(function (MerchantOrder $order) use ($merchantList) {
             /** @var Merchant $merchant */
             $merchant = $merchantList->get($order->merchant_id);
-            $order['company_name'] = $merchant->company_name;
+            $order['merchant_type'] = $merchant->type;
+            if ($merchant->type == 1) {
+                $merchant['name'] = $merchant->name;
+            } else {
+                $order['company_name'] = $merchant->company_name;
+            }
             return $order;
         });
         return $this->success($this->paginate($page, $list));
