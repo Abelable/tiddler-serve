@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Merchant;
+use App\Models\MerchantOrder;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Utils\CodeResponse;
@@ -18,8 +20,17 @@ class MerchantController extends Controller
     {
         $input = MerchantListInput::new();
         $columns = ['id', 'type', 'status', 'failure_reason', 'name', 'mobile', 'created_at', 'updated_at'];
-        $list = MerchantService::getInstance()->getMerchantList($input, $columns);
-        return $this->successPaginate($list);
+        $page = MerchantService::getInstance()->getMerchantList($input, $columns);
+        $merchantList = collect($page->items());
+        $merchantIds = $merchantList->pluck('id')->toArray();
+        $merchantOrderList = MerchantOrderService::getInstance()->getOrderListByMerchantIds($merchantIds)->keyBy('id');
+        $list = $merchantList->map(function (Merchant $merchant) use ($merchantOrderList) {
+            /** @var MerchantOrder $merchantOrder */
+            $merchantOrder = $merchantOrderList->get($merchant->id);
+            $merchant['order_id'] = $merchantOrder->id;
+            return $merchant;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()

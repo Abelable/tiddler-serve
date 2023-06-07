@@ -93,4 +93,9 @@ class MerchantOrderService extends BaseService
     {
         return MerchantOrder::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function getOrderListByMerchantIds(array $merchantIds, $columns = ['*'])
+    {
+        return MerchantOrder::query()->whereIn('merchant_id', $merchantIds)->get($columns);
+    }
 }
