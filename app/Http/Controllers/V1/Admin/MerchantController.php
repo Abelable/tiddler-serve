@@ -84,7 +84,7 @@ class MerchantController extends Controller
     public function orderList()
     {
         $input = PageInput::new();
-        $columns = ['id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
+        $columns = ['id', 'merchant_id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
         $page = MerchantOrderService::getInstance()->getOrderList($input, $columns);
         $orderList = collect($page->items());
         $merchantIds = $orderList->pluck('merchant_id')->toArray();
@@ -94,7 +94,7 @@ class MerchantController extends Controller
             $merchant = $merchantList->get($order->merchant_id);
             $order['merchant_type'] = $merchant->type;
             if ($merchant->type == 1) {
-                $merchant['name'] = $merchant->name;
+                $order['name'] = $merchant->name;
             } else {
                 $order['company_name'] = $merchant->company_name;
             }
