@@ -93,4 +93,9 @@ class ScenicProviderOrderService extends BaseService
     {
         return ScenicProviderOrder::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function getOrderListByProviderIds(array $providerIds, $columns = ['*'])
+    {
+        return ScenicProviderOrder::query()->whereIn('provider_id', $providerIds)->get($columns);
+    }
 }

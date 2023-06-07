@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicProvider;
+use App\Models\ScenicProviderOrder;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Utils\CodeResponse;
@@ -18,8 +20,17 @@ class ScenicProviderController extends Controller
     {
         $input = ScenicProviderListInput::new();
         $columns = ['id', 'status', 'failure_reason', 'company_name', 'name', 'mobile', 'created_at', 'updated_at'];
-        $list = ScenicProviderService::getInstance()->getProviderList($input, $columns);
-        return $this->successPaginate($list);
+        $page = ScenicProviderService::getInstance()->getProviderList($input, $columns);
+        $providerList = collect($page->items());
+        $providerIds = $providerList->pluck('id')->toArray();
+        $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id'])->keyBy('id');
+        $list = $providerList->map(function (ScenicProvider $provider) use ($providerOrderList) {
+            /** @var ScenicProviderOrder $providerOrder */
+            $providerOrder = $providerOrderList->get($provider->id);
+            $provider['order_id'] = $providerOrder->id;
+            return $provider;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
