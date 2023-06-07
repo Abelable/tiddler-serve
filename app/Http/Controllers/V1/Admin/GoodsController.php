@@ -26,6 +26,7 @@ class GoodsController extends Controller
             'category_id',
             'price',
             'stock',
+            'sales_commission_rate',
             'promotion_commission_rate',
             'sales_volume',
             'status',
