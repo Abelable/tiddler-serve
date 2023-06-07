@@ -60,6 +60,11 @@ class MerchantService extends BaseService
         return Merchant::query()->find($id, $columns);
     }
 
+    public function getMerchantListByIds(array $ids, $columns = ['*'])
+    {
+        return Merchant::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function paySuccess(int $merchantId)
     {
         $merchant = $this->getMerchantById($merchantId);

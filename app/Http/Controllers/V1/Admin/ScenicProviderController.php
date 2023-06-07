@@ -84,8 +84,18 @@ class ScenicProviderController extends Controller
     public function orderList()
     {
         $input = PageInput::new();
-        $columns = ['id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
-        $list = ScenicProviderOrderService::getInstance()->getOrderList($input, $columns);
-        return $this->successPaginate($list);
+        $columns = ['id', 'provider_id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
+        $page = ScenicProviderOrderService::getInstance()->getOrderList($input, $columns);
+        $orderList = collect($page->items());
+        $providerIds = $orderList->pluck('provider_id')->toArray();
+        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name'])->keyBy('id');
+        $list = $orderList->map(function (ScenicProviderOrder $order) use ($providerList) {
+            /** @var ScenicProvider $provider */
+            $provider = $providerList->get($order->provider_id);
+            $order['company_name'] = $provider->company_name;
+            return $order;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 }

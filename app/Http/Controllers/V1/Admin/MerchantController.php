@@ -85,7 +85,16 @@ class MerchantController extends Controller
     {
         $input = PageInput::new();
         $columns = ['id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
-        $list = MerchantOrderService::getInstance()->getOrderList($input, $columns);
-        return $this->successPaginate($list);
+        $page = MerchantOrderService::getInstance()->getOrderList($input, $columns);
+        $orderList = collect($page->items());
+        $merchantIds = $orderList->pluck('merchant_id')->toArray();
+        $merchantList =  MerchantService::getInstance()->getMerchantListByIds($merchantIds, ['id', 'company_name'])->keyBy('id');
+        $list = $orderList->map(function (MerchantOrder $order) use ($merchantList) {
+            /** @var Merchant $merchant */
+            $merchant = $merchantList->get($order->merchant_id);
+            $order['company_name'] = $merchant->company_name;
+            return $order;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 }

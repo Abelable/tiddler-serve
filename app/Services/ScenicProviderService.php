@@ -53,6 +53,11 @@ class ScenicProviderService extends BaseService
         return ScenicProvider::query()->find($id, $columns);
     }
 
+    public function getProviderListByIds(array $ids, $columns = ['*'])
+    {
+        return ScenicProvider::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function paySuccess(int $providerId)
     {
         $provider = $this->getProviderById($providerId);
