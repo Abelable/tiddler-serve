@@ -23,7 +23,7 @@ class ScenicProviderController extends Controller
         $page = ScenicProviderService::getInstance()->getProviderList($input, $columns);
         $providerList = collect($page->items());
         $providerIds = $providerList->pluck('id')->toArray();
-        $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id'])->keyBy('id');
+        $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id', 'provider_id'])->keyBy('provider_id');
         $list = $providerList->map(function (ScenicProvider $provider) use ($providerOrderList) {
             /** @var ScenicProviderOrder $providerOrder */
             $providerOrder = $providerOrderList->get($provider->id);

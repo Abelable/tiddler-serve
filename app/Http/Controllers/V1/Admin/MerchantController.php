@@ -23,7 +23,7 @@ class MerchantController extends Controller
         $page = MerchantService::getInstance()->getMerchantList($input, $columns);
         $merchantList = collect($page->items());
         $merchantIds = $merchantList->pluck('id')->toArray();
-        $merchantOrderList = MerchantOrderService::getInstance()->getOrderListByMerchantIds($merchantIds, ['id'])->keyBy('id');
+        $merchantOrderList = MerchantOrderService::getInstance()->getOrderListByMerchantIds($merchantIds, ['id', 'merchant_id'])->keyBy('merchant_id');
         $list = $merchantList->map(function (Merchant $merchant) use ($merchantOrderList) {
             /** @var MerchantOrder $merchantOrder */
             $merchantOrder = $merchantOrderList->get($merchant->id);
