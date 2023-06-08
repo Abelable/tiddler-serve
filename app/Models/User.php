@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
+
 /**
  * App\Models\User
  *
@@ -27,7 +28,8 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
- * @property-read \App\Models\scenicShop|null $scenicShop
+ * @property-read \App\Models\ScenicProvider|null $scenicProvider
+ * @property-read \App\Models\ScenicShop|null $scenicShop
  * @property-read \App\Models\Shop|null $shop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
@@ -91,6 +93,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shop()
     {
         return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
+    }
+
+    public function scenicProvider()
+    {
+        return $this->hasOne(ScenicProvider::class, 'user_id');
     }
 
     public function scenicShop()

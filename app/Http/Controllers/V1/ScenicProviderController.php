@@ -97,6 +97,24 @@ class ScenicProviderController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
+    public function applyScenicSpot()
+    {
+        $scenicId = $this->verifyRequiredId('scenicId');
+        $scenicSpot = ScenicService::getInstance()->getScenicById($scenicId);
+        if (is_null($scenicSpot)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
+        }
+        if (is_null($this->user()->scenicShop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '暂无权限申请添加景点');
+        }
+        $providerScenicSpot = ProviderScenicSpot::new();
+        $providerScenicSpot->user_id = $this->userId();
+        $providerScenicSpot->provider_id = $this->user()->scenicProvider->id;
+        $providerScenicSpot->scenic_id = $scenicId;
+        $providerScenicSpot->save();
+        return $this->success();
+    }
+
     public function deleteProviderScenicSpot()
     {
         $id = $this->verifyRequiredId('id');
