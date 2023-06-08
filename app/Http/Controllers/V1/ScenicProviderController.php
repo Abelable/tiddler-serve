@@ -96,4 +96,15 @@ class ScenicProviderController extends Controller
 
         return $this->success($this->paginate($page, $list));
     }
+
+    public function deleteProviderScenicSpot()
+    {
+        $id = $this->verifyRequiredId('id');
+        $spot = ProviderScenicSpotService::getInstance()->getSpotById($this->userId(), $id);
+        if (is_null($spot)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
+        }
+        $spot->delete();
+        return $this->success();
+    }
 }

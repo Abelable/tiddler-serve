@@ -15,4 +15,9 @@ class ProviderScenicSpotService extends BaseService
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function getSpotById($userId, $id, $columns = ['*'])
+    {
+        return ProviderScenicSpot::query()->where('user_id', $userId)->find($id, $columns);
+    }
 }
