@@ -61,4 +61,14 @@ class ScenicProviderController extends Controller
         $provider->delete();
         return $this->success();
     }
+
+    public function myShopInfo()
+    {
+        $columns = ['id', 'name', 'type', 'avatar', 'cover'];
+        $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId(), $columns);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
+        }
+        return $this->success($shop);
+    }
 }
