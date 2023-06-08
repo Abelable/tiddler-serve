@@ -40,6 +40,11 @@ class ScenicService extends BaseService
         return $scenic;
     }
 
+    public function getScenicListByIds(array $ids, $columns = ['*'])
+    {
+        return ScenicSpot::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function getAllList(AllListInput $input, $columns=['*'])
     {
         $query = ScenicSpot::query()->where('status', 1);

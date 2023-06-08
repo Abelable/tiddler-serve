@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProviderScenicSpot;
+use App\Models\ScenicSpot;
+use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
+use App\Services\ScenicService;
 use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\ProviderScenicSpotListInput;
 use App\Utils\Inputs\ScenicProviderInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -70,5 +75,25 @@ class ScenicProviderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
         return $this->success($shop);
+    }
+
+    public function providerScenicSpotList()
+    {
+        /** @var ProviderScenicSpotListInput $input */
+        $input = ProviderScenicSpotListInput::new();
+
+        $page = ProviderScenicSpotService::getInstance()->getSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason']);
+        $providerScenicSpotList = collect($page->items());
+        $scenicIds = $providerScenicSpotList->pluck('scenic_id')->toArray();
+        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
+        $list = $providerScenicSpotList->map(function (ProviderScenicSpot $providerScenicSpot) use ($scenicList) {
+            /** @var ScenicSpot $scenic */
+            $scenic = $scenicList->get($providerScenicSpot->scenic_id);
+            $providerScenicSpot['scenic_name'] = $scenic->name;
+            $providerScenicSpot['scenic_image'] = json_decode($scenic->image_list)[0];
+            return $providerScenicSpot;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 }

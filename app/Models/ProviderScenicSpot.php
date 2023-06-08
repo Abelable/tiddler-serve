@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\ProviderScenicSpot
  *
  * @property int $id
- * @property int $user_id 供应商id
+ * @property int $user_id 用户id
  * @property int $provider_id 供应商id
  * @property int $scenic_id 景点id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核失败

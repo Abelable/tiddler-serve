@@ -127,6 +127,7 @@ Route::prefix('scenic')->group(function () {
         Route::get('status', 'ScenicProviderController@statusInfo');
         Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
         Route::post('delete', 'ScenicProviderController@deleteProvider');
+        Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
     });
 
     Route::prefix('shop')->group(function () {
