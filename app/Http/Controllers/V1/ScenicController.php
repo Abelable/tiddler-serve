@@ -10,7 +10,7 @@ use App\Utils\Inputs\AllListInput;
 
 class ScenicController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'detail'];
+    protected $except = ['categoryOptions', 'list', 'detail', 'options'];
 
     public function categoryOptions()
     {
@@ -40,5 +40,11 @@ class ScenicController extends Controller
         $id = $this->verifyRequiredId('id');
         $scenic = ScenicService::getInstance()->getScenicById($id);
         return $this->success($scenic);
+    }
+
+    public function options()
+    {
+        $scenicOptions =  ScenicService::getInstance()->getScenicOptions(['id', 'name']);
+        return $this->success($scenicOptions);
     }
 }

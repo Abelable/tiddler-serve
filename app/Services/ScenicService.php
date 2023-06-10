@@ -63,4 +63,9 @@ class ScenicService extends BaseService
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function getScenicOptions($columns = ['*'])
+    {
+        return ScenicSpot::query()->orderBy('id', 'asc')->get($columns);
+    }
 }
