@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\ProviderScenicSpot;
 use App\Models\ScenicProvider;
 use App\Models\ScenicProviderOrder;
+use App\Models\ScenicSpot;
 use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
+use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ProviderScenicListInput;
 use App\Utils\Inputs\PageInput;
@@ -106,16 +108,27 @@ class ScenicProviderController extends Controller
     {
         /** @var ProviderScenicListInput  $input */
         $input = ProviderScenicListInput::new();
-        $page = ProviderScenicSpotService::getInstance()->getScenicList($input, ['id', 'name', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
-        $scenicList = collect($page->items());
-        $providerIds = $scenicList->pluck('provider_id')->toArray();
-        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', '$company_name', 'business_license_photo'])->keyBy('id');
-        $list = $scenicList->map(function (ProviderScenicSpot $spot) use ($providerList) {
+        $page = ProviderScenicSpotService::getInstance()->getScenicList($input, ['id', 'scenic_id', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $providerScenicList = collect($page->items());
+
+        $providerIds = $providerScenicList->pluck('provider_id')->toArray();
+        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name', 'business_license_photo'])->keyBy('id');
+
+        $scenicIds = $providerScenicList->pluck('scenic_id')->toArray();
+        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
+
+        $list = $providerScenicList->map(function (ProviderScenicSpot $providerScenic) use ($scenicList, $providerList) {
             /** @var ScenicProvider $provider */
-            $provider = $providerList->get($spot->provider_id);
-            $spot['provider_company_name'] = $provider->company_name;
-            $spot['provider_business_license_photo'] = $provider->business_license_photo;
-            return $spot;
+            $provider = $providerList->get($providerScenic->provider_id);
+            $providerScenic['provider_company_name'] = $provider->company_name;
+            $providerScenic['provider_business_license_photo'] = $provider->business_license_photo;
+
+            /** @var ScenicSpot $scenic */
+            $scenic = $scenicList->get($providerScenic->scenic_id);
+            $providerScenic['scenic_name'] = $scenic->name;
+            $providerScenic['scenic_image'] = json_decode($scenic->image_list)[0];
+
+            return $providerScenic;
         });
         return $this->success($this->paginate($page, $list));
     }

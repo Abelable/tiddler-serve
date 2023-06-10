@@ -336,6 +336,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('approved', 'ScenicProviderController@approved');
             Route::post('reject', 'ScenicProviderController@reject');
             Route::post('order_list', 'ScenicProviderController@orderList');
+
+            Route::prefix('scenic')->group(function () {
+                Route::post('list', 'ScenicProviderController@providerScenicList');
+                Route::post('approved', 'ScenicProviderController@approvedScenicApply');
+                Route::post('reject', 'ScenicProviderController@rejectScenicApply');
+                Route::post('delete', 'ScenicProviderController@deleteScenicApply');
+            });
         });
 
         Route::prefix('shop')->group(function () {
