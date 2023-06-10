@@ -35,7 +35,7 @@ class ProviderScenicSpotService extends BaseService
     public function getScenicList(ProviderScenicListInput $input, $columns = ['*'])
     {
         $query = ProviderScenicSpot::query();
-        if (!empty($input->name)) {
+        if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
         return $query
