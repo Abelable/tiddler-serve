@@ -9,7 +9,7 @@ class ProviderScenicSpotListInput extends PageInput
     public function rules()
     {
         return array_merge([
-            'status' => 'required|integer|in:1,2,3',
+            'status' => 'required|integer|in:0,1,2',
         ], parent::rules());
     }
 }

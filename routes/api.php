@@ -121,15 +121,17 @@ Route::prefix('scenic')->group(function () {
     Route::get('category_options', 'ScenicController@categoryOptions');
     Route::get('list', 'ScenicController@list');
     Route::get('detail', 'ScenicController@detail');
+    Route::get('options', 'ScenicController@options');
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'ScenicProviderController@settleIn');
         Route::get('status', 'ScenicProviderController@statusInfo');
         Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
         Route::post('delete', 'ScenicProviderController@deleteProvider');
+        Route::get('scenic_list_totals', 'ScenicProviderController@scenicListTotals');
         Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
         Route::post('apply_scenic', 'ScenicProviderController@applyScenicSpot');
-        Route::post('delete_scenic', 'ScenicProviderController@providerScenicSpotList');
+        Route::post('delete_scenic', 'ScenicProviderController@deleteProviderScenicSpot');
     });
 
     Route::prefix('shop')->group(function () {

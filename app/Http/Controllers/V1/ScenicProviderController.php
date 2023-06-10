@@ -77,6 +77,15 @@ class ScenicProviderController extends Controller
         return $this->success($shop);
     }
 
+    public function scenicListTotals()
+    {
+        return $this->success([
+            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 1),
+            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 0),
+            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 2),
+        ]);
+    }
+
     public function providerScenicSpotList()
     {
         /** @var ProviderScenicSpotListInput $input */
@@ -91,8 +100,8 @@ class ScenicProviderController extends Controller
             $scenic = $scenicList->get($providerScenicSpot->scenic_id);
             $providerScenicSpot['scenic_image'] = json_decode($scenic->image_list)[0];
             $providerScenicSpot['scenic_name'] = $scenic->name;
-            $providerScenicSpot['scenic_level'] = $scenic->name;
-            $providerScenicSpot['scenic_address'] = $scenic->name;
+            $providerScenicSpot['scenic_level'] = $scenic->level;
+            $providerScenicSpot['scenic_address'] = $scenic->address;
             return $providerScenicSpot;
         });
 
@@ -102,13 +111,21 @@ class ScenicProviderController extends Controller
     public function applyScenicSpot()
     {
         $scenicId = $this->verifyRequiredId('scenicId');
+
+        if (is_null($this->user()->scenicShop)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加景点');
+        }
+
         $scenicSpot = ScenicService::getInstance()->getScenicById($scenicId);
         if (is_null($scenicSpot)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
-        if (is_null($this->user()->scenicShop)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '暂无权限申请添加景点');
+
+        $providerScenicSpot = ProviderScenicSpotService::getInstance()->getSpotByScenicId($this->userId(), $scenicId);
+        if (!is_null($providerScenicSpot)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前景点');
         }
+
         $providerScenicSpot = ProviderScenicSpot::new();
         $providerScenicSpot->user_id = $this->userId();
         $providerScenicSpot->provider_id = $this->user()->scenicProvider->id;
