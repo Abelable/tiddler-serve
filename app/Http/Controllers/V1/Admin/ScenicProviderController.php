@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProviderScenicSpot;
 use App\Models\ScenicProvider;
 use App\Models\ScenicProviderOrder;
 use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Admin\ProviderScenicListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ScenicProviderListInput;
 use Illuminate\Support\Facades\DB;
@@ -102,7 +104,20 @@ class ScenicProviderController extends Controller
 
     public function providerScenicList()
     {
-
+        /** @var ProviderScenicListInput  $input */
+        $input = ProviderScenicListInput::new();
+        $page = ProviderScenicSpotService::getInstance()->getScenicList($input, ['id', 'name', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $scenicList = collect($page->items());
+        $providerIds = $scenicList->pluck('provider_id')->toArray();
+        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', '$company_name', 'business_license_photo'])->keyBy('id');
+        $list = $scenicList->map(function (ProviderScenicSpot $spot) use ($providerList) {
+            /** @var ScenicProvider $provider */
+            $provider = $providerList->get($spot->provider_id);
+            $spot['provider_company_name'] = $provider->company_name;
+            $spot['provider_business_license_photo'] = $provider->business_license_photo;
+            return $spot;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function approvedScenicApply()
