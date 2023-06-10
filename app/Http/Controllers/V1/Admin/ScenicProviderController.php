@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicProvider;
 use App\Models\ScenicProviderOrder;
+use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Utils\CodeResponse;
@@ -97,5 +98,53 @@ class ScenicProviderController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function providerScenicList()
+    {
+
+    }
+
+    public function approvedScenicApply()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
+        }
+        $scenic->status = 1;
+        $scenic->save();
+
+        return $this->success();
+    }
+
+    public function rejectScenicApply()
+    {
+        $id = $this->verifyRequiredId('id');
+        $reason = $this->verifyRequiredString('failureReason');
+
+        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
+        }
+        $scenic->status = 2;
+        $scenic->failure_reason = $reason;
+        $scenic->save();
+
+        return $this->success();
+    }
+
+    public function deleteScenicApply()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
+        }
+        $scenic->delete();
+
+        return $this->success();
     }
 }

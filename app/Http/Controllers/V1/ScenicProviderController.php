@@ -91,7 +91,7 @@ class ScenicProviderController extends Controller
         /** @var ProviderScenicSpotListInput $input */
         $input = ProviderScenicSpotListInput::new();
 
-        $page = ProviderScenicSpotService::getInstance()->getSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ProviderScenicSpotService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicSpotList = collect($page->items());
         $scenicIds = $providerScenicSpotList->pluck('scenic_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
@@ -137,7 +137,7 @@ class ScenicProviderController extends Controller
     public function deleteProviderScenicSpot()
     {
         $id = $this->verifyRequiredId('id');
-        $spot = ProviderScenicSpotService::getInstance()->getSpotById($this->userId(), $id);
+        $spot = ProviderScenicSpotService::getInstance()->getUserSpotById($this->userId(), $id);
         if (is_null($spot)) {
             return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
         }

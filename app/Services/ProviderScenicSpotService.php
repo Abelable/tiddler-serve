@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProviderScenicSpot;
+use App\Utils\Inputs\Admin\ProviderScenicListInput;
 use App\Utils\Inputs\ProviderScenicSpotListInput;
 
 class ProviderScenicSpotService extends BaseService
@@ -12,7 +13,7 @@ class ProviderScenicSpotService extends BaseService
         return ProviderScenicSpot::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
-    public function getSpotList($userId, ProviderScenicSpotListInput $input, $columns = ['*'])
+    public function getUserSpotList($userId, ProviderScenicSpotListInput $input, $columns = ['*'])
     {
         return ProviderScenicSpot::query()
             ->where('user_id', $userId)
@@ -21,7 +22,7 @@ class ProviderScenicSpotService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getSpotById($userId, $id, $columns = ['*'])
+    public function getUserSpotById($userId, $id, $columns = ['*'])
     {
         return ProviderScenicSpot::query()->where('user_id', $userId)->find($id, $columns);
     }
@@ -29,5 +30,21 @@ class ProviderScenicSpotService extends BaseService
     public function getSpotByScenicId($userId, $scenicId, $columns = ['*'])
     {
         return ProviderScenicSpot::query()->where('user_id', $userId)->where('scenic_id', $scenicId)->first($columns);
+    }
+
+    public function getScenicList(ProviderScenicListInput $input, $columns = ['*'])
+    {
+        $query = ProviderScenicSpot::query();
+        if (!empty($input->name)) {
+            $query = $query->where('status', $input->status);
+        }
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getScenicById($id, $columns = ['*'])
+    {
+        return ProviderScenicSpot::query()->find($id, $columns);
     }
 }
