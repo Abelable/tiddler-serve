@@ -128,7 +128,8 @@ Route::prefix('scenic')->group(function () {
         Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
         Route::post('delete', 'ScenicProviderController@deleteProvider');
         Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
-        Route::get('delete_scenic', 'ScenicProviderController@providerScenicSpotList');
+        Route::post('apply_scenic', 'ScenicProviderController@applyScenicSpot');
+        Route::post('delete_scenic', 'ScenicProviderController@providerScenicSpotList');
     });
 
     Route::prefix('shop')->group(function () {

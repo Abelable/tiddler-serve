@@ -82,15 +82,17 @@ class ScenicProviderController extends Controller
         /** @var ProviderScenicSpotListInput $input */
         $input = ProviderScenicSpotListInput::new();
 
-        $page = ProviderScenicSpotService::getInstance()->getSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason']);
+        $page = ProviderScenicSpotService::getInstance()->getSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicSpotList = collect($page->items());
         $scenicIds = $providerScenicSpotList->pluck('scenic_id')->toArray();
-        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
+        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
         $list = $providerScenicSpotList->map(function (ProviderScenicSpot $providerScenicSpot) use ($scenicList) {
             /** @var ScenicSpot $scenic */
             $scenic = $scenicList->get($providerScenicSpot->scenic_id);
-            $providerScenicSpot['scenic_name'] = $scenic->name;
             $providerScenicSpot['scenic_image'] = json_decode($scenic->image_list)[0];
+            $providerScenicSpot['scenic_name'] = $scenic->name;
+            $providerScenicSpot['scenic_level'] = $scenic->name;
+            $providerScenicSpot['scenic_address'] = $scenic->name;
             return $providerScenicSpot;
         });
 
