@@ -11,8 +11,8 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
 use App\Utils\Inputs\AllListInput;
-use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\StatusPageInput;
 
 class GoodsController extends Controller
 {
@@ -113,8 +113,8 @@ class GoodsController extends Controller
 
     public function merchantGoodsList()
     {
-        /** @var MerchantGoodsListInput $input */
-        $input = MerchantGoodsListInput::new();
+        /** @var StatusPageInput $input */
+        $input = StatusPageInput::new();
 
         $columns = ['id', 'image', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
         $list = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);

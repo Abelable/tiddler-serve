@@ -8,7 +8,6 @@ use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\AllListInput;
-use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
 

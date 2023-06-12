@@ -7,8 +7,8 @@ use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\AllListInput;
-use App\Utils\Inputs\MerchantGoodsListInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\StatusPageInput;
 
 class GoodsService extends BaseService
 {
@@ -103,7 +103,7 @@ class GoodsService extends BaseService
         return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
-    public function getGoodsListByStatus($userId, MerchantGoodsListInput $input, $columns=['*'])
+    public function getGoodsListByStatus($userId, StatusPageInput $input, $columns=['*'])
     {
         return Goods::query()
             ->where('user_id', $userId)
