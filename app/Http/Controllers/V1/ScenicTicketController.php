@@ -44,33 +44,10 @@ class ScenicTicketController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $columns = [
-            'id',
-            'image',
-            'video',
-            'image_list',
-            'detail_image_list',
-            'default_spec_image',
-            'name',
-            'freight_template_id',
-            'category_id',
-            'return_address_id',
-            'price',
-            'market_price',
-            'stock',
-            'promotion_commission_rate',
-            'spec_list',
-            'sku_list'
-        ];
-        $ticket = ScenicTicketService::getInstance()->getTicketById($id, $columns);
+        $ticket = ScenicTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
-
-        $ticket->image_list = json_decode($ticket->image_list);
-        $ticket->detail_image_list = json_decode($ticket->detail_image_list);
-        $ticket->spec_list = json_decode($ticket->spec_list);
-        $ticket->sku_list = json_decode($ticket->sku_list);
 
         return $this->success($ticket);
     }
