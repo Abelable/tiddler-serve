@@ -8,6 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $provider_id 供应商id
+ * @property int $shop_id 店铺id
  * @property int $category_id 门票分类id
  * @property int $type 门票类型：1-单景点门票，2-多景点联票
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
@@ -69,6 +70,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSalesVolume($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereType($value)
