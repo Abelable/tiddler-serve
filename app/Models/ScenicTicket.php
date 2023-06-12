@@ -9,7 +9,6 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $provider_id 供应商id
  * @property int $shop_id 店铺id
- * @property int $category_id 门票分类id
  * @property int $type 门票类型：1-单景点门票，2-多景点联票
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
@@ -17,7 +16,6 @@ namespace App\Models;
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
  * @property int $stock 门票总库存
- * @property string $price_list 价格列表：分时间段设置价格及对应库存
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
  * @property int $sales_volume 门票销量
@@ -44,7 +42,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ScenicTicket onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket query()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereBookingTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereEffectiveTime($value)
@@ -63,7 +60,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereNeedExchange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereOtherTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePriceList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundStatus($value)
