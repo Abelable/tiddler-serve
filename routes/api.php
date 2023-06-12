@@ -139,25 +139,14 @@ Route::prefix('scenic')->group(function () {
     });
 
     Route::prefix('ticket')->group(function () {
-        Route::get('totals', 'ScenicTicketController@goodsListTotals');
-        Route::get('list', 'ScenicTicketController@merchantGoodsList');
-        Route::get('info', 'ScenicTicketController@goodsInfo');
+        Route::get('totals', 'ScenicTicketController@ticketListTotals');
+        Route::get('list', 'ScenicTicketController@userTicketList');
+        Route::get('detail', 'ScenicTicketController@ticketDetail');
         Route::post('add', 'ScenicTicketController@add');
         Route::post('edit', 'ScenicTicketController@edit');
         Route::post('up', 'ScenicTicketController@up');
         Route::post('down', 'ScenicTicketController@down');
         Route::post('delete', 'ScenicTicketController@delete');
-    });
-
-    Route::prefix('joint_ticket')->group(function () {
-        Route::get('totals', 'ScenicJointTicketController@goodsListTotals');
-        Route::get('list', 'ScenicJointTicketController@merchantGoodsList');
-        Route::get('info', 'ScenicJointTicketController@goodsInfo');
-        Route::post('add', 'ScenicJointTicketController@add');
-        Route::post('edit', 'ScenicJointTicketController@edit');
-        Route::post('up', 'ScenicJointTicketController@up');
-        Route::post('down', 'ScenicJointTicketController@down');
-        Route::post('delete', 'ScenicJointTicketController@delete');
     });
 });
 
