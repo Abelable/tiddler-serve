@@ -17,7 +17,6 @@ class CreateTicketSpecsTable extends Migration
             $table->id();
             $table->integer('ticket_id')->comment('用户id');
             $table->integer('category_id')->comment('门票分类id');
-            $table->string('price_list')->comment('价格列表：分时间段设置价格及对应库存');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -15,6 +15,7 @@ namespace App\Models;
  * @property string $name 门票名称
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
+ * @property string $price_list 价格列表：分时间段设置价格及对应库存
  * @property int $stock 门票总库存
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
@@ -60,6 +61,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereNeedExchange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereOtherTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePriceList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundStatus($value)

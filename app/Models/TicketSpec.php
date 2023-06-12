@@ -8,7 +8,6 @@ namespace App\Models;
  * @property int $id
  * @property int $ticket_id 用户id
  * @property int $category_id 门票分类id
- * @property string $price_list 价格列表：分时间段设置价格及对应库存
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -20,7 +19,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec wherePriceList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TicketSpec whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|TicketSpec withTrashed()
