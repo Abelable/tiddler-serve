@@ -31,8 +31,6 @@ namespace App\Models;
  * @property string $exchange_tips 换票说明
  * @property string $exchange_time 换票时间
  * @property string $exchange_location 换票地点
- * @property string $enter_time 入园时间
- * @property string $enter_location 入园地点
  * @property string $other_tips 其他说明
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -45,8 +43,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereEffectiveTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereEnterLocation($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereEnterTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereExchangeLocation($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereExchangeTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereExchangeTips($value)

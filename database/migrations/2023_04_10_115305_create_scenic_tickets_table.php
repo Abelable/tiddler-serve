@@ -25,10 +25,10 @@ class CreateScenicTicketsTable extends Migration
             $table->float('price')->comment('门票最低价格');
             $table->float('market_price')->default(0)->comment('门票市场价格');
             $table->integer('stock')->comment('门票总库存');
-            $table->float('sales_commission_rate')->default(0.1)->comment('销售佣金比例');
-            $table->float('promotion_commission_rate')->default(0.02)->comment('推广佣金比例');
+            $table->float('sales_commission_rate')->comment('销售佣金比例');
+            $table->float('promotion_commission_rate')->comment('推广佣金比例');
             $table->integer('sales_volume')->default(0)->comment('门票销量');
-            $table->string('fee_include_tips')->comment('费用包含说明');
+            $table->string('fee_include_tips')->default('')->comment('费用包含说明');
             $table->string('fee_not_include_tips')->default('')->comment('费用不含说明');
             $table->string('booking_time')->comment('当天门票最晚预定时间');
             $table->string('effective_time')->comment('生效时间');
@@ -40,8 +40,6 @@ class CreateScenicTicketsTable extends Migration
             $table->string('exchange_tips')->default('')->comment('换票说明');
             $table->string('exchange_time')->default('')->comment('换票时间');
             $table->string('exchange_location')->default('')->comment('换票地点');
-            $table->string('enter_time')->default('')->comment('入园时间');
-            $table->string('enter_location')->default('')->comment('入园地点');
             $table->longText('other_tips')->comment('其他说明');
             $table->timestamps();
             $table->softDeletes();
