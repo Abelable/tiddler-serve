@@ -11,8 +11,8 @@ use App\Services\ScenicProviderService;
 use App\Services\ScenicService;
 use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ProviderScenicSpotListInput;
 use App\Utils\Inputs\ScenicProviderInput;
+use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -88,8 +88,8 @@ class ScenicProviderController extends Controller
 
     public function providerScenicSpotList()
     {
-        /** @var ProviderScenicSpotListInput $input */
-        $input = ProviderScenicSpotListInput::new();
+        /** @var StatusPageInput $input */
+        $input = StatusPageInput::new();
 
         $page = ProviderScenicSpotService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicSpotList = collect($page->items());

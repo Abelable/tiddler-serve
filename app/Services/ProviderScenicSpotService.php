@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\ProviderScenicSpot;
 use App\Utils\Inputs\Admin\ProviderScenicListInput;
-use App\Utils\Inputs\ProviderScenicSpotListInput;
+use App\Utils\Inputs\StatusPageInput;
 
 class ProviderScenicSpotService extends BaseService
 {
@@ -13,7 +13,7 @@ class ProviderScenicSpotService extends BaseService
         return ProviderScenicSpot::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
-    public function getUserSpotList($userId, ProviderScenicSpotListInput $input, $columns = ['*'])
+    public function getUserSpotList($userId, StatusPageInput $input, $columns = ['*'])
     {
         return ProviderScenicSpot::query()
             ->where('user_id', $userId)
