@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\ScenicTicket;
+use App\Models\TicketScenicSpot;
+use App\Models\TicketSpec;
 use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
 
@@ -84,5 +86,38 @@ class ScenicTicketService extends BaseService
         $ticket->save();
 
         return $ticket;
+    }
+
+    public function createTicketScenicSpots($ticketId, array $scenicIds)
+    {
+        foreach ($scenicIds as $scenicId) {
+            $scenic = TicketScenicSpot::new();
+            $scenic->ticket_id = $ticketId;
+            $scenic->scenic_id = $scenicId;
+            $scenic->save();
+        }
+    }
+
+    public function updateTicketScenicSpots($ticketId, array $scenicIds)
+    {
+        TicketScenicSpot::query()->where('ticket_id', $ticketId)->delete();
+        $this->createTicketScenicSpots($ticketId, $scenicIds);
+    }
+
+    public function createTicketSpecList($ticketId, array $specList)
+    {
+        foreach ($specList as $spec) {
+            $ticketSpec = TicketSpec::new();
+            $ticketSpec->ticket_id = $ticketId;
+            $ticketSpec->category_id = $spec['categoryId'];
+            $ticketSpec->price_list = $spec['priceList'];
+            $ticketSpec->save();
+        }
+    }
+
+    public function updateTicketSpecList($ticketId, array $specList)
+    {
+        TicketSpec::query()->where('ticket_id', $ticketId)->delete();
+        $this->updateTicketSpecList($ticketId, $specList);
     }
 }

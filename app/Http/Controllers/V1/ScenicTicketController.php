@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\GoodsAddInput;
-use App\Utils\Inputs\GoodsEditInput;
 use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicTicketController extends Controller
 {
@@ -63,8 +61,11 @@ class ScenicTicketController extends Controller
             return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法上传景点门票');
         }
 
-        $ticket = ScenicTicketService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
-
+        DB::transaction(function () use ($shopId, $input) {
+            $ticket = ScenicTicketService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
+            ScenicTicketService::getInstance()->createTicketScenicSpots($ticket->id, $input->scenicIds);
+            ScenicTicketService::getInstance()->createTicketSpecList($ticket->id, $input->specList);
+        });
 
         return $this->success();
     }
@@ -80,7 +81,11 @@ class ScenicTicketController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
 
-        $ticket = ScenicTicketService::getInstance()->updateTicket($ticket, $input);
+        DB::transaction(function () use ($input, $ticket) {
+            $ticket = ScenicTicketService::getInstance()->updateTicket($ticket, $input);
+            ScenicTicketService::getInstance()->updateTicketScenicSpots($ticket->id, $input->scenicIds);
+            ScenicTicketService::getInstance()->updateTicketSpecList($ticket->id, $input->specList);
+        });
 
         return $this->success();
     }
@@ -89,12 +94,9 @@ class ScenicTicketController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getTicketById($id);
+        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
-        }
-        if ($ticket->shop_id != $this->user()->shop_id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家景点门票，无法上架该景点门票');
         }
         if ($ticket->status != 3) {
             return $this->fail(CodeResponse::FORBIDDEN, '非下架景点门票，无法上架');
@@ -109,12 +111,9 @@ class ScenicTicketController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getTicketById($id);
+        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
-        }
-        if ($ticket->shop_id != $this->user()->shop_id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家景点门票，无法下架该景点门票');
         }
         if ($ticket->status != 1) {
             return $this->fail(CodeResponse::FORBIDDEN, '非售卖中景点门票，无法下架');
@@ -129,12 +128,9 @@ class ScenicTicketController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getTicketById($id);
+        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
-        }
-        if ($ticket->shop_id != $this->user()->shop_id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家景点门票，无法删除');
         }
         $ticket->delete();
 

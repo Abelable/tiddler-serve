@@ -9,7 +9,7 @@ class ScenicTicketInput extends BaseInput
     public $name;
     public $price;
     public $marketPrice;
-    public $priceList;
+    public $specList;
     public $salesCommissionRate;
     public $promotionCommissionRate;
     public $feeIncludeTips;
