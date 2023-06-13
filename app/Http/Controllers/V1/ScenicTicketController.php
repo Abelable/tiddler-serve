@@ -9,6 +9,7 @@ use App\Services\ScenicTicketService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsAddInput;
 use App\Utils\Inputs\GoodsEditInput;
+use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class ScenicTicketController extends Controller
@@ -54,80 +55,32 @@ class ScenicTicketController extends Controller
 
     public function add()
     {
-        /** @var GoodsAddInput $input */
-        $input = GoodsAddInput::new();
+        /** @var ScenicTicketInput $input */
+        $input = ScenicTicketInput::new();
 
-        $goods = Goods::new();
-        $shopId = $this->user()->shop->id;
+        $shopId = $this->user()->scenicShop->id;
         if ($shopId == 0) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传景点门票');
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法上传景点门票');
         }
-        $goods->shop_id = $shopId;
-        $goods->user_id = $this->userId();
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
+
+        $ticket = ScenicTicketService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
+
 
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var GoodsEditInput $input */
-        $input = GoodsEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var ScenicTicketInput $input */
+        $input = ScenicTicketInput::new();
 
-        $ticket = ScenicTicketService::getInstance()->getTicketById($input->id);
+        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
-        if ($ticket->shop_id != $this->user()->shop_id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家景点门票，无法编辑');
-        }
-        if ($ticket->status != 2) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非审核未通过景点门票，无法编辑');
-        }
 
-        $ticket->status = 0;
-        $ticket->failure_reason = '';
-        $ticket->image = $input->image;
-        if (!empty($input->video)) {
-            $ticket->video = $input->video;
-        }
-        $ticket->image_list = $input->imageList;
-        $ticket->detail_image_list = $input->detailImageList;
-        $ticket->default_spec_image = $input->defaultSpecImage;
-        $ticket->name = $input->name;
-        $ticket->freight_template_id = $input->freightTemplateId;
-        $ticket->category_id = $input->categoryId;
-        $ticket->return_address_id = $input->returnAddressId;
-        $ticket->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $ticket->market_price = $input->marketPrice;
-        }
-        $ticket->stock = $input->stock;
-        $ticket->sales_commission_rate = $input->salesCommissionRate;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
-        $ticket->spec_list = $input->specList;
-        $ticket->sku_list = $input->skuList;
-        $ticket->save();
+        $ticket = ScenicTicketService::getInstance()->updateTicket($ticket, $input);
 
         return $this->success();
     }

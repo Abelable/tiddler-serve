@@ -2,14 +2,13 @@
 
 namespace App\Utils\Inputs;
 
-class ScenicTicketAddInput extends BaseInput
+class ScenicTicketInput extends BaseInput
 {
     public $type;
     public $scenicIds;
     public $name;
     public $price;
     public $marketPrice;
-    public $stock;
     public $priceList;
     public $salesCommissionRate;
     public $promotionCommissionRate;
@@ -35,7 +34,6 @@ class ScenicTicketAddInput extends BaseInput
             'name' => 'required|string',
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
-            'stock' => 'required|integer',
             'specList' => 'required|array|min:1',
             'salesCommissionRate' => 'required|numeric',
             'promotionCommissionRate' => 'required|numeric',

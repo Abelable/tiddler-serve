@@ -15,7 +15,6 @@ namespace App\Models;
  * @property string $name 门票名称
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
- * @property int $stock 门票总库存
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
  * @property int $sales_volume 门票销量
@@ -64,7 +63,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUserId($value)

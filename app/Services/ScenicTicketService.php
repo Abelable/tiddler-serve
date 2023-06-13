@@ -2,13 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Goods;
 use App\Models\ScenicTicket;
-use App\Models\Shop;
-use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\GoodsListInput;
-use App\Utils\Inputs\AllListInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class ScenicTicketService extends BaseService
@@ -32,204 +27,62 @@ class ScenicTicketService extends BaseService
         return ScenicTicket::query()->find($id, $columns);
     }
 
-    public function getAllList(AllListInput $input, $columns=['*'])
+    public function getUserTicket($userId, $id, $columns=['*'])
     {
-        $query = Goods::query()->where('status', 1);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!empty($input->sort)) {
-            $query = $query->orderBy($input->sort, $input->order);
-        } else {
-            $query = $query
-                ->orderBy('sales_volume', 'desc')
-                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
-                ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('promotion_commission_rate', 'desc')
-                ->orderBy('created_at', 'desc');
-        }
-        return $query->paginate($input->limit, $columns, 'page', $input->page);
+        return ScenicTicket::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function getTopListByCategoryIds(array $goodsIds, array $categoryIds, $limit, $columns=['*'])
+    public function createTicket($userId, $providerId, $shopId, ScenicTicketInput $input)
     {
-        $query = Goods::query()->where('status', 1);
+        $ticket = ScenicTicket::new();
+        $ticket->user_id = $userId;
+        $ticket->provider_id = $providerId;
+        $ticket->shop_id = $shopId;
 
-        if (!empty($categoryIds)) {
-            $query = $query->whereIn('category_id', $categoryIds);
-        }
-        if (!empty($goodsIds)) {
-            $query = $query->whereNotIn('id', $goodsIds);
-        }
-        return $query
-                ->orderBy('sales_volume', 'desc')
-                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
-                ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('promotion_commission_rate', 'desc')
-                ->orderBy('created_at', 'desc')
-                ->take($limit)
-                ->get($columns);
+        return $this->updateTicket($ticket, $input);
     }
 
-    public function getShopTopList($goodsId, $shopId, $limit, $columns=['*'])
+    public function updateTicket(ScenicTicket $ticket, ScenicTicketInput $input)
     {
-        return Goods::query()
-            ->where('status', 1)
-            ->where('shop_id', $shopId)
-            ->where('id', '!=', $goodsId)
-            ->orderBy('sales_volume', 'desc')
-            ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('promotion_commission_rate', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->take($limit)
-            ->get($columns);
-    }
-
-    public function getShopGoodsList($shopId, PageInput $input, $columns=['*'])
-    {
-        return Goods::query()
-            ->where('status', 1)
-            ->where('shop_id', $shopId)
-            ->orderBy('sales_volume', 'desc')
-            ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('promotion_commission_rate', 'desc')
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function getUserGoodsList($userId, PageInput $input, $columns=['*'])
-    {
-        return Goods::query()
-            ->where('user_id', $userId)
-            ->where('status', 1)
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function getLiveUnlistedGoodsList($userId, $goodsIds, $columns=['*'])
-    {
-        return Goods::query()
-            ->where('user_id', $userId)
-            ->where('status', 1)
-            ->whereNotIn('id', $goodsIds)
-            ->get($columns);
-    }
-
-    public function getOnSaleGoods($id, $columns=['*'])
-    {
-        return Goods::query()->where('status', 1)->find($id, $columns);
-    }
-
-    public function getGoodsListByIds($ids, $columns=['*'])
-    {
-        return Goods::query()->whereIn('id', $ids)->get($columns);
-    }
-
-    public function getMerchantGoodsList(GoodsListInput $input, $columns=['*'])
-    {
-        $query = Goods::query()
-            ->where('shop_id', '!=', 0)
-            ->whereIn('status', [0, 1, 2]);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
+        $ticket->type = $input->type;
+        $ticket->name = $input->name;
+        $ticket->price = $input->price;
+        if (!empty($input->marketPrice)) {
+            $ticket->market_price = $input->marketPrice;
         }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+        $ticket->sales_commission_rate = $input->salesCommissionRate;
+        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        if (!empty($input->feeIncludeTips)) {
+            $ticket->fee_include_tips = $input->feeIncludeTips;
         }
-        if (!is_null($input->status)) {
-            $query = $query->where('status', $input->status);
+        if (!empty($input->feeNotIncludeTips)) {
+            $ticket->fee_not_include_tips = $input->feeNotIncludeTips;
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function getOwnerGoodsList(GoodsListInput $input, $columns=['*'])
-    {
-        $query = Goods::query()->where('shop_id', 0);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
+        $ticket->booking_time = $input->bookingTime;
+        $ticket->effective_time = $input->effectiveTime;
+        $ticket->validity_time = $input->validityTime;
+        if (!empty($input->limitNumber)) {
+            $ticket->limit_number = $input->limitNumber;
         }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+        $ticket->refund_status = $input->refundStatus;
+        if (!empty($input->refundTips)) {
+            $ticket->refund_tips = $input->refundTips;
         }
-        if (!empty($input->status)) {
-            $query = $query->where('status', $input->status);
+        $ticket->need_exchange = $input->needExchange;
+        if (!empty($input->exchangeTips)) {
+            $ticket->exchange_tips = $input->exchangeTips;
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function getRecommendGoodsList
-    (
-        $goodsIds,
-        $categoryIds,
-        $limit = 10,
-        $columns=['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume']
-    )
-    {
-        $goodsList = $this->getTopListByCategoryIds($goodsIds, $categoryIds, $limit, $columns);
-        return $this->addShopInfoToGoodsList($goodsList);
-    }
-
-    public function addShopInfoToGoodsList($goodsList)
-    {
-        $shopIds = $goodsList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
-        $list = $goodsList->map(function (Goods $goods) use ($shopList) {
-            if ($goods->shop_id != 0) {
-                /** @var Shop $shop */
-                $shop = $shopList->get($goods->shop_id);
-                $goods['shop_info'] = $shop;
-            }
-            unset($goods->shop_id);
-            return $goods;
-        });
-        return $list;
-    }
-
-    public function reduceStock($id, $number, $selectedSkuIndex = -1)
-    {
-        $goods = $this->getOnSaleGoods($id);
-        if (is_null($goods)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '商品不存在');
+        if (!empty($input->exchangeTime)) {
+            $ticket->exchange_time = $input->exchangeTime;
         }
-
-        $skuList = json_decode($goods->sku_list);
-
-        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
-            $stock = $skuList[$selectedSkuIndex]->stock;
-            if ($stock == 0 || $number > $stock) {
-                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK, '所选规格库存不足');
-            }
-            // 减规格库存
-            $skuList[$selectedSkuIndex]->stock = $skuList[$selectedSkuIndex]->stock - $number;
-            $goods->sku_list = json_encode($skuList);
-        } else {
-            if ($goods->stock == 0 || $number > $goods->stock) {
-                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK, '商品库存不足');
-            }
+        if (!empty($input->exchangeLocation)) {
+            $ticket->exchange_location = $input->exchangeLocation;
         }
-        $goods->stock = $goods->stock - $number;
-
-        return $goods->cas();
-    }
-
-    public function addStock($id, $number, $selectedSkuIndex = -1)
-    {
-        $goods = $this->getOnSaleGoods($id);
-        if (is_null($goods)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '商品不存在');
+        if (!empty($input->otherTips)) {
+            $ticket->other_tips = $input->otherTips;
         }
+        $ticket->save();
 
-        $skuList = json_decode($goods->sku_list);
-
-        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
-            $skuList[$selectedSkuIndex]->stock = $skuList[$selectedSkuIndex]->stock + $number;
-            $goods->sku_list = json_encode($skuList);
-        }
-        $goods->stock = $goods->stock + $number;
-
-        return $goods->cas();
+        return $ticket;
     }
 }

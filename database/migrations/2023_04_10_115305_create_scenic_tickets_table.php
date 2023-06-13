@@ -24,7 +24,6 @@ class CreateScenicTicketsTable extends Migration
             $table->string('name')->comment('门票名称');
             $table->float('price')->comment('门票最低价格');
             $table->float('market_price')->default(0)->comment('门票市场价格');
-            $table->integer('stock')->comment('门票总库存');
             $table->float('sales_commission_rate')->comment('销售佣金比例');
             $table->float('promotion_commission_rate')->comment('推广佣金比例');
             $table->integer('sales_volume')->default(0)->comment('门票销量');
@@ -40,7 +39,7 @@ class CreateScenicTicketsTable extends Migration
             $table->string('exchange_tips')->default('')->comment('换票说明');
             $table->string('exchange_time')->default('')->comment('换票时间');
             $table->string('exchange_location')->default('')->comment('换票地点');
-            $table->longText('other_tips')->comment('其他说明');
+            $table->string('other_tips')->default('')->comment('其他说明');
             $table->timestamps();
             $table->softDeletes();
         });
