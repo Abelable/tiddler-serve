@@ -37,7 +37,7 @@ class ScenicTicketInput extends BaseInput
             'specList' => 'required|array|min:1',
             'salesCommissionRate' => 'required|numeric',
             'promotionCommissionRate' => 'required|numeric',
-            'feeIncludeTips' => 'required|string',
+            'feeIncludeTips' => 'string',
             'feeNotIncludeTips' => 'string',
             'bookingTime' => 'required|string',
             'effectiveTime' => 'required|string',

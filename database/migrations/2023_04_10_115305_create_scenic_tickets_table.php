@@ -29,9 +29,9 @@ class CreateScenicTicketsTable extends Migration
             $table->integer('sales_volume')->default(0)->comment('门票销量');
             $table->string('fee_include_tips')->default('')->comment('费用包含说明');
             $table->string('fee_not_include_tips')->default('')->comment('费用不含说明');
-            $table->string('booking_time')->comment('当天门票最晚预定时间');
-            $table->string('effective_time')->comment('生效时间');
-            $table->string('validity_time')->comment('有效期');
+            $table->string('booking_time')->default('')->comment('当天最晚预定时间');
+            $table->integer('effective_time')->default(0)->comment('生效时间，单位小时');
+            $table->integer('validity_time')->default(0)->comment('有效期, 单位天');
             $table->integer('limit_number')->default(0)->comment('限购数量');
             $table->integer('refund_status')->comment('退票状态：1-随时可退，2-有条件退，3-不可退');
             $table->string('refund_tips')->default('')->comment('退票说明');

@@ -132,6 +132,17 @@ Route::prefix('scenic')->group(function () {
         Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
         Route::post('apply_scenic', 'ScenicProviderController@applyScenicSpot');
         Route::post('delete_scenic', 'ScenicProviderController@deleteProviderScenicSpot');
+
+        Route::prefix('ticket')->group(function () {
+            Route::get('totals', 'ScenicTicketController@ticketListTotals');
+            Route::get('list', 'ScenicTicketController@userTicketList');
+            Route::get('detail', 'ScenicTicketController@ticketDetail');
+            Route::post('add', 'ScenicTicketController@add');
+            Route::post('edit', 'ScenicTicketController@edit');
+            Route::post('up', 'ScenicTicketController@up');
+            Route::post('down', 'ScenicTicketController@down');
+            Route::post('delete', 'ScenicTicketController@delete');
+        });
     });
 
     Route::prefix('shop')->group(function () {
@@ -139,14 +150,9 @@ Route::prefix('scenic')->group(function () {
     });
 
     Route::prefix('ticket')->group(function () {
-        Route::get('totals', 'ScenicTicketController@ticketListTotals');
-        Route::get('list', 'ScenicTicketController@userTicketList');
-        Route::get('detail', 'ScenicTicketController@ticketDetail');
-        Route::post('add', 'ScenicTicketController@add');
-        Route::post('edit', 'ScenicTicketController@edit');
-        Route::post('up', 'ScenicTicketController@up');
-        Route::post('down', 'ScenicTicketController@down');
-        Route::post('delete', 'ScenicTicketController@delete');
+        Route::get('category_options', 'ScenicTicketController@categoryOptions');
+        Route::get('list', 'ScenicTicketController@list');
+        Route::get('detail', 'ScenicTicketController@detail');
     });
 });
 
