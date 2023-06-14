@@ -29,7 +29,7 @@ class CreateScenicTicketsTable extends Migration
             $table->integer('sales_volume')->default(0)->comment('门票销量');
             $table->string('fee_include_tips')->default('')->comment('费用包含说明');
             $table->string('fee_not_include_tips')->default('')->comment('费用不含说明');
-            $table->string('booking_time')->default('')->comment('当天最晚预定时间');
+            $table->string('booking_time')->default('')->comment('预定时间范围');
             $table->integer('effective_time')->default(0)->comment('生效时间，单位小时');
             $table->integer('validity_time')->default(0)->comment('有效期, 单位天');
             $table->integer('limit_number')->default(0)->comment('限购数量');
@@ -37,7 +37,7 @@ class CreateScenicTicketsTable extends Migration
             $table->string('refund_tips')->default('')->comment('退票说明');
             $table->integer('need_exchange')->comment('是否需要换票：0-无需换票，1-需要换票');
             $table->string('exchange_tips')->default('')->comment('换票说明');
-            $table->string('exchange_time')->default('')->comment('换票时间');
+            $table->string('exchange_time')->default('')->comment('换票时间范围');
             $table->string('exchange_location')->default('')->comment('换票地点');
             $table->string('other_tips')->default('')->comment('其他说明');
             $table->timestamps();

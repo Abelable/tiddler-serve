@@ -20,7 +20,7 @@ namespace App\Models;
  * @property int $sales_volume 门票销量
  * @property string $fee_include_tips 费用包含说明
  * @property string $fee_not_include_tips 费用不含说明
- * @property string $booking_time 当天最晚预定时间
+ * @property string $booking_time 预定时间范围
  * @property int $effective_time 生效时间，单位小时
  * @property int $validity_time 有效期, 单位天
  * @property int $limit_number 限购数量
@@ -28,7 +28,7 @@ namespace App\Models;
  * @property string $refund_tips 退票说明
  * @property int $need_exchange 是否需要换票：0-无需换票，1-需要换票
  * @property string $exchange_tips 换票说明
- * @property string $exchange_time 换票时间
+ * @property string $exchange_time 换票时间范围
  * @property string $exchange_location 换票地点
  * @property string $other_tips 其他说明
  * @property \Illuminate\Support\Carbon|null $created_at
