@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\TicketSpec;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
+use App\Services\TicketScenicService;
+use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -48,6 +51,11 @@ class ScenicTicketController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
 
+        $scenicIds = TicketScenicService::getInstance()->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
+        $specList = TicketSpecService::getInstance()->getSpecListByTicketId($ticket->id, ['category_id', 'price_list']);
+        $ticket['scenicIds'] = $scenicIds;
+        $ticket['specList'] = $specList;
+
         return $this->success($ticket);
     }
 
@@ -63,8 +71,8 @@ class ScenicTicketController extends Controller
 
         DB::transaction(function () use ($shopId, $input) {
             $ticket = ScenicTicketService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
-            ScenicTicketService::getInstance()->createTicketScenicSpots($ticket->id, $input->scenicIds);
-            ScenicTicketService::getInstance()->createTicketSpecList($ticket->id, $input->specList);
+            TicketScenicService::getInstance()->createTicketScenicSpots($ticket->id, $input->scenicIds);
+            TicketSpecService::getInstance()->createTicketSpecList($ticket->id, $input->specList);
         });
 
         return $this->success();
@@ -83,8 +91,8 @@ class ScenicTicketController extends Controller
 
         DB::transaction(function () use ($input, $ticket) {
             $ticket = ScenicTicketService::getInstance()->updateTicket($ticket, $input);
-            ScenicTicketService::getInstance()->updateTicketScenicSpots($ticket->id, $input->scenicIds);
-            ScenicTicketService::getInstance()->updateTicketSpecList($ticket->id, $input->specList);
+            TicketScenicService::getInstance()->updateTicketScenicSpots($ticket->id, $input->scenicIds);
+            TicketSpecService::getInstance()->updateTicketSpecList($ticket->id, $input->specList);
         });
 
         return $this->success();
