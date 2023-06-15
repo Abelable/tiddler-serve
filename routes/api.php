@@ -136,7 +136,7 @@ Route::prefix('scenic')->group(function () {
         Route::prefix('ticket')->group(function () {
             Route::get('totals', 'ScenicTicketController@ticketListTotals');
             Route::get('list', 'ScenicTicketController@userTicketList');
-            Route::get('detail', 'ScenicTicketController@ticketDetail');
+            Route::get('detail', 'ScenicTicketController@detail');
             Route::post('add', 'ScenicTicketController@add');
             Route::post('edit', 'ScenicTicketController@edit');
             Route::post('up', 'ScenicTicketController@up');
