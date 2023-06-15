@@ -60,9 +60,15 @@ class ScenicTicketService extends BaseService
         if (!empty($input->feeNotIncludeTips)) {
             $ticket->fee_not_include_tips = $input->feeNotIncludeTips;
         }
-        $ticket->booking_time = $input->bookingTime;
-        $ticket->effective_time = $input->effectiveTime;
-        $ticket->validity_time = $input->validityTime;
+        if (!empty($input->bookingTime)) {
+            $ticket->booking_time = $input->bookingTime;
+        }
+        if (!empty($input->effectiveTime)) {
+            $ticket->effective_time = $input->effectiveTime;
+        }
+        if (!empty($input->validityTime)) {
+            $ticket->validity_time = $input->validityTime;
+        }
         if (!empty($input->limitNumber)) {
             $ticket->limit_number = $input->limitNumber;
         }
