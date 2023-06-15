@@ -162,7 +162,7 @@ class GoodsController extends Controller
         $input = GoodsAddInput::new();
 
         $goods = Goods::new();
-        $shopId = $this->user()->shop_id;
+        $shopId = $this->user()->shop->id;
         if ($shopId == 0) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
         }
@@ -202,7 +202,7 @@ class GoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->shop_id != $this->user()->shop_id) {
+        if ($goods->shop_id != $this->user()->shop->id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法编辑');
         }
         if ($goods->status != 2) {
@@ -244,7 +244,7 @@ class GoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->shop_id != $this->user()->shop_id) {
+        if ($goods->shop_id != $this->user()->shop->id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法上架该商品');
         }
         if ($goods->status != 3) {
@@ -264,7 +264,7 @@ class GoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->shop_id != $this->user()->shop_id) {
+        if ($goods->shop_id != $this->user()->shop->id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法下架该商品');
         }
         if ($goods->status != 1) {
@@ -284,7 +284,7 @@ class GoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->shop_id != $this->user()->shop_id) {
+        if ($goods->shop_id != $this->user()->shop->id) {
             return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法删除');
         }
         $goods->delete();
