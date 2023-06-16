@@ -147,7 +147,8 @@ class ScenicProviderController extends Controller
 
     public function providerScenicOptions()
     {
-        $scenicOptions = ProviderScenicSpotService::getInstance()->getUserScenicOptions($this->userId(), ['id', 'name']);
+        $scenicIds = ProviderScenicSpotService::getInstance()->getUserScenicOptions($this->userId())->pluck('scenic_id')->toArray();
+        $scenicOptions = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name']);
         return $this->success($scenicOptions);
     }
 }
