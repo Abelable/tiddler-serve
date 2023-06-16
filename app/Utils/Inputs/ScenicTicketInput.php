@@ -24,7 +24,10 @@ class ScenicTicketInput extends BaseInput
     public $exchangeTips;
     public $exchangeTime;
     public $exchangeLocation;
-    public $otherTips;
+    public $enterTime;
+    public $enterLocation;
+    public $invoiceTips;
+    public $reminderTips;
 
     public function rules()
     {
@@ -39,7 +42,7 @@ class ScenicTicketInput extends BaseInput
             'promotionCommissionRate' => 'required|numeric',
             'feeIncludeTips' => 'string',
             'feeNotIncludeTips' => 'string',
-            'bookingTime' => 'string',
+            'bookingTime' => 'required|string',
             'effectiveTime' => 'integer',
             'validityTime' => 'integer',
             'limitNumber' => 'integer',
@@ -49,7 +52,10 @@ class ScenicTicketInput extends BaseInput
             'exchangeTips' => 'string',
             'exchangeTime' => 'string',
             'exchangeLocation' => 'string',
-            'otherTips' => 'string',
+            'enterTime' => 'string',
+            'enterLocation' => 'string',
+            'invoiceTips' => 'string',
+            'reminderTips' => 'string',
         ];
     }
 }
