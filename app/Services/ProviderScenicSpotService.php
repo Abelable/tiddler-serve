@@ -47,4 +47,9 @@ class ProviderScenicSpotService extends BaseService
     {
         return ProviderScenicSpot::query()->find($id, $columns);
     }
+
+    public function getUserScenicOptions($userId, $columns = ['*'])
+    {
+        return ProviderScenicSpot::query()->where('user_id', $userId)->orderBy('id', 'asc')->get($columns);
+    }
 }

@@ -144,4 +144,10 @@ class ScenicProviderController extends Controller
         $spot->delete();
         return $this->success();
     }
+
+    public function providerScenicOptions()
+    {
+        $scenicOptions = ProviderScenicSpotService::getInstance()->getUserScenicOptions($this->userId(), ['id', 'name']);
+        return $this->success($scenicOptions);
+    }
 }

@@ -132,6 +132,7 @@ Route::prefix('scenic')->group(function () {
         Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
         Route::post('apply_scenic', 'ScenicProviderController@applyScenicSpot');
         Route::post('delete_scenic', 'ScenicProviderController@deleteProviderScenicSpot');
+        Route::get('scenic_options', 'ScenicProviderController@providerScenicOptions');
 
         Route::prefix('ticket')->group(function () {
             Route::get('totals', 'ScenicTicketController@ticketListTotals');
