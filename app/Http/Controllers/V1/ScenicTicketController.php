@@ -90,7 +90,7 @@ class ScenicTicketController extends Controller
         }
 
         DB::transaction(function () use ($input, $ticket) {
-            $ticket = ScenicTicketService::getInstance()->updateTicket($ticket, $input);
+            ScenicTicketService::getInstance()->updateTicket($ticket, $input);
             TicketScenicService::getInstance()->updateTicketScenicSpots($ticket->id, $input->scenicIds);
             TicketSpecService::getInstance()->updateTicketSpecList($ticket->id, $input->specList);
         });

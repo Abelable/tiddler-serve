@@ -47,55 +47,25 @@ class ScenicTicketService extends BaseService
         $ticket->type = $input->type;
         $ticket->name = $input->name;
         $ticket->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $ticket->market_price = $input->marketPrice;
-        }
+        $ticket->market_price = $input->marketPrice ?: '';
         $ticket->sales_commission_rate = $input->salesCommissionRate;
         $ticket->promotion_commission_rate = $input->promotionCommissionRate;
-        if (!empty($input->feeIncludeTips)) {
-            $ticket->fee_include_tips = $input->feeIncludeTips;
-        }
-        if (!empty($input->feeNotIncludeTips)) {
-            $ticket->fee_not_include_tips = $input->feeNotIncludeTips;
-        }
-        if (!empty($input->bookingTime)) {
-            $ticket->booking_time = $input->bookingTime;
-        }
-        if (!empty($input->effectiveTime)) {
-            $ticket->effective_time = $input->effectiveTime;
-        }
-        if (!empty($input->validityTime)) {
-            $ticket->validity_time = $input->validityTime;
-        }
-        if (!empty($input->limitNumber)) {
-            $ticket->limit_number = $input->limitNumber;
-        }
+        $ticket->fee_include_tips = $input->feeIncludeTips ?: '';
+        $ticket->fee_not_include_tips = $input->feeNotIncludeTips ?: '';
+        $ticket->booking_time = $input->bookingTime;
+        $ticket->effective_time = $input->effectiveTime ?: 0;
+        $ticket->validity_time = $input->validityTime ?: 0;
+        $ticket->limit_number = $input->limitNumber ?: 0;
         $ticket->refund_status = $input->refundStatus;
-        if (!empty($input->refundTips)) {
-            $ticket->refund_tips = $input->refundTips;
-        }
+        $ticket->refund_tips = $input->refundTips ?: '';
         $ticket->need_exchange = $input->needExchange;
-        if (!empty($input->exchangeTips)) {
-            $ticket->exchange_tips = $input->exchangeTips;
-        }
-        if (!empty($input->exchangeTime)) {
-            $ticket->exchange_time = $input->exchangeTime;
-        }
-        if (!empty($input->exchangeLocation)) {
-            $ticket->exchange_location = $input->exchangeLocation;
-        }
-        if (!empty($input->enterTime)) {
-            $ticket->enter_time = $input->enterTime;
-        }
-        if (!empty($input->enterLocation)) {
-            $ticket->enter_location = $input->enterLocation;
-        }
-        if (!empty($input->invoiceTips)) {
-            $ticket->invoice_tips = $input->invoiceTips;
-        }
-        if (!empty($input->reminderTips)) {
-            $ticket->reminder_tips = $input->reminderTips;
-        }
+        $ticket->exchange_tips = $input->exchangeTips ?: '';
+        $ticket->exchange_time = $input->exchangeTime ?: '';
+        $ticket->exchange_location = $input->exchangeLocation ?: '';
+        $ticket->enter_time = $input->enterTime ?: '';
+        $ticket->enter_location = $input->enterLocation ?: '';
+        $ticket->invoice_tips = $input->invoiceTips ?: '';
+        $ticket->reminder_tips = $input->reminderTips ?: '';
         $ticket->save();
 
         return $ticket;

@@ -20,7 +20,7 @@ class TicketSpecService extends BaseService
     public function updateTicketSpecList($ticketId, array $specList)
     {
         TicketSpec::query()->where('ticket_id', $ticketId)->delete();
-        $this->updateTicketSpecList($ticketId, $specList);
+        $this->createTicketSpecList($ticketId, $specList);
     }
 
     public function getSpecListByTicketId($ticketId, $columns = ['*'])

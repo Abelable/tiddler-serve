@@ -212,9 +212,7 @@ class GoodsController extends Controller
         $goods->status = 0;
         $goods->failure_reason = '';
         $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
+        $goods->video = $input->video ?: '';
         $goods->image_list = $input->imageList;
         $goods->detail_image_list = $input->detailImageList;
         $goods->default_spec_image = $input->defaultSpecImage;
@@ -223,9 +221,7 @@ class GoodsController extends Controller
         $goods->category_id = $input->categoryId;
         $goods->return_address_id = $input->returnAddressId;
         $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
+        $goods->market_price = $input->marketPrice ?: 0;
         $goods->stock = $input->stock;
         $goods->sales_commission_rate = $input->salesCommissionRate;
         $goods->promotion_commission_rate = $input->promotionCommissionRate;
