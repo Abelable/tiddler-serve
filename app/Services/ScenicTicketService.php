@@ -84,8 +84,17 @@ class ScenicTicketService extends BaseService
         if (!empty($input->exchangeLocation)) {
             $ticket->exchange_location = $input->exchangeLocation;
         }
-        if (!empty($input->otherTips)) {
-            $ticket->other_tips = $input->otherTips;
+        if (!empty($input->enterTime)) {
+            $ticket->enter_time = $input->enterTime;
+        }
+        if (!empty($input->enterLocation)) {
+            $ticket->enter_location = $input->enterLocation;
+        }
+        if (!empty($input->invoiceTips)) {
+            $ticket->invoice_tips = $input->invoiceTips;
+        }
+        if (!empty($input->reminderTips)) {
+            $ticket->reminder_tips = $input->reminderTips;
         }
         $ticket->save();
 
