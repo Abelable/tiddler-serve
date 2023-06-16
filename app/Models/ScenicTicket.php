@@ -79,4 +79,8 @@ namespace App\Models;
  */
 class ScenicTicket extends BaseModel
 {
+    public function scenicIds(): array
+    {
+        return $this->hasMany(TicketScenicSpot::class, 'ticket_id')->pluck('scenic_id')->toArray();
+    }
 }

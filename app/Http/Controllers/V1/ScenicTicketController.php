@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicTicket;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
 use App\Services\TicketScenicService;
@@ -37,8 +38,14 @@ class ScenicTicketController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $list = ScenicTicketService::getInstance()->getTicketListByStatus($this->userId(), $input);
-        return $this->successPaginate($list);
+        $page = ScenicTicketService::getInstance()->getTicketListByStatus($this->userId(), $input);
+        $ticketList = collect($page->items());
+        $list = $ticketList->map(function (ScenicTicket $ticket) {
+            $ticket['scenicIds'] = $ticket->scenicIds();
+            return $ticket;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
