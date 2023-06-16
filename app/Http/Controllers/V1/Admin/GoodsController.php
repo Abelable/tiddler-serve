@@ -9,8 +9,7 @@ use App\Services\MerchantService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
-use App\Utils\Inputs\GoodsAddInput;
-use App\Utils\Inputs\GoodsEditInput;
+use App\Utils\Inputs\GoodsInput;
 
 class GoodsController extends Controller
 {
@@ -174,67 +173,24 @@ class GoodsController extends Controller
 
     public function add()
     {
-        /** @var GoodsAddInput $input */
-        $input = GoodsAddInput::new();
-
-        $goods = Goods::new();
-        $goods->status = 1;
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
-
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
+        GoodsService::getInstance()->createGoods(0, 0, $input);
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var GoodsEditInput $input */
-        $input = GoodsEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
 
-        $goods = GoodsService::getInstance()->getGoodsById($input->id);
+        $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
+        GoodsService::getInstance()->updateGoods($goods, $input);
 
         return $this->success();
     }

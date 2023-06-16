@@ -44,6 +44,10 @@ class ScenicTicketService extends BaseService
 
     public function updateTicket(ScenicTicket $ticket, ScenicTicketInput $input)
     {
+        if ($ticket->status == 2) {
+            $ticket->status = 0;
+            $ticket->failure_reason = '';
+        }
         $ticket->type = $input->type;
         $ticket->name = $input->name;
         $ticket->price = $input->price;

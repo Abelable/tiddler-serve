@@ -7,6 +7,7 @@ use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
 
@@ -115,6 +116,11 @@ class GoodsService extends BaseService
     public function getGoodsById($id, $columns=['*'])
     {
         return Goods::query()->find($id, $columns);
+    }
+
+    public function getUserGoods($userId, $id, $columns = ['*'])
+    {
+        return Goods::query()->where('user_id', $userId)->find($id, $columns);
     }
 
     public function getOnSaleGoods($id, $columns=['*'])
@@ -230,5 +236,40 @@ class GoodsService extends BaseService
         $goods->stock = $goods->stock + $number;
 
         return $goods->cas();
+    }
+
+    public function createGoods($userId, $shopId, GoodsInput $input)
+    {
+        $goods = Goods::new();
+        $goods->user_id = $userId;
+        $goods->shop_id = $shopId;
+        return $this->updateGoods($goods, $input);
+    }
+
+    public function updateGoods(Goods $goods, GoodsInput $input)
+    {
+        if ($goods->status == 2) {
+            $goods->status = 0;
+            $goods->failure_reason = '';
+        }
+        $goods->image = $input->image;
+        $goods->video = $input->video ?: '';
+        $goods->image_list = $input->imageList;
+        $goods->detail_image_list = $input->detailImageList;
+        $goods->default_spec_image = $input->defaultSpecImage;
+        $goods->name = $input->name;
+        $goods->freight_template_id = $input->freightTemplateId;
+        $goods->category_id = $input->categoryId;
+        $goods->return_address_id = $input->returnAddressId;
+        $goods->price = $input->price;
+        $goods->market_price = $input->marketPrice ?: 0;
+        $goods->stock = $input->stock;
+        $goods->sales_commission_rate = $input->salesCommissionRate;
+        $goods->promotion_commission_rate = $input->promotionCommissionRate;
+        $goods->spec_list = $input->specList;
+        $goods->sku_list = $input->skuList;
+        $goods->save();
+
+        return $goods;
     }
 }

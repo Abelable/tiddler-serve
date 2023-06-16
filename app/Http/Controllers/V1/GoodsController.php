@@ -8,8 +8,7 @@ use App\Services\GoodsCategoryService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\GoodsAddInput;
-use App\Utils\Inputs\GoodsEditInput;
+use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\AllListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -158,76 +157,34 @@ class GoodsController extends Controller
 
     public function add()
     {
-        /** @var GoodsAddInput $input */
-        $input = GoodsAddInput::new();
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
 
-        $goods = Goods::new();
         $shopId = $this->user()->shop->id;
         if ($shopId == 0) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
         }
-        $goods->shop_id = $shopId;
-        $goods->user_id = $this->userId();
-        $goods->image = $input->image;
-        if (!empty($input->video)) {
-            $goods->video = $input->video;
-        }
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        if (!empty($input->marketPrice)) {
-            $goods->market_price = $input->marketPrice;
-        }
-        $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
+
+        GoodsService::getInstance()->createGoods($this->userId(), $shopId, $input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var GoodsEditInput $input */
-        $input = GoodsEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
 
-        $goods = GoodsService::getInstance()->getGoodsById($input->id);
+        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->shop_id != $this->user()->shop->id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法编辑');
-        }
-        if ($goods->status != 2) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非审核未通过商品，无法编辑');
+        if ($goods->status == 0 || $goods->status == 1) {
+            return $this->fail(CodeResponse::FORBIDDEN, '当前状态下商品，无法编辑');
         }
 
-        $goods->status = 0;
-        $goods->failure_reason = '';
-        $goods->image = $input->image;
-        $goods->video = $input->video ?: '';
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
-        $goods->default_spec_image = $input->defaultSpecImage;
-        $goods->name = $input->name;
-        $goods->freight_template_id = $input->freightTemplateId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
-        $goods->price = $input->price;
-        $goods->market_price = $input->marketPrice ?: 0;
-        $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
-        $goods->save();
+        GoodsService::getInstance()->updateGoods($goods, $input);
 
         return $this->success();
     }
@@ -236,12 +193,9 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
+        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        if ($goods->shop_id != $this->user()->shop->id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法上架该商品');
         }
         if ($goods->status != 3) {
             return $this->fail(CodeResponse::FORBIDDEN, '非下架商品，无法上架');
@@ -256,12 +210,9 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
+        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        if ($goods->shop_id != $this->user()->shop->id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法下架该商品');
         }
         if ($goods->status != 1) {
             return $this->fail(CodeResponse::FORBIDDEN, '非售卖中商品，无法下架');
@@ -276,12 +227,9 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
+        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        if ($goods->shop_id != $this->user()->shop->id) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非当前商家商品，无法删除');
         }
         $goods->delete();
 

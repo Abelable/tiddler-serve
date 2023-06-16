@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class GoodsAddInput extends BaseInput
+class GoodsInput extends BaseInput
 {
     public $image;
     public $video;
