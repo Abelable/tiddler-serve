@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\TicketSpec;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
 use App\Services\TicketScenicService;
