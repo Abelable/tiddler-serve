@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicTicket;
 use App\Services\ScenicProviderService;
 use App\Services\ScenicTicketService;
 use App\Utils\CodeResponse;
@@ -16,8 +17,12 @@ class ScenicTicketController extends Controller
     {
         /** @var ScenicTicketListInput $input */
         $input = ScenicTicketListInput::new();
-        $list = ScenicTicketService::getInstance()->getList($input);
-        return $this->successPaginate($list);
+        $page = ScenicTicketService::getInstance()->getList($input);
+        $list = collect($page->items())->map(function (ScenicTicket $ticket) {
+            $ticket['scenicIds'] = $ticket->scenicIds();
+            return $ticket;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -27,6 +32,7 @@ class ScenicTicketController extends Controller
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前门票不存在');
         }
+        $ticket['scenicIds'] = $ticket->scenicIds();
 
         $provider = ScenicProviderService::getInstance()->getProviderById($ticket->provider_id);
         if (is_null($provider)) {

@@ -25,7 +25,7 @@ class ScenicTicketService extends BaseService
                     ->where('scenic_spot_id', $input->scenicId);
             });
         }
-        if (!empty($input->status)) {
+        if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
