@@ -325,6 +325,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('add', 'ScenicController@add');
         Route::post('edit', 'ScenicController@edit');
         Route::post('delete', 'ScenicController@delete');
+        Route::get('options', 'ScenicController@options');
 
         Route::prefix('provider')->group(function () {
             Route::post('list', 'ScenicProviderController@list');
