@@ -3,11 +3,34 @@
 namespace App\Services;
 
 use App\Models\ScenicTicket;
+use App\Utils\Inputs\Admin\ScenicTicketListInput;
 use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class ScenicTicketService extends BaseService
 {
+    public function getList(ScenicTicketListInput $input, $columns=['*'])
+    {
+        $query = ScenicTicket::query()->whereIn('status', [0, 1, 2]);
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
+        }
+        if (!empty($input->scenicSpotId)) {
+            $query = $query->whereIn('id', function ($subQuery) use ($input) {
+                $subQuery->select('ticket_id')
+                    ->from('ticket_scenic_spot')
+                    ->where('scenic_spot_id', $input->scenicId);
+            });
+        }
+        if (!empty($input->status)) {
+            $query = $query->where('status', $input->status);
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getListTotal($userId, $status)
     {
         return ScenicTicket::query()->where('user_id', $userId)->where('status', $status)->count();

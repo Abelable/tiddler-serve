@@ -357,6 +357,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
             Route::post('list', 'ScenicTicketController@list');
             Route::get('detail', 'ScenicTicketController@detail');
+            Route::post('approve', 'ScenicTicketController@approve');
+            Route::post('reject', 'ScenicTicketController@reject');
             Route::post('delete', 'ScenicTicketController@delete');
         });
     });
