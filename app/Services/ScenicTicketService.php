@@ -33,7 +33,7 @@ class ScenicTicketService extends BaseService
 
     public function getListByIds(array $ids, $columns=['*'])
     {
-        return ScenicTicket::query()->whereIn('id', $ids)->with('specList')->get($columns);
+        return ScenicTicket::query()->where('status', 1)->whereIn('id', $ids)->with('specList')->get($columns);
     }
 
     public function getListTotal($userId, $status)
