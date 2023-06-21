@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicShop;
 use App\Models\ScenicTicket;
+use App\Models\TicketSpec;
+use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
 use App\Services\TicketScenicService;
@@ -15,12 +18,43 @@ use Illuminate\Support\Facades\DB;
 
 class ScenicTicketController extends Controller
 {
-    protected $except = ['categoryOptions'];
+    protected $except = ['categoryOptions', 'listByScenicId'];
 
     public function categoryOptions()
     {
         $options = ScenicTicketCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
         return $this->success($options);
+    }
+
+    public function listByScenicId()
+    {
+        $scenicId = $this->verifyRequiredId('scenicId');
+
+        $ticketIds = TicketScenicService::getInstance()->getListByScenicId($scenicId)->pluck('ticket_id')->toArray();
+        $ticketList = ScenicTicketService::getInstance()->getListByIds($ticketIds);
+
+        $shopIds = $ticketList->pluck('shop_id')->toArray();
+        $shopList = ScenicShopService::getInstance()->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
+
+        $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($shopList) {
+            /** @var ScenicShop $shop */
+            $shop = $shopList->get($ticket->shop_id);
+            $ticket['shopInfo'] = $shop;
+
+            unset($ticket->user_id);
+            unset($ticket->shop_id);
+            unset($ticket->provider_id);
+            unset($ticket->status);
+            unset($ticket->failure_reason);
+            unset($ticket->promotion_commission_rate);
+            unset($ticket->sales_commission_rate);
+            unset($ticket->created_at);
+            unset($ticket->updated_at);
+
+            return $ticket;
+        });
+
+        return $this->success($ticketList);
     }
 
     public function ticketListTotals()

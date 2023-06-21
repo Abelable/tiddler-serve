@@ -26,4 +26,9 @@ class TicketScenicService extends BaseService
     {
         return TicketScenicSpot::query()->where('ticket_id', $ticketId)->get($columns);
     }
+
+    public function getListByScenicId($scenicId, $columns = ['*'])
+    {
+        return TicketScenicSpot::query()->where('scenic_id', $scenicId)->get($columns);
+    }
 }

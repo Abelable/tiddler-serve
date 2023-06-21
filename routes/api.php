@@ -154,6 +154,7 @@ Route::prefix('scenic')->group(function () {
         Route::get('category_options', 'ScenicTicketController@categoryOptions');
         Route::get('list', 'ScenicTicketController@list');
         Route::get('detail', 'ScenicTicketController@detail');
+        Route::get('list_of_scenic', 'ScenicTicketController@listByScenicId');
     });
 });
 

@@ -37,6 +37,8 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TicketSpec[] $specList
+ * @property-read int|null $spec_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicTicket onlyTrashed()
@@ -82,5 +84,10 @@ class ScenicTicket extends BaseModel
     public function scenicIds(): array
     {
         return $this->hasMany(TicketScenicSpot::class, 'ticket_id')->pluck('scenic_id')->toArray();
+    }
+
+    public function specList()
+    {
+        return $this->hasMany(TicketSpec::class, 'ticket_id');
     }
 }

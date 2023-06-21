@@ -31,6 +31,11 @@ class ScenicTicketService extends BaseService
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getListByIds(array $ids, $columns=['*'])
+    {
+        return ScenicTicket::query()->whereIn('id', $ids)->with('specList')->get($columns);
+    }
+
     public function getListTotal($userId, $status)
     {
         return ScenicTicket::query()->where('user_id', $userId)->where('status', $status)->count();
