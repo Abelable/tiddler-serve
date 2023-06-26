@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
 use App\Services\GoodsCategoryService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
