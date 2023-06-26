@@ -90,7 +90,7 @@ class OrderController extends Controller
         $lockKey = sprintf('create_order_%s_%s', $this->userId(), md5(serialize($input)));
         $lock = Cache::lock($lockKey, 5);
         if (!$lock->get()) {
-            $this->fail(CodeResponse::FAIL, '请勿重复请求');
+            $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
 
         $orderIds = DB::transaction(function () use ($input) {
