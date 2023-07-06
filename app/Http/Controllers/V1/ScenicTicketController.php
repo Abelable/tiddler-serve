@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicShop;
 use App\Models\ScenicTicket;
-use App\Models\TicketSpec;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;

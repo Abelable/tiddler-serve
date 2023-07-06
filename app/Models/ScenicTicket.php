@@ -90,4 +90,9 @@ class ScenicTicket extends BaseModel
     {
         return $this->hasMany(TicketSpec::class, 'ticket_id');
     }
+
+    public function categoryIds(): array
+    {
+        return $this->specList()->pluck('category_id')->toArray();
+    }
 }

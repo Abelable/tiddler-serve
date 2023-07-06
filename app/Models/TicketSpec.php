@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\TicketSpec
  *
  * @property int $id
- * @property int $ticket_id 用户id
+ * @property int $ticket_id 门票id
  * @property int $category_id 门票分类id
  * @property string $price_list 价格列表：分时间段设置价格及对应库存
  * @property \Illuminate\Support\Carbon|null $created_at
