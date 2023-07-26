@@ -27,4 +27,12 @@ class TicketSpecService extends BaseService
     {
         return TicketSpec::query()->where('ticket_id', $ticketId)->get($columns);
     }
+
+    public function getPriceList($ticketId, $categpryId, $columns = ['*']) {
+        $spec = TicketSpec::query()
+            ->where('ticket_id', $ticketId)
+            ->where('category_id', $categpryId)
+            ->first($columns);
+        return json_decode($spec->price_list);
+    }
 }

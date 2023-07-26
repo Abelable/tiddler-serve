@@ -10,7 +10,10 @@ use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
+use App\Services\ScenicTicketCategoryService;
+use App\Services\ScenicTicketService;
 use App\Services\ShopService;
+use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
@@ -26,64 +29,34 @@ class ScenicOrderController extends Controller
         $ticketId = $this->verifyRequiredId('ticketId');
         $categoryId = $this->verifyRequiredId('categoryId');
         $date = $this->verifyString('date');
-        $num = $this->verifyInteger('num');
+        $num = $this->verifyInteger('num', 1);
 
+        $ticket = ScenicTicketService::getInstance()->getTicketById($ticketId);
+        if (is_null($ticket)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+        }
+        $category = ScenicTicketCategoryService::getInstance()->getCategoryById($categoryId);
+        if (is_null($category)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
+        }
 
+        $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
+        $timeStamp = $date ? '' : time();
+        $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
+                return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
+            })[0] ?? null;
+        if (is_null($priceUnit)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
+        }
 
+        $paymentAmount = bcmul($priceUnit->price, $num, 2);
 
-//        $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
-//        if (is_null($addressId)) {
-//            $address = AddressService::getInstance()->getDefautlAddress($this->userId(), $addressColumns);
-//        } else {
-//            $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
-//        }
-//
-//        $cartListColumns = ['shop_id', 'goods_image', 'goods_name', 'selected_sku_name', 'price', 'number'];
-//        $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $cartIds, $cartListColumns);
-//
-//        $freightPrice = 0;
-//        $totalPrice = 0;
-//        $totalNumber = 0;
-//        foreach ($cartList as $cart) {
-//            $price = bcmul($cart->price, $cart->number, 2);
-//            $totalPrice = bcadd($totalPrice, $price, 2);
-//            $totalNumber = $totalNumber + $cart->number;
-//            // todo 计算运费
-//        }
-//        $paymentAmount = bcadd($totalPrice, $freightPrice, 2);
-//
-//        $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
-//        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
-//        $goodsLists = $shopList->map(function (Shop $shop) use ($cartList) {
-//            return [
-//                'shopInfo' => $shop,
-//                'goodsList' => $cartList->filter(function (Cart $cart) use ($shop) {
-//                    return $cart->shop_id == $shop->id;
-//                })->map(function (Cart $cart) {
-//                    unset($cart->shop_id);
-//                    return $cart;
-//                })
-//            ];
-//        });
-//        if (in_array(0, $shopIds)) {
-//            $goodsLists->prepend([
-//                'goodsList' => $cartList->filter(function (Cart $cart) {
-//                    return $cart->shop_id == 0;
-//                })->map(function (Cart $cart) {
-//                    unset($cart->shop_id);
-//                    return $cart;
-//                })
-//            ]);
-//        }
-//
-//        return $this->success([
-//            'addressInfo' => $address,
-//            'goodsLists' => $goodsLists,
-//            'freightPrice' => $freightPrice,
-//            'totalPrice' => $totalPrice,
-//            'totalNumber' => $totalNumber,
-//            'paymentAmount' => $paymentAmount
-//        ]);
+        return $this->success([
+            'ticketInfo' => $ticket,
+            'priceList' => $priceList,
+            'categoryName' => $category->name,
+            'paymentAmount' => (float)$paymentAmount
+        ]);
     }
 
     public function submit()

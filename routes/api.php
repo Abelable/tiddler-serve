@@ -156,6 +156,18 @@ Route::prefix('scenic')->group(function () {
         Route::get('detail', 'ScenicTicketController@detail');
         Route::get('list_of_scenic', 'ScenicTicketController@listByScenicId');
     });
+
+    Route::prefix('order')->group(function () {
+        Route::get('pre_order_info', 'ScenicOrderController@preOrderInfo');
+        Route::post('submit', 'OrderController@submit');
+        Route::post('pay_params', 'OrderController@payParams');
+        Route::get('list', 'OrderController@list');
+        Route::get('detail', 'OrderController@detail');
+        Route::post('confirm', 'OrderController@confirm');
+        Route::post('refund', 'OrderController@refund');
+        Route::post('cancel', 'OrderController@cancel');
+        Route::post('delete', 'OrderController@delete');
+    });
 });
 
 Route::prefix('media')->group(function () {
