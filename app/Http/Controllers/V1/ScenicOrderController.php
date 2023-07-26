@@ -29,7 +29,7 @@ class ScenicOrderController extends Controller
     {
         $ticketId = $this->verifyRequiredId('ticketId');
         $categoryId = $this->verifyRequiredId('categoryId');
-        $date = $this->verifyString('date');
+        $timeStamp = $this->verifyInteger('timeStamp');
         $num = $this->verifyInteger('num', 1);
 
         $ticket = ScenicTicketService::getInstance()->getTicketById($ticketId);
@@ -46,7 +46,19 @@ class ScenicOrderController extends Controller
         }
 
         $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-        $timeStamp = $date ? '' : time();
+
+        $bookable = true;
+        if (is_null($timeStamp)) {
+            $timeStamp = time();
+
+            $curDate = date('Y-m-d');
+            $bookingTimeStamp = strtotime($curDate . ' ' . $ticket->booking_time);
+            if ($timeStamp > $bookingTimeStamp) {
+                $bookable = false;
+                $timeStamp = strtotime($curDate . ' 00:00:00') + 86400;
+            }
+        }
+
         $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
                 return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
             })[0] ?? null;
@@ -58,6 +70,7 @@ class ScenicOrderController extends Controller
 
         return $this->success([
             'ticketInfo' => $ticket,
+            'bookable' => $bookable,
             'priceList' => $priceList,
             'categoryName' => $category->name,
             'paymentAmount' => (float)$paymentAmount
