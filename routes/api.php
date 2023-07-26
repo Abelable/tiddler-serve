@@ -158,7 +158,7 @@ Route::prefix('scenic')->group(function () {
     });
 
     Route::prefix('order')->group(function () {
-        Route::get('pre_order_info', 'ScenicOrderController@preOrderInfo');
+        Route::get('calc_payment_amount', 'ScenicOrderController@paymentAmount');
         Route::post('submit', 'OrderController@submit');
         Route::post('pay_params', 'OrderController@payParams');
         Route::get('list', 'OrderController@list');

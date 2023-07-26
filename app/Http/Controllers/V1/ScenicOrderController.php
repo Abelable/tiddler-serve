@@ -25,40 +25,14 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class ScenicOrderController extends Controller
 {
-    public function preOrderInfo()
+    public function paymentAmount()
     {
         $ticketId = $this->verifyRequiredId('ticketId');
         $categoryId = $this->verifyRequiredId('categoryId');
-        $timeStamp = $this->verifyInteger('timeStamp');
-        $num = $this->verifyInteger('num', 1);
-
-        $ticket = ScenicTicketService::getInstance()->getTicketById($ticketId);
-        if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
-        }
-        $shopInfo = ScenicShopService::getInstance()->getShopById($ticket->shop_id, ['id', 'name', 'type']);
-        $ticket['shopInfo'] = $shopInfo;
-        unset($ticket->shop_id);
-
-        $category = ScenicTicketCategoryService::getInstance()->getCategoryById($categoryId);
-        if (is_null($category)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
-        }
+        $timeStamp = $this->verifyRequiredInteger('timeStamp');
+        $num = $this->verifyRequiredInteger('num');
 
         $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-
-        $bookable = true;
-        if (is_null($timeStamp)) {
-            $timeStamp = time();
-
-            $curDate = date('Y-m-d');
-            $bookingTimeStamp = strtotime($curDate . ' ' . $ticket->booking_time);
-            if ($timeStamp > $bookingTimeStamp) {
-                $bookable = false;
-                $timeStamp = strtotime($curDate . ' 00:00:00') + 86400;
-            }
-        }
-
         $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
                 return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
             })[0] ?? null;
@@ -66,15 +40,9 @@ class ScenicOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
         }
 
-        $paymentAmount = bcmul($priceUnit->price, $num, 2);
+        $paymentAmount = (float)bcmul($priceUnit->price, $num, 2);
 
-        return $this->success([
-            'ticketInfo' => $ticket,
-            'bookable' => $bookable,
-            'priceList' => $priceList,
-            'categoryName' => $category->name,
-            'paymentAmount' => (float)$paymentAmount
-        ]);
+        return $this->success($paymentAmount);
     }
 
     public function submit()

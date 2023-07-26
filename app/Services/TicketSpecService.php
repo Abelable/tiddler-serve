@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\TicketSpec;
+use App\Utils\CodeResponse;
 
 class TicketSpecService extends BaseService
 {
@@ -33,6 +34,9 @@ class TicketSpecService extends BaseService
             ->where('ticket_id', $ticketId)
             ->where('category_id', $categpryId)
             ->first($columns);
+        if (is_null($spec)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点门票规格不存在');
+        }
         return json_decode($spec->price_list);
     }
 }
