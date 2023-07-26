@@ -7,6 +7,7 @@ class ScenicTicketInput extends BaseInput
     public $type;
     public $scenicIds;
     public $name;
+    public $briefName;
     public $price;
     public $marketPrice;
     public $specList;
@@ -35,6 +36,7 @@ class ScenicTicketInput extends BaseInput
             'type' => 'required|integer|in:1,2',
             'scenicIds' => 'required|array|min:1',
             'name' => 'required|string',
+            'briefName' => 'required|string',
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'specList' => 'required|array|min:1',

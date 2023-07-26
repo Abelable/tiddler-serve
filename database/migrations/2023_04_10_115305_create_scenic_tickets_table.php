@@ -22,6 +22,7 @@ class CreateScenicTicketsTable extends Migration
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->string('name')->comment('门票名称');
+            $table->string('brief_name')->comment('门票简称');
             $table->float('price')->comment('门票最低价格');
             $table->float('market_price')->default(0)->comment('门票市场价格');
             $table->float('sales_commission_rate')->comment('销售佣金比例');

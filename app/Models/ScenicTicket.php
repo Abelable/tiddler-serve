@@ -13,6 +13,7 @@ namespace App\Models;
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
  * @property string $name 门票名称
+ * @property string $brief_name 门票简称
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
  * @property float $sales_commission_rate 销售佣金比例
@@ -44,6 +45,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|ScenicTicket onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket query()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereBookingTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereBriefName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereEffectiveTime($value)

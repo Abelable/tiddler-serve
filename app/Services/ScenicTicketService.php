@@ -78,6 +78,7 @@ class ScenicTicketService extends BaseService
         }
         $ticket->type = $input->type;
         $ticket->name = $input->name;
+        $ticket->brief_name = $input->briefName;
         $ticket->price = $input->price;
         $ticket->market_price = $input->marketPrice ?: '';
         $ticket->sales_commission_rate = $input->salesCommissionRate;
