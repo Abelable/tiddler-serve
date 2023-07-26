@@ -10,6 +10,7 @@ use App\Services\AddressService;
 use App\Services\CartService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
+use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
 use App\Services\ShopService;
@@ -35,6 +36,10 @@ class ScenicOrderController extends Controller
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
+        $shopInfo = ScenicShopService::getInstance()->getShopById($ticket->shop_id, ['id', 'name', 'type']);
+        $ticket['shopInfo'] = $shopInfo;
+        unset($ticket->shop_id);
+
         $category = ScenicTicketCategoryService::getInstance()->getCategoryById($categoryId);
         if (is_null($category)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点分类不存在');
