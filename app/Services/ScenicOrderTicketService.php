@@ -35,7 +35,12 @@ class ScenicOrderTicketService extends BaseService
 
     public function getTicketByOrderId($orderId, $columns = ['*'])
     {
-        return ScenicOrderTicket::query()->where('order_id', $orderId)->get($columns);
+        return ScenicOrderTicket::query()->where('order_id', $orderId)->first($columns);
+    }
+
+    public function getListByOrderIds(array $orderIds, $columns = ['*'])
+    {
+        return ScenicOrderTicket::query()->whereIn('order_id', $orderIds)->get($columns);
     }
 
     public function delete($orderId)

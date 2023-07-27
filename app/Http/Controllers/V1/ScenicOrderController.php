@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Services\OrderGoodsService;
-use App\Services\OrderService;
+use App\Models\ScenicOrder;
 use App\Services\ScenicOrderService;
+use App\Services\ScenicOrderTicketService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\OrderEnums;
 use App\Utils\Enums\ScenicOrderEnums;
 use App\Utils\Inputs\CreateScenicOrderInput;
 use App\Utils\Inputs\PageInput;
@@ -64,7 +62,7 @@ class ScenicOrderController extends Controller
         $status = $this->verifyRequiredInteger('status');
 
         $statusList = $this->statusList($status);
-        $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
+        $page = ScenicOrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
         $list = $this->orderList($page);
 
         return $this->success($this->paginate($page, $list));
@@ -78,7 +76,7 @@ class ScenicOrderController extends Controller
         $shopId = $this->verifyId('shopId');
 
         $statusList = $this->statusList($status);
-        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
+        $page = ScenicOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
         $list = $this->orderList($page);
 
         return $this->success($this->paginate($page, $list));
@@ -110,39 +108,36 @@ class ScenicOrderController extends Controller
     {
         $orderList = collect($page->items());
         $orderIds = $orderList->pluck('id')->toArray();
-        $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
-        $list = $orderList->map(function (Order $order) use ($groupedGoodsList) {
-            $goodsList = $groupedGoodsList->get($order->id);
+        $ticketList = ScenicOrderTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
+        return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
+            $ticket = $ticketList->get($order->id);
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
+                'statusDesc' => ScenicOrderEnums::STATUS_TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopAvatar' => $order->shop_avatar,
                 'shopName' => $order->shop_name,
-                'goodsList' => $goodsList,
+                'ticketInfo' => $ticket,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'address' => $order->address,
                 'orderSn' => $order->order_sn
             ];
         });
-        return $list;
     }
 
     public function cancel()
     {
         $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->userCancel($this->userId(), $id);
+        ScenicOrderService::getInstance()->userCancel($this->userId(), $id);
         return $this->success();
     }
 
     public function confirm()
     {
         $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->confirm($this->userId(), $id);
+        ScenicOrderService::getInstance()->confirm($this->userId(), $id);
         return $this->success();
     }
 
@@ -150,7 +145,7 @@ class ScenicOrderController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         DB::transaction(function () use ($id) {
-            OrderService::getInstance()->delete($this->userId(), $id);
+            ScenicOrderService::getInstance()->delete($this->userId(), $id);
         });
         return $this->success();
     }
@@ -158,7 +153,7 @@ class ScenicOrderController extends Controller
     public function refund()
     {
         $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->refund($this->userId(), $id);
+        ScenicOrderService::getInstance()->refund($this->userId(), $id);
         return $this->success();
     }
 
@@ -185,12 +180,12 @@ class ScenicOrderController extends Controller
             'created_at',
             'updated_at',
         ];
-        $order = OrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
+        $order = ScenicOrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
-        $order['goods_list'] = $goodsList;
+        $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
+        $order['ticket'] = $ticket;
         return $this->success($order);
     }
 }
