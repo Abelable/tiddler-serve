@@ -46,7 +46,7 @@ class ScenicOrderService extends BaseService
             ->where('user_id', $userId)
             ->where('id', $orderId)
             ->where('status', ScenicOrderEnums::STATUS_CREATE)
-            ->get($columns);
+            ->first($columns);
     }
 
     public function getUnpaidOrderBySn($orderSn, $columns = ['*'])
@@ -54,7 +54,7 @@ class ScenicOrderService extends BaseService
         return ScenicOrder::query()
             ->where('order_sn', $orderSn)
             ->where('status', ScenicOrderEnums::STATUS_CREATE)
-            ->get($columns);
+            ->first($columns);
     }
 
     public function generateOrderSn()
@@ -128,7 +128,7 @@ class ScenicOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'scenic_order_sn:' . json_encode($order->order_sn),
+            'body' => 'scenic_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -136,8 +136,7 @@ class ScenicOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['body'] ?
-            json_encode(str_replace('scenic_order_sn:', '', $data['body'])) : [];
+        $orderSn = $data['body'] ? str_replace('scenic_order_sn:', '', $data['body']) : '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 

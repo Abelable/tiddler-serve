@@ -159,14 +159,14 @@ Route::prefix('scenic')->group(function () {
 
     Route::prefix('order')->group(function () {
         Route::get('calc_payment_amount', 'ScenicOrderController@paymentAmount');
-        Route::post('submit', 'OrderController@submit');
-        Route::post('pay_params', 'OrderController@payParams');
-        Route::get('list', 'OrderController@list');
-        Route::get('detail', 'OrderController@detail');
-        Route::post('confirm', 'OrderController@confirm');
-        Route::post('refund', 'OrderController@refund');
-        Route::post('cancel', 'OrderController@cancel');
-        Route::post('delete', 'OrderController@delete');
+        Route::post('submit', 'ScenicOrderController@submit');
+        Route::post('pay_params', 'ScenicOrderController@payParams');
+        Route::get('list', 'ScenicOrderController@list');
+        Route::get('detail', 'ScenicOrderController@detail');
+        Route::post('confirm', 'ScenicOrderController@confirm');
+        Route::post('refund', 'ScenicOrderController@refund');
+        Route::post('cancel', 'ScenicOrderController@cancel');
+        Route::post('delete', 'ScenicOrderController@delete');
     });
 });
 
