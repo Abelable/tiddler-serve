@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\ScenicOrder;
 use App\Utils\CodeResponse;
@@ -16,7 +15,7 @@ class ScenicOrderService extends BaseService
 {
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
-        $query = Order::query()->where('user_id', $userId);
+        $query = ScenicOrder::query()->where('user_id', $userId);
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
@@ -27,7 +26,7 @@ class ScenicOrderService extends BaseService
 
     public function getShopOrderList($shopId, $statusList, PageInput $input, $columns = ['*'])
     {
-        $query = Order::query()->where('shop_id', $shopId);
+        $query = ScenicOrder::query()->where('shop_id', $shopId);
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
