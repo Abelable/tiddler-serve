@@ -3,15 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
 use App\Models\Order;
-use App\Models\Shop;
-use App\Services\AddressService;
-use App\Services\CartService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
-use App\Services\ShopService;
-use App\Services\TicketSpecService;
+use App\Services\ScenicOrderService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateScenicOrderInput;
@@ -29,15 +24,7 @@ class ScenicOrderController extends Controller
         $timeStamp = $this->verifyRequiredInteger('timeStamp');
         $num = $this->verifyRequiredInteger('num');
 
-        $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-        $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
-                return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
-            })[0] ?? null;
-        if (is_null($priceUnit)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
-        }
-
-        $paymentAmount = (float)bcmul($priceUnit->price, $num, 2);
+        list($paymentAmount) = ScenicOrderService::getInstance()->calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num);
 
         return $this->success($paymentAmount);
     }
@@ -54,41 +41,11 @@ class ScenicOrderController extends Controller
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
 
-        $orderIds = DB::transaction(function () use ($input) {
-            // 1.获取地址
-            $address = AddressService::getInstance()->getById($this->userId(), $input->addressId);
-            if (is_null($address)) {
-                return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
-            }
-
-            // 2.获取购物车商品
-            $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $input->cartIds);
-
-            // 3.按商家进行订单拆分，生成对应订单
-            $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
-            $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
-
-            $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartList) {
-                $filterCartList = $cartList->filter(function (Cart $cart) use ($shop) {
-                    return $cart->shop_id == $shop->id;
-                });
-                return OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address, $shop);
-            });
-            if (in_array(0, $shopIds)) {
-                $filterCartList = $cartList->filter(function (Cart $cart) {
-                    return $cart->shop_id == 0;
-                });
-                $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address);
-                $orderIds->push($orderId);
-            }
-
-            // 4.清空购物车
-            CartService::getInstance()->deleteCartList($this->userId(), $input->cartIds);
-
-            return $orderIds;
+        $orderId = DB::transaction(function () use ($input) {
+            return ScenicOrderService::getInstance()->createOrder($this->userId(), $input);
         });
 
-        return $this->success($orderIds);
+        return $this->success($orderId);
     }
 
     public function payParams()

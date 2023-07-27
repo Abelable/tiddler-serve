@@ -2,19 +2,17 @@
 
 namespace App\Services;
 
-use App\Jobs\OverTimeCancelOrder;
-use App\Models\Address;
-use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderGoods;
-use App\Models\Shop;
+use App\Models\ScenicOrder;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\ScenicOrderEnums;
+use App\Utils\Inputs\CreateScenicOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class OrderService extends BaseService
+class ScenicOrderService extends BaseService
 {
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
@@ -48,7 +46,7 @@ class OrderService extends BaseService
         return Order::query()
             ->where('user_id', $userId)
             ->whereIn('id', $orderIds)
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', ScenicOrderEnums::STATUS_CREATE)
             ->get($columns);
     }
 
@@ -56,7 +54,7 @@ class OrderService extends BaseService
     {
         return Order::query()
             ->whereIn('order_sn', $orderSnList)
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', ScenicOrderEnums::STATUS_CREATE)
             ->get($columns);
     }
 
@@ -77,49 +75,48 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, $cartList, Address $address, Shop $shopInfo = null)
+    public function createOrder($userId, CreateScenicOrderInput $input)
     {
-        $goodsPrice = 0;
-        $freightPrice = 0;
+        list($paymentAmount, $price) = $this->calcPaymentAmount($input->ticketId, $input->categoryId, $input->timeStamp, $input->num);
+        $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
+        $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
 
-        /** @var Cart $cart */
-        foreach ($cartList as $cart) {
-            $price = bcmul($cart->price, $cart->number, 2);
-            $goodsPrice = bcadd($goodsPrice, $price, 2);
-            // todo 计算运费
-
-            // 商品减库存
-            $row = GoodsService::getInstance()->reduceStock($cart->goods_id, $cart->number, $cart->selected_sku_index);
-            if ($row == 0) {
-                $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
-            }
-        }
-
-        $order = Order::new();
+        $order = ScenicOrder::new();
         $order->order_sn = $this->generateOrderSn();
-        $order->status = OrderEnums::STATUS_CREATE;
+        $order->status = ScenicOrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
-        $order->consignee = $address->name;
-        $order->mobile = $address->mobile;
-        $order->address = $address->region_desc . ' ' . $address->address_detail;
-        if (!is_null($shopInfo)) {
-            $order->shop_id = $shopInfo->id;
-            $order->shop_avatar = $shopInfo->avatar;
-            $order->shop_name = $shopInfo->name;
-        }
-        $order->goods_price = $goodsPrice;
-        $order->freight_price = $freightPrice;
-        $order->payment_amount = bcadd($goodsPrice, $freightPrice, 2);
+        $order->consignee = $input->consignee;
+        $order->mobile = $input->mobile;
+        $order->id_card_number = $input->idCardNumber;
+        $order->shop_id = $shop->id;
+        $order->shop_avatar = $shop->avatar;
+        $order->shop_name = $shop->name;
+        $order->payment_amount = $paymentAmount;
         $order->refund_amount = $order->payment_amount;
         $order->save();
 
-        // 生成订单商品快照
-        OrderGoodsService::getInstance()->createList($cartList, $order->id);
+        // 生成订单门票快照
+        $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
+        ScenicOrderTicketService::getInstance()->createOrderTicket($order->id, $category, $input->timeStamp, $price, $input->num, $ticket);
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
         return $order->id;
+    }
+
+    public function calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num)
+    {
+        $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
+        $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
+                return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
+            })[0] ?? null;
+        if (is_null($priceUnit)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
+        }
+
+        $paymentAmount = (float)bcmul($priceUnit->price, $num, 2);
+        return [$paymentAmount, $priceUnit->price];
     }
 
     public function createWxPayOrder($userId, array $orderIds, $openid)
@@ -166,7 +163,7 @@ class OrderService extends BaseService
         return $orderList->map(function (Order $order) use ($payId) {
             $order->pay_id = $payId;
             $order->pay_time = now()->toDateTimeString();
-            $order->status = OrderEnums::STATUS_PAY;
+            $order->status = ScenicOrderEnums::STATUS_PAY;
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -196,18 +193,18 @@ class OrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != OrderEnums::STATUS_CREATE) {
+        if ($order->status != ScenicOrderEnums::STATUS_CREATE) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
         }
         switch ($role) {
             case 'system':
-                $order->status = OrderEnums::STATUS_AUTO_CANCEL;
+                $order->status = ScenicOrderEnums::STATUS_AUTO_CANCEL;
                 break;
             case 'admin':
-                $order->status = OrderEnums::STATUS_ADMIN_CANCEL;
+                $order->status = ScenicOrderEnums::STATUS_ADMIN_CANCEL;
                 break;
             case 'user':
-                $order->status = OrderEnums::STATUS_CANCEL;
+                $order->status = ScenicOrderEnums::STATUS_CANCEL;
                 break;
         }
         if ($order->cas() == 0) {
@@ -239,11 +236,8 @@ class OrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != OrderEnums::STATUS_SHIP) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能被确认收货');
-        }
 
-        $order->status = $isAuto ? OrderEnums::STATUS_AUTO_CONFIRM : OrderEnums::STATUS_CONFIRM;
+        $order->status = $isAuto ? ScenicOrderEnums::STATUS_AUTO_CONFIRM : ScenicOrderEnums::STATUS_CONFIRM;
         $order->confirm_time = now()->toDateTimeString();
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -278,7 +272,7 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
         }
 
-        $order->status = OrderEnums::STATUS_REFUND;
+        $order->status = ScenicOrderEnums::STATUS_REFUND;
 
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
