@@ -15,6 +15,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -143,8 +144,29 @@ class OrderController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $status = $this->verifyRequiredInteger('status');
+
+        $statusList = $this->statusList($status);
+        $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
+        $list = $this->orderList($page);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function shopList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $status = $this->verifyRequiredInteger('status');
         $shopId = $this->verifyId('shopId');
 
+        $statusList = $this->statusList($status);
+        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
+        $list = $this->orderList($page);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function statusList($status) {
         switch ($status) {
             case 1:
                 $statusList = [OrderEnums::STATUS_CREATE];
@@ -153,12 +175,9 @@ class OrderController extends Controller
                 $statusList = [OrderEnums::STATUS_PAY];
                 break;
             case 3:
-                $statusList = [OrderEnums::STATUS_SHIP];
-                break;
-            case 4:
                 $statusList = [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM];
                 break;
-            case 5:
+            case 4:
                 $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
                 break;
             default:
@@ -166,14 +185,12 @@ class OrderController extends Controller
                 break;
         }
 
-        if ($shopId) {
-            $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        } else {
-            $page = OrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
-        }
+        return $statusList;
+    }
 
+    private function orderList($page)
+    {
         $orderList = collect($page->items());
-
         $orderIds = $orderList->pluck('id')->toArray();
         $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
         $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
@@ -194,8 +211,7 @@ class OrderController extends Controller
                 'orderSn' => $order->order_sn
             ];
         });
-
-        return $this->success($this->paginate($page, $list));
+        return $list;
     }
 
     public function cancel()
