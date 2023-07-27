@@ -14,7 +14,7 @@ use App\Services\ShopService;
 use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
-use App\Utils\Inputs\CreateOrderInput;
+use App\Utils\Inputs\CreateScenicOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -44,11 +44,11 @@ class ScenicOrderController extends Controller
 
     public function submit()
     {
-        /** @var CreateOrderInput $input */
-        $input = CreateOrderInput::new();
+        /** @var CreateScenicOrderInput $input */
+        $input = CreateScenicOrderInput::new();
 
         // 分布式锁，防止重复请求
-        $lockKey = sprintf('create_order_%s_%s', $this->userId(), md5(serialize($input)));
+        $lockKey = sprintf('create_scenic_order_%s_%s', $this->userId(), md5(serialize($input)));
         $lock = Cache::lock($lockKey, 5);
         if (!$lock->get()) {
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
