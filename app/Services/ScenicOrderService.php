@@ -38,22 +38,22 @@ class ScenicOrderService extends BaseService
 
     public function getOrderById($userId, $id, $columns = ['*'])
     {
-        return Order::query()->where('user_id', $userId)->find($id, $columns);
+        return ScenicOrder::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
+    public function getUnpaidOrder(int $userId, $orderId, $columns = ['*'])
     {
-        return Order::query()
+        return ScenicOrder::query()
             ->where('user_id', $userId)
-            ->whereIn('id', $orderIds)
+            ->where('id', $orderId)
             ->where('status', ScenicOrderEnums::STATUS_CREATE)
             ->get($columns);
     }
 
-    public function getUnpaidListBySn(array $orderSnList, $columns = ['*'])
+    public function getUnpaidOrderBySn($orderSn, $columns = ['*'])
     {
-        return Order::query()
-            ->whereIn('order_sn', $orderSnList)
+        return ScenicOrder::query()
+            ->where('order_sn', $orderSn)
             ->where('status', ScenicOrderEnums::STATUS_CREATE)
             ->get($columns);
     }
@@ -72,7 +72,7 @@ class ScenicOrderService extends BaseService
 
     public function isOrderSnExists(string $orderSn)
     {
-        return Order::query()->where('order_sn', $orderSn)->exists();
+        return ScenicOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
     public function createOrder($userId, CreateScenicOrderInput $input)
@@ -119,58 +119,47 @@ class ScenicOrderService extends BaseService
         return [$paymentAmount, $priceUnit->price];
     }
 
-    public function createWxPayOrder($userId, array $orderIds, $openid)
+    public function createWxPayOrder($userId, $orderId, $openid)
     {
-        $orderList = $this->getUnpaidList($userId, $orderIds);
-        if (count($orderList) == 0) {
+        /** @var ScenicOrder $order */
+        $order = $this->getUnpaidOrder($userId, $orderId);
+        if (is_null($order)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '订单不存在');
-        }
-
-        $orderSnList = $orderList->pluck('order_sn')->toArray();
-
-        $paymentAmount = 0;
-        foreach ($orderList as $order) {
-            $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
         }
 
         return [
             'out_trade_no' => time(),
-            'body' => 'order_sn_list:' . json_encode($orderSnList),
-            'total_fee' => bcmul($paymentAmount, 100),
+            'body' => 'scenic_order_sn:' . json_encode($order->order_sn),
+            'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
     }
 
     public function wxPaySuccess(array $data)
     {
-        $orderSnList = $data['body'] ?
-            json_encode(str_replace('order_sn_list:', '', $data['body'])) : [];
+        $orderSn = $data['body'] ?
+            json_encode(str_replace('scenic_order_sn:', '', $data['body'])) : [];
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
-        $orderList = $this->getUnpaidListBySn($orderSnList);
+        /** @var ScenicOrder $order */
+        $order = $this->getUnpaidOrderBySn($orderSn);
 
-        $paymentAmount = 0;
-        foreach ($orderList as $order) {
-            $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
-        }
-        if (bccomp($actualPaymentAmount, $paymentAmount, 2) != 0) {
-            $errMsg = "支付回调，订单{$data['body']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
+        if (bccomp($actualPaymentAmount, $order->payment_amount, 2) != 0) {
+            $errMsg = "支付回调，订单{$data['body']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$order->payment_amount}";
             Log::error($errMsg);
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
 
-        return $orderList->map(function (Order $order) use ($payId) {
-            $order->pay_id = $payId;
-            $order->pay_time = now()->toDateTimeString();
-            $order->status = ScenicOrderEnums::STATUS_PAY;
-            if ($order->cas() == 0) {
-                $this->throwUpdateFail();
-            }
-            // todo 通知（邮件或钉钉）管理员、
-            // todo 通知（短信、系统消息）商家
-            return $order;
-        });
+        $order->pay_id = $payId;
+        $order->pay_time = now()->toDateTimeString();
+        $order->status = ScenicOrderEnums::STATUS_PAY;
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+        // todo 通知（邮件或钉钉）管理员、
+        // todo 通知（短信、系统消息）商家
+        return $order;
     }
 
     public function userCancel($userId, $orderId)

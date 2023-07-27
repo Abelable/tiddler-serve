@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
+use App\Services\ScenicOrderService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Services\ScenicShopService;
@@ -51,6 +52,13 @@ class CommonController extends Controller
             });
         }
 
+        if (strpos($data['body'], 'order_sn_list')) {
+            Log::info('order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                OrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
         if (strpos($data['body'], 'scenic_provider_order_sn')) {
             Log::info('scenic_provider_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
@@ -60,10 +68,10 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['body'], 'order_sn_list')) {
-            Log::info('order_wx_pay_notify', $data);
+        if (strpos($data['body'], 'scenic_order_sn')) {
+            Log::info('scenic_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                OrderService::getInstance()->wxPaySuccess($data);
+                ScenicOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 

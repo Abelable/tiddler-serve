@@ -50,8 +50,8 @@ class ScenicOrderController extends Controller
 
     public function payParams()
     {
-        $orderIds = $this->verifyArrayNotEmpty('orderIds');
-        $order = OrderService::getInstance()->createWxPayOrder($this->userId(), $orderIds, $this->user()->openid);
+        $orderId = $this->verifyRequiredInteger('orderId');
+        $order = ScenicOrderService::getInstance()->createWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }
