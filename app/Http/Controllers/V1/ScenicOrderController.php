@@ -164,18 +164,13 @@ class ScenicOrderController extends Controller
             'id',
             'order_sn',
             'status',
-            'remarks',
             'consignee',
             'mobile',
-            'address',
             'shop_id',
             'shop_avatar',
             'shop_name',
-            'goods_price',
-            'freight_price',
             'payment_amount',
             'pay_time',
-            'ship_time',
             'confirm_time',
             'created_at',
             'updated_at',
@@ -185,7 +180,7 @@ class ScenicOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
-        $order['ticket'] = $ticket;
+        $order['ticketInfo'] = $ticket;
         return $this->success($order);
     }
 }

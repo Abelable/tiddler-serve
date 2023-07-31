@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\OrderGoods;
 use App\Models\ScenicOrder;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderEnums;
@@ -198,23 +197,7 @@ class ScenicOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
-        // 返还库存
-        $this->returnStock($order->id);
-
         return $order;
-    }
-
-    public function returnStock($orderId)
-    {
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($orderId);
-        /** @var OrderGoods $goods */
-        foreach ($goodsList as $goods)
-        {
-            $row = GoodsService::getInstance()->addStock($goods->goods_id, $goods->number, $goods->selected_sku_index);
-            if ($row == 0) {
-                $this->throwUpdateFail();
-            }
-        }
     }
 
     public function confirm($userId, $orderId, $isAuto = false)

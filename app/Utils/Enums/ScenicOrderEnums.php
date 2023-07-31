@@ -11,8 +11,8 @@ class ScenicOrderEnums
     const STATUS_PAY = 201;
     const STATUS_REFUND = 202;
     const STATUS_REFUND_CONFIRM = 203;
-    const STATUS_CONFIRM = 401;
-    const STATUS_AUTO_CONFIRM = 402;
+    const STATUS_CONFIRM = 301;
+    const STATUS_AUTO_CONFIRM = 302;
 
     const STATUS_TEXT_MAP = [
         self::STATUS_CREATE => '待付款',
