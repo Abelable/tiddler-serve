@@ -163,6 +163,7 @@ Route::prefix('scenic')->group(function () {
         Route::post('submit', 'ScenicOrderController@submit');
         Route::post('pay_params', 'ScenicOrderController@payParams');
         Route::get('list', 'ScenicOrderController@list');
+        Route::get('shop_list', 'ScenicOrderController@shopList');
         Route::get('detail', 'ScenicOrderController@detail');
         Route::post('confirm', 'ScenicOrderController@confirm');
         Route::post('refund', 'ScenicOrderController@refund');
