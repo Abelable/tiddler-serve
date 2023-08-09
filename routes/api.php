@@ -172,6 +172,59 @@ Route::prefix('scenic')->group(function () {
     });
 });
 
+Route::prefix('hotel')->group(function () {
+    Route::get('list', 'HotelController@list');
+    Route::get('detail', 'HotelController@detail');
+    Route::get('options', 'HotelController@options');
+
+    Route::prefix('provider')->group(function () {
+        Route::post('settle_in', 'HotelProviderController@settleIn');
+        Route::get('status', 'HotelProviderController@statusInfo');
+        Route::post('pay_deposit', 'HotelProviderController@payDeposit');
+        Route::post('delete', 'HotelProviderController@deleteProvider');
+        Route::get('scenic_list_totals', 'HotelProviderController@scenicListTotals');
+        Route::get('scenic_list', 'HotelProviderController@providerHotelSpotList');
+        Route::post('apply_scenic', 'HotelProviderController@applyHotelSpot');
+        Route::post('delete_scenic', 'HotelProviderController@deleteProviderHotelSpot');
+        Route::get('scenic_options', 'HotelProviderController@providerHotelOptions');
+
+        Route::prefix('room')->group(function () {
+            Route::get('totals', 'HotelRoomController@roomListTotals');
+            Route::get('list', 'HotelRoomController@userRoomList');
+            Route::get('detail', 'HotelRoomController@detail');
+            Route::post('add', 'HotelRoomController@add');
+            Route::post('edit', 'HotelRoomController@edit');
+            Route::post('up', 'HotelRoomController@up');
+            Route::post('down', 'HotelRoomController@down');
+            Route::post('delete', 'HotelRoomController@delete');
+        });
+    });
+
+    Route::prefix('shop')->group(function () {
+        Route::get('my_shop_info', 'HotelProviderController@myShopInfo');
+    });
+
+    Route::prefix('ticket')->group(function () {
+        Route::get('category_options', 'HotelTicketController@categoryOptions');
+        Route::get('list', 'HotelTicketController@list');
+        Route::get('detail', 'HotelTicketController@detail');
+        Route::get('list_of_scenic', 'HotelTicketController@listByHotelId');
+    });
+
+    Route::prefix('order')->group(function () {
+        Route::get('calc_payment_amount', 'HotelOrderController@paymentAmount');
+        Route::post('submit', 'HotelOrderController@submit');
+        Route::post('pay_params', 'HotelOrderController@payParams');
+        Route::get('list', 'HotelOrderController@list');
+        Route::get('shop_list', 'HotelOrderController@shopList');
+        Route::get('detail', 'HotelOrderController@detail');
+        Route::post('confirm', 'HotelOrderController@confirm');
+        Route::post('refund', 'HotelOrderController@refund');
+        Route::post('cancel', 'HotelOrderController@cancel');
+        Route::post('delete', 'HotelOrderController@delete');
+    });
+});
+
 Route::prefix('media')->group(function () {
     Route::get('list', 'MediaController@list');
     Route::get('follow_list', 'MediaController@followList');
@@ -376,6 +429,60 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('approve', 'ScenicTicketController@approve');
             Route::post('reject', 'ScenicTicketController@reject');
             Route::post('delete', 'ScenicTicketController@delete');
+        });
+    });
+
+    Route::prefix('hotel')->group(function () {
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'HotelCategoryController@list');
+            Route::get('detail', 'HotelCategoryController@detail');
+            Route::post('add', 'HotelCategoryController@add');
+            Route::post('edit', 'HotelCategoryController@edit');
+            Route::post('delete', 'HotelCategoryController@delete');
+            Route::get('options', 'HotelCategoryController@options');
+        });
+
+        Route::post('list', 'HotelController@list');
+        Route::get('detail', 'HotelController@detail');
+        Route::post('add', 'HotelController@add');
+        Route::post('edit', 'HotelController@edit');
+        Route::post('delete', 'HotelController@delete');
+        Route::get('options', 'HotelController@options');
+
+        Route::prefix('provider')->group(function () {
+            Route::post('list', 'HotelProviderController@list');
+            Route::get('detail', 'HotelProviderController@detail');
+            Route::post('approved', 'HotelProviderController@approved');
+            Route::post('reject', 'HotelProviderController@reject');
+            Route::post('order_list', 'HotelProviderController@orderList');
+
+            Route::prefix('hotel')->group(function () {
+                Route::post('list', 'HotelProviderController@providerHotelList');
+                Route::post('approved', 'HotelProviderController@approvedHotelApply');
+                Route::post('reject', 'HotelProviderController@rejectHotelApply');
+                Route::post('delete', 'HotelProviderController@deleteHotelApply');
+            });
+        });
+
+        Route::prefix('shop')->group(function () {
+            Route::post('list', 'HotelShopController@list');
+            Route::get('detail', 'HotelShopController@detail');
+        });
+
+        Route::prefix('room')->group(function () {
+            Route::prefix('type')->group(function () {
+                Route::post('list', 'HotelRoomTypeController@list');
+                Route::get('detail', 'HotelRoomTypeController@detail');
+                Route::post('add', 'HotelRoomTypeController@add');
+                Route::post('edit', 'HotelRoomTypeController@edit');
+                Route::post('delete', 'HotelRoomTypeController@delete');
+            });
+
+            Route::post('list', 'HotelRoomController@list');
+            Route::get('detail', 'HotelRoomController@detail');
+            Route::post('approve', 'HotelRoomController@approve');
+            Route::post('reject', 'HotelRoomController@reject');
+            Route::post('delete', 'HotelRoomController@delete');
         });
     });
 });
