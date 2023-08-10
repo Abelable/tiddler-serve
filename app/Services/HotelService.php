@@ -83,6 +83,7 @@ class HotelService extends BaseService
         $hotel->name = $input->name;
         $hotel->grade = $input->grade;
         $hotel->category_id = $input->categoryId;
+        $hotel->price = $input->price;
         if (!empty($input->video)) {
             $hotel->video = $input->video;
         }
@@ -100,8 +101,17 @@ class HotelService extends BaseService
         if (!empty($input->brief)) {
             $hotel->brief = $input->brief;
         }
-        $hotel->facility_list = json_encode($input->facilityList);
-        $hotel->service_list = json_encode($input->serviceList);
+        $hotel->recreation_facility = json_encode($input->recreationFacility);
+        $hotel->health_facility = json_encode($input->healthFacility);
+        $hotel->children_facility = json_encode($input->childrenFacility);
+        $hotel->common_facility = json_encode($input->commonFacility);
+        $hotel->public_area_facility = json_encode($input->publicAreaFacility);
+        $hotel->traffic_service = json_encode($input->trafficService);
+        $hotel->catering_service = json_encode($input->cateringService);
+        $hotel->reception_service = json_encode($input->receptionService);
+        $hotel->clean_service = json_encode($input->cleanService);
+        $hotel->business_service = json_encode($input->businessService);
+        $hotel->other_service = json_encode($input->otherService);
         $hotel->remind_list = json_encode($input->remindList);
         $hotel->check_in_tip_list = json_encode($input->checkInTipList);
         $hotel->preorder_tip_list = json_encode($input->preorderTipList);

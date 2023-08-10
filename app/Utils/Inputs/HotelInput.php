@@ -9,6 +9,7 @@ class HotelInput extends BaseInput
     public $name;
     public $grade;
     public $categoryId;
+    public $price;
     public $longitude;
     public $latitude;
     public $address;
@@ -18,8 +19,17 @@ class HotelInput extends BaseInput
     public $featureTagList;
     public $tel;
     public $brief;
-    public $facilityList;
-    public $serviceList;
+    public $recreationFacility;
+    public $healthFacility;
+    public $childrenFacility;
+    public $commonFacility;
+    public $publicAreaFacility;
+    public $trafficService;
+    public $cateringService;
+    public $receptionService;
+    public $cleanService;
+    public $businessService;
+    public $otherService;
     public $remindList;
     public $checkInTipList;
     public $preorderTipList;
@@ -31,8 +41,8 @@ class HotelInput extends BaseInput
             'imageList' => 'required|array|min:1',
             'name' => 'required|string',
             'grade' => 'required|integer|in:1,2,3,4',
-            'price' => 'required|numeric',
             'categoryId' => 'required|integer|digits_between:1,20',
+            'price' => 'required|numeric',
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
             'address' => 'required|string',
@@ -42,8 +52,17 @@ class HotelInput extends BaseInput
             'featureTagList'=> 'array',
             'tel' => 'required|string',
             'brief' => 'required|string',
-            'facilityList' => 'array',
-            'serviceList' => 'array',
+            'recreationFacility' => 'array',
+            'healthFacility' => 'array',
+            'childrenFacility' => 'array',
+            'commonFacility' => 'array',
+            'publicAreaFacility' => 'array',
+            'trafficService' => 'array',
+            'cateringService' => 'array',
+            'receptionService' => 'array',
+            'cleanService' => 'array',
+            'businessService' => 'array',
+            'otherService' => 'array',
             'remindList' => 'array',
             'checkInTipList' => 'array',
             'preorderTipList' => 'array',
