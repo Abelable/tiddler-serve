@@ -87,7 +87,12 @@ class HotelService extends BaseService
         if (!empty($input->video)) {
             $hotel->video = $input->video;
         }
-        $hotel->image_list = json_encode($input->imageList);
+        $hotel->cover = $input->cover;
+        $hotel->appearance_image_list = json_encode($input->appearanceImageList);
+        $hotel->interior_image_list = json_encode($input->interiorImageList);
+        $hotel->room_image_list = json_encode($input->roomImageList);
+        $hotel->environment_image_list = json_encode($input->environmentImageList);
+        $hotel->restaurant_image_list = json_encode($input->restaurantImageList);
         $hotel->latitude = $input->latitude;
         $hotel->longitude = $input->longitude;
         $hotel->address = $input->address;

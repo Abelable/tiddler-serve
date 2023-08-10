@@ -12,12 +12,17 @@ namespace App\Models;
  * @property string $name 酒店名称
  * @property int $grade 酒店等级：1-经济，2-舒适，3-高档，4-豪华
  * @property float $price 酒店最低价格
+ * @property string $video 视频
+ * @property string $cover 封面图片
+ * @property string $appearance_image_list 外观图片列表
+ * @property string $interior_image_list 内景图片列表
+ * @property string $room_image_list 房间图片列表
+ * @property string $environment_image_list 环境图片列表
+ * @property string $restaurant_image_list 餐厅图片列表
  * @property float $longitude 经度
  * @property float $latitude 纬度
  * @property string $address 具体地址
  * @property float $rate 酒店评分
- * @property string $video 视频
- * @property string $image_list 图片列表
  * @property string $feature_tag_list 酒店特点
  * @property string $opening_year 开业年份
  * @property string $last_decoration_year 最近一次装修年份
@@ -46,6 +51,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|Hotel onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel query()
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereAppearanceImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereBrief($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereBusinessService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCategoryId($value)
@@ -54,14 +60,16 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereChildrenFacility($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCleanService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCommonFacility($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereEnvironmentImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFeatureTagList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereGrade($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereHealthFacility($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereImageList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereInteriorImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereLastDecorationYear($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereLatitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereLongitude($value)
@@ -75,6 +83,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereReceptionService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRecreationFacility($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRemindList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRestaurantImageList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTel($value)

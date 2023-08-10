@@ -5,7 +5,12 @@ namespace App\Utils\Inputs;
 class HotelInput extends BaseInput
 {
     public $video;
-    public $imageList;
+    public $cover;
+    public $appearanceImageList;
+    public $interiorImageList;
+    public $roomImageList;
+    public $environmentImageList;
+    public $restaurantImageList;
     public $name;
     public $grade;
     public $categoryId;
@@ -38,7 +43,12 @@ class HotelInput extends BaseInput
     {
         return [
             'video' => 'string',
-            'imageList' => 'required|array|min:1',
+            'cover' => 'required|string',
+            'appearanceImageList' => 'required|array',
+            'interiorImageList' => 'required|array',
+            'roomImageList' => 'required|array',
+            'environmentImageList' => 'required|array',
+            'restaurantImageList' => 'required|array',
             'name' => 'required|string',
             'grade' => 'required|integer|in:1,2,3,4',
             'categoryId' => 'required|integer|digits_between:1,20',
