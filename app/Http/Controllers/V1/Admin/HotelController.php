@@ -7,8 +7,7 @@ use App\Models\Hotel;
 use App\Services\HotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelListInput;
-use App\Utils\Inputs\HotelAddInput;
-use App\Utils\Inputs\HotelEditInput;
+use App\Utils\Inputs\HotelInput;
 
 class HotelController extends Controller
 {
@@ -42,62 +41,24 @@ class HotelController extends Controller
 
     public function add()
     {
-        /** @var HotelAddInput $input */
-        $input = HotelAddInput::new();
-
-        $scenic = Hotel::new();
-        $scenic->status = 1;
-        $scenic->name = $input->name;
-        $scenic->level = $input->level;
-        $scenic->category_id = $input->categoryId;
-        if (!empty($input->video)) {
-            $scenic->video = $input->video;
-        }
-        $scenic->image_list = json_encode($input->imageList);
-        $scenic->latitude = $input->latitude;
-        $scenic->longitude = $input->longitude;
-        $scenic->address = $input->address;
-        $scenic->brief = $input->brief;
-        $scenic->open_time_list = json_encode($input->openTimeList);
-        $scenic->policy_list = json_encode($input->policyList);
-        $scenic->hotline_list = json_encode($input->hotlineList);
-        $scenic->project_list = json_encode($input->projectList);
-        $scenic->facility_list = json_encode($input->facilityList);
-        $scenic->tips_list = json_encode($input->tipsList);
-        $scenic->save();
-
+        /** @var HotelInput $input */
+        $input = HotelInput::new();
+        HotelService::getInstance()->createHotel($input);
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var HotelEditInput $input */
-        $input = HotelEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var HotelInput $input */
+        $input = HotelInput::new();
 
-        $scenic = HotelService::getInstance()->getHotelById($input->id);
-        if (is_null($scenic)) {
+        $hotel = HotelService::getInstance()->getHotelById($id);
+        if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
 
-        $scenic->name = $input->name;
-        $scenic->level = $input->level;
-        $scenic->category_id = $input->categoryId;
-        if (!empty($input->video)) {
-            $scenic->video = $input->video;
-        }
-        $scenic->image_list = json_encode($input->imageList);
-        $scenic->latitude = $input->latitude;
-        $scenic->longitude = $input->longitude;
-        $scenic->address = $input->address;
-        $scenic->brief = $input->brief;
-        $scenic->open_time_list = json_encode($input->openTimeList);
-        $scenic->policy_list = json_encode($input->policyList);
-        $scenic->hotline_list = json_encode($input->hotlineList);
-        $scenic->project_list = json_encode($input->projectList);
-        $scenic->facility_list = json_encode($input->facilityList);
-        $scenic->tips_list = json_encode($input->tipsList);
-
-        $scenic->save();
+        HotelService::getInstance()->updateHotel($hotel, $input);
 
         return $this->success();
     }

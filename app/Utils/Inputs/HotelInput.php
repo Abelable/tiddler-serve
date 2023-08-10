@@ -2,12 +2,12 @@
 
 namespace App\Utils\Inputs;
 
-class HotelAddInput extends BaseInput
+class HotelInput extends BaseInput
 {
     public $video;
     public $imageList;
     public $name;
-    public $level;
+    public $grade;
     public $categoryId;
     public $longitude;
     public $latitude;

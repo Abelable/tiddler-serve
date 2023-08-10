@@ -6,6 +6,7 @@ use App\Models\Hotel;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelListInput;
 use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\HotelInput;
 
 class HotelService extends BaseService
 {
@@ -14,6 +15,9 @@ class HotelService extends BaseService
         $query = Hotel::query();
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
+        }
+        if (!empty($input->grade)) {
+            $query = $query->where('grade', $input->grade);
         }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
@@ -67,5 +71,42 @@ class HotelService extends BaseService
     public function getHotelOptions($columns = ['*'])
     {
         return Hotel::query()->orderBy('id', 'asc')->get($columns);
+    }
+
+    public function createHotel(HotelInput $input) {
+        $hotel = Hotel::new();
+        $hotel->status = 1;
+        return $this->updateHotel($hotel, $input);
+    }
+
+    public function updateHotel(Hotel $hotel, HotelInput $input) {
+        $hotel->name = $input->name;
+        $hotel->grade = $input->grade;
+        $hotel->category_id = $input->categoryId;
+        if (!empty($input->video)) {
+            $hotel->video = $input->video;
+        }
+        $hotel->image_list = json_encode($input->imageList);
+        $hotel->latitude = $input->latitude;
+        $hotel->longitude = $input->longitude;
+        $hotel->address = $input->address;
+        $hotel->feature_tag_list = json_encode($input->featureTagList);
+        $hotel->opening_year = $input->openingYear;
+        if (!empty($input->lastDecorationYear)) {
+            $hotel->last_decoration_year = $input->lastDecorationYear;
+        }
+        $hotel->room_num = $input->roomNum;
+        $hotel->tel = $input->tel;
+        if (!empty($input->brief)) {
+            $hotel->brief = $input->brief;
+        }
+        $hotel->facility_list = json_encode($input->facilityList);
+        $hotel->service_list = json_encode($input->serviceList);
+        $hotel->remind_list = json_encode($input->remindList);
+        $hotel->check_in_tip_list = json_encode($input->checkInTipList);
+        $hotel->preorder_tip_list = json_encode($input->preorderTipList);
+        $hotel->save();
+
+        return $hotel;
     }
 }
