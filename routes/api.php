@@ -173,6 +173,7 @@ Route::prefix('scenic')->group(function () {
 });
 
 Route::prefix('hotel')->group(function () {
+    Route::get('category_options', 'HotelController@categoryOptions');
     Route::get('list', 'HotelController@list');
     Route::get('detail', 'HotelController@detail');
     Route::get('options', 'HotelController@options');

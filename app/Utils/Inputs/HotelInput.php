@@ -12,6 +12,7 @@ class HotelInput extends BaseInput
     public $environmentImageList;
     public $restaurantImageList;
     public $name;
+    public $englishName;
     public $grade;
     public $categoryId;
     public $price;
@@ -50,6 +51,7 @@ class HotelInput extends BaseInput
             'environmentImageList' => 'required|array',
             'restaurantImageList' => 'required|array',
             'name' => 'required|string',
+            'englishName' => 'required|string',
             'grade' => 'required|integer|in:1,2,3,4',
             'categoryId' => 'required|integer|digits_between:1,20',
             'price' => 'required|numeric',

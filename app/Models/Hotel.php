@@ -10,6 +10,7 @@ namespace App\Models;
  * @property string $failure_reason 审核失败原因
  * @property int $category_id 酒店分类id
  * @property string $name 酒店名称
+ * @property string $english_name 酒店英文名称
  * @property int $grade 酒店等级：1-经济，2-舒适，3-高档，4-豪华
  * @property float $price 酒店最低价格
  * @property string $video 视频
@@ -63,6 +64,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereEnglishName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereEnvironmentImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFeatureTagList($value)

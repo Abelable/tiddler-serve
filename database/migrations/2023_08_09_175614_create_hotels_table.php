@@ -19,6 +19,7 @@ class CreateHotelsTable extends Migration
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('category_id')->comment('酒店分类id');
             $table->string('name')->comment('酒店名称');
+            $table->string('english_name')->comment('酒店英文名称');
             $table->integer('grade')->comment('酒店等级：1-经济，2-舒适，3-高档，4-豪华');
             $table->float('price')->comment('酒店最低价格');
             $table->string('video')->default('')->comment('视频');

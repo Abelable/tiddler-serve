@@ -94,6 +94,7 @@ class HotelService extends BaseService
 
     public function updateHotel(Hotel $hotel, HotelInput $input) {
         $hotel->name = $input->name;
+        $hotel->english_name = $input->englishName;
         $hotel->grade = $input->grade;
         $hotel->category_id = $input->categoryId;
         $hotel->price = $input->price;
