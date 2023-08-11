@@ -20,6 +20,7 @@ class HotelController extends Controller
             'id',
             'status',
             'failure_reason',
+            'cover',
             'name',
             'grade',
             'category_id',
@@ -35,8 +36,8 @@ class HotelController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $scenic = HotelService::getInstance()->getHotelById($id);
-        return $this->success($scenic);
+        $hotel = HotelService::getInstance()->getHotelById($id);
+        return $this->success($hotel);
     }
 
     public function add()
@@ -64,11 +65,11 @@ class HotelController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $scenic = HotelService::getInstance()->getHotelById($id);
-        if (is_null($scenic)) {
+        $hotel = HotelService::getInstance()->getHotelById($id);
+        if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
-        $scenic->delete();
+        $hotel->delete();
 
         return $this->success();
     }
