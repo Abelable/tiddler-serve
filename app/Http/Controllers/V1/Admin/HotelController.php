@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Hotel;
 use App\Services\HotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelListInput;
@@ -55,9 +54,6 @@ class HotelController extends Controller
         $input = HotelInput::new();
 
         $hotel = HotelService::getInstance()->getHotelById($id);
-        if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
-        }
 
         HotelService::getInstance()->updateHotel($hotel, $input);
 

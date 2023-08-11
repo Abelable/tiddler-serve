@@ -30,18 +30,31 @@ class HotelService extends BaseService
 
     public function getHotelById($id, $columns=['*'])
     {
-        $scenic = Hotel::query()->find($id, $columns);
-        if (is_null($scenic)) {
+        $hotel = Hotel::query()->find($id, $columns);
+        if (is_null($hotel)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
         }
-        $scenic->image_list = json_decode($scenic->image_list);
-        $scenic->open_time_list = json_decode($scenic->open_time_list);
-        $scenic->policy_list = json_decode($scenic->policy_list);
-        $scenic->hotline_list = json_decode($scenic->hotline_list);
-        $scenic->facility_list = json_decode($scenic->facility_list);
-        $scenic->tips_list = json_decode($scenic->tips_list);
-        $scenic->project_list = json_decode($scenic->project_list);
-        return $scenic;
+        $hotel->appearance_image_list = json_decode($hotel->appearance_image_list);
+        $hotel->interior_image_list = json_decode($hotel->interior_image_list);
+        $hotel->room_image_list = json_decode($hotel->room_image_list);
+        $hotel->environment_image_list = json_decode($hotel->environment_image_list);
+        $hotel->restaurant_image_list = json_decode($hotel->restaurant_image_list);
+        $hotel->feature_tag_list = json_decode($hotel->feature_tag_list);
+        $hotel->recreation_facility = json_decode($hotel->recreation_facility);
+        $hotel->health_facility = json_decode($hotel->health_facility);
+        $hotel->children_facility = json_decode($hotel->children_facility);
+        $hotel->common_facility = json_decode($hotel->common_facility);
+        $hotel->public_area_facility = json_decode($hotel->public_area_facility);
+        $hotel->traffic_service = json_decode($hotel->traffic_service);
+        $hotel->catering_service = json_decode($hotel->catering_service);
+        $hotel->reception_service = json_decode($hotel->reception_service);
+        $hotel->clean_service = json_decode($hotel->clean_service);
+        $hotel->business_service = json_decode($hotel->business_service);
+        $hotel->other_service = json_decode($hotel->other_service);
+        $hotel->remind_list = json_decode($hotel->remind_list);
+        $hotel->check_in_tip_list = json_decode($hotel->check_in_tip_list);
+        $hotel->preorder_tip_list = json_decode($hotel->preorder_tip_list);
+        return $hotel;
     }
 
     public function getHotelListByIds(array $ids, $columns = ['*'])
