@@ -25,7 +25,9 @@ class HotelService extends BaseService
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getHotelById($id, $columns=['*'])
