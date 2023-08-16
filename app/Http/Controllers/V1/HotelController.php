@@ -37,13 +37,13 @@ class HotelController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $scenic = HotelService::getInstance()->getScenicById($id);
-        return $this->success($scenic);
+        $hotel = HotelService::getInstance()->getHotelById($id);
+        return $this->success($hotel);
     }
 
     public function options()
     {
-        $scenicOptions = HotelService::getInstance()->getScenicOptions(['id', 'name']);
-        return $this->success($scenicOptions);
+        $hotelOptions = HotelService::getInstance()->getHotelOptions(['id', 'name']);
+        return $this->success($hotelOptions);
     }
 }
