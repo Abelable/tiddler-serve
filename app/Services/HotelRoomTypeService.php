@@ -9,9 +9,10 @@ use App\Utils\Inputs\PageInput;
 
 class HotelRoomTypeService extends BaseService
 {
-    public function getTypeList(pageInput $input, $columns=['*'])
+    public function getTypeList($hotelId, pageInput $input, $columns=['*'])
     {
         return HotelRoomType::query()
+            ->where('hotel_id', $hotelId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

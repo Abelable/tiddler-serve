@@ -14,10 +14,12 @@ class HotelRoomTypeController extends Controller
 
     public function list()
     {
+        $hotelId = $this->verifyRequiredId('hotelId');
         /** @var PageInput $input */
         $input = PageInput::new();
-        $page = HotelRoomTypeService::getInstance()->getTypeList($input);
-        $typeList = $page->items();
+
+        $page = HotelRoomTypeService::getInstance()->getTypeList($hotelId, $input);
+        $typeList = collect($page->items());
         $list = $typeList->map(function (HotelRoomType $hotelRoomType) {
             $hotelRoomType->image_list = json_encode($hotelRoomType->image_list);
             return $hotelRoomType;
