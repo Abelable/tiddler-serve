@@ -450,6 +450,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'HotelController@delete');
         Route::get('options', 'HotelController@options');
 
+        Route::prefix('room_type')->group(function () {
+            Route::post('list', 'HotelRoomTypeController@list');
+            Route::get('detail', 'HotelRoomTypeController@detail');
+            Route::post('add', 'HotelRoomTypeController@add');
+            Route::post('edit', 'HotelRoomTypeController@edit');
+            Route::post('delete', 'HotelRoomTypeController@delete');
+            Route::get('options', 'HotelRoomTypeController@options');
+        });
+
         Route::prefix('provider')->group(function () {
             Route::post('list', 'HotelProviderController@list');
             Route::get('detail', 'HotelProviderController@detail');

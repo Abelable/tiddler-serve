@@ -34,7 +34,7 @@ class HotelService extends BaseService
     {
         $hotel = Hotel::query()->find($id, $columns);
         if (is_null($hotel)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '酒店不存在');
         }
         $hotel->appearance_image_list = json_decode($hotel->appearance_image_list);
         $hotel->interior_image_list = json_decode($hotel->interior_image_list);
