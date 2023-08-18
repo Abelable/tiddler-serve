@@ -24,6 +24,7 @@ class UserController extends Controller
             'mobile' => $user->mobile,
             'shopId' => $user->shop->id ?? 0,
             'scenicShopId' => $user->scenicShop->id ?? 0,
+            'hotelShopId' => $user->hotelShop->id ?? 0,
         ]);
     }
 

@@ -51,7 +51,7 @@ class ShopController extends Controller
             'status' => $merchant->status,
             'failureReason' => $merchant->failure_reason,
             'type' => $merchant->type,
-            'orderId' => $merchantOrder->id
+            'orderId' => $merchantOrder ? $merchantOrder->id : 0
         ] : null);
     }
 

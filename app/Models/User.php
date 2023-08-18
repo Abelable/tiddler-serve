@@ -51,6 +51,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \App\Models\HotelShop|null $hotelShop
  */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
@@ -103,5 +104,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function scenicShop()
     {
         return $this->hasOne(ScenicShop::class, 'user_id')->where('status', 1);
+    }
+
+    public function hotelShop()
+    {
+        return $this->hasOne(HotelShop::class, 'user_id')->where('status', 1);
     }
 }
