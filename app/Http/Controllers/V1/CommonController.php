@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\HotelProviderOrderService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
@@ -72,6 +73,13 @@ class CommonController extends Controller
             Log::info('scenic_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 ScenicOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
+        if (strpos($data['body'], 'hotel_order_sn')) {
+            Log::info('hotel_order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                HotelProviderOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
