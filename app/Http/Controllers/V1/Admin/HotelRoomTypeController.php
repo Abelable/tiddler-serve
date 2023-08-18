@@ -18,10 +18,10 @@ class HotelRoomTypeController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $page = HotelRoomTypeService::getInstance()->getTypeList($hotelId, $input);
+        $page = HotelRoomTypeService::getInstance()->getTypeList($hotelId, $input, ['id', 'image_list', 'name', 'created_at', 'updated_at']);
         $typeList = collect($page->items());
         $list = $typeList->map(function (HotelRoomType $hotelRoomType) {
-            $hotelRoomType->image_list = json_encode($hotelRoomType->image_list);
+            $hotelRoomType->image_list = json_decode($hotelRoomType->image_list);
             return $hotelRoomType;
         });
         return $this->success($this->paginate($page, $list));

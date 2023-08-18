@@ -36,7 +36,8 @@ class HotelRoomTypeService extends BaseService
 
     public function createType(HotelRoomTypeInput $input) {
         $type = HotelRoomType::new();
-        return $this->updateHotel($type, $input);
+        $type->hotel_id = $input->hotelId;
+        return $this->updateType($type, $input);
     }
 
     public function updateType(HotelRoomType $type, HotelRoomTypeInput $input) {
