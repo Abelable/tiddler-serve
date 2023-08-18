@@ -77,7 +77,7 @@ class HotelProviderController extends Controller
         return $this->success($shop);
     }
 
-    public function scenicListTotals()
+    public function hotelListTotals()
     {
         return $this->success([
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
@@ -91,17 +91,17 @@ class HotelProviderController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $page = ProviderHotelService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ProviderHotelService::getInstance()->getUserHotelList($this->userId(), $input, ['id', 'hotel_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerHotelList = collect($page->items());
-        $scenicIds = $providerHotelList->pluck('scenic_id')->toArray();
-        $scenicList = HotelService::getInstance()->getHotelListByIds($scenicIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
-        $list = $providerHotelList->map(function (ProviderHotel $providerHotel) use ($scenicList) {
-            /** @var Hotel $scenic */
-            $scenic = $scenicList->get($providerHotel->scenic_id);
-            $providerHotel['scenic_image'] = json_decode($scenic->image_list)[0];
-            $providerHotel['scenic_name'] = $scenic->name;
-            $providerHotel['scenic_level'] = $scenic->level;
-            $providerHotel['scenic_address'] = $scenic->address;
+        $hotelIds = $providerHotelList->pluck('hotel_id')->toArray();
+        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
+        $list = $providerHotelList->map(function (ProviderHotel $providerHotel) use ($hotelList) {
+            /** @var Hotel $hotel */
+            $hotel = $hotelList->get($providerHotel->hotel_id);
+            $providerHotel['hotel_image'] = json_decode($hotel->image_list)[0];
+            $providerHotel['hotel_name'] = $hotel->name;
+            $providerHotel['hotel_level'] = $hotel->level;
+            $providerHotel['hotel_address'] = $hotel->address;
             return $providerHotel;
         });
 
@@ -110,26 +110,26 @@ class HotelProviderController extends Controller
 
     public function applyHotel()
     {
-        $scenicId = $this->verifyRequiredId('scenicId');
+        $hotelId = $this->verifyRequiredId('hotelId');
 
-        if (is_null($this->user()->scenicShop)) {
+        if (is_null($this->user()->hotelShop)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加景点');
         }
 
-        $scenicSpot = HotelService::getInstance()->getHotelById($scenicId);
-        if (is_null($scenicSpot)) {
+        $hotel = HotelService::getInstance()->getHotelById($hotelId);
+        if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
 
-        $providerHotel = ProviderHotelService::getInstance()->getSpotByHotelId($this->userId(), $scenicId);
+        $providerHotel = ProviderHotelService::getInstance()->getHotelByHotelId($this->userId(), $hotelId);
         if (!is_null($providerHotel)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前景点');
         }
 
         $providerHotel = ProviderHotel::new();
         $providerHotel->user_id = $this->userId();
-        $providerHotel->provider_id = $this->user()->scenicProvider->id;
-        $providerHotel->scenic_id = $scenicId;
+        $providerHotel->provider_id = $this->user()->hotelProvider->id;
+        $providerHotel->hotel_id = $hotelId;
         $providerHotel->save();
         return $this->success();
     }
@@ -137,18 +137,18 @@ class HotelProviderController extends Controller
     public function deleteProviderHotel()
     {
         $id = $this->verifyRequiredId('id');
-        $spot = ProviderHotelService::getInstance()->getUserSpotById($this->userId(), $id);
-        if (is_null($spot)) {
+        $hotel = ProviderHotelService::getInstance()->getUserHotelById($this->userId(), $id);
+        if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
         }
-        $spot->delete();
+        $hotel->delete();
         return $this->success();
     }
 
     public function providerHotelOptions()
     {
-        $scenicIds = ProviderHotelService::getInstance()->getUserHotelOptions($this->userId())->pluck('scenic_id')->toArray();
-        $scenicOptions = HotelService::getInstance()->getHotelListByIds($scenicIds, ['id', 'name']);
-        return $this->success($scenicOptions);
+        $hotelIds = ProviderHotelService::getInstance()->getUserHotelOptions($this->userId())->pluck('hotel_id')->toArray();
+        $hotelOptions = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name']);
+        return $this->success($hotelOptions);
     }
 }
