@@ -183,11 +183,11 @@ Route::prefix('hotel')->group(function () {
         Route::get('status', 'HotelProviderController@statusInfo');
         Route::post('pay_deposit', 'HotelProviderController@payDeposit');
         Route::post('delete', 'HotelProviderController@deleteProvider');
-        Route::get('scenic_list_totals', 'HotelProviderController@scenicListTotals');
-        Route::get('scenic_list', 'HotelProviderController@providerHotelSpotList');
-        Route::post('apply_scenic', 'HotelProviderController@applyHotelSpot');
-        Route::post('delete_scenic', 'HotelProviderController@deleteProviderHotelSpot');
-        Route::get('scenic_options', 'HotelProviderController@providerHotelOptions');
+        Route::get('hotel_list_totals', 'HotelProviderController@hotelListTotals');
+        Route::get('hotel_list', 'HotelProviderController@providerHotelList');
+        Route::post('apply_hotel', 'HotelProviderController@applyHotel');
+        Route::post('delete_hotel', 'HotelProviderController@deleteProviderHotel');
+        Route::get('hotel_options', 'HotelProviderController@providerHotelOptions');
 
         Route::prefix('room')->group(function () {
             Route::get('totals', 'HotelRoomController@roomListTotals');
@@ -205,11 +205,11 @@ Route::prefix('hotel')->group(function () {
         Route::get('my_shop_info', 'HotelProviderController@myShopInfo');
     });
 
-    Route::prefix('ticket')->group(function () {
-        Route::get('category_options', 'HotelTicketController@categoryOptions');
-        Route::get('list', 'HotelTicketController@list');
-        Route::get('detail', 'HotelTicketController@detail');
-        Route::get('list_of_scenic', 'HotelTicketController@listByHotelId');
+    Route::prefix('room')->group(function () {
+        Route::get('category_options', 'HotelRoomController@categoryOptions');
+        Route::get('list', 'HotelRoomController@list');
+        Route::get('detail', 'HotelRoomController@detail');
+        Route::get('list_of_hotel', 'HotelRoomController@listByHotelId');
     });
 
     Route::prefix('order')->group(function () {
