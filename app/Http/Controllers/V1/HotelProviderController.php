@@ -80,8 +80,8 @@ class HotelProviderController extends Controller
     public function hotelListTotals()
     {
         return $this->success([
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 0),
+            ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 2),
         ]);
     }

@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
-
 /**
  * App\Models\User
  *
@@ -26,6 +25,8 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\HotelProvider|null $hotelProvider
+ * @property-read \App\Models\HotelShop|null $hotelShop
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
@@ -51,7 +52,6 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin \Eloquent
- * @property-read \App\Models\HotelShop|null $hotelShop
  */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
@@ -109,5 +109,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function hotelShop()
     {
         return $this->hasOne(HotelShop::class, 'user_id')->where('status', 1);
+    }
+
+    public function hotelProvider()
+    {
+        return $this->hasOne(HotelProvider::class, 'user_id');
     }
 }
