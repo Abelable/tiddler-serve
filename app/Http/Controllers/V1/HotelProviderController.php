@@ -80,8 +80,8 @@ class HotelProviderController extends Controller
     public function hotelListTotals()
     {
         return $this->success([
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 0),
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
+            ProviderHotelService::getInstance()->getListTotal($this->userId(), 0),
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 2),
         ]);
     }
@@ -94,13 +94,13 @@ class HotelProviderController extends Controller
         $page = ProviderHotelService::getInstance()->getUserHotelList($this->userId(), $input, ['id', 'hotel_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerHotelList = collect($page->items());
         $hotelIds = $providerHotelList->pluck('hotel_id')->toArray();
-        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
+        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name', 'cover', 'grade', 'address'])->keyBy('id');
         $list = $providerHotelList->map(function (ProviderHotel $providerHotel) use ($hotelList) {
             /** @var Hotel $hotel */
             $hotel = $hotelList->get($providerHotel->hotel_id);
-            $providerHotel['hotel_image'] = json_decode($hotel->image_list)[0];
+            $providerHotel['hotel_cover'] = $hotel->cover;
             $providerHotel['hotel_name'] = $hotel->name;
-            $providerHotel['hotel_level'] = $hotel->level;
+            $providerHotel['hotel_grade'] = $hotel->grade;
             $providerHotel['hotel_address'] = $hotel->address;
             return $providerHotel;
         });

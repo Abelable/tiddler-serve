@@ -27,6 +27,8 @@ class CreateHotelRoomsTable extends Migration
             $table->integer('breakfast_num')->comment('早餐份数');
             $table->integer('guest_num')->comment('可入住客人数量');
             $table->integer('cancellable')->comment('免费取消：0-不可取消，1-可免费取消');
+            $table->float('price')->comment('房间起始价格');
+            $table->integer('sales_volume')->default(0)->comment('房间销量');
             $table->longText('price_list')->comment('价格列表：分时间段设置价格');
             $table->timestamps();
             $table->softDeletes();

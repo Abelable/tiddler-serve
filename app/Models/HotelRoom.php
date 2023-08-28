@@ -18,6 +18,8 @@ namespace App\Models;
  * @property int $breakfast_num 早餐份数
  * @property int $guest_num 可入住客人数量
  * @property int $cancellable 免费取消：0-不可取消，1-可免费取消
+ * @property float $price 房间起始价格
+ * @property int $sales_volume 房间销量
  * @property string $price_list 价格列表：分时间段设置价格
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -34,10 +36,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereGuestNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereHotelId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePriceList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSalesCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereTypeId($value)
