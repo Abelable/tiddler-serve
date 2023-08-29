@@ -3,17 +3,14 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicShop;
-use App\Models\ScenicTicket;
+use App\Models\HotelRoom;
+use App\Models\HotelShop;
 use App\Services\HotelRoomTypeService;
-use App\Services\ScenicShopService;
+use App\Services\HotelShopService;
 use App\Services\HotelRoomService;
-use App\Services\TicketScenicService;
-use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicTicketInput;
+use App\Utils\Inputs\HotelRoomInput;
 use App\Utils\Inputs\StatusPageInput;
-use Illuminate\Support\Facades\DB;
 
 class HotelRoomController extends Controller
 {
@@ -25,18 +22,16 @@ class HotelRoomController extends Controller
         return $this->success($options);
     }
 
-    public function listByScenicId()
+    public function roomListByHotelId()
     {
-        $scenicId = $this->verifyRequiredId('scenicId');
+        $hotelId = $this->verifyRequiredId('hotelId');
 
-        $roomIds = TicketScenicService::getInstance()->getListByScenicId($scenicId)->pluck('room_id')->toArray();
-        $roomList = HotelRoomService::getInstance()->getListByIds($roomIds);
-
+        $roomList = HotelRoomService::getInstance()->getListByHotelId($hotelId);
         $shopIds = $roomList->pluck('shop_id')->toArray();
-        $shopList = ScenicShopService::getInstance()->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
+        $shopList = HotelShopService::getInstance()->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
 
-        $roomList = $roomList->map(function (ScenicTicket $room) use ($shopList) {
-            /** @var ScenicShop $shop */
+        $roomList = $roomList->map(function (HotelRoom $room) use ($shopList) {
+            /** @var HotelShop $shop */
             $shop = $shopList->get($room->shop_id);
             $room['shopInfo'] = $shop;
 
@@ -66,53 +61,38 @@ class HotelRoomController extends Controller
         ]);
     }
 
-    public function userTicketList()
+    public function userRoomList()
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
-
-        $page = HotelRoomService::getInstance()->getTicketListByStatus($this->userId(), $input);
-        $roomList = collect($page->items());
-        $list = $roomList->map(function (ScenicTicket $room) {
-            $room['scenicIds'] = $room->scenicIds();
-            return $room;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        $page = HotelRoomService::getInstance()->getRoomListByStatus($this->userId(), $input);
+        return $this->successPaginate($page);
     }
 
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getTicketById($id);
+        $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
-
-        $scenicIds = TicketScenicService::getInstance()->getListByTicketId($room->id)->pluck('scenic_id')->toArray();
-        $specList = TicketSpecService::getInstance()->getSpecListByTicketId($room->id, ['category_id', 'price_list']);
-        $room['scenicIds'] = $scenicIds;
-        $room['specList'] = $specList;
+        $room->price_list = json_decode($room->price_list);
 
         return $this->success($room);
     }
 
     public function add()
     {
-        /** @var ScenicTicketInput $input */
-        $input = ScenicTicketInput::new();
+        /** @var HotelRoomInput $input */
+        $input = HotelRoomInput::new();
 
-        $shopId = $this->user()->scenicShop->id;
+        $shopId = $this->user()->hotelShop->id;
         if ($shopId == 0) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法上传景点门票');
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法添加酒店房间');
         }
 
-        DB::transaction(function () use ($shopId, $input) {
-            $room = HotelRoomService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
-            TicketScenicService::getInstance()->createTicketScenicSpots($room->id, $input->scenicIds);
-            TicketSpecService::getInstance()->createTicketSpecList($room->id, $input->specList);
-        });
+        HotelRoomService::getInstance()->createRoom($this->userId(), $this->user()->hotelProvider->id, $shopId, $input);
 
         return $this->success();
     }
@@ -120,19 +100,15 @@ class HotelRoomController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        /** @var ScenicTicketInput $input */
-        $input = ScenicTicketInput::new();
+        /** @var HotelRoomInput $input */
+        $input = HotelRoomInput::new();
 
-        $room = HotelRoomService::getInstance()->getUserTicket($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
 
-        DB::transaction(function () use ($input, $room) {
-            HotelRoomService::getInstance()->updateTicket($room, $input);
-            TicketScenicService::getInstance()->updateTicketScenicSpots($room->id, $input->scenicIds);
-            TicketSpecService::getInstance()->updateTicketSpecList($room->id, $input->specList);
-        });
+        HotelRoomService::getInstance()->updateRoom($room, $input);
 
         return $this->success();
     }
@@ -141,12 +117,12 @@ class HotelRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserTicket($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         if ($room->status != 3) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非下架景点门票，无法上架');
+            return $this->fail(CodeResponse::FORBIDDEN, '非下架酒店房间，无法上架');
         }
         $room->status = 1;
         $room->save();
@@ -158,12 +134,12 @@ class HotelRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserTicket($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         if ($room->status != 1) {
-            return $this->fail(CodeResponse::FORBIDDEN, '非售卖中景点门票，无法下架');
+            return $this->fail(CodeResponse::FORBIDDEN, '非售卖中酒店房间，无法下架');
         }
         $room->status = 3;
         $room->save();
@@ -175,9 +151,9 @@ class HotelRoomController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserTicket($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         $room->delete();
 
