@@ -17,6 +17,11 @@ class HotelRoomTypeService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return HotelRoomType::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function getTypeById($id, $columns=['*'])
     {
         /** @var HotelRoomType $type */

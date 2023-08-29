@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\HotelRoom;
+use App\Models\HotelRoomType;
 use App\Models\HotelShop;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelShopService;
@@ -18,7 +19,8 @@ class HotelRoomController extends Controller
 
     public function typeOptions()
     {
-        $options = HotelRoomTypeService::getInstance()->getTypeOptions(['id', 'name']);
+        $hotelId = $this->verifyRequiredId('hotelId');
+        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId, ['id', 'name']);
         return $this->success($options);
     }
 
@@ -66,7 +68,19 @@ class HotelRoomController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
         $page = HotelRoomService::getInstance()->getRoomListByStatus($this->userId(), $input);
-        return $this->successPaginate($page);
+        $roomList = collect($page->items());
+
+        $typeIds = $roomList->pluck('type_id')->toArray();
+        $typeList = HotelRoomTypeService::getInstance()->getListByIds($typeIds, ['id', 'name'])->keyBy('id');
+
+        $list = $roomList->map(function (HotelRoom $room) use ($typeList) {
+            /** @var HotelRoomType $type */
+            $type = $typeList->get($room->type_id);
+            $room['typeName'] = $type->name;
+            return $room;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
