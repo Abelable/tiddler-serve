@@ -206,7 +206,7 @@ Route::prefix('hotel')->group(function () {
     });
 
     Route::prefix('room')->group(function () {
-        Route::get('category_options', 'HotelRoomController@categoryOptions');
+        Route::get('type_options', 'HotelRoomController@typeOptions');
         Route::get('list', 'HotelRoomController@list');
         Route::get('detail', 'HotelRoomController@detail');
         Route::get('list_of_hotel', 'HotelRoomController@listByHotelId');

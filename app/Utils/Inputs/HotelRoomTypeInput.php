@@ -15,7 +15,7 @@ class HotelRoomTypeInput extends BaseInput
     public function rules()
     {
         return [
-            'hotelId' => 'integer|digits_between:1,20',
+            'hotelId' => 'required|integer|digits_between:1,20',
             'name' => 'required|string',
             'imageList' => 'required|array',
             'bedDesc' => 'required|string',

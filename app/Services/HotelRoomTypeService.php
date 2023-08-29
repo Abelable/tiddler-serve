@@ -29,9 +29,9 @@ class HotelRoomTypeService extends BaseService
         return $type;
     }
 
-    public function getTypeOptions($columns = ['*'])
+    public function getTypeOptions($hotelId, $columns = ['*'])
     {
-        return HotelRoomType::query()->orderBy('id', 'asc')->get($columns);
+        return HotelRoomType::query()->where('hotel_id', $hotelId)->orderBy('id', 'asc')->get($columns);
     }
 
     public function createType(HotelRoomTypeInput $input) {
