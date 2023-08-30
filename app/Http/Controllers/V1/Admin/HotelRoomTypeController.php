@@ -67,7 +67,8 @@ class HotelRoomTypeController extends Controller
 
     public function options()
     {
-        $options = HotelRoomTypeService::getInstance()->getTypeOptions(['id', 'name']);
+        $hotelId = $this->verifyRequiredId('hotelId');
+        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId, ['id', 'name']);
         return $this->success($options);
     }
 }
