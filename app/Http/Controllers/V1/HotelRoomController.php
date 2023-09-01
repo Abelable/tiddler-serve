@@ -15,12 +15,17 @@ use App\Utils\Inputs\StatusPageInput;
 
 class HotelRoomController extends Controller
 {
-    protected $except = ['categoryOptions', 'listByScenicId'];
+    protected $except = ['typeOptions', 'roomListByHotelId'];
 
     public function typeOptions()
     {
         $hotelId = $this->verifyRequiredId('hotelId');
-        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId, ['id', 'name']);
+        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId);
+        $options = $options->map(function (HotelRoomType $type) {
+            $type->image_list = json_decode($type->image_list);
+            $type->facility_list = json_decode($type->facility_list);
+            return $type;
+        });
         return $this->success($options);
     }
 
