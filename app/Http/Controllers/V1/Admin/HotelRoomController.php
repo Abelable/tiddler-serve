@@ -53,11 +53,16 @@ class HotelRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
         }
 
+        $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
+        $room['hotelName'] = $hotel->name;
+
+        $roomType = HotelRoomTypeService::getInstance()->getTypeById($room->type_id);
+        $room['typeName'] = $roomType->name;
+
         $provider = HotelProviderService::getInstance()->getProviderById($room->provider_id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
         }
-
         $room['provider_info'] = $provider;
 
         return $this->success($room);

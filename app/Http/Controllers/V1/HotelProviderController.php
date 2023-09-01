@@ -113,17 +113,17 @@ class HotelProviderController extends Controller
         $hotelId = $this->verifyRequiredId('hotelId');
 
         if (is_null($this->user()->hotelShop)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加景点');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加酒店');
         }
 
         $hotel = HotelService::getInstance()->getHotelById($hotelId);
         if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '酒店不存在');
         }
 
         $providerHotel = ProviderHotelService::getInstance()->getHotelByHotelId($this->userId(), $hotelId);
         if (!is_null($providerHotel)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前景点');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前酒店');
         }
 
         $providerHotel = ProviderHotel::new();
@@ -139,7 +139,7 @@ class HotelProviderController extends Controller
         $id = $this->verifyRequiredId('id');
         $hotel = ProviderHotelService::getInstance()->getUserHotelById($this->userId(), $id);
         if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '供应商酒店不存在');
         }
         $hotel->delete();
         return $this->success();
