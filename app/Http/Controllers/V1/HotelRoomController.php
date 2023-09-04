@@ -24,12 +24,13 @@ class HotelRoomController extends Controller
         $options = $options->map(function (HotelRoomType $type) {
             $type->image_list = json_decode($type->image_list);
             $type->facility_list = json_decode($type->facility_list);
+            unset($type->hotel_id);
             return $type;
         });
         return $this->success($options);
     }
 
-    public function roomListByHotelId()
+    public function listByHotelId()
     {
         $hotelId = $this->verifyRequiredId('hotelId');
 
@@ -42,9 +43,13 @@ class HotelRoomController extends Controller
             $shop = $shopList->get($room->shop_id);
             $room['shopInfo'] = $shop;
 
+            $room->price_list = json_decode($room->price_list);
+
             unset($room->user_id);
+            unset($room->hotel_id);
             unset($room->shop_id);
             unset($room->provider_id);
+            unset($room->price);
             unset($room->status);
             unset($room->failure_reason);
             unset($room->promotion_commission_rate);

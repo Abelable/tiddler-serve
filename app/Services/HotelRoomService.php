@@ -26,7 +26,7 @@ class HotelRoomService extends BaseService
 
     public function getListByHotelId($hotelId, $columns=['*'])
     {
-        return HotelRoom::query()->where('hotel_id', $hotelId)->where('status', 1)->with('specList')->get($columns);
+        return HotelRoom::query()->where('hotel_id', $hotelId)->where('status', 1)->get($columns);
     }
 
     public function getListTotal($userId, $status)
