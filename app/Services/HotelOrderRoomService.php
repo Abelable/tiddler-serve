@@ -6,6 +6,7 @@ use App\Models\Hotel;
 use App\Models\HotelOrderRoom;
 use App\Models\HotelRoom;
 use App\Models\HotelRoomType;
+use App\Utils\Inputs\CreateHotelOrderInput;
 
 class HotelOrderRoomService extends BaseService
 {
@@ -13,32 +14,30 @@ class HotelOrderRoomService extends BaseService
         $orderId,
         Hotel $hotel,
         HotelRoomType $typeInfo,
-        $checkInDate,
-        $checkOutDate,
-        $price,
-        $number,
-        HotelRoom $roomInfo
+        HotelRoom $roomInfo,
+        CreateHotelOrderInput $input,
+        $price
     )
     {
         $room = HotelOrderRoom::new();
         $room->order_id = $orderId;
-        $room->room_id = $roomInfo->id;
-        $room->image_list = $typeInfo->image_list;
-        $room->type_id = $typeInfo->id;
-        $room->type_name = $typeInfo->name;
         $room->hotel_id = $hotel->id;
         $room->hotel_name = $hotel->name;
-        $room->check_in_date = $checkInDate;
-        $room->check_out_date = $checkOutDate;
-        $room->price = $price;
-        $room->number = $number;
+        $room->room_id = $roomInfo->id;
         $room->breakfast_num = $roomInfo->breakfast_num;
         $room->guest_num = $roomInfo->guest_num;
         $room->cancellable = $roomInfo->cancellable;
+        $room->image_list = $typeInfo->image_list;
+        $room->type_id = $typeInfo->id;
+        $room->type_name = $typeInfo->name;
         $room->bed_desc = $typeInfo->bed_desc;
         $room->area_size = $typeInfo->area_size;
         $room->floor_desc = $typeInfo->floor_desc;
         $room->facility_list = $typeInfo->facility_list;
+        $room->check_in_date = $input->checkInDate;
+        $room->check_out_date = $input->checkOutDate;
+        $room->number = $input->number;
+        $room->price = $price;
         $room->save();
     }
 

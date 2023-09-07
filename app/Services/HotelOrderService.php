@@ -100,14 +100,14 @@ class HotelOrderService extends BaseService
 
         // 生成订单房间快照
         $type = HotelRoomTypeService::getInstance()->getTypeById($room->type_id);
+        $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
         HotelOrderRoomService::getInstance()->createOrderRoom(
             $order->id,
+            $hotel,
             $type,
-            $input->checkInDate,
-            $input->checkOutDate,
-            $averagePrice,
-            $input->num,
-            $room
+            $room,
+            $input,
+            $averagePrice
         );
 
         // 设置订单支付超时任务
@@ -162,7 +162,7 @@ class HotelOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'scenic_order_sn:' . $order->order_sn,
+            'body' => 'hotel_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -170,7 +170,7 @@ class HotelOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['body'] ? str_replace('scenic_order_sn:', '', $data['body']) : '';
+        $orderSn = $data['body'] ? str_replace('hotel_order_sn:', '', $data['body']) : '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
