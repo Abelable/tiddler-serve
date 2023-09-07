@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\HotelOrderService;
 use App\Services\HotelProviderOrderService;
+use App\Services\HotelProviderService;
+use App\Services\HotelShopService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
@@ -76,10 +79,19 @@ class CommonController extends Controller
             });
         }
 
+        if (strpos($data['body'], 'hotel_provider_order_sn')) {
+            Log::info('hotel_provider_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $order = HotelProviderOrderService::getInstance()->wxPaySuccess($data);
+                HotelProviderService::getInstance()->paySuccess($order->provider_id);
+                HotelShopService::getInstance()->paySuccess($order->provider_id);
+            });
+        }
+
         if (strpos($data['body'], 'hotel_order_sn')) {
             Log::info('hotel_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                HotelProviderOrderService::getInstance()->wxPaySuccess($data);
+                HotelOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
