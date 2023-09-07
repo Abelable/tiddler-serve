@@ -15,7 +15,7 @@ use App\Utils\Inputs\StatusPageInput;
 
 class HotelRoomController extends Controller
 {
-    protected $except = ['typeOptions', 'roomListByHotelId'];
+    protected $except = ['typeOptions', 'listByHotelId'];
 
     public function typeOptions()
     {
@@ -24,7 +24,11 @@ class HotelRoomController extends Controller
         $options = $options->map(function (HotelRoomType $type) {
             $type->image_list = json_decode($type->image_list);
             $type->facility_list = json_decode($type->facility_list);
+
             unset($type->hotel_id);
+            unset($type->created_at);
+            unset($type->updated_at);
+
             return $type;
         });
         return $this->success($options);
@@ -50,6 +54,7 @@ class HotelRoomController extends Controller
             unset($room->shop_id);
             unset($room->provider_id);
             unset($room->price);
+            unset($room->sales_volume);
             unset($room->status);
             unset($room->failure_reason);
             unset($room->promotion_commission_rate);
