@@ -22,15 +22,17 @@ class HotelRoomTypeService extends BaseService
         return HotelRoomType::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getTypeById($id, $columns=['*'])
+    public function getTypeById($id, $columns=['*'], $needDecode = true)
     {
         /** @var HotelRoomType $type */
         $type = HotelRoomType::query()->find($id, $columns);
         if (is_null($type)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '房型不存在');
         }
-        $type->image_list = json_decode($type->image_list);
-        $type->facility_list = json_decode($type->facility_list);
+        if ($needDecode) {
+            $type->image_list = json_decode($type->image_list);
+            $type->facility_list = json_decode($type->facility_list);
+        }
         return $type;
     }
 

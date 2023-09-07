@@ -99,7 +99,7 @@ class HotelOrderService extends BaseService
         $order->save();
 
         // 生成订单房间快照
-        $type = HotelRoomTypeService::getInstance()->getTypeById($room->type_id);
+        $type = HotelRoomTypeService::getInstance()->getTypeById($room->type_id, ['*'], false);
         $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
         HotelOrderRoomService::getInstance()->createOrderRoom(
             $order->id,
@@ -125,6 +125,7 @@ class HotelOrderService extends BaseService
         $priceList = json_decode($room->price_list);
 
         $dateList = $this->createDateList($checkInDate, $checkOutDate);
+
         $datePriceList = $dateList->map(function ($date) use ($priceList) {
             $priceUnit = array_filter($priceList, function ($item) use ($date) {
                 return $date >= $item->startDate && $date <= $item->endDate;
@@ -146,7 +147,9 @@ class HotelOrderService extends BaseService
         $startDate = Carbon::createFromTimestamp($checkInDate);
         $endDate = Carbon::createFromTimestamp($checkOutDate);
 
-        $dateList = collect($startDate->range($endDate));
+        $dateList = collect($startDate->range($endDate))->map(function ($date) {
+            return $date->timestamp;
+        });
         $dateList->pop();
 
         return $dateList;

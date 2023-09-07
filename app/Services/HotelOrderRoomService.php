@@ -27,16 +27,16 @@ class HotelOrderRoomService extends BaseService
         $room->breakfast_num = $roomInfo->breakfast_num;
         $room->guest_num = $roomInfo->guest_num;
         $room->cancellable = $roomInfo->cancellable;
-        $room->image_list = $typeInfo->image_list;
         $room->type_id = $typeInfo->id;
         $room->type_name = $typeInfo->name;
+        $room->image_list = $typeInfo->image_list;
         $room->bed_desc = $typeInfo->bed_desc;
         $room->area_size = $typeInfo->area_size;
         $room->floor_desc = $typeInfo->floor_desc;
         $room->facility_list = $typeInfo->facility_list;
         $room->check_in_date = $input->checkInDate;
         $room->check_out_date = $input->checkOutDate;
-        $room->number = $input->number;
+        $room->number = $input->num;
         $room->price = $price;
         $room->save();
     }
