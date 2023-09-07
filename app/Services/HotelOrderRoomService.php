@@ -23,7 +23,7 @@ class HotelOrderRoomService extends BaseService
         $room = HotelOrderRoom::new();
         $room->order_id = $orderId;
         $room->room_id = $roomInfo->id;
-        $room->image = json_decode($typeInfo->image_list)[0];
+        $room->image_list = $typeInfo->image_list;
         $room->type_id = $typeInfo->id;
         $room->type_name = $typeInfo->name;
         $room->hotel_id = $hotel->id;
@@ -35,6 +35,10 @@ class HotelOrderRoomService extends BaseService
         $room->breakfast_num = $roomInfo->breakfast_num;
         $room->guest_num = $roomInfo->guest_num;
         $room->cancellable = $roomInfo->cancellable;
+        $room->bed_desc = $typeInfo->bed_desc;
+        $room->area_size = $typeInfo->area_size;
+        $room->floor_desc = $typeInfo->floor_desc;
+        $room->facility_list = $typeInfo->facility_list;
         $room->save();
     }
 
