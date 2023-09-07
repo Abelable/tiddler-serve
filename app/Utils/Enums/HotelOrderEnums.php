@@ -10,9 +10,11 @@ class HotelOrderEnums
     const STATUS_ADMIN_CANCEL = 104;
     const STATUS_PAY = 201;
     const STATUS_REFUND = 202;
-    const STATUS_REFUND_CONFIRM = 203;
-    const STATUS_CONFIRM = 301;
-    const STATUS_AUTO_CONFIRM = 302;
+    const STATUS_SUPPLIER_REFUND = 203;
+    const STATUS_REFUND_CONFIRM = 204;
+    const STATUS_SETTLE_IN = 301;
+    const STATUS_CONFIRM = 401;
+    const STATUS_AUTO_CONFIRM = 402;
 
     const STATUS_TEXT_MAP = [
         self::STATUS_CREATE => '待付款',
@@ -21,7 +23,9 @@ class HotelOrderEnums
         self::STATUS_ADMIN_CANCEL => '已取消(管理员)',
         self::STATUS_PAY => '已付款',
         self::STATUS_REFUND => '订单取消，退款中',
+        self::STATUS_SUPPLIER_REFUND => '商家取消订单，退款中',
         self::STATUS_REFUND_CONFIRM => '已退款',
+        self::STATUS_SETTLE_IN => '待入住',
         self::STATUS_CONFIRM => '已确认',
         self::STATUS_AUTO_CONFIRM => '已确认(系统)'
     ];

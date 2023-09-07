@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\HotelOrder;
+use App\Models\HotelOrderRoom;
 use App\Services\HotelOrderRoomService;
 use App\Services\HotelOrderService;
 use App\Utils\CodeResponse;
@@ -92,10 +93,13 @@ class HotelOrderController extends Controller
                 $statusList = [HotelOrderEnums::STATUS_PAY];
                 break;
             case 3:
-                $statusList = [HotelOrderEnums::STATUS_CONFIRM, HotelOrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [HotelOrderEnums::STATUS_SETTLE_IN];
                 break;
             case 4:
-                $statusList = [HotelOrderEnums::STATUS_REFUND, HotelOrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [HotelOrderEnums::STATUS_CONFIRM, HotelOrderEnums::STATUS_AUTO_CONFIRM];
+                break;
+            case 5:
+                $statusList = [HotelOrderEnums::STATUS_REFUND, HotelOrderEnums::STATUS_SUPPLIER_REFUND, HotelOrderEnums::STATUS_REFUND_CONFIRM];
                 break;
             default:
                 $statusList = [];
@@ -111,7 +115,11 @@ class HotelOrderController extends Controller
         $orderIds = $orderList->pluck('id')->toArray();
         $roomList = HotelOrderRoomService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
         return $orderList->map(function (HotelOrder $order) use ($roomList) {
+            /** @var HotelOrderRoom $room */
             $room = $roomList->get($order->id);
+            $room->image_list = json_decode($room->image_list);
+            $room->facility_list = json_decode($room->facility_list);
+
             return [
                 'id' => $order->id,
                 'status' => $order->status,
@@ -181,6 +189,8 @@ class HotelOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
         $room = HotelOrderRoomService::getInstance()->getRoomByOrderId($order->id);
+        $room->image_list = json_decode($room->image_list);
+        $room->facility_list = json_decode($room->facility_list);
         $order['roomInfo'] = $room;
         return $this->success($order);
     }
