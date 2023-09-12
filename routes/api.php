@@ -226,6 +226,78 @@ Route::prefix('hotel')->group(function () {
     });
 });
 
+Route::prefix('restaurant')->group(function () {
+    Route::get('category_options', 'RestaurantController@categoryOptions');
+    Route::get('list', 'RestaurantController@list');
+    Route::get('detail', 'RestaurantController@detail');
+    Route::get('options', 'RestaurantController@options');
+
+    Route::get('my_restaurant_detail', 'RestaurantController@myRestaurantDetail');
+
+    Route::prefix('provider')->group(function () {
+        Route::post('settle_in', 'RestaurantProviderController@settleIn');
+        Route::get('status', 'RestaurantProviderController@statusInfo');
+        Route::post('pay_deposit', 'RestaurantProviderController@payDeposit');
+        Route::post('delete', 'RestaurantProviderController@deleteProvider');
+
+        Route::prefix('set_meal')->group(function () {
+            Route::get('totals', 'SetMealController@roomListTotals');
+            Route::get('list', 'SetMealController@userRoomList');
+            Route::get('detail', 'SetMealController@detail');
+            Route::post('add', 'SetMealController@add');
+            Route::post('edit', 'SetMealController@edit');
+            Route::post('up', 'SetMealController@up');
+            Route::post('down', 'SetMealController@down');
+            Route::post('delete', 'SetMealController@delete');
+        });
+
+        Route::prefix('meal_ticket')->group(function () {
+            Route::get('totals', 'MealTicketController@roomListTotals');
+            Route::get('list', 'MealTicketController@userRoomList');
+            Route::get('detail', 'MealTicketController@detail');
+            Route::post('add', 'MealTicketController@add');
+            Route::post('edit', 'MealTicketController@edit');
+            Route::post('up', 'MealTicketController@up');
+            Route::post('down', 'MealTicketController@down');
+            Route::post('delete', 'MealTicketController@delete');
+        });
+    });
+
+    Route::prefix('set_meal')->group(function () {
+        Route::get('list', 'SetMealController@list');
+        Route::get('detail', 'SetMealController@detail');
+        Route::prefix('order')->group(function () {
+            Route::get('calc_payment_amount', 'SetMealOrderController@paymentAmount');
+            Route::post('submit', 'SetMealOrderController@submit');
+            Route::post('pay_params', 'SetMealOrderController@payParams');
+            Route::get('list', 'SetMealOrderController@list');
+            Route::get('shop_list', 'SetMealOrderController@shopList');
+            Route::get('detail', 'SetMealOrderController@detail');
+            Route::post('confirm', 'SetMealOrderController@confirm');
+            Route::post('refund', 'SetMealOrderController@refund');
+            Route::post('cancel', 'SetMealOrderController@cancel');
+            Route::post('delete', 'SetMealOrderController@delete');
+        });
+    });
+
+    Route::prefix('meal_ticket')->group(function () {
+        Route::get('list', 'MealTicketController@list');
+        Route::get('detail', 'MealTicketController@detail');
+        Route::prefix('order')->group(function () {
+            Route::get('calc_payment_amount', 'MealTicketOrderController@paymentAmount');
+            Route::post('submit', 'MealTicketOrderController@submit');
+            Route::post('pay_params', 'MealTicketOrderController@payParams');
+            Route::get('list', 'MealTicketOrderController@list');
+            Route::get('shop_list', 'MealTicketOrderController@shopList');
+            Route::get('detail', 'MealTicketOrderController@detail');
+            Route::post('confirm', 'MealTicketOrderController@confirm');
+            Route::post('refund', 'MealTicketOrderController@refund');
+            Route::post('cancel', 'MealTicketOrderController@cancel');
+            Route::post('delete', 'MealTicketOrderController@delete');
+        });
+    });
+});
+
 Route::prefix('media')->group(function () {
     Route::get('list', 'MediaController@list');
     Route::get('follow_list', 'MediaController@followList');
@@ -288,7 +360,6 @@ Route::prefix('media')->group(function () {
         Route::post('delete_comment', 'TourismNoteController@deleteComment');
     });
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -493,6 +564,46 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('approve', 'HotelRoomController@approve');
             Route::post('reject', 'HotelRoomController@reject');
             Route::post('delete', 'HotelRoomController@delete');
+        });
+    });
+
+    Route::prefix('restaurant')->group(function () {
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'RestaurantCategoryController@list');
+            Route::get('detail', 'RestaurantCategoryController@detail');
+            Route::post('add', 'RestaurantCategoryController@add');
+            Route::post('edit', 'RestaurantCategoryController@edit');
+            Route::post('delete', 'RestaurantCategoryController@delete');
+            Route::get('options', 'RestaurantCategoryController@options');
+        });
+
+        Route::post('list', 'RestaurantController@list');
+        Route::get('detail', 'RestaurantController@detail');
+        Route::post('delete', 'RestaurantController@delete');
+        Route::get('options', 'RestaurantController@options');
+
+        Route::prefix('provider')->group(function () {
+            Route::post('list', 'RestaurantProviderController@list');
+            Route::get('detail', 'RestaurantProviderController@detail');
+            Route::post('approved', 'RestaurantProviderController@approved');
+            Route::post('reject', 'RestaurantProviderController@reject');
+            Route::post('order_list', 'RestaurantProviderController@orderList');
+        });
+
+        Route::prefix('set_meal')->group(function () {
+            Route::post('list', 'SetMealController@list');
+            Route::get('detail', 'SetMealController@detail');
+            Route::post('approve', 'SetMealController@approve');
+            Route::post('reject', 'SetMealController@reject');
+            Route::post('delete', 'SetMealController@delete');
+        });
+
+        Route::prefix('meal_ticket')->group(function () {
+            Route::post('list', 'MealTicketController@list');
+            Route::get('detail', 'MealTicketController@detail');
+            Route::post('approve', 'MealTicketController@approve');
+            Route::post('reject', 'MealTicketController@reject');
+            Route::post('delete', 'MealTicketController@delete');
         });
     });
 });
