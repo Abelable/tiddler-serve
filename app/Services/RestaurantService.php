@@ -34,7 +34,7 @@ class RestaurantService extends BaseService
     {
         $restaurant = Restaurant::query()->find($id, $columns);
         if (is_null($restaurant)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '餐厅不存在');
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '餐馆不存在');
         }
         $restaurant->food_image_list = json_decode($restaurant->food_image_list);
         $restaurant->environment_image_list = json_decode($restaurant->environment_image_list);
