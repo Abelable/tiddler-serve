@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class HotelProviderInput extends BaseInput
+class RestaurantProviderInput extends BaseInput
 {
     public $companyName;
     public $regionDesc;
@@ -27,7 +27,7 @@ class HotelProviderInput extends BaseInput
     public function rules()
     {
         return [
-            'companyName' => 'required|string',
+            'companyName' => 'required_if:type,2',
             'regionDesc' => 'required|string',
             'regionCodeList' => 'required|string',
             'addressDetail' => 'required|string',

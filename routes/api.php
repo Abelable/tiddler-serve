@@ -226,13 +226,20 @@ Route::prefix('hotel')->group(function () {
     });
 });
 
-Route::prefix('restaurant')->group(function () {
-    Route::get('category_options', 'RestaurantController@categoryOptions');
-    Route::get('list', 'RestaurantController@list');
-    Route::get('detail', 'RestaurantController@detail');
-    Route::get('options', 'RestaurantController@options');
-
-    Route::get('my_restaurant_detail', 'RestaurantController@myRestaurantDetail');
+Route::prefix('food')->group(function () {
+    Route::prefix('restaurant')->group(function () {
+        Route::get('category_options', 'RestaurantController@categoryOptions');
+        Route::get('list', 'RestaurantController@list');
+        Route::get('detail', 'RestaurantController@detail');
+        Route::get('options', 'RestaurantController@options');
+        Route::get('totals', 'RestaurantController@listTotals');
+        Route::get('user_list', 'RestaurantController@userList');
+        Route::post('add', 'RestaurantController@add');
+        Route::post('edit', 'RestaurantController@edit');
+        Route::post('up', 'RestaurantController@up');
+        Route::post('down', 'RestaurantController@down');
+        Route::post('delete', 'RestaurantController@delete');
+    });
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'RestaurantProviderController@settleIn');
