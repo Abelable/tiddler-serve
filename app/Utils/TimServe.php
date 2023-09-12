@@ -76,6 +76,7 @@ class TimServe
     {
         $userSig = $this->api->generate_user_sig($userId, 31536000);
         return [
+            'userId' => $userId,
             'sdkAppId' => env('TIM_APPID'),
             'userSig' => $userSig
         ];
