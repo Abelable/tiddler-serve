@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProviderHotel;
-use App\Models\Hotel;
-use App\Services\ProviderHotelService;
-use App\Services\HotelProviderOrderService;
-use App\Services\HotelProviderService;
-use App\Services\HotelService;
-use App\Services\HotelShopService;
+use App\Models\ProviderRestaurant;
+use App\Models\Restaurant;
+use App\Services\RestaurantProviderOrderService;
+use App\Services\RestaurantProviderService;
+use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\HotelProviderInput;
+use App\Utils\Inputs\RestaurantProviderInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -20,17 +18,17 @@ class RestaurantProviderController extends Controller
 {
     public function settleIn()
     {
-        /** @var HotelProviderInput $input */
-        $input = HotelProviderInput::new();
+        /** @var RestaurantProviderInput $input */
+        $input = RestaurantProviderInput::new();
 
-        $provider = HotelProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId());
         if (!is_null($provider)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '您已提交申请，请勿重复操作');
         }
 
         DB::transaction(function () use ($input) {
-            $provider = HotelProviderService::getInstance()->createProvider($input, $this->userId());
-            HotelShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
+            $provider = RestaurantProviderService::getInstance()->createProvider($input, $this->userId());
+            RestaurantShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
         });
 
         return $this->success();
@@ -38,8 +36,8 @@ class RestaurantProviderController extends Controller
 
     public function statusInfo()
     {
-        $provider = HotelProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
-        $providerOrder = HotelProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
+        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
+        $providerOrder = RestaurantProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
 
         return $this->success($provider ? [
             'id' => $provider->id,
@@ -52,14 +50,14 @@ class RestaurantProviderController extends Controller
     public function payDeposit()
     {
         $orderId = $this->verifyRequiredId('orderId');
-        $order = HotelProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $order = RestaurantProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }
 
     public function deleteProvider()
     {
-        $provider = HotelProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId());
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景区服务商信息不存在');
         }
@@ -70,7 +68,7 @@ class RestaurantProviderController extends Controller
     public function myShopInfo()
     {
         $columns = ['id', 'name', 'type', 'avatar', 'cover'];
-        $shop = HotelShopService::getInstance()->getShopByUserId($this->userId(), $columns);
+        $shop = RestaurantShopService::getInstance()->getShopByUserId($this->userId(), $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
@@ -80,35 +78,35 @@ class RestaurantProviderController extends Controller
     public function hotelListTotals()
     {
         return $this->success([
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 0),
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 2),
+            ProviderRestaurantService::getInstance()->getListTotal($this->userId(), 1),
+            ProviderRestaurantService::getInstance()->getListTotal($this->userId(), 0),
+            ProviderRestaurantService::getInstance()->getListTotal($this->userId(), 2),
         ]);
     }
 
-    public function providerHotelList()
+    public function providerRestaurantList()
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $page = ProviderHotelService::getInstance()->getUserHotelList($this->userId(), $input, ['id', 'hotel_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
-        $providerHotelList = collect($page->items());
-        $hotelIds = $providerHotelList->pluck('hotel_id')->toArray();
-        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name', 'cover', 'grade', 'address'])->keyBy('id');
-        $list = $providerHotelList->map(function (ProviderHotel $providerHotel) use ($hotelList) {
-            /** @var Hotel $hotel */
-            $hotel = $hotelList->get($providerHotel->hotel_id);
-            $providerHotel['hotel_cover'] = $hotel->cover;
-            $providerHotel['hotel_name'] = $hotel->name;
-            $providerHotel['hotel_grade'] = $hotel->grade;
-            $providerHotel['hotel_address'] = $hotel->address;
-            return $providerHotel;
+        $page = ProviderRestaurantService::getInstance()->getUserRestaurantList($this->userId(), $input, ['id', 'hotel_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $providerRestaurantList = collect($page->items());
+        $hotelIds = $providerRestaurantList->pluck('hotel_id')->toArray();
+        $hotelList = RestaurantService::getInstance()->getRestaurantListByIds($hotelIds, ['id', 'name', 'cover', 'grade', 'address'])->keyBy('id');
+        $list = $providerRestaurantList->map(function (ProviderRestaurant $providerRestaurant) use ($hotelList) {
+            /** @var Restaurant $hotel */
+            $hotel = $hotelList->get($providerRestaurant->hotel_id);
+            $providerRestaurant['hotel_cover'] = $hotel->cover;
+            $providerRestaurant['hotel_name'] = $hotel->name;
+            $providerRestaurant['hotel_grade'] = $hotel->grade;
+            $providerRestaurant['hotel_address'] = $hotel->address;
+            return $providerRestaurant;
         });
 
         return $this->success($this->paginate($page, $list));
     }
 
-    public function applyHotel()
+    public function applyRestaurant()
     {
         $hotelId = $this->verifyRequiredId('hotelId');
 
@@ -116,28 +114,28 @@ class RestaurantProviderController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加酒店');
         }
 
-        $hotel = HotelService::getInstance()->getHotelById($hotelId);
+        $hotel = RestaurantService::getInstance()->getRestaurantById($hotelId);
         if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '酒店不存在');
         }
 
-        $providerHotel = ProviderHotelService::getInstance()->getHotelByHotelId($this->userId(), $hotelId);
-        if (!is_null($providerHotel)) {
+        $providerRestaurant = ProviderRestaurantService::getInstance()->getRestaurantByRestaurantId($this->userId(), $hotelId);
+        if (!is_null($providerRestaurant)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前酒店');
         }
 
-        $providerHotel = ProviderHotel::new();
-        $providerHotel->user_id = $this->userId();
-        $providerHotel->provider_id = $this->user()->hotelProvider->id;
-        $providerHotel->hotel_id = $hotelId;
-        $providerHotel->save();
+        $providerRestaurant = ProviderRestaurant::new();
+        $providerRestaurant->user_id = $this->userId();
+        $providerRestaurant->provider_id = $this->user()->hotelProvider->id;
+        $providerRestaurant->hotel_id = $hotelId;
+        $providerRestaurant->save();
         return $this->success();
     }
 
-    public function deleteProviderHotel()
+    public function deleteProviderRestaurant()
     {
         $id = $this->verifyRequiredId('id');
-        $hotel = ProviderHotelService::getInstance()->getUserHotelById($this->userId(), $id);
+        $hotel = ProviderRestaurantService::getInstance()->getUserRestaurantById($this->userId(), $id);
         if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '供应商酒店不存在');
         }
@@ -145,10 +143,10 @@ class RestaurantProviderController extends Controller
         return $this->success();
     }
 
-    public function providerHotelOptions()
+    public function providerRestaurantOptions()
     {
-        $hotelIds = ProviderHotelService::getInstance()->getUserHotelOptions($this->userId())->pluck('hotel_id')->toArray();
-        $hotelOptions = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name']);
+        $hotelIds = ProviderRestaurantService::getInstance()->getUserRestaurantOptions($this->userId())->pluck('hotel_id')->toArray();
+        $hotelOptions = RestaurantService::getInstance()->getRestaurantListByIds($hotelIds, ['id', 'name']);
         return $this->success($hotelOptions);
     }
 }
