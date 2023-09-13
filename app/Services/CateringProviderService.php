@@ -2,42 +2,42 @@
 
 namespace App\Services;
 
-use App\Models\Merchant;
-use App\Utils\Inputs\MerchantListInput;
-use App\Utils\Inputs\MerchantSettleInInput;
+use App\Models\CateringProvider;
+use App\Utils\Inputs\CateringProviderListInput;
+use App\Utils\Inputs\CateringProviderSettleInInput;
 
 class CateringProviderService extends BaseService
 {
-    public function createMerchant(MerchantSettleInInput $input, $userId)
+    public function createProvider(CateringProviderSettleInInput $input, $userId)
     {
-        $merchant = Merchant::new();
-        $merchant->user_id = $userId;
-        $merchant->type = $input->type;
+        $provider = CateringProvider::new();
+        $provider->user_id = $userId;
+        $provider->type = $input->type;
         if ($input->type == 2) {
-            $merchant->company_name = $input->companyName;
-            $merchant->business_license_photo = $input->businessLicensePhoto;
+            $provider->company_name = $input->companyName;
+            $provider->business_license_photo = $input->businessLicensePhoto;
         }
-        $merchant->region_desc = $input->regionDesc;
-        $merchant->region_code_list = $input->regionCodeList;
-        $merchant->address_detail = $input->addressDetail;
-        $merchant->name = $input->name;
-        $merchant->mobile = $input->mobile;
-        $merchant->email = $input->email;
-        $merchant->id_card_number = $input->idCardNumber;
-        $merchant->id_card_front_photo = $input->idCardFrontPhoto;
-        $merchant->id_card_back_photo = $input->idCardBackPhoto;
-        $merchant->hold_id_card_photo = $input->holdIdCardPhoto;
-        $merchant->bank_card_owner_name = $input->bankCardOwnerName;
-        $merchant->bank_card_number = $input->bankCardNumber;
-        $merchant->bank_name = $input->bankName;
-        $merchant->save();
+        $provider->region_desc = $input->regionDesc;
+        $provider->region_code_list = $input->regionCodeList;
+        $provider->address_detail = $input->addressDetail;
+        $provider->name = $input->name;
+        $provider->mobile = $input->mobile;
+        $provider->email = $input->email;
+        $provider->id_card_number = $input->idCardNumber;
+        $provider->id_card_front_photo = $input->idCardFrontPhoto;
+        $provider->id_card_back_photo = $input->idCardBackPhoto;
+        $provider->hold_id_card_photo = $input->holdIdCardPhoto;
+        $provider->bank_card_owner_name = $input->bankCardOwnerName;
+        $provider->bank_card_number = $input->bankCardNumber;
+        $provider->bank_name = $input->bankName;
+        $provider->save();
 
-        return $merchant;
+        return $provider;
     }
 
-    public function getMerchantList(MerchantListInput $input, $columns = ['*'])
+    public function getProviderList(CateringProviderListInput $input, $columns = ['*'])
     {
-        $query = Merchant::query();
+        $query = CateringProvider::query();
         if (!empty($input->type)) {
             $query = $query->where('type', $input->type);
         }
@@ -50,29 +50,29 @@ class CateringProviderService extends BaseService
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getMerchantByUserId($userId, $columns = ['*'])
+    public function getProviderByUserId($userId, $columns = ['*'])
     {
-        return Merchant::query()->where('user_id', $userId)->first($columns);
+        return CateringProvider::query()->where('user_id', $userId)->first($columns);
     }
 
-    public function getMerchantById($id, $columns = ['*'])
+    public function getProviderById($id, $columns = ['*'])
     {
-        return Merchant::query()->find($id, $columns);
+        return CateringProvider::query()->find($id, $columns);
     }
 
-    public function getMerchantListByIds(array $ids, $columns = ['*'])
+    public function getProviderListByIds(array $ids, $columns = ['*'])
     {
-        return Merchant::query()->whereIn('id', $ids)->get($columns);
+        return CateringProvider::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function paySuccess(int $providerId)
     {
-        $merchant = $this->getMerchantById($merchantId);
-        if (is_null($merchant)) {
+        $provider = $this->getProviderById($providerId);
+        if (is_null($provider)) {
             $this->throwBadArgumentValue();
         }
-        $merchant->status = 2;
-        $merchant->save();
-        return $merchant;
+        $provider->status = 2;
+        $provider->save();
+        return $provider;
     }
 }

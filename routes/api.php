@@ -242,10 +242,10 @@ Route::prefix('catering')->group(function () {
     });
 
     Route::prefix('provider')->group(function () {
-        Route::post('settle_in', 'RestaurantProviderController@settleIn');
-        Route::get('status', 'RestaurantProviderController@statusInfo');
-        Route::post('pay_deposit', 'RestaurantProviderController@payDeposit');
-        Route::post('delete', 'RestaurantProviderController@deleteProvider');
+        Route::post('settle_in', 'CateringProviderController@settleIn');
+        Route::get('status', 'CateringProviderController@statusInfo');
+        Route::post('pay_deposit', 'CateringProviderController@payDeposit');
+        Route::post('delete', 'CateringProviderController@deleteProvider');
 
         Route::prefix('set_meal')->group(function () {
             Route::get('totals', 'SetMealController@roomListTotals');
@@ -590,11 +590,11 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'RestaurantController@options');
 
         Route::prefix('provider')->group(function () {
-            Route::post('list', 'RestaurantProviderController@list');
-            Route::get('detail', 'RestaurantProviderController@detail');
-            Route::post('approved', 'RestaurantProviderController@approved');
-            Route::post('reject', 'RestaurantProviderController@reject');
-            Route::post('order_list', 'RestaurantProviderController@orderList');
+            Route::post('list', 'CateringProviderController@list');
+            Route::get('detail', 'CateringProviderController@detail');
+            Route::post('approved', 'CateringProviderController@approved');
+            Route::post('reject', 'CateringProviderController@reject');
+            Route::post('order_list', 'CateringProviderController@orderList');
         });
 
         Route::prefix('set_meal')->group(function () {

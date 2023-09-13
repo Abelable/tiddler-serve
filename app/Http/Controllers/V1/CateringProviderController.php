@@ -5,30 +5,30 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ProviderRestaurant;
 use App\Models\Restaurant;
-use App\Services\RestaurantProviderOrderService;
-use App\Services\RestaurantProviderService;
+use App\Services\CateringProviderOrderService;
+use App\Services\CateringProviderService;
 use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\RestaurantProviderInput;
+use App\Utils\Inputs\CateringProviderInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
-class RestaurantProviderController extends Controller
+class CateringProviderController extends Controller
 {
     public function settleIn()
     {
-        /** @var RestaurantProviderInput $input */
-        $input = RestaurantProviderInput::new();
+        /** @var CateringProviderInput $input */
+        $input = CateringProviderInput::new();
 
-        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = CateringProviderService::getInstance()->getProviderByUserId($this->userId());
         if (!is_null($provider)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '您已提交申请，请勿重复操作');
         }
 
         DB::transaction(function () use ($input) {
-            $provider = RestaurantProviderService::getInstance()->createProvider($input, $this->userId());
-            RestaurantShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
+            $provider = CateringProviderService::getInstance()->createProvider($input, $this->userId());
+            RestaurantService::getInstance()->createShop($this->userId(), $provider->id, $input);
         });
 
         return $this->success();
@@ -36,8 +36,8 @@ class RestaurantProviderController extends Controller
 
     public function statusInfo()
     {
-        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
-        $providerOrder = RestaurantProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
+        $provider = CateringProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
+        $providerOrder = CateringProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
 
         return $this->success($provider ? [
             'id' => $provider->id,
@@ -50,14 +50,14 @@ class RestaurantProviderController extends Controller
     public function payDeposit()
     {
         $orderId = $this->verifyRequiredId('orderId');
-        $order = RestaurantProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $order = CateringProviderOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }
 
     public function deleteProvider()
     {
-        $provider = RestaurantProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = CateringProviderService::getInstance()->getProviderByUserId($this->userId());
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景区服务商信息不存在');
         }
@@ -68,7 +68,7 @@ class RestaurantProviderController extends Controller
     public function myShopInfo()
     {
         $columns = ['id', 'name', 'type', 'avatar', 'cover'];
-        $shop = RestaurantShopService::getInstance()->getShopByUserId($this->userId(), $columns);
+        $shop = RestaurantService::getInstance()->getShopByUserId($this->userId(), $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
