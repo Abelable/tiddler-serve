@@ -226,7 +226,7 @@ Route::prefix('hotel')->group(function () {
     });
 });
 
-Route::prefix('food')->group(function () {
+Route::prefix('catering')->group(function () {
     Route::prefix('restaurant')->group(function () {
         Route::get('category_options', 'RestaurantController@categoryOptions');
         Route::get('list', 'RestaurantController@list');

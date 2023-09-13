@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRestaurantProvidersTable extends Migration
+class CreateCateringProvidersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,16 @@ class CreateRestaurantProvidersTable extends Migration
      */
     public function up()
     {
-        Schema::create('restaurant_providers', function (Blueprint $table) {
+        Schema::create('catering_providers', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
+            $table->integer('type')->comment('商家类型：1-个人，2-企业');
+            $table->string('company_name')->default('')->comment('企业名称');
+            $table->string('region_desc')->comment('省市区描述');
+            $table->string('region_code_list')->comment('省市区编码');
+            $table->string('address_detail')->comment('地址详情');
             $table->string('id_card_front_photo')->comment('身份证正面照片');
             $table->string('id_card_back_photo')->comment('身份证反面照片');
             $table->string('hold_id_card_photo')->comment('手持身份证照片');
@@ -41,6 +46,6 @@ class CreateRestaurantProvidersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('restaurant_providers');
+        Schema::dropIfExists('catering_providers');
     }
 }
