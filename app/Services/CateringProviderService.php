@@ -4,19 +4,21 @@ namespace App\Services;
 
 use App\Models\CateringProvider;
 use App\Utils\Inputs\CateringProviderListInput;
-use App\Utils\Inputs\CateringProviderSettleInInput;
+use App\Utils\Inputs\CateringProviderInput;
 
 class CateringProviderService extends BaseService
 {
-    public function createProvider(CateringProviderSettleInInput $input, $userId)
+    public function createProvider(CateringProviderInput $input, $userId)
     {
         $provider = CateringProvider::new();
         $provider->user_id = $userId;
         $provider->type = $input->type;
         if ($input->type == 2) {
             $provider->company_name = $input->companyName;
-            $provider->business_license_photo = $input->businessLicensePhoto;
+
         }
+        $provider->business_license_photo = $input->businessLicensePhoto;
+        $provider->hygienic_license_photo = $input->hygienicLicensePhoto;
         $provider->region_desc = $input->regionDesc;
         $provider->region_code_list = $input->regionCodeList;
         $provider->address_detail = $input->addressDetail;
@@ -26,10 +28,6 @@ class CateringProviderService extends BaseService
         $provider->id_card_number = $input->idCardNumber;
         $provider->id_card_front_photo = $input->idCardFrontPhoto;
         $provider->id_card_back_photo = $input->idCardBackPhoto;
-        $provider->hold_id_card_photo = $input->holdIdCardPhoto;
-        $provider->bank_card_owner_name = $input->bankCardOwnerName;
-        $provider->bank_card_number = $input->bankCardNumber;
-        $provider->bank_name = $input->bankName;
         $provider->save();
 
         return $provider;

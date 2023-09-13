@@ -17,14 +17,6 @@ class CateringProviderInput extends BaseInput
     public $idCardNumber;
     public $idCardFrontPhoto;
     public $idCardBackPhoto;
-    public $holdIdCardPhoto;
-    public $bankCardOwnerName;
-    public $bankCardNumber;
-    public $bankName;
-    public $shopAvatar;
-    public $shopName;
-    public $shopType;
-    public $shopCover;
 
     public function rules()
     {
@@ -42,14 +34,6 @@ class CateringProviderInput extends BaseInput
             'idCardNumber' => 'required|string',
             'idCardFrontPhoto' => 'required|string',
             'idCardBackPhoto' => 'required|string',
-            'holdIdCardPhoto' => 'required|string',
-            'bankCardOwnerName' => 'required|string',
-            'bankCardNumber' => 'required|string',
-            'bankName' => 'required|string',
-            'shopAvatar' => 'required|string',
-            'shopName' => 'required|string',
-            'shopType' => 'required|integer|in:1,2,3',
-            'shopCover' => 'string',
         ];
     }
 }
