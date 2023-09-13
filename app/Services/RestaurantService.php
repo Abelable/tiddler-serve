@@ -44,6 +44,20 @@ class RestaurantService extends BaseService
         return $restaurant;
     }
 
+    public function getRestaurantByProviderId($providerId, $columns=['*'])
+    {
+        $restaurant = Restaurant::query()->where('provider_id', $providerId)->get($columns);
+        if (is_null($restaurant)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '餐馆不存在');
+        }
+        $restaurant->food_image_list = json_decode($restaurant->food_image_list);
+        $restaurant->environment_image_list = json_decode($restaurant->environment_image_list);
+        $restaurant->price_image_list = json_decode($restaurant->price_image_list);
+        $restaurant->facility_list = json_decode($restaurant->facility_list);
+        $restaurant->open_time_list = json_decode($restaurant->open_time_list);
+        return $restaurant;
+    }
+
     public function getRestaurantListByIds(array $ids, $columns = ['*'])
     {
         return Restaurant::query()->whereIn('id', $ids)->get($columns);
@@ -99,6 +113,17 @@ class RestaurantService extends BaseService
         $restaurant->facility_list = json_encode($input->facilityList);
         $restaurant->save();
 
+        return $restaurant;
+    }
+
+    public function paySuccess(int $providerId)
+    {
+        $restaurant = $this->getRestaurantByProviderId($providerId);
+        if (is_null($restaurant)) {
+            $this->throwBadArgumentValue();
+        }
+        $restaurant->status = 1;
+        $restaurant->save();
         return $restaurant;
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\CateringProviderOrderService;
+use App\Services\CateringProviderService;
 use App\Services\HotelOrderService;
 use App\Services\HotelProviderOrderService;
 use App\Services\HotelProviderService;
@@ -10,6 +12,7 @@ use App\Services\HotelShopService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
+use App\Services\RestaurantService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
@@ -92,6 +95,15 @@ class CommonController extends Controller
             Log::info('hotel_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 HotelOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
+        if (strpos($data['body'], 'catering_provider_order_sn')) {
+            Log::info('catering_provider_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $order = CateringProviderOrderService::getInstance()->wxPaySuccess($data);
+                CateringProviderService::getInstance()->paySuccess($order->provider_id);
+                RestaurantService::getInstance()->paySuccess($order->provider_id);
             });
         }
 
