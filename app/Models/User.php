@@ -25,13 +25,12 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\CateringProvider|null $cateringProvider
  * @property-read \App\Models\HotelProvider|null $hotelProvider
- * @property-read \App\Models\HotelShop|null $hotelShop
+ * @property-read \App\Models\Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
- * @property-read \App\Models\ScenicShop|null $scenicShop
- * @property-read \App\Models\Shop|null $shop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
@@ -91,28 +90,23 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return [];
     }
 
-    public function shop()
+    public function merchant()
     {
-        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
+        return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
     }
 
     public function scenicProvider()
     {
-        return $this->hasOne(ScenicProvider::class, 'user_id');
-    }
-
-    public function scenicShop()
-    {
-        return $this->hasOne(ScenicShop::class, 'user_id')->where('status', 1);
-    }
-
-    public function hotelShop()
-    {
-        return $this->hasOne(HotelShop::class, 'user_id')->where('status', 1);
+        return $this->hasOne(ScenicProvider::class, 'user_id')->where('status', 2);
     }
 
     public function hotelProvider()
     {
-        return $this->hasOne(HotelProvider::class, 'user_id');
+        return $this->hasOne(HotelProvider::class, 'user_id')->where('status', 2);
+    }
+
+    public function cateringProvider()
+    {
+        return $this->hasOne(CateringProvider::class, 'user_id')->where('status', 2);
     }
 }

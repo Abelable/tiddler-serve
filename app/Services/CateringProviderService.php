@@ -15,7 +15,6 @@ class CateringProviderService extends BaseService
         $provider->type = $input->type;
         if ($input->type == 2) {
             $provider->company_name = $input->companyName;
-
         }
         $provider->business_license_photo = $input->businessLicensePhoto;
         $provider->hygienic_license_photo = $input->hygienicLicensePhoto;
