@@ -9,7 +9,7 @@ use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\MerchantSettleInInput;
+use App\Utils\Inputs\MerchantInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -25,8 +25,8 @@ class ShopController extends Controller
 
     public function addMerchant()
     {
-        /** @var MerchantSettleInInput $input */
-        $input = MerchantSettleInInput::new();
+        /** @var MerchantInput $input */
+        $input = MerchantInput::new();
 
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {

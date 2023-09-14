@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class FreightTemplateAddInput extends BaseInput
+class FreightTemplateInput extends BaseInput
 {
     public $mode;
     public $name;

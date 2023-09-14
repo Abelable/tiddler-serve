@@ -7,8 +7,7 @@ use App\Models\ScenicSpot;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicListInput;
-use App\Utils\Inputs\ScenicAddInput;
-use App\Utils\Inputs\ScenicEditInput;
+use App\Utils\Inputs\ScenicInput;
 
 class ScenicController extends Controller
 {
@@ -42,43 +41,35 @@ class ScenicController extends Controller
 
     public function add()
     {
-        /** @var ScenicAddInput $input */
-        $input = ScenicAddInput::new();
+        /** @var ScenicInput $input */
+        $input = ScenicInput::new();
 
         $scenic = ScenicSpot::new();
         $scenic->status = 1;
-        $scenic->name = $input->name;
-        $scenic->level = $input->level;
-        $scenic->category_id = $input->categoryId;
-        if (!empty($input->video)) {
-            $scenic->video = $input->video;
-        }
-        $scenic->image_list = json_encode($input->imageList);
-        $scenic->latitude = $input->latitude;
-        $scenic->longitude = $input->longitude;
-        $scenic->address = $input->address;
-        $scenic->brief = $input->brief;
-        $scenic->open_time_list = json_encode($input->openTimeList);
-        $scenic->policy_list = json_encode($input->policyList);
-        $scenic->hotline_list = json_encode($input->hotlineList);
-        $scenic->project_list = json_encode($input->projectList);
-        $scenic->facility_list = json_encode($input->facilityList);
-        $scenic->tips_list = json_encode($input->tipsList);
-        $scenic->save();
+
+        $this->update($scenic, $input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var ScenicEditInput $input */
-        $input = ScenicEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var ScenicInput $input */
+        $input = ScenicInput::new();
 
-        $scenic = ScenicService::getInstance()->getScenicById($input->id);
+        $scenic = ScenicService::getInstance()->getScenicById($id);
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
 
+        $this->update($scenic, $input);
+
+        return $this->success();
+    }
+
+    private function update($scenic, ScenicInput $input)
+    {
         $scenic->name = $input->name;
         $scenic->level = $input->level;
         $scenic->category_id = $input->categoryId;
@@ -96,10 +87,9 @@ class ScenicController extends Controller
         $scenic->project_list = json_encode($input->projectList);
         $scenic->facility_list = json_encode($input->facilityList);
         $scenic->tips_list = json_encode($input->tipsList);
-
         $scenic->save();
 
-        return $this->success();
+        return $scenic;
     }
 
     public function delete()

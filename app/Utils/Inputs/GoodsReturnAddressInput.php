@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class GoodsReturnAddressAddInput extends BaseInput
+class GoodsReturnAddressInput extends BaseInput
 {
     public $consigneeName;
     public $mobile;

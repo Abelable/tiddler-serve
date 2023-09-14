@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class ScenicAddInput extends BaseInput
+class ScenicInput extends BaseInput
 {
     public $video;
     public $imageList;

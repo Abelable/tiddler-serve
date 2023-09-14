@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FreightTemplate;
 use App\Services\FreightTemplateService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\FreightTemplateAddInput;
-use App\Utils\Inputs\FreightTemplateEditInput;
+use App\Utils\Inputs\FreightTemplateInput;
 
 class FreightTemplateController extends Controller
 {
@@ -30,34 +29,35 @@ class FreightTemplateController extends Controller
 
     public function add()
     {
-        /** @var FreightTemplateAddInput $input */
-        $input = FreightTemplateAddInput::new();
+        /** @var FreightTemplateInput $input */
+        $input = FreightTemplateInput::new();
 
         $freightTemplate = FreightTemplate::new();
         $freightTemplate->user_id = $this->userId();
-        $freightTemplate->mode = $input->mode;
-        $freightTemplate->name = $input->name;
-        $freightTemplate->title = $input->title;
-        $freightTemplate->compute_mode = $input->computeMode;
-        $freightTemplate->free_quota = $input->freeQuota;
-        $freightTemplate->area_list = $input->areaList;
-        $freightTemplate->express_list = $input->expressList;
-        $freightTemplate->express_template_lists = $input->expressTemplateLists;
-        $freightTemplate->save();
+
+        $this->update($freightTemplate, $input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var FreightTemplateEditInput $input */
-        $input = FreightTemplateEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var FreightTemplateInput $input */
+        $input = FreightTemplateInput::new();
 
-        $freightTemplate = FreightTemplateService::getInstance()->getFreightTemplateById($input->id);
+        $freightTemplate = FreightTemplateService::getInstance()->getFreightTemplateById($id);
         if (is_null($freightTemplate)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前运费模板不存在');
         }
 
+        $this->update($freightTemplate, $input);
+
+        return $this->success();
+    }
+
+    private function update($freightTemplate, FreightTemplateInput $input)
+    {
         $freightTemplate->mode = $input->mode;
         $freightTemplate->name = $input->name;
         $freightTemplate->title = $input->title;
@@ -68,7 +68,7 @@ class FreightTemplateController extends Controller
         $freightTemplate->express_template_lists = $input->expressTemplateLists;
         $freightTemplate->save();
 
-        return $this->success();
+        return $freightTemplate;
     }
 
     public function delete()

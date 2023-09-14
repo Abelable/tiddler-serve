@@ -34,6 +34,9 @@ class ScenicProviderService extends BaseService
     public function getProviderList(ScenicProviderListInput $input, $columns = ['*'])
     {
         $query = ScenicProvider::query();
+        if (!is_null($input->status)) {
+            $query = $query->where('status', $input->status);
+        }
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }

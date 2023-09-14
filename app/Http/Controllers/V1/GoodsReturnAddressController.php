@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GoodsReturnAddress;
 use App\Services\GoodsReturnAddressService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\GoodsReturnAddressAddInput;
-use App\Utils\Inputs\GoodsReturnAddressEditInput;
+use App\Utils\Inputs\GoodsReturnAddressInput;
 
 class GoodsReturnAddressController extends Controller
 {
@@ -28,32 +27,35 @@ class GoodsReturnAddressController extends Controller
 
     public function add()
     {
-        /** @var GoodsReturnAddressAddInput $input */
-        $input = GoodsReturnAddressAddInput::new();
+        /** @var GoodsReturnAddressInput $input */
+        $input = GoodsReturnAddressInput::new();
 
         $address = GoodsReturnAddress::new();
         $address->user_id = $this->userId();
-        $address->consignee_name = $input->consigneeName;
-        $address->mobile = $input->mobile;
-        $address->address_detail = $input->addressDetail;
-        if (!empty($input->supplement)) {
-            $address->supplement = $input->supplement;
-        }
-        $address->save();
+
+        $this->update($address, $input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        /** @var GoodsReturnAddressEditInput $input */
-        $input = GoodsReturnAddressEditInput::new();
+        $id = $this->verifyRequiredId('id');
+        /** @var GoodsReturnAddressInput $input */
+        $input = GoodsReturnAddressInput::new();
 
-        $address = GoodsReturnAddressService::getInstance()->getAddressById($input->id);
+        $address = GoodsReturnAddressService::getInstance()->getAddressById($id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
         }
 
+        $this->update($address, $input);
+
+        return $this->success();
+    }
+
+    private function update($address, GoodsReturnAddressInput $input)
+    {
         $address->consignee_name = $input->consigneeName;
         $address->mobile = $input->mobile;
         $address->address_detail = $input->addressDetail;
@@ -62,7 +64,7 @@ class GoodsReturnAddressController extends Controller
         }
         $address->save();
 
-        return $this->success();
+        return $address;
     }
 
     public function delete()

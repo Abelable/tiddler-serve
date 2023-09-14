@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Models\Shop;
 use App\Utils\Inputs\Admin\ShopListInput;
-use App\Utils\Inputs\MerchantSettleInInput;
+use App\Utils\Inputs\MerchantInput;
 
 class ShopService extends BaseService
 {
-    public function createShop(int $userId, int $merchantId, MerchantSettleInInput $input)
+    public function createShop(int $userId, int $merchantId, MerchantInput $input)
     {
         $shop = Shop::new();
         $shop->user_id = $userId;

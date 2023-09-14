@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Models\Merchant;
 use App\Utils\Inputs\MerchantListInput;
-use App\Utils\Inputs\MerchantSettleInInput;
+use App\Utils\Inputs\MerchantInput;
 
 class MerchantService extends BaseService
 {
-    public function createMerchant(MerchantSettleInInput $input, $userId)
+    public function createMerchant(MerchantInput $input, $userId)
     {
         $merchant = Merchant::new();
         $merchant->user_id = $userId;

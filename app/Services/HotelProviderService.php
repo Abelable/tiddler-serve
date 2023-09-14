@@ -34,6 +34,9 @@ class HotelProviderService extends BaseService
     public function getProviderList(HotelProviderListInput $input, $columns = ['*'])
     {
         $query = HotelProvider::query();
+        if (!is_null($input->status)) {
+            $query = $query->where('status', $input->status);
+        }
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }

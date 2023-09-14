@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class MerchantSettleInInput extends BaseInput
+class MerchantInput extends BaseInput
 {
     public $type;
     public $companyName;
