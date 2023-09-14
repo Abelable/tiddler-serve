@@ -41,6 +41,9 @@ class MerchantService extends BaseService
         if (!empty($input->type)) {
             $query = $query->where('type', $input->type);
         }
+        if (!is_null($input->status)) {
+            $query = $query->where('status', $input->status);
+        }
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }

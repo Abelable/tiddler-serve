@@ -23,11 +23,15 @@ class MerchantController extends Controller
         $page = MerchantService::getInstance()->getMerchantList($input, $columns);
         $merchantList = collect($page->items());
         $merchantIds = $merchantList->pluck('id')->toArray();
-        $merchantOrderList = MerchantOrderService::getInstance()->getOrderListByMerchantIds($merchantIds, ['id', 'merchant_id'])->keyBy('merchant_id');
+        $merchantOrderList = MerchantOrderService::getInstance()->getOrderListByMerchantIds($merchantIds)->keyBy('merchant_id');
         $list = $merchantList->map(function (Merchant $merchant) use ($merchantOrderList) {
-            /** @var MerchantOrder $merchantOrder */
-            $merchantOrder = $merchantOrderList->get($merchant->id);
-            $merchant['order_id'] = $merchantOrder->id;
+            /** @var MerchantOrder $depositInfo */
+            $depositInfo = $merchantOrderList->get($merchant->id);
+            unset($depositInfo->id);
+            unset($depositInfo->user_id);
+            unset($depositInfo->merchant_id);
+
+            $merchant['depositInfo'] = $depositInfo;
             return $merchant;
         });
         return $this->success($this->paginate($page, $list));
