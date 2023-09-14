@@ -28,11 +28,17 @@ class HotelProviderController extends Controller
         $page = HotelProviderService::getInstance()->getProviderList($input, $columns);
         $providerList = collect($page->items());
         $providerIds = $providerList->pluck('id')->toArray();
-        $providerOrderList = HotelProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id', 'provider_id'])->keyBy('provider_id');
+        $providerOrderList = HotelProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds)->keyBy('provider_id');
         $list = $providerList->map(function (HotelProvider $provider) use ($providerOrderList) {
-            /** @var HotelProviderOrder $providerOrder */
-            $providerOrder = $providerOrderList->get($provider->id);
-            $provider['order_id'] = $providerOrder ? $providerOrder->id : 0;
+            /** @var HotelProviderOrder $depositInfo */
+            $depositInfo = $providerOrderList->get($provider->id);
+            if (!is_null($depositInfo)) {
+                unset($depositInfo->id);
+                unset($depositInfo->user_id);
+                unset($depositInfo->provider_id);
+            }
+
+            $provider['depositInfo'] = $depositInfo;
             return $provider;
         });
         return $this->success($this->paginate($page, $list));

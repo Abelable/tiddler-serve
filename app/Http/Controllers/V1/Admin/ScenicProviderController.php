@@ -32,9 +32,11 @@ class ScenicProviderController extends Controller
         $list = $providerList->map(function (ScenicProvider $provider) use ($providerOrderList) {
             /** @var ScenicProviderOrder $depositInfo */
             $depositInfo = $providerOrderList->get($provider->id);
-            unset($depositInfo->id);
-            unset($depositInfo->user_id);
-            unset($depositInfo->provider_id);
+            if (!is_null($depositInfo)) {
+                unset($depositInfo->id);
+                unset($depositInfo->user_id);
+                unset($depositInfo->provider_id);
+            }
 
             $provider['depositInfo'] = $depositInfo;
             return $provider;

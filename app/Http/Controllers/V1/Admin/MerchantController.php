@@ -27,9 +27,11 @@ class MerchantController extends Controller
         $list = $merchantList->map(function (Merchant $merchant) use ($merchantOrderList) {
             /** @var MerchantOrder $depositInfo */
             $depositInfo = $merchantOrderList->get($merchant->id);
-            unset($depositInfo->id);
-            unset($depositInfo->user_id);
-            unset($depositInfo->merchant_id);
+            if (!is_null($depositInfo)) {
+                unset($depositInfo->id);
+                unset($depositInfo->user_id);
+                unset($depositInfo->merchant_id);
+            }
 
             $merchant['depositInfo'] = $depositInfo;
             return $merchant;
