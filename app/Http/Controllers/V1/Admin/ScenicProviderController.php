@@ -28,11 +28,15 @@ class ScenicProviderController extends Controller
         $page = ScenicProviderService::getInstance()->getProviderList($input, $columns);
         $providerList = collect($page->items());
         $providerIds = $providerList->pluck('id')->toArray();
-        $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id', 'provider_id'])->keyBy('provider_id');
+        $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds)->keyBy('provider_id');
         $list = $providerList->map(function (ScenicProvider $provider) use ($providerOrderList) {
-            /** @var ScenicProviderOrder $providerOrder */
-            $providerOrder = $providerOrderList->get($provider->id);
-            $provider['order_id'] = $providerOrder->id;
+            /** @var ScenicProviderOrder $depositInfo */
+            $depositInfo = $providerOrderList->get($provider->id);
+            unset($depositInfo->id);
+            unset($depositInfo->user_id);
+            unset($depositInfo->provider_id);
+
+            $provider['depositInfo'] = $depositInfo;
             return $provider;
         });
         return $this->success($this->paginate($page, $list));
