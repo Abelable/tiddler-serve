@@ -24,11 +24,17 @@ class CateringProviderController extends Controller
         $page = CateringProviderService::getInstance()->getProviderList($input, $columns);
         $providerList = collect($page->items());
         $providerIds = $providerList->pluck('id')->toArray();
-        $providerOrderList = CateringProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds, ['id', 'provider_id'])->keyBy('provider_id');
+        $providerOrderList = CateringProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds)->keyBy('provider_id');
         $list = $providerList->map(function (CateringProvider $provider) use ($providerOrderList) {
             /** @var CateringProviderOrder $providerOrder */
-            $providerOrder = $providerOrderList->get($provider->id);
-            $provider['order_id'] = $providerOrder->id;
+            $depositInfo = $providerOrderList->get($provider->id);
+            if (!is_null($depositInfo)) {
+                unset($depositInfo->id);
+                unset($depositInfo->user_id);
+                unset($depositInfo->provider_id);
+            }
+            $provider['depositInfo'] = $depositInfo;
+
             return $provider;
         });
         return $this->success($this->paginate($page, $list));

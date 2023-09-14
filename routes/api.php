@@ -574,7 +574,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         });
     });
 
-    Route::prefix('restaurant')->group(function () {
+    Route::prefix('catering')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'RestaurantCategoryController@list');
             Route::get('detail', 'RestaurantCategoryController@detail');
