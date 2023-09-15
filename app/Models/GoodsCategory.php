@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\GoodsCategory
  *
  * @property int $id
- * @property string $name 店铺分类名称
+ * @property string $name 商品分类名称
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
