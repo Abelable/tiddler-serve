@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopCategory;
+use App\Models\RestaurantCategory;
 use App\Services\RestaurantCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -38,7 +38,7 @@ class RestaurantCategoryController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '当前餐饮门店分类已存在');
         }
 
-        $category = ShopCategory::new();
+        $category = RestaurantCategory::new();
         $category->name = $name;
         $category->save();
 

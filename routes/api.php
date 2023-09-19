@@ -595,6 +595,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
             Route::post('list', 'RestaurantController@list');
             Route::get('detail', 'RestaurantController@detail');
+            Route::post('add', 'RestaurantController@add');
+            Route::post('edit', 'RestaurantController@edit');
             Route::post('delete', 'RestaurantController@delete');
             Route::get('options', 'RestaurantController@options');
         });
