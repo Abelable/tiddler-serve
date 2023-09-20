@@ -232,13 +232,10 @@ Route::prefix('catering')->group(function () {
         Route::get('list', 'RestaurantController@list');
         Route::get('detail', 'RestaurantController@detail');
         Route::get('options', 'RestaurantController@options');
-        Route::get('totals', 'RestaurantController@listTotals');
-        Route::get('user_list', 'RestaurantController@userList');
         Route::post('add', 'RestaurantController@add');
         Route::post('edit', 'RestaurantController@edit');
-        Route::post('up', 'RestaurantController@up');
-        Route::post('down', 'RestaurantController@down');
         Route::post('delete', 'RestaurantController@delete');
+        Route::get('user_options', 'RestaurantController@userOptions');
     });
 
     Route::prefix('provider')->group(function () {
@@ -246,6 +243,13 @@ Route::prefix('catering')->group(function () {
         Route::get('status', 'CateringProviderController@statusInfo');
         Route::post('pay_deposit', 'CateringProviderController@payDeposit');
         Route::post('delete', 'CateringProviderController@deleteProvider');
+
+        Route::prefix('restaurant')->group(function () {
+            Route::get('totals', 'ProviderRestaurantController@listTotals');
+            Route::get('list', 'ProviderRestaurantController@list');
+            Route::post('apply', 'ProviderRestaurantController@apply');
+            Route::post('delete', 'ProviderRestaurantController@delete');
+        });
 
         Route::prefix('set_meal')->group(function () {
             Route::get('totals', 'SetMealController@roomListTotals');

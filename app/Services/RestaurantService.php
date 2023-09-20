@@ -82,9 +82,14 @@ class RestaurantService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getRestaurantOptions($columns = ['*'])
+    public function getOptions($columns = ['*'])
     {
         return Restaurant::query()->orderBy('id', 'asc')->get($columns);
+    }
+
+    public function getUserOptions(array $ids, $columns = ['*'])
+    {
+        return Restaurant::query()->whereNotIn('id', $ids)->orderBy('id', 'asc')->get($columns);
     }
 
     public function createRestaurant(RestaurantInput $input) {

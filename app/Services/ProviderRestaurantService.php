@@ -42,9 +42,19 @@ class ProviderRestaurantService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getAllUserList($userId, $columns = ['*'])
+    {
+        return ProviderRestaurant::query()->where('user_id', $userId)->get($columns);
+    }
+
     public function getUserRestaurant($userId, $id, $columns = ['*'])
     {
         return ProviderRestaurant::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getUserRestaurantByRestaurantId($userId, $restaurantId, $columns = ['*'])
+    {
+        return ProviderRestaurant::query()->where('user_id', $userId)->where('restaurant_id', $restaurantId)->first($columns);
     }
 
     public function getOptions($userId, $columns = ['*'])

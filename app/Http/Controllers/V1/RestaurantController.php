@@ -4,13 +4,16 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantController extends Controller
 {
-    protected $only = [];
+    protected $only = ['edit', 'delete', ];
 
     public function categoryOptions()
     {
@@ -47,7 +50,54 @@ class RestaurantController extends Controller
 
     public function options()
     {
-        $restaurantOptions = RestaurantService::getInstance()->getRestaurantOptions(['id', 'name']);
+        $restaurantOptions = RestaurantService::getInstance()->getOptions(['id', 'name']);
+        return $this->success($restaurantOptions);
+    }
+
+    public function add()
+    {
+        /** @var RestaurantInput $input */
+        $input = RestaurantInput::new();
+        $restaurant = Restaurant::new();
+        RestaurantService::getInstance()->updateRestaurant($restaurant, $input);
+        return $this->success();
+    }
+
+    public function edit()
+    {
+        $id = $this->verifyRequiredId('id');
+        /** @var RestaurantInput $input */
+        $input = RestaurantInput::new();
+
+        $providerRestaurant = ProviderRestaurantService::getInstance()->getUserRestaurantByRestaurantId($this->userId(), $id);
+        if (is_null($providerRestaurant)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家门店，不可编辑');
+        }
+
+        $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
+        RestaurantService::getInstance()->updateRestaurant($restaurant, $input);
+        return $this->success();
+    }
+
+    public function delete()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $providerRestaurant = ProviderRestaurantService::getInstance()->getUserRestaurantByRestaurantId($this->userId(), $id);
+        if (is_null($providerRestaurant)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家门店，不可删除');
+        }
+
+        $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
+        $restaurant->delete();
+
+        return $this->success();
+    }
+
+    public function userOptions()
+    {
+        $restaurantIds = ProviderRestaurantService::getInstance()->getAllUserList($this->userId())->pluck('restaurant_id')->toArray();
+        $restaurantOptions = RestaurantService::getInstance()->getUserOptions($restaurantIds, ['id', 'name']);
         return $this->success($restaurantOptions);
     }
 }
