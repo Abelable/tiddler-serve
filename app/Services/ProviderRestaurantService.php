@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProviderRestaurant;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 
 class ProviderRestaurantService extends BaseService
@@ -25,7 +26,11 @@ class ProviderRestaurantService extends BaseService
 
     public function getRestaurant($id, $columns = ['*'])
     {
-        return ProviderRestaurant::query()->find($id, $columns);
+        $restaurant = ProviderRestaurant::query()->find($id, $columns);
+        if (is_null($restaurant)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前服务商门店不存在');
+        }
+        return $restaurant;
     }
 
     public function getUserList($userId, StatusPageInput $input, $columns = ['*'])

@@ -9,7 +9,6 @@ use App\Models\Restaurant;
 use App\Services\CateringProviderService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantService;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 
 class ProviderRestaurantController extends Controller
@@ -48,14 +47,9 @@ class ProviderRestaurantController extends Controller
     public function approvedApply()
     {
         $id = $this->verifyRequiredId('id');
-
         $restaurant = ProviderRestaurantService::getInstance()->getRestaurant($id);
-        if (is_null($restaurant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商门店不存在');
-        }
         $restaurant->status = 1;
         $restaurant->save();
-
         return $this->success();
     }
 
@@ -63,28 +57,18 @@ class ProviderRestaurantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
-
         $restaurant = ProviderRestaurantService::getInstance()->getRestaurant($id);
-        if (is_null($restaurant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商门店不存在');
-        }
         $restaurant->status = 2;
         $restaurant->failure_reason = $reason;
         $restaurant->save();
-
         return $this->success();
     }
 
     public function deleteApply()
     {
         $id = $this->verifyRequiredId('id');
-
         $restaurant = ProviderRestaurantService::getInstance()->getRestaurant($id);
-        if (is_null($restaurant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商门店不存在');
-        }
         $restaurant->delete();
-
         return $this->success();
     }
 }

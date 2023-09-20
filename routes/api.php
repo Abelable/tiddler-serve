@@ -581,6 +581,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('approved', 'CateringProviderController@approved');
             Route::post('reject', 'CateringProviderController@reject');
             Route::post('order_list', 'CateringProviderController@orderList');
+
+            Route::prefix('restaurant')->group(function () {
+                Route::post('list', 'ProviderRestaurantController@list');
+                Route::post('approved', 'ProviderRestaurantController@approvedApply');
+                Route::post('reject', 'ProviderRestaurantController@rejectApply');
+                Route::post('delete', 'ProviderRestaurantController@deleteApply');
+            });
         });
 
         Route::prefix('restaurant')->group(function () {
