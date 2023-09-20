@@ -12,9 +12,9 @@ use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\ProviderScenicListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ScenicProviderListInput;
+use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 
 class ScenicProviderController extends Controller
@@ -112,8 +112,8 @@ class ScenicProviderController extends Controller
 
     public function providerScenicList()
     {
-        /** @var ProviderScenicListInput  $input */
-        $input = ProviderScenicListInput::new();
+        /** @var StatusPageInput  $input */
+        $input = StatusPageInput::new();
         $page = ProviderScenicSpotService::getInstance()->getScenicList($input, ['id', 'scenic_id', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicList = collect($page->items());
 

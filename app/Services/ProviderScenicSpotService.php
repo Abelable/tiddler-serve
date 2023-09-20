@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\ProviderScenicSpot;
-use App\Utils\Inputs\Admin\ProviderScenicListInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class ProviderScenicSpotService extends BaseService
@@ -32,7 +31,7 @@ class ProviderScenicSpotService extends BaseService
         return ProviderScenicSpot::query()->where('user_id', $userId)->where('scenic_id', $scenicId)->first($columns);
     }
 
-    public function getScenicList(ProviderScenicListInput $input, $columns = ['*'])
+    public function getScenicList(StatusPageInput $input, $columns = ['*'])
     {
         $query = ProviderScenicSpot::query();
         if (!is_null($input->status)) {

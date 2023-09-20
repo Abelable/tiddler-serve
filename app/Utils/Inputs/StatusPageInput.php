@@ -9,7 +9,7 @@ class StatusPageInput extends PageInput
     public function rules()
     {
         return array_merge([
-            'status' => 'required|integer|in:0,1,2,3',
+            'status' => 'integer|in:0,1,2,3,4,5,6',
         ], parent::rules());
     }
 }
