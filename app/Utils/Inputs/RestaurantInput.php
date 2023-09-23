@@ -5,7 +5,6 @@ namespace App\Utils\Inputs;
 class RestaurantInput extends BaseInput
 {
     public $categoryId;
-    public $openStatus;
     public $name;
     public $price;
     public $logo;
@@ -24,7 +23,6 @@ class RestaurantInput extends BaseInput
     public function rules()
     {
         return [
-            'openStatus' => 'required|integer|in:0,1',
             'categoryId' => 'required|integer|digits_between:1,20',
             'name' => 'required|string',
             'price' => 'required|numeric',

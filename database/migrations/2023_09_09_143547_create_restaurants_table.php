@@ -33,7 +33,6 @@ class CreateRestaurantsTable extends Migration
             $table->float('service_rate')->default(0)->comment('餐馆服务评分');
             $table->float('food_rate')->default(0)->comment('餐馆食材评分');
             $table->longText('tel_list')->comment('餐馆联系电话');
-            $table->integer('open_status')->default(0)->comment('营业状态：0-尚未营业，1-正在营业');
             $table->longText('open_time_list')->comment('餐馆营业时间');
             $table->longText('facility_list')->comment('服务设施列表');
             $table->timestamps();

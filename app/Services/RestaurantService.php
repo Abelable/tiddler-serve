@@ -98,7 +98,6 @@ class RestaurantService extends BaseService
     }
 
     public function updateRestaurant(Restaurant $restaurant, RestaurantInput $input) {
-        $restaurant->open_status = $input->openStatus;
         $restaurant->category_id = $input->categoryId;
         $restaurant->name = $input->name;
         $restaurant->price = $input->price;

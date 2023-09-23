@@ -24,7 +24,6 @@ namespace App\Models;
  * @property float $service_rate 餐馆服务评分
  * @property float $food_rate 餐馆食材评分
  * @property string $tel_list 餐馆联系电话
- * @property int $open_status 营业状态：0-尚未营业，1-正在营业
  * @property string $open_time_list 餐馆营业时间
  * @property string $facility_list 服务设施列表
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -49,7 +48,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereOpenStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePriceImageList($value)
