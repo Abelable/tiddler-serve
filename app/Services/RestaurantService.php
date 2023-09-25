@@ -16,14 +16,8 @@ class RestaurantService extends BaseService
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
-        if (!empty($input->grade)) {
-            $query = $query->where('grade', $input->grade);
-        }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!is_null($input->status)) {
-            $query = $query->where('status', $input->status);
         }
         return $query
             ->orderBy($input->sort, $input->order)
@@ -39,6 +33,7 @@ class RestaurantService extends BaseService
         $restaurant->food_image_list = json_decode($restaurant->food_image_list);
         $restaurant->environment_image_list = json_decode($restaurant->environment_image_list);
         $restaurant->price_image_list = json_decode($restaurant->price_image_list);
+        $restaurant->tel_list = json_decode($restaurant->tel_list);
         $restaurant->facility_list = json_decode($restaurant->facility_list);
         $restaurant->open_time_list = json_decode($restaurant->open_time_list);
         return $restaurant;
@@ -111,7 +106,7 @@ class RestaurantService extends BaseService
         $restaurant->latitude = $input->latitude;
         $restaurant->longitude = $input->longitude;
         $restaurant->address = $input->address;
-        $restaurant->tel_list = $input->telList;
+        $restaurant->tel_list = json_encode($input->telList);
         $restaurant->open_time_list = json_encode($input->openTimeList);
         $restaurant->facility_list = json_encode($input->facilityList);
         $restaurant->save();

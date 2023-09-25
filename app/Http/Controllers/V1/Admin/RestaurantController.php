@@ -18,10 +18,8 @@ class RestaurantController extends Controller
         $input = RestaurantListInput::new();
         $columns = [
             'id',
-            'status',
-            'failure_reason',
+            'cover',
             'name',
-            'level',
             'category_id',
             'rate',
             'created_at',
