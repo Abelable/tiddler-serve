@@ -104,7 +104,6 @@ class RestaurantService extends BaseService
         if (!empty($input->video)) {
             $restaurant->video = $input->video;
         }
-        $restaurant->logo = $input->logo;
         $restaurant->cover = $input->cover;
         $restaurant->food_image_list = json_encode($input->foodImageList);
         $restaurant->environment_image_list = json_encode($input->environmentImageList);

@@ -7,7 +7,6 @@ class RestaurantInput extends BaseInput
     public $categoryId;
     public $name;
     public $price;
-    public $logo;
     public $cover;
     public $video;
     public $foodImageList;
@@ -27,7 +26,6 @@ class RestaurantInput extends BaseInput
             'name' => 'required|string',
             'price' => 'required|numeric',
             'video' => 'string',
-            'logo' => 'required|string',
             'cover' => 'required|string',
             'foodImageList' => 'required|array',
             'environmentImageList' => 'required|array',

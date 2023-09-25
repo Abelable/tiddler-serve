@@ -9,7 +9,6 @@ namespace App\Models;
  * @property int $category_id 餐馆分类id
  * @property string $name 餐馆名称
  * @property float $price 餐馆最低价格
- * @property string $logo 餐馆头像图片
  * @property string $video 视频
  * @property string $cover 餐馆封面图片
  * @property string $food_image_list 菜品图片列表
@@ -45,7 +44,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereFoodRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereLatitude($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereOpenTimeList($value)
