@@ -43,6 +43,8 @@ class RestaurantService extends BaseService
     }
 
     private function decodeRestaurantInfo(Restaurant $restaurant) {
+        $restaurant->longitude = (float) $restaurant->longitude;
+        $restaurant->latitude = (float) $restaurant->latitude;
         $restaurant->food_image_list = json_decode($restaurant->food_image_list);
         $restaurant->environment_image_list = json_decode($restaurant->environment_image_list);
         $restaurant->price_image_list = json_decode($restaurant->price_image_list);

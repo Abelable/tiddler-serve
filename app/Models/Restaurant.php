@@ -14,8 +14,8 @@ namespace App\Models;
  * @property string $food_image_list 菜品图片列表
  * @property string $environment_image_list 环境图片列表
  * @property string $price_image_list 价目表图片列表
- * @property float $longitude 经度
- * @property float $latitude 纬度
+ * @property string $longitude 经度
+ * @property string $latitude 纬度
  * @property string $address 具体地址
  * @property float $rate 餐馆综合评分
  * @property float $taste_rate 餐馆口味评分

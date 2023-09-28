@@ -58,7 +58,6 @@ class RestaurantController extends Controller
 
         $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
         $restaurant['categoryName'] = $category->name;
-        unset($restaurant->category_id);
 
         return $this->success($restaurant);
     }
