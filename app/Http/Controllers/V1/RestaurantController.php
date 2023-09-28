@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Models\RestaurantCategory;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
@@ -13,7 +14,7 @@ use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantController extends Controller
 {
-    protected $only = ['edit', 'delete', ];
+    protected $only = ['edit', 'delete'];
 
     public function categoryOptions()
     {
@@ -28,7 +29,16 @@ class RestaurantController extends Controller
 
         $page = RestaurantService::getInstance()->getAllList($input);
         $restaurantList = collect($page->items());
-        $list = $restaurantList->map(function (Restaurant $restaurant) {
+
+        $categoryIds = $restaurantList->pluck('category_id')->toArray();
+        $categoryList = RestaurantCategoryService::getInstance()->getListByIds($categoryIds)->keyBy('id');
+
+        $list = $restaurantList->map(function (Restaurant $restaurant) use ($categoryList) {
+            /** @var RestaurantCategory $category */
+            $category = $categoryList->get($restaurant->category_id);
+            $restaurant['categoryName'] = $category->name;
+            unset($restaurant->category_id);
+
             $restaurant->food_image_list= json_decode($restaurant->food_image_list);
             $restaurant->environment_image_list= json_decode($restaurant->environment_image_list);
             $restaurant->price_image_list= json_decode($restaurant->price_image_list);
@@ -45,6 +55,11 @@ class RestaurantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
+
+        $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
+        $restaurant['categoryName'] = $category->name;
+        unset($restaurant->category_id);
+
         return $this->success($restaurant);
     }
 

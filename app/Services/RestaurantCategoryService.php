@@ -26,4 +26,9 @@ class RestaurantCategoryService extends BaseService
     {
         return RestaurantCategory::query()->orderBy('id', 'asc')->get($columns);
     }
+
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return RestaurantCategory::query()->whereIn('id', $ids)->get($columns);
+    }
 }

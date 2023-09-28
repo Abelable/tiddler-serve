@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
 use App\Utils\Inputs\Admin\RestaurantListInput;
 use App\Utils\Inputs\RestaurantInput;
