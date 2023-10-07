@@ -31,6 +31,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
+ * @property-read \App\Models\ScenicShop|null $scenicShop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
@@ -98,6 +99,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function scenicProvider()
     {
         return $this->hasOne(ScenicProvider::class, 'user_id')->where('status', 2);
+    }
+
+    public function scenicShop()
+    {
+        return $this->hasOne(ScenicShop::class, 'user_id')->where('status', 1);
     }
 
     public function hotelProvider()

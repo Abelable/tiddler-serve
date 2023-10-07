@@ -18,7 +18,7 @@ class ScenicTicketService extends BaseService
         if (!empty($input->type)) {
             $query = $query->where('type', $input->type);
         }
-        if (!empty($input->scenicSpotId)) {
+        if (!empty($input->scenicId)) {
             $query = $query->whereIn('id', function ($subQuery) use ($input) {
                 $subQuery->select('ticket_id')
                     ->from('ticket_scenic_spot')
