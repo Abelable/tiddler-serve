@@ -252,8 +252,8 @@ Route::prefix('catering')->group(function () {
         });
 
         Route::prefix('set_meal')->group(function () {
-            Route::get('totals', 'SetMealController@roomListTotals');
-            Route::get('list', 'SetMealController@userRoomList');
+            Route::get('totals', 'SetMealController@listTotals');
+            Route::get('list', 'SetMealController@userList');
             Route::get('detail', 'SetMealController@detail');
             Route::post('add', 'SetMealController@add');
             Route::post('edit', 'SetMealController@edit');
@@ -263,8 +263,8 @@ Route::prefix('catering')->group(function () {
         });
 
         Route::prefix('meal_ticket')->group(function () {
-            Route::get('totals', 'MealTicketController@roomListTotals');
-            Route::get('list', 'MealTicketController@userRoomList');
+            Route::get('totals', 'MealTicketController@listTotals');
+            Route::get('list', 'MealTicketController@userList');
             Route::get('detail', 'MealTicketController@detail');
             Route::post('add', 'MealTicketController@add');
             Route::post('edit', 'MealTicketController@edit');
