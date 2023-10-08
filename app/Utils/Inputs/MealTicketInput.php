@@ -18,14 +18,13 @@ class MealTicketInput extends BaseInput
     public $useTimeList;
     public $includingDrink;
     public $boxAvailable;
-    public $needPreKook;
+    public $needPreBook;
     public $useRules;
 
     public function rules()
     {
         return [
             'restaurantIds' => 'required|array|min:1',
-            'name' => 'required|string',
             'price' => 'required|numeric',
             'originalPrice' => 'numeric',
             'salesCommissionRate' => 'required|numeric',
@@ -39,7 +38,7 @@ class MealTicketInput extends BaseInput
             'useTimeList' => 'array',
             'includingDrink' => 'integer',
             'boxAvailable' => 'integer',
-            'needPreKook' => 'integer',
+            'needPreBook' => 'integer',
             'useRules' => 'array',
         ];
     }

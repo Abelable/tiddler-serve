@@ -76,16 +76,16 @@ class MealTicketService extends BaseService
         $ticket->original_price = $input->originalPrice;
         $ticket->sales_commission_rate = $input->salesCommissionRate;
         $ticket->promotion_commission_rate = $input->promotionCommissionRate;
-        $ticket->validity_days = $input->validityDays;
-        $ticket->validity_start_time = $input->validityStartTime;
-        $ticket->validity_end_time = $input->validityEndTime;
-        $ticket->buy_limit = $input->buyLimit;
-        $ticket->per_table_usage_limit = $input->perTableUsageLimit;
-        $ticket->overlay_usage_limit = $input->overlayUsageLimit;
+        $ticket->validity_days = $input->validityDays ?: 0;
+        $ticket->validity_start_time = $input->validityStartTime ?: '';
+        $ticket->validity_end_time = $input->validityEndTime ?: '';
+        $ticket->buy_limit = $input->buyLimit ?: 0;
+        $ticket->per_table_usage_limit = $input->perTableUsageLimit ?: 0;
+        $ticket->overlay_usage_limit = $input->overlayUsageLimit ?: 0;
         $ticket->use_time_list = json_encode($input->useTimeList);
         $ticket->including_drink = $input->includingDrink;
         $ticket->box_available = $input->boxAvailable;
-        $ticket->need_pre_book = $input->needPreKook;
+        $ticket->need_pre_book = $input->needPreBook;
         $ticket->use_rules = json_encode($input->useRules);
         $ticket->save();
 
