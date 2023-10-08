@@ -72,7 +72,6 @@ class MealTicketService extends BaseService
             $ticket->status = 0;
             $ticket->failure_reason = '';
         }
-        $ticket->name = $input->name;
         $ticket->price = $input->price;
         $ticket->original_price = $input->originalPrice;
         $ticket->sales_commission_rate = $input->salesCommissionRate;
@@ -80,8 +79,9 @@ class MealTicketService extends BaseService
         $ticket->validity_days = $input->validityDays;
         $ticket->validity_start_time = $input->validityStartTime;
         $ticket->validity_end_time = $input->validityEndTime;
-        $ticket->buy_limit_number = $input->buyLimitNumber;
-        $ticket->use_limit_number = $input->useLimitNumber;
+        $ticket->buy_limit = $input->buyLimit;
+        $ticket->per_table_usage_limit = $input->perTableUsageLimit;
+        $ticket->overlay_usage_limit = $input->overlayUsageLimit;
         $ticket->use_time_list = json_encode($input->useTimeList);
         $ticket->including_drink = $input->includingDrink;
         $ticket->box_available = $input->boxAvailable;

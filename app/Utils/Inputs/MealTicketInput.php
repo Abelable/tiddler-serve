@@ -5,7 +5,6 @@ namespace App\Utils\Inputs;
 class MealTicketInput extends BaseInput
 {
     public $restaurantIds;
-    public $name;
     public $price;
     public $originalPrice;
     public $salesCommissionRate;
@@ -13,8 +12,9 @@ class MealTicketInput extends BaseInput
     public $validityDays;
     public $validityStartTime;
     public $validityEndTime;
-    public $buyLimitNumber;
-    public $useLimitNumber;
+    public $buyLimit;
+    public $perTableUsageLimit;
+    public $overlayUsageLimit;
     public $useTimeList;
     public $includingDrink;
     public $boxAvailable;
@@ -33,8 +33,9 @@ class MealTicketInput extends BaseInput
             'validityDays' => 'integer',
             'validityStartTime' => 'string',
             'validityEndTime' => 'string',
-            'buyLimitNumber' => 'integer',
-            'useLimitNumber' => 'integer',
+            'buyLimit' => 'integer',
+            'perTableUsageLimit' => 'integer',
+            'overlayUsageLimit' => 'integer',
             'useTimeList' => 'array',
             'includingDrink' => 'integer',
             'boxAvailable' => 'integer',
