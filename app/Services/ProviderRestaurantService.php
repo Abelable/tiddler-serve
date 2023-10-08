@@ -42,11 +42,6 @@ class ProviderRestaurantService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getAllUserList($userId, $columns = ['*'])
-    {
-        return ProviderRestaurant::query()->where('user_id', $userId)->get($columns);
-    }
-
     public function getUserRestaurant($userId, $id, $columns = ['*'])
     {
         return ProviderRestaurant::query()->where('user_id', $userId)->find($id, $columns);

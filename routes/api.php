@@ -249,6 +249,7 @@ Route::prefix('catering')->group(function () {
             Route::get('list', 'ProviderRestaurantController@list');
             Route::post('apply', 'ProviderRestaurantController@apply');
             Route::post('delete', 'ProviderRestaurantController@delete');
+            Route::get('options', 'ProviderRestaurantController@options');
         });
 
         Route::prefix('set_meal')->group(function () {

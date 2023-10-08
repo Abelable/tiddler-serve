@@ -110,7 +110,7 @@ class RestaurantController extends Controller
 
     public function userOptions()
     {
-        $restaurantIds = ProviderRestaurantService::getInstance()->getAllUserList($this->userId())->pluck('restaurant_id')->toArray();
+        $restaurantIds = ProviderRestaurantService::getInstance()->getOptions($this->userId())->pluck('restaurant_id')->toArray();
         $restaurantOptions = RestaurantService::getInstance()->getUserOptions($restaurantIds, ['id', 'name']);
         return $this->success($restaurantOptions);
     }

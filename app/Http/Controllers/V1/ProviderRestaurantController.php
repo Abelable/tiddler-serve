@@ -74,4 +74,11 @@ class ProviderRestaurantController extends Controller
         $restaurant->delete();
         return $this->success();
     }
+
+    public function options()
+    {
+        $restaurantIds = ProviderRestaurantService::getInstance()->getOptions($this->userId())->pluck('restaurant_id')->toArray();
+        $options = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, ['id', 'name'])->keyBy('id');
+        return $this->success($options);
+    }
 }
