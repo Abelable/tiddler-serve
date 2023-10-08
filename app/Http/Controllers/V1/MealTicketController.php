@@ -82,10 +82,9 @@ class MealTicketController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
         }
 
-        $restaurantIds = RestaurantTicketService::getInstance()->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
-        $specList = TicketSpecService::getInstance()->getSpecListByTicketId($ticket->id, ['category_id', 'price_list']);
-        $ticket['restaurantIds'] = $restaurantIds;
-        $ticket['specList'] = $specList;
+        $ticket['restaurantIds'] = $ticket->restaurantIds();
+        $ticket['useTimeList'] = json_decode($ticket->use_time_list);
+        $ticket['useRules'] = json_decode($ticket->use_rules);
 
         return $this->success($ticket);
     }
