@@ -32,15 +32,16 @@ class MealTicketController extends Controller
             'per_table_usage_limit',
             'overlay_usage_limit',
             'use_time_list',
-            'including_drink',
+            'inapplicable_products',
             'box_available',
             'need_pre_book',
             'use_rules'
         ]);
 
         $ticketList = $ticketList->map(function (MealTicket $ticket) {
-            $ticket->use_time_list = json_decode($ticket->use_time_list);
-            $ticket->use_rules = json_decode($ticket->use_rules);
+            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+            $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+            $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
             return $ticket;
         });
 
@@ -82,8 +83,9 @@ class MealTicketController extends Controller
         }
 
         $ticket['restaurantIds'] = $ticket->restaurantIds();
-        $ticket['useTimeList'] = json_decode($ticket->use_time_list);
-        $ticket['useRules'] = json_decode($ticket->use_rules);
+        $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+        $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+        $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
 
         return $this->success($ticket);
     }
