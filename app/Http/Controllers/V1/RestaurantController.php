@@ -41,7 +41,7 @@ class RestaurantController extends Controller
             $restaurant['categoryName'] = $category->name;
             unset($restaurant->category_id);
 
-            $mealTicketList = MealTicketService::getInstance()->getListByIds($restaurant->ticketIds(), ['price', 'originalPrice']);
+            $mealTicketList = MealTicketService::getInstance()->getListByIds($restaurant->ticketIds(), ['price', 'original_price']);
             $restaurant['mealTicketList'] = $mealTicketList;
 
             $restaurant->food_image_list= json_decode($restaurant->food_image_list);
@@ -64,11 +64,13 @@ class RestaurantController extends Controller
         $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
         $restaurant['categoryName'] = $category->name;
 
-        $columns = ['id', 'price', 'originalPrice', 'sales_volume', 'buy_limit', 'per_table_usage_limit', 'overlay_usage_limit', 'use_time_list', 'inapplicable_products', 'box_available', 'need_pre_book'];
+        $columns = ['id', 'price', 'original_price', 'sales_volume', 'buy_limit', 'per_table_usage_limit', 'overlay_usage_limit', 'use_time_list', 'inapplicable_products', 'box_available', 'need_pre_book'];
         $mealTicketList = MealTicketService::getInstance()->getListByIds($restaurant->ticketIds(), $columns);
         $mealTicketList = $mealTicketList->map(function (MealTicket $ticket) {
             $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
             $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+
+            return $ticket;
         });
         $restaurant['mealTicketList'] = $mealTicketList;
 
