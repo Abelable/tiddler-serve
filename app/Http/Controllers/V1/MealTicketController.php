@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\MealTicket;
 use App\Services\MealTicketService;
 use App\Services\RestaurantTicketService;
-use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MealTicketInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -164,11 +163,10 @@ class MealTicketController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = MealTicketService::getInstance()->getUserTicket($this->userId(), $id);
-        if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
-        }
-        $ticket->delete();
+        DB::transaction(function () use ($id) {
+            MealTicketService::getInstance()->deleteTicket($this->userId(), $id);
+            RestaurantTicketService::getInstance()->deleteByTicketId($id);
+        });
 
         return $this->success();
     }

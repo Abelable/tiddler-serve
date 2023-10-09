@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\MealTicket;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\MealTicketListInput;
 use App\Utils\Inputs\MealTicketInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -83,12 +84,21 @@ class MealTicketService extends BaseService
         $ticket->per_table_usage_limit = $input->perTableUsageLimit ?: 0;
         $ticket->overlay_usage_limit = $input->overlayUsageLimit ?: 0;
         $ticket->use_time_list = json_encode($input->useTimeList);
-        $ticket->including_drink = $input->includingDrink;
+        $ticket->inapplicable_products = json_encode($input->inapplicableProducts);
         $ticket->box_available = $input->boxAvailable;
         $ticket->need_pre_book = $input->needPreBook;
         $ticket->use_rules = json_encode($input->useRules);
         $ticket->save();
 
         return $ticket;
+    }
+
+    public function deleteTicket($userId, $id)
+    {
+        $ticket = $this->getUserTicket($userId, $id);
+        if (is_null($ticket)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '代金券不存在');
+        }
+        $ticket->delete();
     }
 }

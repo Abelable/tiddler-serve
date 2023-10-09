@@ -18,7 +18,7 @@ class RestaurantTicketService extends BaseService
 
     public function updateRestaurantTickets($ticketId, array $restaurantIds)
     {
-        RestaurantTicket::query()->where('ticket_id', $ticketId)->delete();
+        $this->deleteByTicketId($ticketId);
         $this->createRestaurantTickets($ticketId, $restaurantIds);
     }
 
@@ -30,5 +30,10 @@ class RestaurantTicketService extends BaseService
     public function getListByRestaurantId($restaurantId, $columns = ['*'])
     {
         return RestaurantTicket::query()->where('restaurant_id', $restaurantId)->get($columns);
+    }
+
+    public function deleteByTicketId($ticketId)
+    {
+        RestaurantTicket::query()->where('ticket_id', $ticketId)->delete();
     }
 }

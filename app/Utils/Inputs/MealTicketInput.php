@@ -16,7 +16,7 @@ class MealTicketInput extends BaseInput
     public $perTableUsageLimit;
     public $overlayUsageLimit;
     public $useTimeList;
-    public $includingDrink;
+    public $inapplicableProducts;
     public $boxAvailable;
     public $needPreBook;
     public $useRules;
@@ -36,7 +36,7 @@ class MealTicketInput extends BaseInput
             'perTableUsageLimit' => 'integer',
             'overlayUsageLimit' => 'integer',
             'useTimeList' => 'array',
-            'includingDrink' => 'integer',
+            'inapplicableProducts' => 'array',
             'boxAvailable' => 'integer',
             'needPreBook' => 'integer',
             'useRules' => 'array',

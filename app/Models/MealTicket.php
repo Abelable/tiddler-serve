@@ -22,7 +22,7 @@ namespace App\Models;
  * @property int $per_table_usage_limit 单桌使用数量限制
  * @property int $overlay_usage_limit 叠加使用数量限制
  * @property string $use_time_list 使用时间范围
- * @property int $including_drink 全场通用是否包含酒水：0-不含酒水，1-包含酒水
+ * @property string $inapplicable_products 不可用商品列表
  * @property int $box_available 包厢是否可用：0-不可用，1-可用
  * @property int $need_pre_book 是否需要预定：0-不需要预定，1-需要预定
  * @property string $use_rules 使用规则
@@ -39,7 +39,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereIncludingDrink($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereInapplicableProducts($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereNeedPreBook($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereOriginalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereOverlayUsageLimit($value)
