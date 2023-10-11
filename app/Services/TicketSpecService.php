@@ -29,10 +29,10 @@ class TicketSpecService extends BaseService
         return TicketSpec::query()->where('ticket_id', $ticketId)->get($columns);
     }
 
-    public function getPriceList($ticketId, $categpryId, $columns = ['*']) {
+    public function getPriceList($ticketId, $categoryId, $columns = ['*']) {
         $spec = TicketSpec::query()
             ->where('ticket_id', $ticketId)
-            ->where('category_id', $categpryId)
+            ->where('category_id', $categoryId)
             ->first($columns);
         if (is_null($spec)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点门票规格不存在');

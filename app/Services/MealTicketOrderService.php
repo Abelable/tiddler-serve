@@ -2,19 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\ScenicOrder;
+use App\Models\MealTicketOrder;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\ScenicOrderEnums;
-use App\Utils\Inputs\ScenicOrderInput;
+use App\Utils\Enums\MealTicketOrderEnums;
+use App\Utils\Inputs\MealTicketOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ScenicOrderService extends BaseService
+class MealTicketOrderService extends BaseService
 {
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
-        $query = ScenicOrder::query()->where('user_id', $userId);
+        $query = MealTicketOrder::query()->where('user_id', $userId);
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
@@ -23,9 +23,9 @@ class ScenicOrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopOrderList($shopId, $statusList, PageInput $input, $columns = ['*'])
+    public function getProviderOrderList($providerId, $statusList, PageInput $input, $columns = ['*'])
     {
-        $query = ScenicOrder::query()->where('shop_id', $shopId);
+        $query = MealTicketOrder::query()->where('provider_id', $providerId);
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
@@ -36,23 +36,23 @@ class ScenicOrderService extends BaseService
 
     public function getOrderById($userId, $id, $columns = ['*'])
     {
-        return ScenicOrder::query()->where('user_id', $userId)->find($id, $columns);
+        return MealTicketOrder::query()->where('user_id', $userId)->find($id, $columns);
     }
 
     public function getUnpaidOrder(int $userId, $orderId, $columns = ['*'])
     {
-        return ScenicOrder::query()
+        return MealTicketOrder::query()
             ->where('user_id', $userId)
             ->where('id', $orderId)
-            ->where('status', ScenicOrderEnums::STATUS_CREATE)
+            ->where('status', MealTicketOrderEnums::STATUS_CREATE)
             ->first($columns);
     }
 
     public function getUnpaidOrderBySn($orderSn, $columns = ['*'])
     {
-        return ScenicOrder::query()
+        return MealTicketOrder::query()
             ->where('order_sn', $orderSn)
-            ->where('status', ScenicOrderEnums::STATUS_CREATE)
+            ->where('status', MealTicketOrderEnums::STATUS_CREATE)
             ->first($columns);
     }
 
@@ -70,32 +70,23 @@ class ScenicOrderService extends BaseService
 
     public function isOrderSnExists(string $orderSn)
     {
-        return ScenicOrder::query()->where('order_sn', $orderSn)->exists();
+        return MealTicketOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, ScenicOrderInput $input)
+    public function createOrder($userId, MealTicketOrderInput $input)
     {
-        list($paymentAmount, $price) = $this->calcPaymentAmount($input->ticketId, $input->categoryId, $input->timeStamp, $input->num);
-        $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
-        $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
+        list($paymentAmount, $ticket) = $this->calcPaymentAmount($input->ticketId, $input->num);
 
-        $order = ScenicOrder::new();
+        $order = MealTicketOrder::new();
         $order->order_sn = $this->generateOrderSn();
-        $order->status = ScenicOrderEnums::STATUS_CREATE;
+        $order->status = MealTicketOrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
-        $order->consignee = $input->consignee;
-        $order->mobile = $input->mobile;
-        $order->id_card_number = $input->idCardNumber;
-        $order->shop_id = $shop->id;
-        $order->shop_avatar = $shop->avatar;
-        $order->shop_name = $shop->name;
         $order->payment_amount = $paymentAmount;
         $order->refund_amount = $order->payment_amount;
         $order->save();
 
-        // 生成订单门票快照
-        $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
-        ScenicOrderTicketService::getInstance()->createOrderTicket($order->id, $category, $input->timeStamp, $price, $input->num, $ticket);
+        // 生成订单代金券快照
+        OrderMealTicketService::getInstance()->createOrderTicket($order->id, $input->num, $ticket);
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
@@ -103,23 +94,16 @@ class ScenicOrderService extends BaseService
         return $order->id;
     }
 
-    public function calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num)
+    public function calcPaymentAmount($ticketId, $num)
     {
-        $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-        $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
-                return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
-            })[0] ?? null;
-        if (is_null($priceUnit)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
-        }
-
-        $paymentAmount = (float)bcmul($priceUnit->price, $num, 2);
-        return [$paymentAmount, $priceUnit->price];
+        $ticket = MealTicketService::getInstance()->getTicketById($ticketId);
+        $paymentAmount = (float)bcmul($ticket->price, $num, 2);
+        return [$paymentAmount, $ticket];
     }
 
     public function createWxPayOrder($userId, $orderId, $openid)
     {
-        /** @var ScenicOrder $order */
+        /** @var MealTicketOrder $order */
         $order = $this->getUnpaidOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '订单不存在');
@@ -139,7 +123,7 @@ class ScenicOrderService extends BaseService
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
-        /** @var ScenicOrder $order */
+        /** @var MealTicketOrder $order */
         $order = $this->getUnpaidOrderBySn($orderSn);
 
         if (bccomp($actualPaymentAmount, $order->payment_amount, 2) != 0) {
@@ -150,7 +134,7 @@ class ScenicOrderService extends BaseService
 
         $order->pay_id = $payId;
         $order->pay_time = now()->toDateTimeString();
-        $order->status = ScenicOrderEnums::STATUS_PAY;
+        $order->status = MealTicketOrderEnums::STATUS_PAY;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -179,18 +163,18 @@ class ScenicOrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != ScenicOrderEnums::STATUS_CREATE) {
+        if ($order->status != MealTicketOrderEnums::STATUS_CREATE) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
         }
         switch ($role) {
             case 'system':
-                $order->status = ScenicOrderEnums::STATUS_AUTO_CANCEL;
+                $order->status = MealTicketOrderEnums::STATUS_AUTO_CANCEL;
                 break;
             case 'admin':
-                $order->status = ScenicOrderEnums::STATUS_ADMIN_CANCEL;
+                $order->status = MealTicketOrderEnums::STATUS_ADMIN_CANCEL;
                 break;
             case 'user':
-                $order->status = ScenicOrderEnums::STATUS_CANCEL;
+                $order->status = MealTicketOrderEnums::STATUS_CANCEL;
                 break;
         }
         if ($order->cas() == 0) {
@@ -207,7 +191,7 @@ class ScenicOrderService extends BaseService
             $this->throwBadArgumentValue();
         }
 
-        $order->status = $isAuto ? ScenicOrderEnums::STATUS_AUTO_CONFIRM : ScenicOrderEnums::STATUS_CONFIRM;
+        $order->status = $isAuto ? MealTicketOrderEnums::STATUS_AUTO_CONFIRM : MealTicketOrderEnums::STATUS_CONFIRM;
         $order->confirm_time = now()->toDateTimeString();
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -242,7 +226,7 @@ class ScenicOrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
         }
 
-        $order->status = ScenicOrderEnums::STATUS_REFUND;
+        $order->status = MealTicketOrderEnums::STATUS_REFUND;
 
         if ($order->cas() == 0) {
             $this->throwUpdateFail();

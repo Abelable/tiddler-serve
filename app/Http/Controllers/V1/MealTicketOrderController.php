@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
-class ScenicOrderController extends Controller
+class MealTicketOrderController extends Controller
 {
     public function paymentAmount()
     {

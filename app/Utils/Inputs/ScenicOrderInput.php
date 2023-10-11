@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class CreateScenicOrderInput extends BaseInput
+class ScenicOrderInput extends BaseInput
 {
     public $ticketId;
     public $categoryId;
