@@ -15,9 +15,21 @@ class OrderMealTicketService extends BaseService
     {
         $ticket = OrderMealTicket::new();
         $ticket->order_id = $orderId;
-        $ticket->ticket_id = $ticketInfo->id;
-        $ticket->ticket_price = $ticketInfo->price;
         $ticket->number = $number;
+        $ticket->ticket_id = $ticketInfo->id;
+        $ticket->price = $ticketInfo->price;
+        $ticket->original_price = $ticketInfo->original_price;
+        $ticket->validity_days = $ticketInfo->validity_days;
+        $ticket->validity_start_time = $ticketInfo->validity_start_time;
+        $ticket->validity_end_time = $ticketInfo->validity_end_time;
+        $ticket->buy_limit = $ticketInfo->buy_limit;
+        $ticket->per_table_usage_limit = $ticketInfo->per_table_usage_limit;
+        $ticket->overlay_usage_limit = $ticketInfo->overlay_usage_limit;
+        $ticket->use_time_list = $ticketInfo->use_time_list;
+        $ticket->inapplicable_products = $ticketInfo->inapplicable_products;
+        $ticket->box_available = $ticketInfo->box_available;
+        $ticket->need_pre_book = $ticketInfo->need_pre_book;
+        $ticket->use_rules = $ticketInfo->use_rules;
         $ticket->save();
     }
 
