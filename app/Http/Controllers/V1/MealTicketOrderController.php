@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealTicketOrder;
+use App\Models\OrderMealTicket;
 use App\Services\MealTicketOrderService;
 use App\Services\OrderMealTicketService;
 use App\Utils\CodeResponse;
@@ -19,11 +20,9 @@ class MealTicketOrderController extends Controller
     public function paymentAmount()
     {
         $ticketId = $this->verifyRequiredId('ticketId');
-        $categoryId = $this->verifyRequiredId('categoryId');
-        $timeStamp = $this->verifyRequiredInteger('timeStamp');
         $num = $this->verifyRequiredInteger('num');
 
-        list($paymentAmount) = MealTicketOrderService::getInstance()->calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num);
+        list($paymentAmount) = MealTicketOrderService::getInstance()->calcPaymentAmount($ticketId, $num);
 
         return $this->success($paymentAmount);
     }
@@ -41,7 +40,7 @@ class MealTicketOrderController extends Controller
         }
 
         $orderId = DB::transaction(function () use ($input) {
-            return MealTicketOrderService::getInstance()->createOrder($this->userId(), $input);
+            return MealTicketOrderService::getInstance()->createOrder($this->user(), $input);
         });
 
         return $this->success($orderId);
@@ -109,14 +108,18 @@ class MealTicketOrderController extends Controller
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = OrderMealTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
         return $orderList->map(function (MealTicketOrder $order) use ($ticketList) {
+            /** @var OrderMealTicket $ticket */
             $ticket = $ticketList->get($order->id);
+            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+            $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+            $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
+
             return [
                 'id' => $order->id,
                 'status' => $order->status,
                 'statusDesc' => MealTicketOrderEnums::STATUS_TEXT_MAP[$order->status],
-                'shopId' => $order->shop_id,
-                'shopAvatar' => $order->shop_avatar,
-                'shopName' => $order->shop_name,
+                'restaurantId' => $order->restaurant_id,
+                'restaurantName' => $order->restaurant_name,
                 'ticketInfo' => $ticket,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,

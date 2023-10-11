@@ -228,7 +228,7 @@ class ScenicOrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
         }
 
-        OrderGoodsService::getInstance()->delete($order->id);
+        ScenicOrderTicketService::getInstance()->delete($order->id);
         $order->delete();
     }
 

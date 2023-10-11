@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\MealTicket;
 use App\Models\MealTicketOrder;
+use App\Models\User;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderEnums;
 use App\Utils\Inputs\MealTicketOrderInput;
@@ -74,7 +75,7 @@ class MealTicketOrderService extends BaseService
         return MealTicketOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, MealTicketOrderInput $input)
+    public function createOrder(User $user, MealTicketOrderInput $input)
     {
         /** @var MealTicket $ticket */
         list($paymentAmount, $ticket) = $this->calcPaymentAmount($input->ticketId, $input->num);
@@ -82,7 +83,9 @@ class MealTicketOrderService extends BaseService
         $order = MealTicketOrder::new();
         $order->order_sn = $this->generateOrderSn();
         $order->status = MealTicketOrderEnums::STATUS_CREATE;
-        $order->user_id = $userId;
+        $order->user_id = $user->id;
+        $order->consignee = $user->nickname;
+        $order->mobile = $user->mobile;
         $order->provider_id = $ticket->provider_id;
         $order->restaurant_id = $input->restaurantId;
         $order->restaurant_name = $input->restaurantName;
@@ -116,7 +119,7 @@ class MealTicketOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'scenic_order_sn:' . $order->order_sn,
+            'body' => 'meal_ticket_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -124,7 +127,7 @@ class MealTicketOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['body'] ? str_replace('scenic_order_sn:', '', $data['body']) : '';
+        $orderSn = $data['body'] ? str_replace('meal_ticket_order_sn:', '', $data['body']) : '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -217,7 +220,7 @@ class MealTicketOrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
         }
 
-        OrderGoodsService::getInstance()->delete($order->id);
+        OrderMealTicketService::getInstance()->delete($order->id);
         $order->delete();
     }
 

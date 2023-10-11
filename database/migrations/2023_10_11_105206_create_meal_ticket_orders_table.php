@@ -18,6 +18,8 @@ class CreateMealTicketOrdersTable extends Migration
             $table->string('order_sn')->comment('订单编号');
             $table->integer('status')->comment('订单状态');
             $table->integer('user_id')->comment('用户id');
+            $table->string('consignee')->comment('用户姓名');
+            $table->string('mobile')->comment('用户手机号');
             $table->integer('provider_id')->comment('供应商id');
             $table->integer('restaurant_id')->comment('门店id');
             $table->string('restaurant_name')->comment('门店名称');

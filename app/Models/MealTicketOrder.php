@@ -9,6 +9,8 @@ namespace App\Models;
  * @property string $order_sn 订单编号
  * @property int $status 订单状态
  * @property int $user_id 用户id
+ * @property string $consignee 用户姓名
+ * @property string $mobile 用户手机号
  * @property int $provider_id 供应商id
  * @property int $restaurant_id 门店id
  * @property string $restaurant_name 门店名称
@@ -29,10 +31,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|MealTicketOrder onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder query()
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereConfirmTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereConsignee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereFinishTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereOrderSn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder wherePayId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder wherePayTime($value)
