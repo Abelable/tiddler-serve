@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\MealTicket;
 use App\Models\MealTicketOrder;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderEnums;
@@ -75,14 +76,18 @@ class MealTicketOrderService extends BaseService
 
     public function createOrder($userId, MealTicketOrderInput $input)
     {
+        /** @var MealTicket $ticket */
         list($paymentAmount, $ticket) = $this->calcPaymentAmount($input->ticketId, $input->num);
 
         $order = MealTicketOrder::new();
         $order->order_sn = $this->generateOrderSn();
         $order->status = MealTicketOrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
+        $order->provider_id = $ticket->provider_id;
+        $order->restaurant_id = $input->restaurantId;
+        $order->restaurant_name = $input->restaurantName;
         $order->payment_amount = $paymentAmount;
-        $order->refund_amount = $order->payment_amount;
+        $order->refund_amount = $paymentAmount;
         $order->save();
 
         // 生成订单代金券快照
