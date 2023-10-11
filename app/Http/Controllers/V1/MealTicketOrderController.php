@@ -168,9 +168,8 @@ class MealTicketOrderController extends Controller
             'status',
             'consignee',
             'mobile',
-            'shop_id',
-            'shop_avatar',
-            'shop_name',
+            'restaurant_id',
+            'restaurant_name',
             'payment_amount',
             'pay_time',
             'confirm_time',
@@ -181,8 +180,13 @@ class MealTicketOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
         $ticket = OrderMealTicketService::getInstance()->getTicketByOrderId($order->id);
+        $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+        $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+        $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
         $order['ticketInfo'] = $ticket;
+
         return $this->success($order);
     }
 }
