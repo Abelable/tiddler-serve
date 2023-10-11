@@ -9,6 +9,7 @@ use App\Services\HotelOrderService;
 use App\Services\HotelProviderOrderService;
 use App\Services\HotelProviderService;
 use App\Services\HotelShopService;
+use App\Services\MealTicketOrderService;
 use App\Services\MerchantOrderService;
 use App\Services\MerchantService;
 use App\Services\OrderService;
@@ -104,6 +105,13 @@ class CommonController extends Controller
                 $order = CateringProviderOrderService::getInstance()->wxPaySuccess($data);
                 CateringProviderService::getInstance()->paySuccess($order->provider_id);
                 RestaurantService::getInstance()->paySuccess($order->provider_id);
+            });
+        }
+
+        if (strpos($data['body'], 'meal_ticket_order_sn')) {
+            Log::info('meal_ticket_order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                MealTicketOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
