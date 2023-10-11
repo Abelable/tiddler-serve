@@ -283,7 +283,7 @@ Route::prefix('catering')->group(function () {
             Route::post('submit', 'SetMealOrderController@submit');
             Route::post('pay_params', 'SetMealOrderController@payParams');
             Route::get('list', 'SetMealOrderController@list');
-            Route::get('shop_list', 'SetMealOrderController@shopList');
+            Route::get('provider_list', 'SetMealOrderController@providerList');
             Route::get('detail', 'SetMealOrderController@detail');
             Route::post('confirm', 'SetMealOrderController@confirm');
             Route::post('refund', 'SetMealOrderController@refund');
@@ -300,7 +300,7 @@ Route::prefix('catering')->group(function () {
             Route::post('submit', 'MealTicketOrderController@submit');
             Route::post('pay_params', 'MealTicketOrderController@payParams');
             Route::get('list', 'MealTicketOrderController@list');
-            Route::get('shop_list', 'MealTicketOrderController@shopList');
+            Route::get('provider_list', 'MealTicketOrderController@providerList');
             Route::get('detail', 'MealTicketOrderController@detail');
             Route::post('confirm', 'MealTicketOrderController@confirm');
             Route::post('refund', 'MealTicketOrderController@refund');

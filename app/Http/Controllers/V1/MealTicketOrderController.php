@@ -67,7 +67,7 @@ class MealTicketOrderController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function shopList()
+    public function providerList()
     {
         /** @var PageInput $input */
         $input = PageInput::new();
