@@ -73,6 +73,8 @@ class SetMealService extends BaseService
             $setMeal->status = 0;
             $setMeal->failure_reason = '';
         }
+        $setMeal->cover = $input->cover;
+        $setMeal->name = $input->name;
         $setMeal->price = $input->price;
         $setMeal->original_price = $input->originalPrice;
         $setMeal->sales_commission_rate = $input->salesCommissionRate;
