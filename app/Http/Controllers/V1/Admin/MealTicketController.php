@@ -30,7 +30,7 @@ class MealTicketController extends Controller
         $id = $this->verifyRequiredId('id');
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
         }
         $ticket['restaurantIds'] = $ticket->restaurantIds();
 
@@ -50,7 +50,7 @@ class MealTicketController extends Controller
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
         }
         $ticket->status = 1;
         $ticket->save();
@@ -65,7 +65,7 @@ class MealTicketController extends Controller
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
         }
         $ticket->status = 2;
         $ticket->failure_reason = $reason;
@@ -80,7 +80,7 @@ class MealTicketController extends Controller
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前门票不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
         }
         $ticket->delete();
 
