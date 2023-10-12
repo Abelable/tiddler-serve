@@ -21,7 +21,6 @@ class MealTicketController extends Controller
 
         $ticketIds = RestaurantTicketService::getInstance()->getListByRestaurantId($restaurantId)->pluck('ticket_id')->toArray();
         $ticketList = MealTicketService::getInstance()->getListByIds($ticketIds, [
-            'name',
             'price',
             'original_price',
             'sales_volume',

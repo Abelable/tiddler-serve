@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\MealTicket;
-use App\Services\MealTicketService;
-use App\Services\RestaurantTicketService;
+use App\Models\SetMeal;
+use App\Services\SetMealService;
+use App\Services\RestaurantSetMealService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\MealTicketInput;
+use App\Utils\Inputs\SetMealInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -19,42 +19,41 @@ class SetMealController extends Controller
     {
         $restaurantId = $this->verifyRequiredId('restaurantId');
 
-        $ticketIds = RestaurantTicketService::getInstance()->getListByRestaurantId($restaurantId)->pluck('ticket_id')->toArray();
-        $ticketList = MealTicketService::getInstance()->getListByIds($ticketIds, [
+        $setMealIds = RestaurantSetMealService::getInstance()->getListByRestaurantId($restaurantId)->pluck('set_meal_id')->toArray();
+        $setMealList = SetMealService::getInstance()->getListByIds($setMealIds, [
+            'cover',
             'name',
             'price',
             'original_price',
             'sales_volume',
+            'package_details',
             'validity_days',
             'validity_start_time',
             'validity_end_time',
             'buy_limit',
             'per_table_usage_limit',
-            'overlay_usage_limit',
             'use_time_list',
-            'inapplicable_products',
-            'box_available',
             'need_pre_book',
             'use_rules'
         ]);
 
-        $ticketList = $ticketList->map(function (MealTicket $ticket) {
-            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
-            $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
-            $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
-            return $ticket;
+        $setMealList = $setMealList->map(function (SetMeal $setMeal) {
+            $setMeal->package_details = json_decode($setMeal->package_details);
+            $setMeal->use_time_list = json_decode($setMeal->use_time_list) ?: [];
+            $setMeal->use_rules = json_decode($setMeal->use_rules) ?: [];
+            return $setMeal;
         });
 
-        return $this->success($ticketList);
+        return $this->success($setMealList);
     }
 
     public function listTotals()
     {
         return $this->success([
-            MealTicketService::getInstance()->getListTotal($this->userId(), 1),
-            MealTicketService::getInstance()->getListTotal($this->userId(), 3),
-            MealTicketService::getInstance()->getListTotal($this->userId(), 0),
-            MealTicketService::getInstance()->getListTotal($this->userId(), 2),
+            SetMealService::getInstance()->getListTotal($this->userId(), 1),
+            SetMealService::getInstance()->getListTotal($this->userId(), 3),
+            SetMealService::getInstance()->getListTotal($this->userId(), 0),
+            SetMealService::getInstance()->getListTotal($this->userId(), 2),
         ]);
     }
 
@@ -63,11 +62,11 @@ class SetMealController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $page = MealTicketService::getInstance()->getTicketListByStatus($this->userId(), $input);
-        $ticketList = collect($page->items());
-        $list = $ticketList->map(function (MealTicket $ticket) {
-            $ticket['restaurantIds'] = $ticket->restaurantIds();
-            return $ticket;
+        $page = SetMealService::getInstance()->getSetMealListByStatus($this->userId(), $input);
+        $setMealList = collect($page->items());
+        $list = $setMealList->map(function (SetMeal $setMeal) {
+            $setMeal['restaurantIds'] = $setMeal->restaurantIds();
+            return $setMeal;
         });
 
         return $this->success($this->paginate($page, $list));
@@ -77,23 +76,23 @@ class SetMealController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = MealTicketService::getInstance()->getTicketById($id);
-        if (is_null($ticket)) {
+        $setMeal = SetMealService::getInstance()->getTicketById($id);
+        if (is_null($setMeal)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
         }
 
-        $ticket['restaurantIds'] = $ticket->restaurantIds();
-        $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
-        $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
-        $ticket->use_rules = json_decode($ticket->use_rules) ?: [];
+        $setMeal['restaurantIds'] = $setMeal->restaurantIds();
+        $setMeal->use_time_list = json_decode($setMeal->use_time_list) ?: [];
+        $setMeal->inapplicable_products = json_decode($setMeal->inapplicable_products) ?: [];
+        $setMeal->use_rules = json_decode($setMeal->use_rules) ?: [];
 
-        return $this->success($ticket);
+        return $this->success($setMeal);
     }
 
     public function add()
     {
-        /** @var MealTicketInput $input */
-        $input = MealTicketInput::new();
+        /** @var SetMealInput $input */
+        $input = SetMealInput::new();
 
         $providerId = $this->user()->cateringProvider->id;
         if ($providerId == 0) {
@@ -101,8 +100,8 @@ class SetMealController extends Controller
         }
 
         DB::transaction(function () use ($providerId, $input) {
-            $ticket = MealTicketService::getInstance()->createTicket($this->userId(), $providerId, $input);
-            RestaurantTicketService::getInstance()->createRestaurantTickets($ticket->id, $input->restaurantIds);
+            $setMeal = SetMealService::getInstance()->createTicket($this->userId(), $providerId, $input);
+            RestaurantSetMealService::getInstance()->createRestaurantTickets($setMeal->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -111,17 +110,17 @@ class SetMealController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        /** @var MealTicketInput $input */
-        $input = MealTicketInput::new();
+        /** @var SetMealInput $input */
+        $input = SetMealInput::new();
 
-        $ticket = MealTicketService::getInstance()->getUserTicket($this->userId(), $id);
-        if (is_null($ticket)) {
+        $setMeal = SetMealService::getInstance()->getUserTicket($this->userId(), $id);
+        if (is_null($setMeal)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
         }
 
-        DB::transaction(function () use ($input, $ticket) {
-            MealTicketService::getInstance()->updateTicket($ticket, $input);
-            RestaurantTicketService::getInstance()->updateRestaurantTickets($ticket->id, $input->restaurantIds);
+        DB::transaction(function () use ($input, $setMeal) {
+            SetMealService::getInstance()->updateTicket($setMeal, $input);
+            RestaurantSetMealService::getInstance()->updateRestaurantTickets($setMeal->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -131,15 +130,15 @@ class SetMealController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = MealTicketService::getInstance()->getUserTicket($this->userId(), $id);
-        if (is_null($ticket)) {
+        $setMeal = SetMealService::getInstance()->getUserTicket($this->userId(), $id);
+        if (is_null($setMeal)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
         }
-        if ($ticket->status != 3) {
+        if ($setMeal->status != 3) {
             return $this->fail(CodeResponse::FORBIDDEN, '非下架餐饮代金券，无法上架');
         }
-        $ticket->status = 1;
-        $ticket->save();
+        $setMeal->status = 1;
+        $setMeal->save();
 
         return $this->success();
     }
@@ -148,15 +147,15 @@ class SetMealController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $ticket = MealTicketService::getInstance()->getUserTicket($this->userId(), $id);
-        if (is_null($ticket)) {
+        $setMeal = SetMealService::getInstance()->getUserTicket($this->userId(), $id);
+        if (is_null($setMeal)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮代金券不存在');
         }
-        if ($ticket->status != 1) {
+        if ($setMeal->status != 1) {
             return $this->fail(CodeResponse::FORBIDDEN, '非售卖中餐饮代金券，无法下架');
         }
-        $ticket->status = 3;
-        $ticket->save();
+        $setMeal->status = 3;
+        $setMeal->save();
 
         return $this->success();
     }
@@ -166,8 +165,8 @@ class SetMealController extends Controller
         $id = $this->verifyRequiredId('id');
 
         DB::transaction(function () use ($id) {
-            MealTicketService::getInstance()->deleteTicket($this->userId(), $id);
-            RestaurantTicketService::getInstance()->deleteByTicketId($id);
+            SetMealService::getInstance()->deleteTicket($this->userId(), $id);
+            RestaurantSetMealService::getInstance()->deleteByTicketId($id);
         });
 
         return $this->success();
