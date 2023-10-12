@@ -10,6 +10,7 @@ use App\Services\MealTicketService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
+use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\AllListInput;
 use App\Utils\Inputs\RestaurantInput;
@@ -44,6 +45,9 @@ class RestaurantController extends Controller
             $mealTicketList = MealTicketService::getInstance()->getListByIds($restaurant->ticketIds(), ['price', 'original_price']);
             $restaurant['mealTicketList'] = $mealTicketList;
 
+            $setMealList = SetMealService::getInstance()->getListByIds($restaurant->setMealIds(), ['name', 'price', 'original_price']);
+            $restaurant['setMealList'] = $setMealList;
+
             $restaurant->food_image_list= json_decode($restaurant->food_image_list);
             $restaurant->environment_image_list= json_decode($restaurant->environment_image_list);
             $restaurant->price_image_list= json_decode($restaurant->price_image_list);
@@ -69,10 +73,17 @@ class RestaurantController extends Controller
         $mealTicketList = $mealTicketList->map(function (MealTicket $ticket) {
             $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
             $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
-
             return $ticket;
         });
         $restaurant['mealTicketList'] = $mealTicketList;
+
+        $columns = ['id', 'cover', 'name', 'price', 'original_price', 'sales_volume', 'buy_limit', 'per_table_usage_limit', 'use_time_list', 'need_pre_book'];
+        $setMealList = SetMealService::getInstance()->getListByIds($restaurant->setMealIds(), $columns);
+        $setMealList = $setMealList->map(function (MealTicket $ticket) {
+            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+            return $ticket;
+        });
+        $restaurant['setMealList'] = $setMealList;
 
         return $this->success($restaurant);
     }
