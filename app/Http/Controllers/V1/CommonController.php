@@ -18,6 +18,7 @@ use App\Services\ScenicOrderService;
 use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Services\ScenicShopService;
+use App\Services\SetMealOrderService;
 use App\Services\ShopService;
 use App\Utils\AliOssServe;
 use App\Utils\WxMpServe;
@@ -112,6 +113,13 @@ class CommonController extends Controller
             Log::info('meal_ticket_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 MealTicketOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
+        if (strpos($data['body'], 'set_meal_order_sn')) {
+            Log::info('set_meal_order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                SetMealOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
