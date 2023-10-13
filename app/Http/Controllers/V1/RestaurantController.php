@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\MealTicket;
 use App\Models\Restaurant;
 use App\Models\RestaurantCategory;
+use App\Models\SetMeal;
 use App\Services\MealTicketService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
@@ -79,9 +80,9 @@ class RestaurantController extends Controller
 
         $columns = ['id', 'cover', 'name', 'price', 'original_price', 'sales_volume', 'buy_limit', 'per_table_usage_limit', 'use_time_list', 'need_pre_book'];
         $setMealList = SetMealService::getInstance()->getListByIds($restaurant->setMealIds(), $columns);
-        $setMealList = $setMealList->map(function (MealTicket $ticket) {
-            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
-            return $ticket;
+        $setMealList = $setMealList->map(function (SetMeal $setMeal) {
+            $setMeal->use_time_list = json_decode($setMeal->use_time_list) ?: [];
+            return $setMeal;
         });
         $restaurant['setMealList'] = $setMealList;
 
