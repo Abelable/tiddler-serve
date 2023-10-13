@@ -182,6 +182,7 @@ class SetMealOrderController extends Controller
         }
 
         $setMeal = OrderSetMealService::getInstance()->getSetMealByOrderId($order->id);
+        unset($setMeal->id);
         $setMeal->package_details = json_decode($setMeal->package_details);
         $setMeal->use_time_list = json_decode($setMeal->use_time_list) ?: [];
         $setMeal->use_rules = json_decode($setMeal->use_rules) ?: [];

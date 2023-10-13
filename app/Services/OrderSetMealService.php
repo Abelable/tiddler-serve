@@ -17,6 +17,8 @@ class OrderSetMealService extends BaseService
         $setMeal->order_id = $orderId;
         $setMeal->number = $number;
         $setMeal->set_meal_id = $setMealInfo->id;
+        $setMeal->cover = $setMealInfo->cover;
+        $setMeal->name = $setMealInfo->name;
         $setMeal->price = $setMealInfo->price;
         $setMeal->original_price = $setMealInfo->original_price;
         $setMeal->package_details = $setMealInfo->package_details;
