@@ -27,6 +27,13 @@ Route::get('tim_login_info', 'UserController@timLoginInfo');
 Route::get('author_info', 'UserController@authorInfo');
 Route::get('oss_config', 'CommonController@ossConfig');
 
+Route::prefix('auth_info')->group(function () {
+    Route::get('detail', 'AuthInfoController@detail');
+    Route::post('add', 'AuthInfoController@add');
+    Route::post('edit', 'AuthInfoController@edit');
+    Route::post('delete', 'AuthInfoController@delete');
+});
+
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
     Route::get('qrcode', 'CommonController@wxQRCode');
@@ -407,6 +414,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('list', 'UserController@list');
         Route::get('detail', 'UserController@detail');
         Route::post('delete', 'UserController@delete');
+    });
+
+    Route::prefix('auth_info')->group(function () {
+        Route::post('list', 'AuthInfoController@list');
+        Route::get('detail', 'AuthInfoController@detail');
+        Route::post('approved', 'AuthInfoController@approved');
+        Route::post('reject', 'AuthInfoController@reject');
+        Route::post('delete', 'AuthInfoController@delete');
     });
 
     Route::prefix('merchant')->group(function () {
