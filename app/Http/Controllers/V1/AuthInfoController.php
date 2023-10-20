@@ -13,9 +13,6 @@ class AuthInfoController extends Controller
     public function detail()
     {
         $authInfo = AuthInfoService::getInstance()->getAuthInfoByUserId($this->userId());
-        if (is_null($authInfo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '实名认证信息不存在');
-        }
         return $this->success($authInfo);
     }
 
@@ -23,7 +20,7 @@ class AuthInfoController extends Controller
     {
         /** @var AuthInfoInput $input */
         $input = AuthInfoInput::new();
-        AuthInfoService::getInstance()->createAuthInfo($input, $this->userId());
+        AuthInfoService::getInstance()->createAuthInfo($this->userId(), $input);
         return $this->success();
     }
 
