@@ -20,11 +20,15 @@ use Illuminate\Notifications\Notifiable;
  * @property string $openid 小程序openid
  * @property string $unionid 微信unionid
  * @property int $gender 性别：0-未知，1-男，2-女
- * @property string $signature 签名
  * @property string $bg 背景图
+ * @property string $birthday 生日
+ * @property string $constellation 星座
+ * @property string $career 职业
+ * @property string $signature 签名
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read \App\Models\CateringProvider|null $cateringProvider
  * @property-read \App\Models\HotelProvider|null $hotelProvider
  * @property-read \App\Models\Merchant|null $merchant
@@ -39,6 +43,9 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBg($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBirthday($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCareer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereConstellation($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereGender($value)
@@ -114,5 +121,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function cateringProvider()
     {
         return $this->hasOne(CateringProvider::class, 'user_id')->where('status', 2);
+    }
+
+    public function authInfo()
+    {
+        return $this->hasOne(AuthInfo::class, 'user_id')->where('status', 1);
     }
 }
