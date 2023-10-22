@@ -23,6 +23,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('user_info', 'UserController@userInfo');
+Route::post('update_user_info', 'UserController@updateUserInfo');
 Route::get('tim_login_info', 'UserController@timLoginInfo');
 Route::get('author_info', 'UserController@authorInfo');
 Route::get('oss_config', 'CommonController@ossConfig');

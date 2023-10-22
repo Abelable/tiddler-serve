@@ -7,6 +7,7 @@ use App\Services\FanService;
 use App\Services\Media\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\UserInfoInput;
 use App\Utils\TimServe;
 
 class UserController extends Controller
@@ -16,17 +17,51 @@ class UserController extends Controller
     public function userInfo()
     {
         $user = $this->user();
-        return $this->success([
-            'id' => $user->id,
-            'avatar' => $user->avatar,
-            'nickname' => $user->nickname,
-            'gender' => $user->gender,
-            'mobile' => $user->mobile,
-            'merchantId' => $user->merchant->id ?? 0,
-            'scenicProviderId' => $user->scenicProvider->id ?? 0,
-            'hotelProviderId' => $user->hotelProvider->id ?? 0,
-            'cateringProviderId' => $user->cateringProvider->id ?? 0,
-        ]);
+
+        $user['authInfoId'] = $user->authInfo->id ?? 0;
+        $user['merchantId'] = $user->merchant->id ?? 0;
+        $user['scenicProviderId'] = $user->scenicProvider->id ?? 0;
+        $user['hotelProviderId'] = $user->hotelProvider->id ?? 0;
+        $user['cateringProviderId'] = $user->cateringProvider->id ?? 0;
+
+        unset($user->openid);
+        unset($user->unionid);
+        unset($user->created_at);
+        unset($user->updated_at);
+        unset($user->authInfo);
+        unset($user->merchant);
+        unset($user->scenicProvider);
+        unset($user->hotelProvider);
+        unset($user->cateringProvider);
+
+        return $this->success($user);
+    }
+
+    public function updateUserInfo()
+    {
+        /** @var UserInfoInput $input */
+        $input = UserInfoInput::new();
+        $user = $this->user();
+
+        if (!empty($input->bg)) {
+            $user->bg = $input->bg;
+        }
+        $user->avatar = $input->avatar;
+        $user->nickname = $input->nickname;
+        $user->gender = $input->gender;
+        if (!empty($input->birthday)) {
+            $user->birthday = $input->birthday;
+        }
+        if (!empty($input->constellation)) {
+            $user->constellation = $input->constellation;
+        }
+        if (!empty($input->signature)) {
+            $user->signature = $input->signature;
+        }
+
+        $user->save();
+
+        return $this->success();
     }
 
     public function timLoginInfo()
@@ -41,7 +76,7 @@ class UserController extends Controller
     {
         $authorId = $this->verifyRequiredId('authorId');
 
-        $authorInfo = UserService::getInstance()->getUserById($authorId, ['id', 'avatar', 'nickname', 'gender']);
+        $authorInfo = UserService::getInstance()->getUserById($authorId, ['id', 'avatar', 'nickname', 'bg', 'gender', 'signature']);
         if (is_null($authorInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前用户不存在');
         }
