@@ -66,7 +66,7 @@ class FanController extends Controller
         $followList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname', 'signature']);
 
         $list = $followList->map(function (User $user) use ($authorIdsGroup) {
-            $authorIds = $authorIdsGroup->get($user->id);
+            $authorIds = $authorIdsGroup->get($user->id) ?: [];
 
             if (in_array($this->userId(), $authorIds)) {
                 $user['status'] = 2;
@@ -94,7 +94,7 @@ class FanController extends Controller
         $fanList = UserService::getInstance()->getListByIds($fanIds, ['id', 'avatar', 'nickname', 'signature']);
 
         $list = $fanList->map(function (User $user) use ($fanIdsGroup) {
-            $fanIds = $fanIdsGroup->get($user->id);
+            $fanIds = $fanIdsGroup->get($user->id) ?: [];
 
             if (in_array($this->userId(), $fanIds)) {
                 $user['status'] = 2;
