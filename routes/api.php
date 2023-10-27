@@ -44,6 +44,8 @@ Route::prefix('fan')->group(function () {
     Route::post('follow', 'FanController@follow');
     Route::post('cancel_follow', 'FanController@cancelFollow');
     Route::get('follow_status', 'FanController@followStatus');
+    Route::get('follow_list', 'FanController@followList');
+    Route::get('fan_list', 'FanController@fanList');
 });
 
 Route::prefix('shop')->group(function () {

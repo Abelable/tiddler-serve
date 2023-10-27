@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Fan;
+use App\Utils\Inputs\PageInput;
 
 class FanService extends BaseService
 {
@@ -54,6 +55,18 @@ class FanService extends BaseService
             });
     }
 
+    public function authorIdsGroup($fanIds)
+    {
+        return Fan::query()
+            ->whereIn('fan_id', $fanIds)
+            ->select(['author_id', 'fan_id'])
+            ->get()
+            ->groupBy('fan_id')
+            ->map(function ($author) {
+                return $author->pluck('author_id')->toArray();
+            });
+    }
+
     public function followedAuthorNumber($userId)
     {
         return Fan::query()->where('fan_id', $userId)->count();
@@ -62,5 +75,21 @@ class FanService extends BaseService
     public function fansNumber($authorId)
     {
         return Fan::query()->where('author_id', $authorId)->count();
+    }
+
+    public function followPaginate($userId, PageInput $input, $columns=['*'])
+    {
+        return Fan::query()
+            ->where('fan_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function fanPaginate($userId, PageInput $input, $columns=['*'])
+    {
+        return Fan::query()
+            ->where('author_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 }
