@@ -3,22 +3,18 @@
 namespace App\Services;
 
 use App\Models\Goods;
-use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsListInput;
-use App\Utils\Inputs\AllListInput;
 use App\Utils\Inputs\GoodsInput;
+use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class GoodsService extends BaseService
 {
-    public function getAllList(AllListInput $input, $columns=['*'])
+    public function getAllList(GoodsPageInput $input, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
@@ -34,6 +30,25 @@ class GoodsService extends BaseService
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
+
+    public function search($keywords, GoodsPageInput $input)
+    {
+        $query = Goods::search($keywords)->where('status', 1);
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        if (!empty($input->sort)) {
+            $query = $query->orderBy($input->sort, $input->order);
+        } else {
+            $query = $query
+                ->orderBy('sales_volume', 'desc')
+                ->orderBy('sales_commission_rate', 'desc')
+                ->orderBy('promotion_commission_rate', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
+        return $query->paginate($input->limit,'page', $input->page);
+    }
+
 
     public function getTopListByCategoryIds(array $goodsIds, array $categoryIds, $limit, $columns=['*'])
     {
@@ -181,16 +196,17 @@ class GoodsService extends BaseService
     {
         $shopIds = $goodsList->pluck('shop_id')->toArray();
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
-        $list = $goodsList->map(function (Goods $goods) use ($shopList) {
-            if ($goods->shop_id != 0) {
-                /** @var Shop $shop */
-                $shop = $shopList->get($goods->shop_id);
-                $goods['shop_info'] = $shop;
-            }
-            unset($goods->shop_id);
-            return $goods;
+        return $goodsList->map(function (Goods $goods) use ($shopList) {
+            return [
+                'id' => $goods->id,
+                'image' => $goods->image,
+                'name' => $goods->name,
+                'price' => $goods->price,
+                'marketPrice' => $goods->market_price,
+                'salesVolume' => $goods->sales_volume,
+                'shopInfo' => $shopList->get($goods->shop_id) ?: null,
+            ];
         });
-        return $list;
     }
 
     public function reduceStock($id, $number, $selectedSkuIndex = -1)

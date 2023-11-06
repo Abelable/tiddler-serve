@@ -9,6 +9,7 @@ use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
 
@@ -24,11 +25,23 @@ class GoodsController extends Controller
 
     public function list()
     {
-        /** @var AllListInput $input */
-        $input = AllListInput::new();
+        /** @var GoodsPageInput $input */
+        $input = GoodsPageInput::new();
 
-        $columns = ['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
-        $page = GoodsService::getInstance()->getAllList($input, $columns);
+        $page = GoodsService::getInstance()->getAllList($input);
+        $goodsList = collect($page->items());
+        $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var GoodsPageInput $input */
+        $input = GoodsPageInput::new();
+
+        $page = GoodsService::getInstance()->search($keywords, $input);
         $goodsList = collect($page->items());
         $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
 
