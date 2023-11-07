@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+
 /**
  * App\Models\TourismNote
  *
@@ -55,6 +57,18 @@ namespace App\Models;
  */
 class TourismNote extends BaseModel
 {
+    use Searchable;
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'content' => $this->content,
+            'authorName' => $this->authorInfo->nickname,
+        ];
+    }
+
     public function commentList()
     {
         return $this->hasMany(TourismNoteComment::class, 'note_id');

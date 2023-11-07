@@ -9,7 +9,7 @@ use App\Utils\Inputs\TourismNoteInput;
 
 class TourismNoteService extends BaseService
 {
-    public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curNoteId = 0, $withComments = false)
+    public function pageList(PageInput $input, $authorIds = null, $curNoteId = 0, $withComments = false, $columns = ['*'])
     {
         $query = TourismNote::query()->where('is_private', 0);
         if (!is_null($authorIds)) {
@@ -28,6 +28,34 @@ class TourismNoteService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input, $columns = ['*'])
+    {
+        return TourismNote::search($keywords)
+            ->where('is_private', 0)
+            ->orderBy('like_number', 'desc')
+            ->orderBy('comments_number', 'desc')
+            ->orderBy('collection_times', 'desc')
+            ->orderBy('share_times', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function userPageList(PageInput $input, $userId, $curNoteId = 0, $columns = ['*'], $withComments = false)
+    {
+        $query = TourismNote::query()->where('user_id', $userId);
+        if ($curNoteId != 0) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $curNoteId . " THEN 0 ELSE 1 END");
+        }
+        if ($withComments) {
+            $query = $query->with(['commentList' => function ($query) {
+                $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
+            }]);
+        }
+        return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

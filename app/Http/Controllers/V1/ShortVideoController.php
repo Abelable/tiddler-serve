@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
-    protected $except = ['list'];
+    protected $except = ['list', 'search'];
 
     public function list()
     {

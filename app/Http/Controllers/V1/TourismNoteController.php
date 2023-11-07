@@ -32,11 +32,23 @@ class TourismNoteController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
+        $page = TourismNoteService::getInstance()->pageList($input, $authorId != 0 ? [$authorId] : null, $id, true);
+        $list = $this->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
 
-        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'created_at'];
-        $page = TourismNoteService::getInstance()->pageList($input, $columns, $authorId != 0 ? [$authorId] : null, $id, true);
-        $noteList = collect($page->items());
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = TourismNoteService::getInstance()->search($keywords, $input);
+        $list = $this->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
 
+    private function handleList($noteList)
+    {
         $authorIds = $noteList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
@@ -48,47 +60,53 @@ class TourismNoteController extends Controller
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $list = $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
-            $note->image_list = json_decode($note->image_list);
-
-            $note['is_follow'] = false;
+        return $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
+            $isFollow = false;
+            $isLike = false;
+            $isCollected = false;
             if ($this->isLogin()) {
                 $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
                 if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
-                    $note['is_follow'] = true;
+                    $isFollow = true;
                 }
 
                 $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
                 if (in_array($this->userId(), $likeUserIds)) {
-                    $note['is_like'] = true;
+                    $isLike = true;
                 }
 
                 $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
                 if (in_array($this->userId(), $collectedUserIds)) {
-                    $note['is_collected'] = true;
+                    $isCollected = true;
                 }
             }
 
-            $goods = $goodsList->get($note->goods_id);
-            $note['goods_info'] = $goods;
-            unset($note->goods_id);
-
-            $authorInfo = $authorList->get($note->user_id);
-            $note['author_info'] = $authorInfo;
-            unset($note->user_id);
-
-            $note['comments'] = $note['commentList']->map(function ($comment) {
+            $comments = $note['commentList']->map(function ($comment) {
                 return [
                     'nickname' => $comment['userInfo']->nickname,
                     'content' => $comment['content']
                 ];
             });
-            unset($note['commentList']);
 
-            return $note;
+            return [
+                'id' => $note->id,
+                'imageList' => json_decode($note->image_list),
+                'title' => $note->title,
+                'content' => $note->content,
+                'likeNumber' => $note->like_number,
+                'commentsNumber' => $note->comments_number,
+                'collectionTimes' => $note->collection_times,
+                'shareTimes' => $note->share_times,
+                'address' => $note->address,
+                'authorInfo' => $authorList->get($note->user_id),
+                'goodsInfo' => $goodsList->get($note->goods_id),
+                'isFollow' => $isFollow,
+                'isLike' => $isLike,
+                'isCollected' => $isCollected,
+                'comments' => $comments,
+                'createdAt' => $note->created_at,
+            ];
         });
-
-        return $this->success($this->paginate($page, $list));
     }
 
     public function userNoteList()
