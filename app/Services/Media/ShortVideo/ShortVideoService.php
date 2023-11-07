@@ -9,7 +9,7 @@ use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
-    public function pageList(PageInput $input, $columns = ['*'], $authorIds = null, $curVideoId = 0)
+    public function pageList(PageInput $input, $authorIds = null, $curVideoId = 0, $columns = ['*'])
     {
         $query = ShortVideo::query()->where('is_private', 0);
         if (!is_null($authorIds)) {
@@ -23,6 +23,29 @@ class ShortVideoService extends BaseService
             ->orderBy('comments_number', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input)
+    {
+        return ShortVideo::search($keywords)
+            ->where('is_private', 0)
+            ->orderBy('like_number', 'desc')
+            ->orderBy('comments_number', 'desc')
+            ->orderBy('collection_times', 'desc')
+            ->orderBy('share_times', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
+    }
+
+    public function userPageList(PageInput $input, $userId, $curVideoId = 0, $columns = ['*'])
+    {
+        $query = ShortVideo::query()->where('user_id', $userId);
+        if ($curVideoId != 0) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $curVideoId . " THEN 0 ELSE 1 END");
+        }
+        return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

@@ -351,6 +351,7 @@ Route::prefix('media')->group(function () {
 
     Route::prefix('short_video')->group(function () {
         Route::get('list', 'ShortVideoController@list');
+        Route::get('search', 'ShortVideoController@search');
         Route::get('user_list', 'ShortVideoController@userVideoList');
         Route::get('collect_list', 'ShortVideoController@collectVideoList');
         Route::get('like_list', 'ShortVideoController@likeVideoList');

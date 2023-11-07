@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+
 /**
  * App\Models\ShortVideo
  *
@@ -53,6 +55,17 @@ namespace App\Models;
  */
 class ShortVideo extends BaseModel
 {
+    use Searchable;
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'authorName' => $this->authorInfo->nickname,
+        ];
+    }
+
     public function authorInfo()
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');

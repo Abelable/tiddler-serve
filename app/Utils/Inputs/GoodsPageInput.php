@@ -2,8 +2,6 @@
 
 namespace App\Utils\Inputs;
 
-use Illuminate\Validation\Rule;
-
 class GoodsPageInput extends PageInput
 {
     public $categoryId;
