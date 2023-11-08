@@ -20,6 +20,7 @@ use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\TourismNoteInput;
+use App\Utils\Inputs\TourismNotePageInput;
 use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
@@ -28,11 +29,9 @@ class TourismNoteController extends Controller
 
     public function list()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-        $authorId = $this->verifyId('authorId', 0);
-        $page = TourismNoteService::getInstance()->pageList($input, $authorId != 0 ? [$authorId] : null, $id, true);
+        /** @var TourismNotePageInput $input */
+        $input = TourismNotePageInput::new();
+        $page = TourismNoteService::getInstance()->pageList($input);
         $list = $this->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }

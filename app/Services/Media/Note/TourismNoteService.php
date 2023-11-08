@@ -6,19 +6,21 @@ use App\Models\TourismNote;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\TourismNoteInput;
+use App\Utils\Inputs\TourismNotePageInput;
+use function PHPUnit\Framework\isEmpty;
 
 class TourismNoteService extends BaseService
 {
-    public function pageList(PageInput $input, $authorIds = null, $curNoteId = 0, $withComments = false, $columns = ['*'])
+    public function pageList(TourismNotePageInput $input, $columns = ['*'])
     {
         $query = TourismNote::query()->where('is_private', 0);
-        if (!is_null($authorIds)) {
-            $query = $query->whereIn('user_id', $authorIds);
+        if (!isEmpty($input->authorId)) {
+            $query = $query->where('user_id', $input->authorId);
         }
-        if ($curNoteId != 0) {
-            $query = $query->orderByRaw("CASE WHEN id = " . $curNoteId . " THEN 0 ELSE 1 END");
+        if (!isEmpty($input->id)) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $input->id . " THEN 0 ELSE 1 END");
         }
-        if ($withComments) {
+        if ($input->withComments) {
             $query = $query->with(['commentList' => function ($query) {
                 $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
             }]);
