@@ -10,10 +10,10 @@ class TourismNotePageInput extends PageInput
 
     public function rules()
     {
-        return [
+        return array_merge([
             'id' => 'integer|digits_between:1,20',
             'authorId' => 'integer|digits_between:1,20',
-            'withComments' => 'boolean'
-        ];
+            'withComments' => 'integer|in:0,1',
+        ], parent::rules());
     }
 }

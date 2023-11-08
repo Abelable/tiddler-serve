@@ -9,9 +9,9 @@ class GoodsPageInput extends PageInput
 
     public function rules()
     {
-        return [
+        return array_merge(parent::rules(), [
             'categoryId' => 'integer|digits_between:1,20',
             'sort' => 'string',
-        ];
+        ]);
     }
 }

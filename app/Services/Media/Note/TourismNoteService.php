@@ -20,7 +20,7 @@ class TourismNoteService extends BaseService
         if (!isEmpty($input->id)) {
             $query = $query->orderByRaw("CASE WHEN id = " . $input->id . " THEN 0 ELSE 1 END");
         }
-        if ($input->withComments) {
+        if ($input->withComments == 1) {
             $query = $query->with(['commentList' => function ($query) {
                 $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
             }]);
@@ -46,13 +46,13 @@ class TourismNoteService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function userPageList(PageInput $input, $userId, $curNoteId = 0, $columns = ['*'], $withComments = false)
+    public function userPageList($userId, TourismNotePageInput $input, $columns = ['*'])
     {
         $query = TourismNote::query()->where('user_id', $userId);
-        if ($curNoteId != 0) {
-            $query = $query->orderByRaw("CASE WHEN id = " . $curNoteId . " THEN 0 ELSE 1 END");
+        if (!isEmpty($input->id)) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $input->id . " THEN 0 ELSE 1 END");
         }
-        if ($withComments) {
+        if ($input->withComments) {
             $query = $query->with(['commentList' => function ($query) {
                 $query->orderBy('created_at', 'desc')->take(8)->with('userInfo');
             }]);

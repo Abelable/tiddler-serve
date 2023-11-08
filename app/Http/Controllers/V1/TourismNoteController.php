@@ -11,7 +11,6 @@ use App\Services\FanService;
 use App\Services\GoodsService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
-use App\Services\Media\Note\TourismNoteGoodsService;
 use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\UserService;
@@ -32,7 +31,7 @@ class TourismNoteController extends Controller
         /** @var TourismNotePageInput $input */
         $input = TourismNotePageInput::new();
         $page = TourismNoteService::getInstance()->pageList($input);
-        $list = $this->handleList(collect($page->items()));
+        $list = $this->handleList(collect($page->items()), $input->withComments);
         return $this->success($this->paginate($page, $list));
     }
 
@@ -46,7 +45,7 @@ class TourismNoteController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    private function handleList($noteList)
+    private function handleList($noteList, $withComments = 0)
     {
         $authorIds = $noteList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
@@ -59,7 +58,7 @@ class TourismNoteController extends Controller
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        return $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
+        return $noteList->map(function (TourismNote $note) use ($withComments, $goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
             $isFollow = false;
             $isLike = false;
             $isCollected = false;
@@ -80,14 +79,16 @@ class TourismNoteController extends Controller
                 }
             }
 
-            $comments = $note['commentList']->map(function ($comment) {
-                return [
-                    'nickname' => $comment['userInfo']->nickname,
-                    'content' => $comment['content']
-                ];
-            });
+            if ($withComments == 1) {
+                $comments = $note['commentList']->map(function ($comment) {
+                    return [
+                        'nickname' => $comment['userInfo']->nickname,
+                        'content' => $comment['content']
+                    ];
+                });
+            }
 
-            return [
+            $note = [
                 'id' => $note->id,
                 'imageList' => json_decode($note->image_list),
                 'title' => $note->title,
@@ -102,20 +103,20 @@ class TourismNoteController extends Controller
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
-                'comments' => $comments,
                 'createdAt' => $note->created_at,
             ];
+
+            return $withComments == 1 ? array_merge(['comments' => $comments], $note) : $note;
         });
     }
 
     public function userNoteList()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
+        /** @var TourismNotePageInput $input */
+        $input = TourismNotePageInput::new();
 
         $columns = ['id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
-        $page = TourismNoteService::getInstance()->pageList($input, $columns, [$this->userId()], $id, true);
+        $page = TourismNoteService::getInstance()->userPageList($this->userId(), $input, $columns);
         $noteList = collect($page->items());
 
         $noteIds = $noteList->pluck('id')->toArray();
@@ -125,7 +126,7 @@ class TourismNoteController extends Controller
         $goodsIds = $noteList->pluck('goods_id')->toArray();
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
-        $list = $noteList->map(function (TourismNote $note) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
+        $list = $noteList->map(function (TourismNote $note) use ($input, $goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
             $note->image_list = json_decode($note->image_list);
 
             $note['is_follow'] = true;
@@ -146,13 +147,15 @@ class TourismNoteController extends Controller
                 'nickname' => $this->user()->nickname
             ];
 
-            $note['comments'] = $note['commentList']->map(function ($comment) {
-                return [
-                    'nickname' => $comment['userInfo']->nickname,
-                    'content' => $comment['content']
-                ];
-            });
-            unset($note['commentList']);
+            if ($input->withComments) {
+                $note['comments'] = $note['commentList']->map(function ($comment) {
+                    return [
+                        'nickname' => $comment['userInfo']->nickname,
+                        'content' => $comment['content']
+                    ];
+                });
+                unset($note['commentList']);
+            }
 
             $goods = $goodsList->get($note->goods_id);
             $note['goods_info'] = $goods;
