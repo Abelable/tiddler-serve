@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+
 /**
  * App\Models\LiveRoom
  *
@@ -56,6 +58,17 @@ namespace App\Models;
  */
 class LiveRoom extends BaseModel
 {
+    use Searchable;
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'anchorName' => $this->anchorInfo->nickname,
+        ];
+    }
+
     public function anchorInfo()
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'avatar', 'nickname');

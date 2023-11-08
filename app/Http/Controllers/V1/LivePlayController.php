@@ -24,20 +24,37 @@ class LivePlayController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $id = $this->verifyRequiredId('id');
-
-        $columns = ['id', 'user_id', 'status', 'title', 'cover', 'share_cover', 'direction', 'group_id', 'play_url', 'notice_time'];
-        $page = LiveRoomService::getInstance()->pageList($input, $columns, [1, 3], null, $id);
-        $roomList = collect($page->items());
-        $anchorIds = $roomList->pluck('user_id')->toArray();
-        $anchorList = UserService::getInstance()->getListByIds($anchorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $list = $roomList->map(function (LiveRoom $room) use ($anchorList) {
-            $anchorInfo = $anchorList->get($room->user_id);
-            $room['anchor_info'] = $anchorInfo;
-            unset($room->user_id);
-            return $room;
-        });
-
+        $page = LiveRoomService::getInstance()->pageList($input, $id);
+        $list = $this->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = LiveRoomService::getInstance()->search($keywords, $input);
+        $list = $this->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function handleList($roomList)
+    {
+        return $roomList->map(function (LiveRoom $room) {
+            return [
+                'id' => $room->id,
+                'status' => $room->status,
+                'title' => $room->title,
+                'cover' => $room->cover,
+                'shareCover' => $room->share_cover,
+                'direction' => $room->direction,
+                'groupId' => $room->group_id,
+                'playUrl' => $room->play_url,
+                'noticeTime' => $room->notice_time,
+                'anchorInfo' => $room->anchorInfo
+            ];
+        });
     }
 
     public function joinRoom()

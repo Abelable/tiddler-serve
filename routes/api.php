@@ -336,6 +336,7 @@ Route::prefix('media')->group(function () {
         Route::post('start', 'LivePushController@startLive');
         Route::post('stop', 'LivePushController@stopLive');
         Route::get('list', 'LivePlayController@roomList');
+        Route::get('search', 'LivePlayController@search');
         Route::get('push_room_goods_list', 'LivePushController@pushRoomGoodsList');
         Route::post('listing_goods', 'LivePushController@listingGoods');
         Route::post('de_listing_goods', 'LivePushController@delistingGoods');

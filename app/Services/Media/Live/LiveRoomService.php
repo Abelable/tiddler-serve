@@ -11,12 +11,9 @@ use Illuminate\Support\Facades\Cache;
 
 class LiveRoomService extends BaseService
 {
-    public function pageList(PageInput $input, $columns = ['*'], $statusList = [1, 2, 3], $anchorIds = null, $curRoomId = 0)
+    public function pageList(PageInput $input, $curRoomId, $columns = ['*'], $statusList = [1, 3])
     {
         $query = LiveRoom::query();
-        if (!is_null($anchorIds)) {
-            $query = $query->whereIn('user_id', $anchorIds);
-        }
         if ($curRoomId != 0) {
             $query = $query->orderByRaw("CASE WHEN id = " . $curRoomId . " THEN 0 ELSE 1 END");
         }
@@ -27,6 +24,16 @@ class LiveRoomService extends BaseService
             ->orderBy('praise_number', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input)
+    {
+        return LiveRoom::search($keywords)
+            ->whereIn('status', [1, 3])
+            ->orderBy('viewers_number', 'desc')
+            ->orderBy('praise_number', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
     }
 
     public function newLiveRoom($userId, LiveRoomInput $input)
