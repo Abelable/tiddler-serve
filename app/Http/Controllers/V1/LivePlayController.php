@@ -35,7 +35,10 @@ class LivePlayController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $page = LiveRoomService::getInstance()->search($keywords, $input);
-        $list = $this->handleList(collect($page->items()));
+        // 由于以TNTSearch作为驱动的scout，whereIn无法过滤数据，原因未知，此处增加filter进行数据过滤
+        $list = $this->handleList(collect($page->items())->filter(function (LiveRoom $room) {
+            return $room->status == 1 || $room->status == 3;
+        }));
         return $this->success($this->paginate($page, $list));
     }
 

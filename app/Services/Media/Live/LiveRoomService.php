@@ -8,6 +8,7 @@ use App\Utils\Enums\LiveStatus;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
+use Laravel\Scout\Builder;
 
 class LiveRoomService extends BaseService
 {
