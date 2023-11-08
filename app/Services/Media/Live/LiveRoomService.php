@@ -26,10 +26,10 @@ class LiveRoomService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search($keywords, PageInput $input, $statusList = [1, 3])
     {
         return LiveRoom::search($keywords)
-            ->whereIn('status', [1, 3])
+            ->whereIn('status', $statusList)
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')
             ->orderBy($input->sort, $input->order)

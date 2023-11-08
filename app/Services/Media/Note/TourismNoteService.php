@@ -34,7 +34,7 @@ class TourismNoteService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input, $columns = ['*'])
+    public function search($keywords, PageInput $input)
     {
         return TourismNote::search($keywords)
             ->where('is_private', 0)
@@ -43,7 +43,7 @@ class TourismNoteService extends BaseService
             ->orderBy('collection_times', 'desc')
             ->orderBy('share_times', 'desc')
             ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+            ->paginate($input->limit,'page', $input->page);
     }
 
     public function userPageList($userId, TourismNotePageInput $input, $columns = ['*'])
