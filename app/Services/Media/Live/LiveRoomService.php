@@ -29,6 +29,7 @@ class LiveRoomService extends BaseService
 
     public function search($keywords, PageInput $input, $statusList = [1, 3])
     {
+        // todo whereIn无效
         return LiveRoom::search($keywords)
             ->whereIn('status', $statusList)
             ->orderBy('viewers_number', 'desc')

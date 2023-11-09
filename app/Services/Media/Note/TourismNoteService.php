@@ -14,10 +14,10 @@ class TourismNoteService extends BaseService
     public function pageList(TourismNotePageInput $input, $columns = ['*'])
     {
         $query = TourismNote::query()->where('is_private', 0);
-        if (!isEmpty($input->authorId)) {
+        if ($input->authorId != 0) {
             $query = $query->where('user_id', $input->authorId);
         }
-        if (!isEmpty($input->id)) {
+        if ($input->id != 0) {
             $query = $query->orderByRaw("CASE WHEN id = " . $input->id . " THEN 0 ELSE 1 END");
         }
         if ($input->withComments == 1) {
