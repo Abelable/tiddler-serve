@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['list', 'getList'];
+    protected $except = ['list'];
 
     public function list()
     {
