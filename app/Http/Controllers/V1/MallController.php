@@ -12,7 +12,7 @@ class MallController extends Controller
 {
     protected $except = ['list'];
 
-    private function list()
+    public function list()
     {
         /** @var PageInput $input */
         $input = PageInput::new();
@@ -27,6 +27,7 @@ class MallController extends Controller
             'image_list',
             DB::raw('NULL as price'),
             DB::raw('NULL as market_price'),
+            DB::raw('NULL as sales_volume'),
             'longitude',
             'latitude',
             'address',
@@ -42,6 +43,7 @@ class MallController extends Controller
             DB::raw('NULL as image_list'),
             'price',
             DB::raw('NULL as market_price'),
+            DB::raw('NULL as sales_volume'),
             'longitude',
             'latitude',
             'address',
@@ -57,6 +59,7 @@ class MallController extends Controller
             DB::raw('NULL as image_list'),
             'price',
             DB::raw('NULL as market_price'),
+            DB::raw('NULL as sales_volume'),
             'longitude',
             'latitude',
             'address',
@@ -72,6 +75,7 @@ class MallController extends Controller
             'image_list',
             'price',
             'market_price',
+            'sales_volume',
             DB::raw('NULL as longitude'),
             DB::raw('NULL as latitude'),
             DB::raw('NULL as address'),
