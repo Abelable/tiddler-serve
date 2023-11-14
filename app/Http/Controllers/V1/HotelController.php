@@ -11,7 +11,7 @@ use App\Utils\Inputs\PageInput;
 
 class HotelController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'detail', 'options'];
+    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'options'];
 
     public function categoryOptions()
     {

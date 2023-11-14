@@ -328,7 +328,6 @@ Route::prefix('mall')->group(function () {
     Route::get('commodity_list', 'MallController@list');
 });
 
-
 Route::prefix('media')->group(function () {
     Route::get('list', 'MediaController@list');
     Route::get('follow_list', 'MediaController@followList');
