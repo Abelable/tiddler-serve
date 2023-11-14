@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class SearchPageInput extends BaseInput
+class SearchPageInput extends PageInput
 {
     public $keywords;
 
