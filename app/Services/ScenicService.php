@@ -8,6 +8,7 @@ use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicService extends BaseService
 {
@@ -61,7 +62,12 @@ class ScenicService extends BaseService
             $query = $query->where('id', '!=', $input->id);
         }
         return $query
-            ->selectRaw('(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [$input->latitude, $input->longitude, $input->latitude])
+            ->select(
+                '*',
+                DB::raw(
+                    '(6371 * acos(cos(radians(' . $input->latitude . ')) * cos(radians(latitude)) * cos(radians(longitude) - radians(' . $input->longitude . ')) + sin(radians(' . $input->latitude . ')) * sin(radians(latitude)))) AS distance'
+                )
+            )
             ->having('distance', '<=', $input->radius)
             ->orderBy('distance')
             ->orderBy($input->sort, $input->order)

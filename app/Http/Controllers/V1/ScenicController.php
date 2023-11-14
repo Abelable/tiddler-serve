@@ -24,16 +24,8 @@ class ScenicController extends Controller
     {
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
-
-        $columns = ['id', 'image_list', 'name', 'level', 'rate', 'longitude', 'latitude', 'address'];
-        $page = ScenicService::getInstance()->getScenicPage($input, $columns);
-        $scenicList = collect($page->items());
-        $list = $scenicList->map(function (ScenicSpot $scenic) {
-            $scenic['image'] = json_decode($scenic->image_list)[0];
-            unset($scenic->image_list);
-            return $scenic;
-        });
-
+        $page = ScenicService::getInstance()->getScenicPage($input);
+        $list = $this->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -42,7 +34,22 @@ class ScenicController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
         $page = ScenicService::getInstance()->search($input);
-        $list = collect($page->items())->map(function (ScenicSpot $spot) {
+        $list = $this->handelList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        $page = ScenicService::getInstance()->getNearbyList($input);
+        $list = $this->handelList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function handelList($scenicList)
+    {
+        return $scenicList->map(function (ScenicSpot $spot) {
             return [
                 'id' => $spot->id,
                 'cover' => json_decode($spot->image_list)[0],
@@ -54,20 +61,6 @@ class ScenicController extends Controller
                 'address' => $spot->address,
             ];
         });
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function nearbyList()
-    {
-        /** @var NearbyPageInput $input */
-        $input = NearbyPageInput::new();
-        $columns = ['id', 'image_list', 'name', 'rate', 'longitude', 'latitude'];
-        $page = ScenicService::getInstance()->getNearbyList($input, $columns);
-        $list = collect($page->items())->map(function (ScenicSpot $spot) {
-            $spot['cover'] = json_decode($spot->image_list)[0];
-            return $spot;
-        });
-        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
