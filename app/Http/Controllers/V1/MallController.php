@@ -85,7 +85,7 @@ class MallController extends Controller
         $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
         $list = collect($page->items())->map(function ($commodity) {
             if ($commodity['type'] == 1) {
-                $commodity['image_list'] = json_decode($commodity['image_list']);
+                $commodity['cover'] = json_decode($commodity['image_list'])[0];
             }
             if ($commodity['type'] == 4 && $commodity->shop_id != 0) {
                 $shopInfo = ShopService::getInstance()->getShopById($commodity->shop_id, ['id', 'type', 'avatar', 'name']);
