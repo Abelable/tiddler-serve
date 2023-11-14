@@ -4,14 +4,14 @@ namespace App\Services;
 
 use App\Models\Hotel;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\AdminHotelPageInput;
+use App\Utils\Inputs\Admin\HotelPageInput;
+use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
-use App\Utils\Inputs\HotelPageInput;
 use App\Utils\Inputs\PageInput;
 
 class HotelService extends BaseService
 {
-    public function getAdminHotelPage(AdminHotelPageInput $input, $columns=['*'])
+    public function getAdminHotelPage(HotelPageInput $input, $columns=['*'])
     {
         $query = Hotel::query();
         if (!empty($input->name)) {
@@ -31,9 +31,12 @@ class HotelService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getHotelPage(HotelPageInput $input, $columns=['*'])
+    public function getHotelPage(CommonPageInput $input, $columns=['*'])
     {
         $query = Hotel::query()->where('status', 1);
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }

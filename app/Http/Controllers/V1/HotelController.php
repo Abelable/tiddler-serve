@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
-use App\Utils\Inputs\HotelPageInput;
+use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\PageInput;
 
 class HotelController extends Controller
@@ -21,8 +21,8 @@ class HotelController extends Controller
 
     public function list()
     {
-        /** @var HotelPageInput $input */
-        $input = HotelPageInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
         $columns = ['id', 'cover', 'name', 'english_name', 'grade', 'rate', 'longitude', 'latitude', 'address', 'feature_tag_list', 'price'];
         $page = HotelService::getInstance()->getHotelPage($input, $columns);

@@ -4,7 +4,7 @@ namespace App\Utils\Inputs\Admin;
 
 use App\Utils\Inputs\PageInput;
 
-class ScenicListInput extends PageInput
+class ScenicPageInput extends PageInput
 {
     public $name;
     public $status;

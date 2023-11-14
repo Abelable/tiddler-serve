@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\Restaurant;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantListInput;
-use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantService extends BaseService
@@ -59,7 +59,7 @@ class RestaurantService extends BaseService
         return Restaurant::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getAllList(AllListInput $input, $columns=['*'])
+    public function getAllList(CommonPageInput $input, $columns=['*'])
     {
         $query = Restaurant::query();
         if (!empty($input->name)) {

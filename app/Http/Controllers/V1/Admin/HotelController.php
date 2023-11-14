@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\HotelService;
-use App\Utils\Inputs\Admin\AdminHotelPageInput;
+use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\HotelInput;
 
 class HotelController extends Controller
@@ -13,8 +13,8 @@ class HotelController extends Controller
 
     public function list()
     {
-        /** @var AdminHotelPageInput $input */
-        $input = AdminHotelPageInput::new();
+        /** @var HotelPageInput $input */
+        $input = HotelPageInput::new();
         $columns = [
             'id',
             'status',

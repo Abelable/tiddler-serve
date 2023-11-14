@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
-use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\CommonPageInput;
 
 class ScenicController extends Controller
 {
@@ -20,11 +20,11 @@ class ScenicController extends Controller
 
     public function list()
     {
-        /** @var AllListInput $input */
-        $input = AllListInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
         $columns = ['id', 'image_list', 'name', 'level', 'rate', 'longitude', 'latitude', 'address'];
-        $page = ScenicService::getInstance()->getAllList($input, $columns);
+        $page = ScenicService::getInstance()->getScenicPage($input, $columns);
         $scenicList = collect($page->items());
         $list = $scenicList->map(function (ScenicSpot $scenic) {
             $scenic['image'] = json_decode($scenic->image_list)[0];

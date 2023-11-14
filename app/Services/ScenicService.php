@@ -4,12 +4,12 @@ namespace App\Services;
 
 use App\Models\ScenicSpot;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\ScenicListInput;
-use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\Admin\ScenicPageInput;
+use App\Utils\Inputs\CommonPageInput;
 
 class ScenicService extends BaseService
 {
-    public function getScenicList(ScenicListInput $input, $columns=['*'])
+    public function getAdminScenicPage(ScenicPageInput $input, $columns=['*'])
     {
         $query = ScenicSpot::query();
         if (!empty($input->name)) {
@@ -22,6 +22,25 @@ class ScenicService extends BaseService
             $query = $query->where('status', $input->status);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getScenicPage(CommonPageInput $input, $columns=['*'])
+    {
+        $query = ScenicSpot::query()->where('status', 1);
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        if (!empty($input->sort)) {
+            $query = $query->orderBy($input->sort, $input->order);
+        } else {
+            $query = $query
+                ->orderBy('rate', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getScenicById($id, $columns=['*'])
@@ -43,25 +62,6 @@ class ScenicService extends BaseService
     public function getScenicListByIds(array $ids, $columns = ['*'])
     {
         return ScenicSpot::query()->whereIn('id', $ids)->get($columns);
-    }
-
-    public function getAllList(AllListInput $input, $columns=['*'])
-    {
-        $query = ScenicSpot::query()->where('status', 1);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!empty($input->sort)) {
-            $query = $query->orderBy($input->sort, $input->order);
-        } else {
-            $query = $query
-                ->orderBy('rate', 'desc')
-                ->orderBy('created_at', 'desc');
-        }
-        return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getScenicOptions($columns = ['*'])

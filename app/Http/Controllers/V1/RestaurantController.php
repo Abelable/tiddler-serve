@@ -13,7 +13,7 @@ use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantController extends Controller
@@ -28,8 +28,8 @@ class RestaurantController extends Controller
 
     public function list()
     {
-        /** @var AllListInput $input */
-        $input = AllListInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
         $page = RestaurantService::getInstance()->getAllList($input);
         $restaurantList = collect($page->items());

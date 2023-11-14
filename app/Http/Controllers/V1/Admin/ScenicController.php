@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\ScenicListInput;
+use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\ScenicInput;
 
 class ScenicController extends Controller
@@ -15,8 +15,8 @@ class ScenicController extends Controller
 
     public function list()
     {
-        /** @var ScenicListInput $input */
-        $input = ScenicListInput::new();
+        /** @var ScenicPageInput $input */
+        $input = ScenicPageInput::new();
         $columns = [
             'id',
             'status',
@@ -28,7 +28,7 @@ class ScenicController extends Controller
             'created_at',
             'updated_at'
         ];
-        $list = ScenicService::getInstance()->getScenicList($input, $columns);
+        $list = ScenicService::getInstance()->getAdminScenicPage($input, $columns);
         return $this->successPaginate($list);
     }
 

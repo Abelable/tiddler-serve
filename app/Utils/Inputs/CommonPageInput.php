@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class AllListInput extends PageInput
+class CommonPageInput extends PageInput
 {
     public $name;
     public $categoryId;
