@@ -4,13 +4,14 @@ namespace App\Services;
 
 use App\Models\Hotel;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\HotelListInput;
-use App\Utils\Inputs\AllListInput;
+use App\Utils\Inputs\Admin\AdminHotelPageInput;
 use App\Utils\Inputs\HotelInput;
+use App\Utils\Inputs\HotelPageInput;
+use App\Utils\Inputs\PageInput;
 
 class HotelService extends BaseService
 {
-    public function getHotelList(HotelListInput $input, $columns=['*'])
+    public function getAdminHotelPage(AdminHotelPageInput $input, $columns=['*'])
     {
         $query = Hotel::query();
         if (!empty($input->name)) {
@@ -28,6 +29,31 @@ class HotelService extends BaseService
         return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getHotelPage(HotelPageInput $input, $columns=['*'])
+    {
+        $query = Hotel::query()->where('status', 1);
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        if (!empty($input->sort)) {
+            $query = $query->orderBy($input->sort, $input->order);
+        } else {
+            $query = $query
+                ->orderBy('rate', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input)
+    {
+        return Hotel::search($keywords)
+            ->where('status', 1)
+            ->orderBy('rate', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
     }
 
     public function getHotelById($id, $columns=['*'])
@@ -62,25 +88,6 @@ class HotelService extends BaseService
     public function getHotelListByIds(array $ids, $columns = ['*'])
     {
         return Hotel::query()->whereIn('id', $ids)->get($columns);
-    }
-
-    public function getAllList(AllListInput $input, $columns=['*'])
-    {
-        $query = Hotel::query()->where('status', 1);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!empty($input->sort)) {
-            $query = $query->orderBy($input->sort, $input->order);
-        } else {
-            $query = $query
-                ->orderBy('rate', 'desc')
-                ->orderBy('created_at', 'desc');
-        }
-        return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getHotelOptions($columns = ['*'])

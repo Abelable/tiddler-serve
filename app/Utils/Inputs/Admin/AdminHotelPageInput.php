@@ -4,7 +4,7 @@ namespace App\Utils\Inputs\Admin;
 
 use App\Utils\Inputs\PageInput;
 
-class HotelListInput extends PageInput
+class AdminHotelPageInput extends PageInput
 {
     public $name;
     public $status;

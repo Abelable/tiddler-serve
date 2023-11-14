@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\HotelService;
-use App\Utils\Inputs\Admin\HotelListInput;
+use App\Utils\Inputs\Admin\AdminHotelPageInput;
 use App\Utils\Inputs\HotelInput;
 
 class HotelController extends Controller
@@ -13,8 +13,8 @@ class HotelController extends Controller
 
     public function list()
     {
-        /** @var HotelListInput $input */
-        $input = HotelListInput::new();
+        /** @var AdminHotelPageInput $input */
+        $input = AdminHotelPageInput::new();
         $columns = [
             'id',
             'status',
@@ -28,8 +28,8 @@ class HotelController extends Controller
             'created_at',
             'updated_at'
         ];
-        $list = HotelService::getInstance()->getHotelList($input, $columns);
-        return $this->successPaginate($list);
+        $page = HotelService::getInstance()->getAdminHotelPage($input, $columns);
+        return $this->successPaginate($page);
     }
 
     public function detail()

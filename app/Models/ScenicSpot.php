@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+
 /**
  * App\Models\ScenicSpot
  *
@@ -59,4 +61,15 @@ namespace App\Models;
  */
 class ScenicSpot extends BaseModel
 {
+    use Searchable;
+
+    /**
+     * 索引的字段
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('id', 'name', 'brief');
+    }
 }

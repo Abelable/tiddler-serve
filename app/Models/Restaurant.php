@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
+
 /**
  * App\Models\Restaurant
  *
@@ -61,6 +63,18 @@ namespace App\Models;
  */
 class Restaurant extends BaseModel
 {
+    use Searchable;
+
+    /**
+     * 索引的字段
+     *
+     * @return array
+     */
+    public function toSearchableArray()
+    {
+        return $this->only('id', 'name');
+    }
+
     public function ticketIds(): array
     {
         return $this->hasMany(RestaurantTicket::class, 'restaurant_id')->pluck('ticket_id')->toArray();
