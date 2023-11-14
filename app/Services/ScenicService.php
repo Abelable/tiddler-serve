@@ -6,6 +6,7 @@ use App\Models\ScenicSpot;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\PageInput;
 
 class ScenicService extends BaseService
 {
@@ -41,6 +42,16 @@ class ScenicService extends BaseService
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input)
+    {
+        return ScenicSpot::search($keywords)
+            ->where('status', 1)
+            ->orderBy('rate', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
+
     }
 
     public function getScenicById($id, $columns=['*'])

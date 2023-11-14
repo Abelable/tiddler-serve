@@ -48,6 +48,8 @@ class HotelController extends Controller
                 'price' => $hotel->price,
                 'grade' => $hotel->grade,
                 'rate' => $hotel->rate,
+                'longitude' => $hotel->longitude,
+                'latitude' => $hotel->latitude,
                 'address' => $hotel->address,
                 'featureTagList' => $hotel->feature_tag_list,
             ];

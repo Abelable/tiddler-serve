@@ -7,6 +7,7 @@ use App\Models\ScenicSpot;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\PageInput;
 
 class ScenicController extends Controller
 {
@@ -32,6 +33,27 @@ class ScenicController extends Controller
             return $scenic;
         });
 
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = ScenicService::getInstance()->search($keywords, $input);
+        $list = collect($page->items())->map(function (ScenicSpot $spot) {
+            return [
+                'id' => $spot->id,
+                'cover' => json_decode($spot->image_list)[0],
+                'name' => $spot->name,
+                'level' => $spot->level,
+                'rate' => $spot->rate,
+                'longitude' => $spot->longitude,
+                'latitude' => $spot->latitude,
+                'address' => $spot->address,
+            ];
+        });
         return $this->success($this->paginate($page, $list));
     }
 
