@@ -29,8 +29,8 @@ class CreateHotelsTable extends Migration
             $table->longText('room_image_list')->comment('房间图片列表');
             $table->longText('environment_image_list')->comment('环境图片列表');
             $table->longText('restaurant_image_list')->comment('餐厅图片列表');
-            $table->float('longitude')->comment('经度');
-            $table->float('latitude')->comment('纬度');
+            $table->decimal('longitude', 9, 6)->comment('经度');
+            $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
             $table->float('rate')->default(0)->comment('酒店评分');
             $table->string('feature_tag_list')->default('')->comment('酒店特点');

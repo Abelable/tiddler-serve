@@ -22,8 +22,8 @@ use Laravel\Scout\Searchable;
  * @property string $room_image_list 房间图片列表
  * @property string $environment_image_list 环境图片列表
  * @property string $restaurant_image_list 餐厅图片列表
- * @property float $longitude 经度
- * @property float $latitude 纬度
+ * @property string $longitude 经度
+ * @property string $latitude 纬度
  * @property string $address 具体地址
  * @property float $rate 酒店评分
  * @property string $feature_tag_list 酒店特点

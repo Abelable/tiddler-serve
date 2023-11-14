@@ -13,8 +13,8 @@ use Laravel\Scout\Searchable;
  * @property int $category_id 景区分类id
  * @property string $name 景区名称
  * @property string $level 景区等级
- * @property float $longitude 经度
- * @property float $latitude 纬度
+ * @property string $longitude 经度
+ * @property string $latitude 纬度
  * @property string $address 具体地址
  * @property float $rate 景区评分
  * @property string $video 视频
