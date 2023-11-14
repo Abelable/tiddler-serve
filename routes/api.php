@@ -132,6 +132,7 @@ Route::prefix('order')->group(function () {
 Route::prefix('scenic')->group(function () {
     Route::get('category_options', 'ScenicController@categoryOptions');
     Route::get('list', 'ScenicController@list');
+    Route::get('search', 'ScenicController@search');
     Route::get('detail', 'ScenicController@detail');
     Route::get('options', 'ScenicController@options');
 
@@ -186,6 +187,7 @@ Route::prefix('scenic')->group(function () {
 Route::prefix('hotel')->group(function () {
     Route::get('category_options', 'HotelController@categoryOptions');
     Route::get('list', 'HotelController@list');
+    Route::get('search', 'HotelController@search');
     Route::get('detail', 'HotelController@detail');
     Route::get('options', 'HotelController@options');
 
@@ -241,6 +243,7 @@ Route::prefix('catering')->group(function () {
     Route::prefix('restaurant')->group(function () {
         Route::get('category_options', 'RestaurantController@categoryOptions');
         Route::get('list', 'RestaurantController@list');
+        Route::get('search', 'RestaurantController@search');
         Route::get('detail', 'RestaurantController@detail');
         Route::get('options', 'RestaurantController@options');
         Route::post('add', 'RestaurantController@add');
