@@ -11,7 +11,6 @@ use App\Services\FanService;
 use App\Services\GoodsService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
-use App\Services\Media\ShortVideo\ShortVideoGoodsService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
@@ -19,6 +18,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
 use Illuminate\Support\Facades\DB;
 
@@ -39,10 +39,9 @@ class ShortVideoController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = ShortVideoService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = ShortVideoService::getInstance()->search($input);
         $list = $this->handleVideoList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }

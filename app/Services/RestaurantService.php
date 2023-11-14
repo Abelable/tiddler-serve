@@ -6,8 +6,8 @@ use App\Models\Restaurant;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\CommonPageInput;
-use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\RestaurantInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class RestaurantService extends BaseService
 {
@@ -44,9 +44,9 @@ class RestaurantService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search(SearchPageInput $input)
     {
-        return Restaurant::search($keywords)
+        return Restaurant::search($input->keywords)
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);

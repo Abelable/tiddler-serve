@@ -4,7 +4,7 @@ namespace App\Services\Media\Note;
 
 use App\Models\TourismNote;
 use App\Services\BaseService;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\TourismNoteInput;
 use App\Utils\Inputs\TourismNotePageInput;
 use function PHPUnit\Framework\isEmpty;
@@ -34,9 +34,9 @@ class TourismNoteService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search(SearchPageInput $input)
     {
-        return TourismNote::search($keywords)
+        return TourismNote::search($input->keywords)
             ->where('is_private', 0)
             ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')

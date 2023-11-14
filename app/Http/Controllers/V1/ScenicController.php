@@ -7,7 +7,7 @@ use App\Models\ScenicSpot;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\Inputs\CommonPageInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
 {
@@ -38,10 +38,9 @@ class ScenicController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = ScenicService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = ScenicService::getInstance()->search($input);
         $list = collect($page->items())->map(function (ScenicSpot $spot) {
             return [
                 'id' => $spot->id,

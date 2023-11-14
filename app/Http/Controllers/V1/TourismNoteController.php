@@ -18,6 +18,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\TourismNoteInput;
 use App\Utils\Inputs\TourismNotePageInput;
 use Illuminate\Support\Facades\DB;
@@ -37,10 +38,9 @@ class TourismNoteController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = TourismNoteService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = TourismNoteService::getInstance()->search($input);
         $list = $this->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }

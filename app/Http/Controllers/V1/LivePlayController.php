@@ -9,10 +9,10 @@ use App\Services\FanService;
 use App\Services\GoodsService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
-use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\LiveGroupMsgType;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\TimServe;
 
 class LivePlayController extends Controller
@@ -31,10 +31,9 @@ class LivePlayController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = LiveRoomService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = LiveRoomService::getInstance()->search($input);
         // 由于以TNTSearch作为驱动的scout，whereIn无法过滤数据，原因未知，此处增加filter进行数据过滤
         $list = $this->handleList(collect($page->items())->filter(function (LiveRoom $room) {
             return $room->status == 1 || $room->status == 3;

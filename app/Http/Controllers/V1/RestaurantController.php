@@ -14,8 +14,8 @@ use App\Services\RestaurantService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
-use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\RestaurantInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class RestaurantController extends Controller
 {
@@ -64,10 +64,9 @@ class RestaurantController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = RestaurantService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = RestaurantService::getInstance()->search($input);
         $list = collect($page->items())->map(function (Restaurant $restaurant) {
             return [
                 'id' => $restaurant->id,

@@ -7,8 +7,8 @@ use App\Services\BaseService;
 use App\Utils\Enums\LiveStatus;
 use App\Utils\Inputs\LiveRoomInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use Illuminate\Support\Facades\Cache;
-use Laravel\Scout\Builder;
 
 class LiveRoomService extends BaseService
 {
@@ -27,10 +27,10 @@ class LiveRoomService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input, $statusList = [1, 3])
+    public function search(SearchPageInput $input, $statusList = [1, 3])
     {
         // todo whereIn无效
-        return LiveRoom::search($keywords)
+        return LiveRoom::search($input->keywords)
             ->whereIn('status', $statusList)
             ->orderBy('viewers_number', 'desc')
             ->orderBy('praise_number', 'desc')

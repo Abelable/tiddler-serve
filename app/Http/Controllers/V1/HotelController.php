@@ -7,7 +7,7 @@ use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
 use App\Utils\Inputs\CommonPageInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class HotelController extends Controller
 {
@@ -36,10 +36,9 @@ class HotelController extends Controller
 
     public function search()
     {
-        $keywords = $this->verifyRequiredString('keywords');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $page = HotelService::getInstance()->search($keywords, $input);
+        /** @var SearchPageInput $input */
+        $input = SearchPageInput::new();
+        $page = HotelService::getInstance()->search($input);
         $list = collect($page->items())->map(function (Hotel $hotel) {
             return [
                 'id' => $hotel->id,

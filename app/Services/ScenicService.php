@@ -6,7 +6,7 @@ use App\Models\ScenicSpot;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\CommonPageInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class ScenicService extends BaseService
 {
@@ -44,9 +44,9 @@ class ScenicService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search(SearchPageInput $input)
     {
-        return ScenicSpot::search($keywords)
+        return ScenicSpot::search($input->keywords)
             ->where('status', 1)
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)

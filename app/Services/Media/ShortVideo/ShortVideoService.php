@@ -5,6 +5,7 @@ namespace App\Services\Media\ShortVideo;
 use App\Models\ShortVideo;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
@@ -27,9 +28,9 @@ class ShortVideoService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search(SearchPageInput $input)
     {
-        return ShortVideo::search($keywords)
+        return ShortVideo::search($input->keywords)
             ->where('is_private', 0)
             ->orderBy('like_number', 'desc')
             ->orderBy('comments_number', 'desc')

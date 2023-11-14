@@ -7,7 +7,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SearchPageInput;
 
 class HotelService extends BaseService
 {
@@ -50,9 +50,9 @@ class HotelService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search($keywords, PageInput $input)
+    public function search(SearchPageInput $input)
     {
-        return Hotel::search($keywords)
+        return Hotel::search($input->keywords)
             ->where('status', 1)
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)
