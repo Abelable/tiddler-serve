@@ -4,13 +4,14 @@ namespace App\Services;
 
 use App\Models\Restaurant;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\RestaurantListInput;
+use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantService extends BaseService
 {
-    public function getRestaurantList(RestaurantListInput $input, $columns=['*'])
+    public function getAdminRestaurantList(RestaurantPageInput $input, $columns=['*'])
     {
         $query = Restaurant::query();
         if (!empty($input->name)) {
@@ -22,6 +23,33 @@ class RestaurantService extends BaseService
         return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getRestaurantPage(CommonPageInput $input, $columns=['*'])
+    {
+        $query = Restaurant::query();
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
+        if (!empty($input->categoryId)) {
+            $query = $query->where('category_id', $input->categoryId);
+        }
+        if (!empty($input->sort)) {
+            $query = $query->orderBy($input->sort, $input->order);
+        } else {
+            $query = $query
+                ->orderBy('rate', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function search($keywords, PageInput $input)
+    {
+        return Restaurant::search($keywords)
+            ->orderBy('rate', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
     }
 
     public function getRestaurantById($id, $columns=['*'])
@@ -57,25 +85,6 @@ class RestaurantService extends BaseService
     public function getRestaurantListByIds(array $ids, $columns = ['*'])
     {
         return Restaurant::query()->whereIn('id', $ids)->get($columns);
-    }
-
-    public function getAllList(CommonPageInput $input, $columns=['*'])
-    {
-        $query = Restaurant::query();
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!empty($input->sort)) {
-            $query = $query->orderBy($input->sort, $input->order);
-        } else {
-            $query = $query
-                ->orderBy('rate', 'desc')
-                ->orderBy('created_at', 'desc');
-        }
-        return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getOptions($columns = ['*'])

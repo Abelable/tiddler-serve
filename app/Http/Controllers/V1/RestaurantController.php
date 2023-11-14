@@ -14,6 +14,7 @@ use App\Services\RestaurantService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\RestaurantInput;
 
 class RestaurantController extends Controller
@@ -31,7 +32,7 @@ class RestaurantController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
 
-        $page = RestaurantService::getInstance()->getAllList($input);
+        $page = RestaurantService::getInstance()->getRestaurantPage($input);
         $restaurantList = collect($page->items());
 
         $categoryIds = $restaurantList->pluck('category_id')->toArray();
@@ -58,6 +59,26 @@ class RestaurantController extends Controller
             return $restaurant;
         });
 
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = RestaurantService::getInstance()->search($keywords, $input);
+        $list = collect($page->items())->map(function (Restaurant $restaurant) {
+            return [
+                'id' => $restaurant->id,
+                'name' => $restaurant->name,
+                'cover' => $restaurant->cover,
+                'price' => $restaurant->price,
+                'longitude' => $restaurant->longitude,
+                'latitude' => $restaurant->latitude,
+                'address' => $restaurant->address,
+            ];
+        });
         return $this->success($this->paginate($page, $list));
     }
 

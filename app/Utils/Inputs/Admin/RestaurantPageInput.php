@@ -4,7 +4,7 @@ namespace App\Utils\Inputs\Admin;
 
 use App\Utils\Inputs\PageInput;
 
-class RestaurantListInput extends PageInput
+class RestaurantPageInput extends PageInput
 {
     public $name;
     public $categoryId;
