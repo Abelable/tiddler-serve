@@ -7,6 +7,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
 
 class HotelService extends BaseService
@@ -57,6 +58,21 @@ class HotelService extends BaseService
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
+    }
+
+    public function getNearbyList(NearbyPageInput $input, $columns = ['*'])
+    {
+        $query = Hotel::query()->where('status', 1);
+        if (!empty($input->id)) {
+            $query = $query->where('id', '!=', $input->id);
+        }
+        return $query
+            ->where('id', '!=', $input->id)
+            ->selectRaw('(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [$input->latitude, $input->longitude, $input->latitude])
+            ->having('distance', '<=', $input->radius)
+            ->orderBy('distance')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getHotelById($id, $columns=['*'])

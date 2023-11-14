@@ -7,7 +7,9 @@ use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
+use PhpParser\Node\Expr\New_;
 
 class HotelController extends Controller
 {
@@ -50,8 +52,21 @@ class HotelController extends Controller
                 'longitude' => $hotel->longitude,
                 'latitude' => $hotel->latitude,
                 'address' => $hotel->address,
-                'featureTagList' => $hotel->feature_tag_list,
+                'featureTagList' => json_decode($hotel->feature_tag_list),
             ];
+        });
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        $columns = ['id', 'cover', 'name', 'price', 'rate', 'grade', 'longitude', 'latitude', 'feature_tag_list'];
+        $page = HotelService::getInstance()->getNearbyList($input, $columns);
+        $list = collect($page->items())->map(function (Hotel $hotel) {
+            $hotel->feature_tag_list = json_decode($hotel->feature_tag_list);
+            return $hotel;
         });
         return $this->success($this->paginate($page, $list));
     }

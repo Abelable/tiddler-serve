@@ -7,6 +7,7 @@ use App\Models\ScenicSpot;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
@@ -52,6 +53,19 @@ class ScenicController extends Controller
                 'latitude' => $spot->latitude,
                 'address' => $spot->address,
             ];
+        });
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        $columns = ['id', 'image_list', 'name', 'rate', 'longitude', 'latitude'];
+        $page = ScenicService::getInstance()->getNearbyList($input, $columns);
+        $list = collect($page->items())->map(function (ScenicSpot $spot) {
+            $spot['cover'] = json_decode($spot->image_list)[0];
+            return $spot;
         });
         return $this->success($this->paginate($page, $list));
     }

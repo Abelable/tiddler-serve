@@ -133,6 +133,7 @@ Route::prefix('scenic')->group(function () {
     Route::get('category_options', 'ScenicController@categoryOptions');
     Route::get('list', 'ScenicController@list');
     Route::get('search', 'ScenicController@search');
+    Route::get('nearby_list', 'ScenicController@nearbyList');
     Route::get('detail', 'ScenicController@detail');
     Route::get('options', 'ScenicController@options');
 
@@ -188,6 +189,7 @@ Route::prefix('hotel')->group(function () {
     Route::get('category_options', 'HotelController@categoryOptions');
     Route::get('list', 'HotelController@list');
     Route::get('search', 'HotelController@search');
+    Route::get('nearby_list', 'HotelController@nearbyList');
     Route::get('detail', 'HotelController@detail');
     Route::get('options', 'HotelController@options');
 
