@@ -16,6 +16,7 @@ class CreateShopCategoriesTable extends Migration
         Schema::create('shop_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('店铺分类名称');
+            $table->integer('deposit')->comment('店铺保证金');
             $table->timestamps();
             $table->softDeletes();
         });

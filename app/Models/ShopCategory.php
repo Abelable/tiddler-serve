@@ -7,6 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property string $name 店铺分类名称
+ * @property int $deposit 店铺保证金
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -16,6 +17,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory query()
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereDeposit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereUpdatedAt($value)
@@ -25,5 +27,4 @@ namespace App\Models;
  */
 class ShopCategory extends BaseModel
 {
-
 }

@@ -32,6 +32,7 @@ class ShopCategoryController extends Controller
     public function add()
     {
         $name = $this->verifyRequiredString('name');
+        $deposit = $this->verifyRequiredInteger('deposit');
 
         $category = ShopCategoryService::getInstance()->getCategoryByName($name);
         if (!is_null($category)) {
@@ -40,6 +41,7 @@ class ShopCategoryController extends Controller
 
         $category = ShopCategory::new();
         $category->name = $name;
+        $category->deposit = $deposit;
         $category->save();
 
         return $this->success();
@@ -49,11 +51,7 @@ class ShopCategoryController extends Controller
     {
         $id = $this->verifyId('id');
         $name = $this->verifyRequiredString('name');
-
-        $category = ShopCategoryService::getInstance()->getCategoryByName($name);
-        if (!is_null($category)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '当前店铺分类已存在');
-        }
+        $deposit = $this->verifyRequiredInteger('deposit');
 
         $category = ShopCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
@@ -61,6 +59,7 @@ class ShopCategoryController extends Controller
         }
 
         $category->name = $name;
+        $category->deposit = $deposit;
         $category->save();
 
         return $this->success();
@@ -79,7 +78,7 @@ class ShopCategoryController extends Controller
 
     public function options()
     {
-        $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
+        $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name', 'deposit']);
         return $this->success($options);
     }
 }
