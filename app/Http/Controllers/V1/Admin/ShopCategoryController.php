@@ -22,7 +22,7 @@ class ShopCategoryController extends Controller
             return $category;
         });
 
-        return $this->successPaginate($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
