@@ -15,6 +15,7 @@ class ShopCategoryController extends Controller
 
     public function list()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $page = ShopCategoryService::getInstance()->getCategoryList($input);
         $list = collect($page->items())->map(function (ShopCategory $category) {
@@ -87,11 +88,7 @@ class ShopCategoryController extends Controller
 
     public function options()
     {
-        $options = ShopCategoryService::getInstance()->getCategoryOptions();
-        $options = $options->map(function (ShopCategory $category) {
-            $category->adapted_merchant_types = json_decode($category->adapted_merchant_types);
-            return $category;
-        });
+        $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
         return $this->success($options);
     }
 }

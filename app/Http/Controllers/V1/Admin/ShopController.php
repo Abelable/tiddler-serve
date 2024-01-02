@@ -13,6 +13,7 @@ class ShopController extends Controller
 
     public function list()
     {
+        /** @var ShopListInput $input */
         $input = ShopListInput::new();
         $list = ShopService::getInstance()->getShopList($input);
         return $this->successPaginate($list);
