@@ -17,6 +17,7 @@ class CreateShopCategoriesTable extends Migration
             $table->id();
             $table->string('name')->comment('店铺分类名称');
             $table->integer('deposit')->comment('店铺保证金');
+            $table->string('adapted_merchant_types')->default('[1,2]')->comment('适配的商家类型：1-个人，2-企业');
             $table->timestamps();
             $table->softDeletes();
         });
