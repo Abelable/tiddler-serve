@@ -3,13 +3,17 @@
 namespace App\Services;
 
 use App\Models\GoodsCategory;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\Admin\GoodsCategoryPageInput;
 
 class GoodsCategoryService extends BaseService
 {
-    public function getCategoryList(PageInput $input, $columns = ['*'])
+    public function getCategoryList(GoodsCategoryPageInput $input, $columns = ['*'])
     {
-        return GoodsCategory::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        $query = GoodsCategory::query();
+        if (!empty($input->shopCategoryId)) {
+            $query = $query->where('shop_category_id', $input->shopCategoryId);
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getCategoryById($id, $columns = ['*'])
@@ -25,5 +29,10 @@ class GoodsCategoryService extends BaseService
     public function getCategoryOptions($columns = ['*'])
     {
         return GoodsCategory::query()->orderBy('id', 'asc')->get($columns);
+    }
+
+    public function getOptionsByShopCategoryId($shopCategoryId, $columns = ['*'])
+    {
+        return GoodsCategory::query()->where('shop_category_id', $shopCategoryId)->get($columns);
     }
 }
