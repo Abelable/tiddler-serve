@@ -98,14 +98,23 @@ class GoodsController extends Controller
     public function shopGoodsList()
     {
         $shopId = $this->verifyRequiredId('shopId');
+        /** @var PageInput $input */
         $input = PageInput::new();
         $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
         $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
         return $this->successPaginate($list);
     }
 
+    public function shopCategoryOptions()
+    {
+        $shopCategoryIds = json_decode($this->user()->shopInfo->category_ids);
+        $options = GoodsCategoryService::getInstance()->getOptionsByShopCategoryIds($shopCategoryIds);
+        return $this->success($options);
+    }
+
     public function userGoodsList()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $columns = ['id', 'image', 'name', 'price'];
         $list = GoodsService::getInstance()->getUserGoodsList($this->userId(), $input, $columns);

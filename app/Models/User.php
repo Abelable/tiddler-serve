@@ -36,6 +36,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read int|null $notifications_count
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
  * @property-read \App\Models\ScenicShop|null $scenicShop
+ * @property-read \App\Models\Shop|null $shopInfo
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
@@ -101,6 +102,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function merchant()
     {
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
+    }
+
+    public function shopInfo()
+    {
+        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
     }
 
     public function scenicProvider()

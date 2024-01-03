@@ -80,6 +80,7 @@ Route::prefix('shop')->group(function () {
 
     Route::get('goods_list', 'GoodsController@shopGoodsList');
     Route::prefix('goods')->group(function () {
+        Route::get('category_options', 'GoodsController@shopCategoryOptions');
         Route::get('totals', 'GoodsController@goodsListTotals');
         Route::get('list', 'GoodsController@merchantGoodsList');
         Route::get('info', 'GoodsController@goodsInfo');
