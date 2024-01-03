@@ -19,7 +19,7 @@ class CreateShopsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('merchant_id')->comment('商家id');
             $table->string('name')->comment('店铺名称');
-            $table->integer('category_id')->comment('店铺分类id');
+            $table->string('category_ids')->comment('店铺分类id');
             $table->integer('type')->comment('店铺类型：1-个人，2-企业');
             $table->string('cover')->default('')->comment('店铺封面图片');
             $table->string('avatar')->comment('店铺头像');

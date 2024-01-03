@@ -10,7 +10,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $merchant_id 商家id
  * @property string $name 店铺名称
- * @property int $category_id 店铺分类id
+ * @property string $category_ids 店铺分类id
  * @property int $type 店铺类型：1-个人，2-企业
  * @property string $cover 店铺封面图片
  * @property string $avatar 店铺头像
@@ -22,7 +22,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|Shop onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Shop query()
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereAvatar($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCategoryIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereDeletedAt($value)
