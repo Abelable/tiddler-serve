@@ -81,21 +81,23 @@ class ShopController extends Controller
     public function shopInfo()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'name', 'type', 'avatar', 'cover'];
+        $columns = ['id', 'category_ids', 'name', 'type', 'avatar', 'cover'];
         $shop = ShopService::getInstance()->getShopById($id, $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
+        $shop->category_ids = json_decode($shop->category_ids);
         return $this->success($shop);
     }
 
     public function myShopInfo()
     {
-        $columns = ['id', 'name', 'type', 'avatar', 'cover'];
+        $columns = ['id', 'category_ids', 'name', 'type', 'avatar', 'cover'];
         $shop = ShopService::getInstance()->getShopByUserId($this->userId(), $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
+        $shop->category_ids = json_decode($shop->category_ids);
         return $this->success($shop);
     }
 

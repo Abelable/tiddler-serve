@@ -23,7 +23,7 @@ class MerchantInput extends BaseInput
     public $bankName;
     public $shopAvatar;
     public $shopName;
-    public $shopCategoryId;
+    public $shopCategoryIds;
     public $shopCover;
 
     public function rules()
@@ -48,7 +48,7 @@ class MerchantInput extends BaseInput
             'bankName' => 'required|string',
             'shopAvatar' => 'required|string',
             'shopName' => 'required|string',
-            'shopCategoryId' => 'required|integer|digits_between:1,20',
+            'shopCategoryIds' => 'required|array|min:1',
             'shopCover' => 'string',
         ];
     }

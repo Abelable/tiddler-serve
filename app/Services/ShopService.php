@@ -14,7 +14,7 @@ class ShopService extends BaseService
         $shop->user_id = $userId;
         $shop->merchant_id = $merchantId;
         $shop->type = $input->type;
-        $shop->category_id = $input->shopCategoryId;
+        $shop->category_ids = json_encode($input->shopCategoryIds);
         $shop->avatar = $input->shopAvatar;
         $shop->name = $input->shopName;
         $shop->cover = $input->shopCover;
