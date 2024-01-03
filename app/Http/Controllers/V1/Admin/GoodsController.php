@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
 use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
@@ -26,23 +25,7 @@ class GoodsController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-
-        $goodsColumns = [
-            'id',
-            'shop_id',
-            'image',
-            'name',
-            'category_id',
-            'price',
-            'stock',
-            'promotion_commission_rate',
-            'sales_volume',
-            'status',
-            'failure_reason',
-            'created_at',
-            'updated_at'
-        ];
-        $goods = GoodsService::getInstance()->getGoodsById($id, $goodsColumns);
+        $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
