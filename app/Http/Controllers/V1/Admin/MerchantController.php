@@ -59,7 +59,7 @@ class MerchantController extends Controller
         }
 
         DB::transaction(function () use ($merchant) {
-            MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->type == 1 ? '1000' : '10000');
+            MerchantOrderService::getInstance()->createMerchantOrder($merchant->user_id, $merchant->id, $merchant->deposit);
             $merchant->status = 1;
             $merchant->save();
         });
@@ -89,6 +89,7 @@ class MerchantController extends Controller
 
     public function orderList()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $columns = ['id', 'merchant_id', 'order_sn', 'payment_amount', 'status', 'pay_id', 'created_at', 'updated_at'];
         $page = MerchantOrderService::getInstance()->getOrderList($input, $columns);

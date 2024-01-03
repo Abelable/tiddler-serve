@@ -13,6 +13,7 @@ class MerchantService extends BaseService
         $merchant = Merchant::new();
         $merchant->user_id = $userId;
         $merchant->type = $input->type;
+        $merchant->deposit = $input->deposit;
         if ($input->type == 2) {
             $merchant->company_name = $input->companyName;
             $merchant->business_license_photo = $input->businessLicensePhoto;

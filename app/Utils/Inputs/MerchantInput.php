@@ -5,6 +5,7 @@ namespace App\Utils\Inputs;
 class MerchantInput extends BaseInput
 {
     public $type;
+    public $deposit;
     public $companyName;
     public $regionDesc;
     public $regionCodeList;
@@ -29,6 +30,7 @@ class MerchantInput extends BaseInput
     {
         return [
             'type' => 'required|integer|in:1,2',
+            'deposit' => 'required|integer',
             'companyName' => 'required_if:type,2',
             'regionDesc' => 'required|string',
             'regionCodeList' => 'required|string',
