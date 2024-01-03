@@ -15,6 +15,9 @@ class GoodsService extends BaseService
     public function getAllList(GoodsPageInput $input, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
+        if (!empty($input->shopCategoryId)) {
+            $query = $query->where('shop_category_id', $input->shopCategoryId);
+        }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
