@@ -10,6 +10,7 @@ namespace App\Models;
  * @property int $status 申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败
  * @property string $failure_reason 审核失败原因
  * @property int $type 商家类型：1-个人，2-企业
+ * @property int $deposit 商家保证金
  * @property string $company_name 企业名称
  * @property string $region_desc 省市区描述
  * @property string $region_code_list 省市区编码
@@ -40,6 +41,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereCompanyName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereDeposit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant whereHoldIdCardPhoto($value)
