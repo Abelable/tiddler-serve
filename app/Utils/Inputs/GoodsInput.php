@@ -36,8 +36,8 @@ class GoodsInput extends BaseInput
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'stock' => 'required|integer',
-            'salesCommissionRate' => 'required|numeric',
-            'promotionCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'required|integer',
+            'promotionCommissionRate' => 'required|integer',
             'specList' => 'required|string',
             'skuList' => 'required|string',
         ];
