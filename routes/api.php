@@ -480,6 +480,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'GoodsCategoryController@edit');
             Route::post('delete', 'GoodsCategoryController@delete');
             Route::get('options', 'GoodsCategoryController@options');
+            Route::get('filter_options', 'GoodsCategoryController@filterOptions');
         });
 
         Route::post('list', 'GoodsController@list');

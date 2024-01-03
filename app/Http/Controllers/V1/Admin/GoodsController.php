@@ -17,23 +17,9 @@ class GoodsController extends Controller
 
     public function list()
     {
+        /** @var GoodsListInput $input */
         $input = GoodsListInput::new();
-        $columns = [
-            'id',
-            'image',
-            'name',
-            'category_id',
-            'price',
-            'stock',
-            'sales_commission_rate',
-            'promotion_commission_rate',
-            'sales_volume',
-            'status',
-            'failure_reason',
-            'created_at',
-            'updated_at'
-        ];
-        $list = GoodsService::getInstance()->getMerchantGoodsList($input, $columns);
+        $list = GoodsService::getInstance()->getMerchantGoodsList($input);
         return $this->successPaginate($list);
     }
 

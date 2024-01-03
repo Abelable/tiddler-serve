@@ -91,7 +91,14 @@ class GoodsCategoryController extends Controller
 
     public function options()
     {
-        $options = GoodsCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions();
+        return $this->success($options);
+    }
+
+    public function filterOptions()
+    {
+        $shopCategoryId = $this->verifyRequiredId('shopCategoryId');
+        $options = GoodsCategoryService::getInstance()->getOptionsByShopCategoryId($shopCategoryId, ['id', 'name']);
         return $this->success($options);
     }
 }
