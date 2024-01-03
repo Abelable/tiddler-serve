@@ -19,6 +19,8 @@ class CreateGoodsTable extends Migration
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
+            $table->integer('category_id')->comment('商品分类id');
+            $table->integer('shop_category_id')->comment('所属店铺分类id');
             $table->string('image')->comment('列表图片');
             $table->string('video')->default('')->comment('主图视频');
             $table->longText('image_list')->comment('主图图片列表');
@@ -26,7 +28,6 @@ class CreateGoodsTable extends Migration
             $table->string('default_spec_image')->comment('默认规格图片');
             $table->string('name')->comment('商品名称');
             $table->integer('freight_template_id')->default(0)->comment('运费模板id：0-包邮');
-            $table->integer('category_id')->comment('商品分类id');
             $table->integer('return_address_id')->comment('退货地址id');
             $table->float('price')->comment('商品价格');
             $table->float('market_price')->default(0)->comment('市场价格');

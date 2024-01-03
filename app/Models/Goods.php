@@ -12,6 +12,8 @@ use Laravel\Scout\Searchable;
  * @property int $shop_id 店铺id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
+ * @property int $category_id 商品分类id
+ * @property int $shop_category_id 所属店铺分类id
  * @property string $image 列表图片
  * @property string $video 主图视频
  * @property string $image_list 主图图片列表
@@ -19,7 +21,6 @@ use Laravel\Scout\Searchable;
  * @property string $default_spec_image 默认规格图片
  * @property string $name 商品名称
  * @property int $freight_template_id 运费模板id：0-包邮
- * @property int $category_id 商品分类id
  * @property int $return_address_id 退货地址id
  * @property float $price 商品价格
  * @property float $market_price 市场价格
@@ -53,6 +54,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereReturnAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSkuList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSpecList($value)
