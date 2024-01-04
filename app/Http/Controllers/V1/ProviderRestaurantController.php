@@ -44,23 +44,14 @@ class ProviderRestaurantController extends Controller
 
     public function apply()
     {
-        $restaurantId = $this->verifyRequiredId('restaurantId');
+        $restaurantIds = $this->verifyArrayNotEmpty('restaurantIds');
 
         $cateringProvider = $this->user()->cateringProvider;
         if (is_null($cateringProvider)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加门店');
         }
 
-        $providerRestaurant = ProviderRestaurantService::getInstance()->getUserRestaurant($this->userId(), $restaurantId);
-        if (!is_null($providerRestaurant)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前门店');
-        }
-
-        $providerRestaurant = ProviderRestaurant::new();
-        $providerRestaurant->user_id = $this->userId();
-        $providerRestaurant->provider_id = $cateringProvider->id;
-        $providerRestaurant->restaurant_id = $restaurantId;
-        $providerRestaurant->save();
+        ProviderRestaurantService::getInstance()->createRestaurant($this->userId(), $cateringProvider->id, $restaurantIds);
         return $this->success();
     }
 

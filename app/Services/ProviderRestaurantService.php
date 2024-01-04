@@ -24,6 +24,22 @@ class ProviderRestaurantService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function createRestaurant($userId, $providerId, array $restaurantIds)
+    {
+        foreach ($restaurantIds as $restaurantId) {
+            $restaurant = $this->getUserRestaurant($userId, $restaurantId);
+            if (!is_null($restaurant)) {
+                $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '包含已添加门店，请重试');
+            }
+
+            $restaurant = ProviderRestaurant::new();
+            $restaurant->user_id = $userId;
+            $restaurant->provider_id = $providerId;
+            $restaurant->restaurant_id = $restaurantId;
+            $restaurant->save();
+        }
+    }
+
     public function getRestaurant($id, $columns = ['*'])
     {
         $restaurant = ProviderRestaurant::query()->find($id, $columns);
