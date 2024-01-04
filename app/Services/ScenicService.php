@@ -7,6 +7,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
+use App\Utils\Inputs\ScenicInput;
 use App\Utils\Inputs\SearchPageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -21,15 +22,12 @@ class ScenicService extends BaseService
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
-        if (!is_null($input->status)) {
-            $query = $query->where('status', $input->status);
-        }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getScenicPage(CommonPageInput $input, $columns=['*'])
     {
-        $query = ScenicSpot::query()->where('status', 1);
+        $query = ScenicSpot::query();
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
@@ -49,7 +47,6 @@ class ScenicService extends BaseService
     public function search(SearchPageInput $input)
     {
         return ScenicSpot::search($input->keywords)
-            ->where('status', 1)
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
@@ -57,7 +54,7 @@ class ScenicService extends BaseService
 
     public function getNearbyList(NearbyPageInput $input, $columns = ['*'])
     {
-        $query = ScenicSpot::query()->where('status', 1);
+        $query = ScenicSpot::query();
         if (!empty($input->id)) {
             $query = $query->where('id', '!=', $input->id);
         }
@@ -90,6 +87,16 @@ class ScenicService extends BaseService
         return $scenic;
     }
 
+    public function getUserScenic($userId, $scenicId, $columns = ['*'])
+    {
+        return ScenicSpot::query()->where('user_id', $userId)->find($scenicId, $columns);
+    }
+
+    public function getScenicByName($name, $columns = ['*'])
+    {
+        return ScenicSpot::query()->where('name', $name)->first($columns);
+    }
+
     public function getScenicListByIds(array $ids, $columns = ['*'])
     {
         return ScenicSpot::query()->whereIn('id', $ids)->get($columns);
@@ -98,5 +105,29 @@ class ScenicService extends BaseService
     public function getScenicOptions($columns = ['*'])
     {
         return ScenicSpot::query()->orderBy('id', 'asc')->get($columns);
+    }
+
+    public function updateScenic(ScenicSpot $scenic, ScenicInput $input)
+    {
+        $scenic->name = $input->name;
+        $scenic->level = $input->level;
+        $scenic->category_id = $input->categoryId;
+        if (!empty($input->video)) {
+            $scenic->video = $input->video;
+        }
+        $scenic->image_list = json_encode($input->imageList);
+        $scenic->latitude = $input->latitude;
+        $scenic->longitude = $input->longitude;
+        $scenic->address = $input->address;
+        $scenic->brief = $input->brief;
+        $scenic->open_time_list = json_encode($input->openTimeList);
+        $scenic->policy_list = json_encode($input->policyList);
+        $scenic->hotline_list = json_encode($input->hotlineList);
+        $scenic->project_list = json_encode($input->projectList);
+        $scenic->facility_list = json_encode($input->facilityList);
+        $scenic->tips_list = json_encode($input->tipsList);
+        $scenic->save();
+
+        return $scenic;
     }
 }

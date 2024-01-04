@@ -4,15 +4,18 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
+use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
+use App\Utils\Inputs\ScenicInput;
 use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'options'];
+    protected $only = ['add', 'edit'];
 
     public function categoryOptions()
     {
@@ -74,5 +77,37 @@ class ScenicController extends Controller
     {
         $scenicOptions = ScenicService::getInstance()->getScenicOptions(['id', 'name']);
         return $this->success($scenicOptions);
+    }
+
+    public function add()
+    {
+        /** @var ScenicInput $input */
+        $input = ScenicInput::new();
+
+        $scenic = ScenicService::getInstance()->getScenicByName($input->name);
+        if (!is_null($scenic)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '已存在相同名称景点');
+        }
+
+        $scenic = ScenicSpot::new();
+        ScenicService::getInstance()->updateScenic($scenic, $input);
+        return $this->success();
+    }
+
+    public function edit()
+    {
+        $id = $this->verifyRequiredId('id');
+        /** @var ScenicInput $input */
+        $input = ScenicInput::new();
+
+        $providerScenicSpot = ProviderScenicSpotService::getInstance()->getSpotByScenicId($this->userId(), $id);
+        if (is_null($providerScenicSpot)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '暂无该景点编辑权限');
+        }
+
+        $scenic = ScenicService::getInstance()->getScenicById($id);
+        ScenicService::getInstance()->updateScenic($scenic, $input);
+
+        return $this->success();
     }
 }

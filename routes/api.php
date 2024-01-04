@@ -137,6 +137,8 @@ Route::prefix('scenic')->group(function () {
     Route::get('nearby_list', 'ScenicController@nearbyList');
     Route::get('detail', 'ScenicController@detail');
     Route::get('options', 'ScenicController@options');
+    Route::post('add', 'ScenicController@add');
+    Route::post('edit', 'ScenicController@edit');
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'ScenicProviderController@settleIn');
