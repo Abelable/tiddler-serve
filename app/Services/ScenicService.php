@@ -77,6 +77,31 @@ class ScenicService extends BaseService
         if (is_null($scenic)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
         }
+        return $this->decodeScenicInfo($scenic);
+    }
+
+    public function getUserScenic($userId, $scenicId, $columns = ['*'])
+    {
+        $scenic = ScenicSpot::query()->where('user_id', $userId)->find($scenicId, $columns);
+        if (is_null($scenic)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
+        }
+        return $this->decodeScenicInfo($scenic);
+    }
+
+    public function getScenicByName($name, $columns = ['*'])
+    {
+        $scenic = ScenicSpot::query()->where('name', $name)->first($columns);
+        if (is_null($scenic)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
+        }
+        return $this->decodeScenicInfo($scenic);
+    }
+
+    private function decodeScenicInfo(ScenicSpot $scenic)
+    {
+        $scenic->longitude = (float) $scenic->longitude;
+        $scenic->latitude = (float) $scenic->latitude;
         $scenic->image_list = json_decode($scenic->image_list);
         $scenic->open_time_list = json_decode($scenic->open_time_list);
         $scenic->policy_list = json_decode($scenic->policy_list);
@@ -85,16 +110,6 @@ class ScenicService extends BaseService
         $scenic->tips_list = json_decode($scenic->tips_list);
         $scenic->project_list = json_decode($scenic->project_list);
         return $scenic;
-    }
-
-    public function getUserScenic($userId, $scenicId, $columns = ['*'])
-    {
-        return ScenicSpot::query()->where('user_id', $userId)->find($scenicId, $columns);
-    }
-
-    public function getScenicByName($name, $columns = ['*'])
-    {
-        return ScenicSpot::query()->where('name', $name)->first($columns);
     }
 
     public function getScenicListByIds(array $ids, $columns = ['*'])
