@@ -20,7 +20,7 @@ class GoodsReturnAddressController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'consignee_name', 'mobile', 'address', 'supplement'];
+        $columns = ['id', 'consignee_name', 'mobile', 'address_detail', 'supplement'];
         $detail = GoodsReturnAddressService::getInstance()->getAddressById($id, $columns);
         return $this->success($detail);
     }

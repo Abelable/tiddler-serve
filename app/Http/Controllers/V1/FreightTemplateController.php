@@ -21,9 +21,6 @@ class FreightTemplateController extends Controller
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'mode', 'name', 'title', 'compute_mode', 'free_quota', 'area_list', 'express_list', 'express_template_lists'];
         $detail = FreightTemplateService::getInstance()->getFreightTemplateById($id, $columns);
-        $detail->area_list = json_decode($detail->area_list);
-        $detail->express_list = json_decode($detail->express_list);
-        $detail->express_template_lists = json_decode($detail->express_template_lists);
         return $this->success($detail);
     }
 
