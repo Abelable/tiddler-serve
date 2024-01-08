@@ -25,8 +25,8 @@ use Laravel\Scout\Searchable;
  * @property float $price 商品价格
  * @property float $market_price 市场价格
  * @property int $stock 商品库存
- * @property int $sales_commission_rate 销售佣金比例%
- * @property int $promotion_commission_rate 推广佣金比例%
+ * @property float $sales_commission_rate 销售佣金比例%
+ * @property float $promotion_commission_rate 推广佣金比例%
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
  * @property int $sales_volume 商品销量
