@@ -276,8 +276,8 @@ class GoodsService extends BaseService
         }
         $goods->image = $input->image;
         $goods->video = $input->video ?: '';
-        $goods->image_list = $input->imageList;
-        $goods->detail_image_list = $input->detailImageList;
+        $goods->image_list = json_encode($input->imageList);
+        $goods->detail_image_list = json_encode($input->detailImageList);
         $goods->default_spec_image = $input->defaultSpecImage;
         $goods->name = $input->name;
         $goods->freight_template_id = $input->freightTemplateId;
@@ -288,8 +288,8 @@ class GoodsService extends BaseService
         $goods->stock = $input->stock;
         $goods->sales_commission_rate = $input->salesCommissionRate;
         $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->spec_list = $input->specList;
-        $goods->sku_list = $input->skuList;
+        $goods->spec_list = json_encode($input->specList);
+        $goods->sku_list = json_encode($input->skuList);
         $goods->save();
 
         return $goods;

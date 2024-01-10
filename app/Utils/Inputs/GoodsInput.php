@@ -26,8 +26,8 @@ class GoodsInput extends BaseInput
         return [
             'image' => 'required|string',
             'video' => 'string',
-            'imageList' => 'required|string',
-            'detailImageList' => 'required|string',
+            'imageList' => 'required|array',
+            'detailImageList' => 'required|array',
             'defaultSpecImage' => 'required|string',
             'name' => 'required|string',
             'freightTemplateId' => 'required|integer|digits_between:1,20',
@@ -38,8 +38,8 @@ class GoodsInput extends BaseInput
             'stock' => 'required|integer',
             'salesCommissionRate' => 'required|numeric',
             'promotionCommissionRate' => 'required|numeric',
-            'specList' => 'required|string',
-            'skuList' => 'required|string',
+            'specList' => 'required|array',
+            'skuList' => 'required|array',
         ];
     }
 }
