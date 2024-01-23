@@ -20,7 +20,7 @@ class MallController extends Controller
         $scenicColumns = [
             'id',
             DB::raw('NULL as shop_id'),
-            'status',
+            DB::raw('NULL as status'),
             'name',
             DB::raw('NULL as cover'),
             DB::raw('NULL as image'),
@@ -36,7 +36,7 @@ class MallController extends Controller
         $hotelColumns = [
             'id',
             DB::raw('NULL as shop_id'),
-            'status',
+            DB::raw('NULL as status'),
             'name',
             'cover',
             DB::raw('NULL as image'),

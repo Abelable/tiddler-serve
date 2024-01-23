@@ -12,8 +12,8 @@ class MallService extends BaseService
 {
     public function pageList(PageInput $input, $scenicColumns = ['*'], $hotelColumns = ['*'], $restaurantColumns = ['*'], $goodsColumns = ['*'])
     {
-        $scenicQuery = ScenicSpot::query()->select($scenicColumns)->where('status', 1)->selectRaw("1 as type");
-        $hotelQuery = Hotel::query()->select($hotelColumns)->where('status', 1)->selectRaw("2 as type");
+        $scenicQuery = ScenicSpot::query()->select($scenicColumns)->selectRaw("1 as type");
+        $hotelQuery = Hotel::query()->select($hotelColumns)->selectRaw("2 as type");
         $restaurantQuery = Restaurant::query()->select($restaurantColumns)->selectRaw("3 as type");
         $goodsQuery = Goods::query()->select($goodsColumns)->where('status', 1)->selectRaw("4 as type");
         $mallQuery = $scenicQuery->union($hotelQuery)->union($restaurantQuery)->union($goodsQuery);
