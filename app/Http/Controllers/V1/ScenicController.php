@@ -15,7 +15,7 @@ use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
 {
-    protected $only = ['add', 'edit'];
+    protected $only = ['add', 'edit', 'providerOptions'];
 
     public function categoryOptions()
     {
@@ -109,5 +109,12 @@ class ScenicController extends Controller
         ScenicService::getInstance()->updateScenic($scenic, $input);
 
         return $this->success();
+    }
+
+    public function providerOptions()
+    {
+        $providerScenicIds = ProviderScenicSpotService::getInstance()->getUserScenicOptions($this->userId())->pluck('scenic_id')->toArray();
+        $options = ScenicService::getInstance()->getProviderScenicOptions($providerScenicIds, ['id', 'name']);
+        return $this->success($options);
     }
 }

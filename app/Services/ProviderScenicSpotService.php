@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProviderScenicSpot;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 
 class ProviderScenicSpotService extends BaseService
@@ -50,5 +51,21 @@ class ProviderScenicSpotService extends BaseService
     public function getUserScenicOptions($userId, $columns = ['*'])
     {
         return ProviderScenicSpot::query()->where('user_id', $userId)->get($columns);
+    }
+
+    public function createScenicList($userId, $providerId, array $scenicIds)
+    {
+        foreach ($scenicIds as $scenicId) {
+            $scenic = $this->getUserSpotById($userId, $scenicId);
+            if (!is_null($scenic)) {
+                $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '包含已添加景点，请重试');
+            }
+
+            $scenic = ProviderScenicSpot::new();
+            $scenic->user_id = $userId;
+            $scenic->provider_id = $providerId;
+            $scenic->scenic_id = $scenicId;
+            $scenic->save();
+        }
     }
 }

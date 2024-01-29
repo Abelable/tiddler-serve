@@ -24,7 +24,7 @@ class ProviderRestaurantService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function createRestaurant($userId, $providerId, array $restaurantIds)
+    public function createRestaurants($userId, $providerId, array $restaurantIds)
     {
         foreach ($restaurantIds as $restaurantId) {
             $restaurant = $this->getUserRestaurant($userId, $restaurantId);

@@ -139,17 +139,21 @@ Route::prefix('scenic')->group(function () {
     Route::get('options', 'ScenicController@options');
     Route::post('add', 'ScenicController@add');
     Route::post('edit', 'ScenicController@edit');
+    Route::get('provider_options', 'ScenicController@providerOptions');
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'ScenicProviderController@settleIn');
         Route::get('status', 'ScenicProviderController@statusInfo');
         Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
         Route::post('delete', 'ScenicProviderController@deleteProvider');
-        Route::get('scenic_list_totals', 'ScenicProviderController@scenicListTotals');
-        Route::get('scenic_list', 'ScenicProviderController@providerScenicSpotList');
-        Route::post('apply_scenic', 'ScenicProviderController@applyScenicSpot');
-        Route::post('delete_scenic', 'ScenicProviderController@deleteProviderScenicSpot');
-        Route::get('scenic_options', 'ScenicProviderController@providerScenicOptions');
+
+        Route::prefix('scenic')->group(function () {
+            Route::get('totals', 'ProviderScenicController@listTotals');
+            Route::get('list', 'ProviderScenicController@list');
+            Route::post('apply', 'ProviderScenicController@apply');
+            Route::post('delete', 'ProviderScenicController@delete');
+            Route::get('options', 'ProviderScenicController@options');
+        });
 
         Route::prefix('ticket')->group(function () {
             Route::get('totals', 'ScenicTicketController@ticketListTotals');

@@ -51,7 +51,7 @@ class ProviderRestaurantController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加门店');
         }
 
-        ProviderRestaurantService::getInstance()->createRestaurant($this->userId(), $cateringProvider->id, $restaurantIds);
+        ProviderRestaurantService::getInstance()->createRestaurants($this->userId(), $cateringProvider->id, $restaurantIds);
         return $this->success();
     }
 

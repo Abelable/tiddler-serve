@@ -145,4 +145,9 @@ class ScenicService extends BaseService
 
         return $scenic;
     }
+
+    public function getProviderScenicOptions($scenicIds, $columns = ['*'])
+    {
+        return ScenicSpot::query()->whereNotIn('id', $scenicIds)->get($columns);
+    }
 }
