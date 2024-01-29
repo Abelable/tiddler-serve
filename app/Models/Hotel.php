@@ -8,8 +8,6 @@ use Laravel\Scout\Searchable;
  * App\Models\Hotel
  *
  * @property int $id
- * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过
- * @property string $failure_reason 审核失败原因
  * @property int $category_id 酒店分类id
  * @property string $name 酒店名称
  * @property string $english_name 酒店英文名称
@@ -68,7 +66,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereEnglishName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereEnvironmentImageList($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereFeatureTagList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereGrade($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereHealthFacility($value)
@@ -90,7 +87,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRestaurantImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomNum($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTrafficService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereUpdatedAt($value)
