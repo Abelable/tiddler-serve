@@ -35,7 +35,7 @@ class HotelService extends BaseService
 
     public function getHotelPage(CommonPageInput $input, $columns=['*'])
     {
-        $query = Hotel::query()->where('status', 1);
+        $query = Hotel::query();
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
@@ -55,7 +55,6 @@ class HotelService extends BaseService
     public function search(SearchPageInput $input)
     {
         return Hotel::search($input->keywords)
-            ->where('status', 1)
             ->orderBy('rate', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
@@ -63,7 +62,7 @@ class HotelService extends BaseService
 
     public function getNearbyList(NearbyPageInput $input, $columns = ['*'])
     {
-        $query = Hotel::query()->where('status', 1);
+        $query = Hotel::query();
         if (!empty($input->id)) {
             $query = $query->where('id', '!=', $input->id);
         }
@@ -121,7 +120,6 @@ class HotelService extends BaseService
 
     public function createHotel(HotelInput $input) {
         $hotel = Hotel::new();
-        $hotel->status = 1;
         return $this->updateHotel($hotel, $input);
     }
 
