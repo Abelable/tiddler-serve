@@ -3,16 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProviderHotel;
-use App\Models\Hotel;
-use App\Services\ProviderHotelService;
 use App\Services\HotelProviderOrderService;
 use App\Services\HotelProviderService;
-use App\Services\HotelService;
 use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelProviderInput;
-use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -75,80 +70,5 @@ class HotelProviderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
         return $this->success($shop);
-    }
-
-    public function hotelListTotals()
-    {
-        return $this->success([
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 0),
-            ProviderHotelService::getInstance()->getListTotal($this->userId(), 2),
-        ]);
-    }
-
-    public function providerHotelList()
-    {
-        /** @var StatusPageInput $input */
-        $input = StatusPageInput::new();
-
-        $page = ProviderHotelService::getInstance()->getUserHotelList($this->userId(), $input, ['id', 'hotel_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
-        $providerHotelList = collect($page->items());
-        $hotelIds = $providerHotelList->pluck('hotel_id')->toArray();
-        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name', 'cover', 'grade', 'address'])->keyBy('id');
-        $list = $providerHotelList->map(function (ProviderHotel $providerHotel) use ($hotelList) {
-            /** @var Hotel $hotel */
-            $hotel = $hotelList->get($providerHotel->hotel_id);
-            $providerHotel['hotel_cover'] = $hotel->cover;
-            $providerHotel['hotel_name'] = $hotel->name;
-            $providerHotel['hotel_grade'] = $hotel->grade;
-            $providerHotel['hotel_address'] = $hotel->address;
-            return $providerHotel;
-        });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function applyHotel()
-    {
-        $hotelId = $this->verifyRequiredId('hotelId');
-
-        if (is_null($this->user()->hotelShop)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加酒店');
-        }
-
-        $hotel = HotelService::getInstance()->getHotelById($hotelId);
-        if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '酒店不存在');
-        }
-
-        $providerHotel = ProviderHotelService::getInstance()->getHotelByHotelId($this->userId(), $hotelId);
-        if (!is_null($providerHotel)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '您已添加过当前酒店');
-        }
-
-        $providerHotel = ProviderHotel::new();
-        $providerHotel->user_id = $this->userId();
-        $providerHotel->provider_id = $this->user()->hotelProvider->id;
-        $providerHotel->hotel_id = $hotelId;
-        $providerHotel->save();
-        return $this->success();
-    }
-
-    public function deleteProviderHotel()
-    {
-        $id = $this->verifyRequiredId('id');
-        $hotel = ProviderHotelService::getInstance()->getUserHotelById($this->userId(), $id);
-        if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '供应商酒店不存在');
-        }
-        $hotel->delete();
-        return $this->success();
-    }
-
-    public function providerHotelOptions()
-    {
-        $hotelIds = ProviderHotelService::getInstance()->getUserHotelOptions($this->userId())->pluck('hotel_id')->toArray();
-        $hotelOptions = HotelService::getInstance()->getHotelListByIds($hotelIds, ['id', 'name']);
-        return $this->success($hotelOptions);
     }
 }

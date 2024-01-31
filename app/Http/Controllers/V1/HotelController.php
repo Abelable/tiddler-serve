@@ -12,7 +12,6 @@ use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
-use PhpParser\Node\Expr\New_;
 
 class HotelController extends Controller
 {

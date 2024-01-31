@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ProviderHotel;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ProviderHotelListInput;
 use App\Utils\Inputs\StatusPageInput;
 
@@ -51,5 +52,21 @@ class ProviderHotelService extends BaseService
     public function getUserHotelOptions($userId, $columns = ['*'])
     {
         return ProviderHotel::query()->where('user_id', $userId)->get($columns);
+    }
+
+    public function createHotels($userId, $providerId, array $hotelIds)
+    {
+        foreach ($hotelIds as $hotelId) {
+            $hotel = $this->getUserHotelById($userId, $hotelId);
+            if (!is_null($hotel)) {
+                $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '包含已添加酒店，请重试');
+            }
+
+            $providerHotel = ProviderHotel::new();
+            $providerHotel->user_id = $userId;
+            $providerHotel->provider_id = $providerId;
+            $providerHotel->hotel_id = $hotelId;
+            $providerHotel->save();
+        }
     }
 }

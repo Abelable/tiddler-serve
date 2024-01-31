@@ -208,11 +208,14 @@ Route::prefix('hotel')->group(function () {
         Route::get('status', 'HotelProviderController@statusInfo');
         Route::post('pay_deposit', 'HotelProviderController@payDeposit');
         Route::post('delete', 'HotelProviderController@deleteProvider');
-        Route::get('hotel_list_totals', 'HotelProviderController@hotelListTotals');
-        Route::get('hotel_list', 'HotelProviderController@providerHotelList');
-        Route::post('apply_hotel', 'HotelProviderController@applyHotel');
-        Route::post('delete_hotel', 'HotelProviderController@deleteProviderHotel');
-        Route::get('hotel_options', 'HotelProviderController@providerHotelOptions');
+
+        Route::prefix('hotel')->group(function () {
+            Route::get('totals', 'ProviderHotelController@listTotals');
+            Route::get('list', 'ProviderHotelController@list');
+            Route::post('apply', 'ProviderHotelController@apply');
+            Route::post('delete', 'ProviderHotelController@delete');
+            Route::get('options', 'ProviderHotelController@options');
+        });
 
         Route::prefix('room')->group(function () {
             Route::get('totals', 'HotelRoomController@roomListTotals');
