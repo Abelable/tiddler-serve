@@ -85,6 +85,20 @@ class HotelService extends BaseService
         if (is_null($hotel)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '酒店不存在');
         }
+        return $this->handleHotelInfo($hotel);
+    }
+
+    public function getHotelByName($name, $columns=['*'])
+    {
+        $hotel = Hotel::query()->where('name', $name)->first($columns);
+        if (is_null($hotel)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '酒店不存在');
+        }
+        return $this->handleHotelInfo($hotel);
+    }
+
+    private function handleHotelInfo(Hotel $hotel)
+    {
         $hotel->appearance_image_list = json_decode($hotel->appearance_image_list);
         $hotel->interior_image_list = json_decode($hotel->interior_image_list);
         $hotel->room_image_list = json_decode($hotel->room_image_list);
@@ -168,5 +182,10 @@ class HotelService extends BaseService
         $hotel->save();
 
         return $hotel;
+    }
+
+    public function getProviderHotelOptions(array $hotelIds, $columns = ['*'])
+    {
+        return Hotel::query()->whereNotIn('id', $hotelIds)->get($columns);
     }
 }

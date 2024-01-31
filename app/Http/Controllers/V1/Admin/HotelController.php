@@ -17,8 +17,6 @@ class HotelController extends Controller
         $input = HotelPageInput::new();
         $columns = [
             'id',
-            'status',
-            'failure_reason',
             'cover',
             'name',
             'grade',

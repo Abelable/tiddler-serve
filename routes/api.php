@@ -199,6 +199,9 @@ Route::prefix('hotel')->group(function () {
     Route::get('nearby_list', 'HotelController@nearbyList');
     Route::get('detail', 'HotelController@detail');
     Route::get('options', 'HotelController@options');
+    Route::post('add', 'HotelController@add');
+    Route::post('edit', 'HotelController@edit');
+    Route::get('provider_options', 'HotelController@providerOptions');
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'HotelProviderController@settleIn');

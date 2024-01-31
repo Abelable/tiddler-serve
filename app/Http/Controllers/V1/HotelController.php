@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
+use App\Services\ProviderHotelService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\SearchPageInput;
 use PhpParser\Node\Expr\New_;
 
 class HotelController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'options'];
+    protected $only = ['add', 'edit', 'providerOptions'];
 
     public function categoryOptions()
     {
@@ -78,5 +81,48 @@ class HotelController extends Controller
     {
         $hotelOptions = HotelService::getInstance()->getHotelOptions(['id', 'name']);
         return $this->success($hotelOptions);
+    }
+
+    public function add()
+    {
+        /** @var HotelInput $input */
+        $input = HotelInput::new();
+
+        $hotel = HotelService::getInstance()->getHotelByName($input->name);
+        if (!is_null($hotel)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '已存在相同名称酒店');
+        }
+
+        $hotel = Hotel::new();
+        HotelService::getInstance()->updateHotel($hotel, $input);
+
+        return $this->success();
+    }
+
+    public function edit()
+    {
+        $id = $this->verifyRequiredId('id');
+        /** @var HotelInput $input */
+        $input = HotelInput::new();
+
+        $providerHotel = ProviderHotelService::getInstance()->getHotelByHotelId($this->userId(), $id);
+        if (is_null($providerHotel)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '暂未改酒店编辑权限');
+        }
+
+        $hotel = HotelService::getInstance()->getHotelById($id);
+        HotelService::getInstance()->updateHotel($hotel, $input);
+
+        return $this->success();
+    }
+
+    public function providerOptions()
+    {
+        $providerHotelIds = ProviderHotelService::getInstance()
+            ->getUserHotelOptions($this->userId())
+            ->pluck('hotel_id')
+            ->toArray();
+        $options = HotelService::getInstance()->getProviderHotelOptions($providerHotelIds, ['id', 'name']);
+        return $this->success($options);
     }
 }
