@@ -8,7 +8,11 @@ use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\GoodsService;
 use App\Services\Media\MediaService;
+use App\Services\Media\Note\TourismNoteCollectionService;
+use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
+use App\Services\Media\ShortVideo\ShortVideoCollectionService;
+use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\Inputs\PageInput;
@@ -106,13 +110,34 @@ class MediaController extends Controller
         $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList);
         $mediaList = collect($page->items());
 
+        $videoList = $mediaList->filter(function ($media) {
+            return $media->type == 2;
+        });
+        $videoIds = $videoList->pluck('id')->toArray();
+        $videoLikeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
+        $videoCollectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
+
+        $noteList = $mediaList->filter(function ($media) {
+            return $media->type == 3;
+        });
+        $noteIds = $noteList->pluck('id')->toArray();
+        $noteLikeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
+        $noteCollectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
+
         $authorIds = $mediaList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
 
         $goodsIds = $mediaList->pluck('goods_id')->toArray();
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
-        $list = collect($page->items())->map(function ($media) use ($authorList, $goodsList) {
+        $list = $mediaList->map(function ($media) use (
+            $authorList,
+            $goodsList,
+            $videoLikeUserIdsGroup,
+            $videoCollectedUserIdsGroup,
+            $noteLikeUserIdsGroup,
+            $noteCollectedUserIdsGroup
+        ) {
             $authorInfo = $authorList->get($media['user_id']);
             if ($media['type'] == 1) {
                 $media['anchorInfo'] = $authorInfo;
@@ -128,6 +153,23 @@ class MediaController extends Controller
             if ($media['type'] == 3) {
                 $media['image_list'] = json_decode($media['image_list']);
             }
+
+            if ($media['type'] == 2) {
+                $videoLikeUserIds = $videoLikeUserIdsGroup->get($media->id) ?? [];
+                $media['isLike'] = in_array($this->userId(), $videoLikeUserIds);
+
+                $videoCollectedUserIds = $videoCollectedUserIdsGroup->get($media->id) ?? [];
+                $media['isCollected'] = in_array($this->userId(), $videoCollectedUserIds);
+            }
+
+            if ($media['type'] == 3) {
+                $noteLikeUserIds = $noteLikeUserIdsGroup->get($media->id) ?? [];
+                $media['isLike'] = in_array($this->userId(), $noteLikeUserIds);
+
+                $noteCollectedUserIds = $noteCollectedUserIdsGroup->get($media->id) ?? [];
+                $media['isCollected'] = in_array($this->userId(), $noteCollectedUserIds);
+            }
+
 
             unset($media['user_id']);
 
