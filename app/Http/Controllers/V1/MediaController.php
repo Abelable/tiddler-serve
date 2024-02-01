@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\FanService;
+use App\Services\GoodsService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoService;
@@ -30,10 +31,10 @@ class MediaController extends Controller
         $input = PageInput::new();
 
         $authorIds = FanService::getInstance()->authorIds($this->userId());
-        return $this->getMediaList($input, $authorIds);
+        return $this->getMediaList($input, $authorIds, false);
     }
 
-    private function getMediaList(PageInput $input, $authorIds = null)
+    private function getMediaList(PageInput $input, $authorIds = null, $withLiveList = true)
     {
         $videoColumns = [
             'id',
@@ -54,6 +55,7 @@ class MediaController extends Controller
             DB::raw('NULL as viewers_number'),
             DB::raw('NULL as praise_number'),
             DB::raw('NULL as notice_time'),
+            'goods_id',
             'created_at',
         ];
         $noteColumns = [
@@ -75,6 +77,7 @@ class MediaController extends Controller
             DB::raw('NULL as viewers_number'),
             DB::raw('NULL as praise_number'),
             DB::raw('NULL as notice_time'),
+            'goods_id',
             'created_at',
         ];
         $liveColumns = [
@@ -96,19 +99,30 @@ class MediaController extends Controller
             'viewers_number',
             'praise_number',
             'notice_time',
+            DB::raw('NULL as goods_id'),
             'created_at',
         ];
 
-        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, true, $authorIds);
+        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList);
         $mediaList = collect($page->items());
+
         $authorIds = $mediaList->pluck('user_id')->toArray();
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $list = collect($page->items())->map(function ($media) use ($authorList) {
+
+        $goodsIds = $mediaList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
+
+        $list = collect($page->items())->map(function ($media) use ($authorList, $goodsList) {
             $authorInfo = $authorList->get($media['user_id']);
             if ($media['type'] == 1) {
                 $media['anchorInfo'] = $authorInfo;
             } else {
                 $media['authorInfo'] = $authorInfo;
+            }
+
+            $goodsInfo = $goodsList->get($media['goods_id']);
+            if ($media['type'] != 1) {
+                $media['goodsInfo'] = $goodsInfo;
             }
 
             if ($media['type'] == 3) {

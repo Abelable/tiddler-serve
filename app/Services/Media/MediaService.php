@@ -14,7 +14,7 @@ use App\Utils\Inputs\PageInput;
 
 class MediaService extends BaseService
 {
-    public function pageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $withLiveList = true, $authorIds = null)
+    public function pageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $authorIds = null, $withLiveList = true)
     {
         $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
         if (!is_null($authorIds)) {
@@ -49,7 +49,6 @@ class MediaService extends BaseService
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }
-
 
     public function collectPageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
     {
