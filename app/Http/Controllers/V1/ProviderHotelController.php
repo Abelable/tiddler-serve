@@ -12,7 +12,7 @@ use App\Utils\Inputs\StatusPageInput;
 
 class ProviderHotelController extends Controller
 {
-    public function totals()
+    public function listTotals()
     {
         return $this->success([
             ProviderHotelService::getInstance()->getListTotal($this->userId(), 1),
