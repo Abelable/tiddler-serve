@@ -154,22 +154,23 @@ class MediaController extends Controller
                 $media['image_list'] = json_decode($media['image_list']);
             }
 
-            if ($media['type'] == 2) {
-                $videoLikeUserIds = $videoLikeUserIdsGroup->get($media->id) ?? [];
-                $media['isLike'] = in_array($this->userId(), $videoLikeUserIds);
+            if ($this->isLogin()) {
+                if ($media['type'] == 2) {
+                    $videoLikeUserIds = $videoLikeUserIdsGroup->get($media->id) ?? [];
+                    $media['isLike'] = in_array($this->userId(), $videoLikeUserIds);
 
-                $videoCollectedUserIds = $videoCollectedUserIdsGroup->get($media->id) ?? [];
-                $media['isCollected'] = in_array($this->userId(), $videoCollectedUserIds);
+                    $videoCollectedUserIds = $videoCollectedUserIdsGroup->get($media->id) ?? [];
+                    $media['isCollected'] = in_array($this->userId(), $videoCollectedUserIds);
+                }
+
+                if ($media['type'] == 3) {
+                    $noteLikeUserIds = $noteLikeUserIdsGroup->get($media->id) ?? [];
+                    $media['isLike'] = in_array($this->userId(), $noteLikeUserIds);
+
+                    $noteCollectedUserIds = $noteCollectedUserIdsGroup->get($media->id) ?? [];
+                    $media['isCollected'] = in_array($this->userId(), $noteCollectedUserIds);
+                }
             }
-
-            if ($media['type'] == 3) {
-                $noteLikeUserIds = $noteLikeUserIdsGroup->get($media->id) ?? [];
-                $media['isLike'] = in_array($this->userId(), $noteLikeUserIds);
-
-                $noteCollectedUserIds = $noteCollectedUserIdsGroup->get($media->id) ?? [];
-                $media['isCollected'] = in_array($this->userId(), $noteCollectedUserIds);
-            }
-
 
             unset($media['user_id']);
 
