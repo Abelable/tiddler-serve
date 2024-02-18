@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
+use App\Models\CartGoods;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Services\AddressService;
-use App\Services\CartService;
+use App\Services\CartGoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\ShopService;
@@ -15,7 +15,6 @@ use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -35,7 +34,7 @@ class OrderController extends Controller
         }
 
         $cartListColumns = ['shop_id', 'goods_image', 'goods_name', 'selected_sku_name', 'price', 'number'];
-        $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $cartIds, $cartListColumns);
+        $cartList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartIds, $cartListColumns);
 
         $freightPrice = 0;
         $totalPrice = 0;
@@ -53,9 +52,9 @@ class OrderController extends Controller
         $goodsLists = $shopList->map(function (Shop $shop) use ($cartList) {
             return [
                 'shopInfo' => $shop,
-                'goodsList' => $cartList->filter(function (Cart $cart) use ($shop) {
+                'goodsList' => $cartList->filter(function (CartGoods $cart) use ($shop) {
                     return $cart->shop_id == $shop->id;
-                })->map(function (Cart $cart) {
+                })->map(function (CartGoods $cart) {
                     unset($cart->shop_id);
                     return $cart;
                 })
@@ -63,9 +62,9 @@ class OrderController extends Controller
         });
         if (in_array(0, $shopIds)) {
             $goodsLists->prepend([
-                'goodsList' => $cartList->filter(function (Cart $cart) {
+                'goodsList' => $cartList->filter(function (CartGoods $cart) {
                     return $cart->shop_id == 0;
-                })->map(function (Cart $cart) {
+                })->map(function (CartGoods $cart) {
                     unset($cart->shop_id);
                     return $cart;
                 })
@@ -102,20 +101,20 @@ class OrderController extends Controller
             }
 
             // 2.获取购物车商品
-            $cartList = CartService::getInstance()->getCartListByIds($this->userId(), $input->cartIds);
+            $cartList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $input->cartIds);
 
             // 3.按商家进行订单拆分，生成对应订单
             $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 
             $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartList) {
-                $filterCartList = $cartList->filter(function (Cart $cart) use ($shop) {
+                $filterCartList = $cartList->filter(function (CartGoods $cart) use ($shop) {
                     return $cart->shop_id == $shop->id;
                 });
                 return OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address, $shop);
             });
             if (in_array(0, $shopIds)) {
-                $filterCartList = $cartList->filter(function (Cart $cart) {
+                $filterCartList = $cartList->filter(function (CartGoods $cart) {
                     return $cart->shop_id == 0;
                 });
                 $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address);
@@ -123,7 +122,7 @@ class OrderController extends Controller
             }
 
             // 4.清空购物车
-            CartService::getInstance()->deleteCartList($this->userId(), $input->cartIds);
+            CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $input->cartIds);
 
             return $orderIds;
         });

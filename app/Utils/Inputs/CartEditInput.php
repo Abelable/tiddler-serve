@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class CartEditInput extends CartAddInput
+class CartEditInput extends CartGoodsInput
 {
     public $id;
 

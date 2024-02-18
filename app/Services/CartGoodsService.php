@@ -2,29 +2,29 @@
 
 namespace App\Services;
 
-use App\Models\Cart;
+use App\Models\CartGoods;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\CartAddInput;
+use App\Utils\Inputs\CartGoodsInput;
 use App\Utils\Inputs\CartEditInput;
 
-class CartService extends BaseService
+class CartGoodsService extends BaseService
 {
     public function cartGoodsNumber($userId)
     {
-        return Cart::query()->where('user_id', $userId)->where('scene', '1')->sum('number');
+        return CartGoods::query()->where('user_id', $userId)->where('scene', '1')->sum('number');
     }
 
-    public function cartList($userId, $columns = ['*'])
+    public function cartGoodsList($userId, $columns = ['*'])
     {
-        return Cart::query()->where('user_id', $userId)->where('scene', '1')->get($columns);
+        return CartGoods::query()->where('user_id', $userId)->where('scene', '1')->get($columns);
     }
 
-    public function getCartListByIds($userId, array $ids, $columns = ['*'])
+    public function getCartGoodsListByIds($userId, array $ids, $columns = ['*'])
     {
-        return Cart::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+        return CartGoods::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
     }
 
-    public function addCart($userId, CartAddInput $input, $scene = 1)
+    public function addCartGoods($userId, CartGoodsInput $input, $scene = 1)
     {
         $goodsId = $input->goodsId;
         $selectedSkuIndex = $input->selectedSkuIndex;
@@ -32,48 +32,49 @@ class CartService extends BaseService
 
         [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
 
-        $cart = $this->getExistCart($goodsId, $selectedSkuIndex, $scene);
-        if (!is_null($cart)) {
-            $cart->number = $scene == 1 ? ($cart->number + $number) : $number;
+        $cartGoods = $this->getExistCartGoods($goodsId, $selectedSkuIndex, $scene);
+        if (!is_null($cartGoods)) {
+            $cartGoods->number = $scene == 1 ? ($cartGoods->number + $number) : $number;
         } else {
-            $cart = Cart::new();
-            $cart->scene = $scene;
-            $cart->user_id = $userId;
-            $cart->goods_id = $goodsId;
-            $cart->shop_id = $goods->shop_id;
-            $cart->goods_category_id = $goods->category_id;
-            $cart->goods_image = $goods->image;
-            $cart->goods_name = $goods->name;
+            $cartGoods = CartGoods::new();
+            $cartGoods->scene = $scene;
+            $cartGoods->user_id = $userId;
+            $cartGoods->goods_id = $goodsId;
+            $cartGoods->shop_id = $goods->shop_id;
+            $cartGoods->category_id = $goods->category_id;
+            $cartGoods->freight_template_id = $goods->freight_template_id;
+            $cartGoods->image = $goods->image;
+            $cartGoods->name = $goods->name;
             if (count($skuList) != 0 && $selectedSkuIndex != -1 ) {
-                $cart->selected_sku_index = $selectedSkuIndex;
-                $cart->selected_sku_name = $skuList[$selectedSkuIndex]->name;
-                $cart->price = $skuList[$selectedSkuIndex]->price;
+                $cartGoods->selected_sku_index = $selectedSkuIndex;
+                $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
+                $cartGoods->price = $skuList[$selectedSkuIndex]->price;
             } else {
-                $cart->price = $goods->price;
+                $cartGoods->price = $goods->price;
             }
-            $cart->market_price = $goods->market_price;
-            $cart->number = $number;
+            $cartGoods->market_price = $goods->market_price;
+            $cartGoods->number = $number;
         }
-        $cart->save();
+        $cartGoods->save();
 
-        return $cart;
+        return $cartGoods;
     }
 
-    public function editCart(CartEditInput $input)
+    public function editCartGoods(CartEditInput $input)
     {
         $cartId = $input->id;
         $goodsId = $input->goodsId;
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        $cart = $this->getExistCart($goodsId, $selectedSkuIndex, 1, $cartId);
+        $cart = $this->getExistCartGoods($goodsId, $selectedSkuIndex, 1, $cartId);
         if (!is_null($cart)) {
             $this->throwBusinessException(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
 
         [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
 
-        $cart = $this->getCartById($cartId);
+        $cart = $this->getCartGoodsById($cartId);
         if (is_null($cart)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '购物车中未添加该商品');
         }
@@ -121,9 +122,9 @@ class CartService extends BaseService
         return [$goods, $skuList];
     }
 
-    public function getExistCart($goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])
+    public function getExistCartGoods($goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])
     {
-        $query = Cart::query();
+        $query = CartGoods::query();
         if ($id != 0) {
             $query = $query->where('id', '!=', $id);
         }
@@ -134,13 +135,13 @@ class CartService extends BaseService
             ->first($columns);
     }
 
-    public function getCartById($id, $columns = ['*'])
+    public function getCartGoodsById($id, $columns = ['*'])
     {
-        return Cart::query()->find($id, $columns);
+        return CartGoods::query()->find($id, $columns);
     }
 
-    public function deleteCartList($userId, array $ids)
+    public function deleteCartGoodsList($userId, array $ids)
     {
-        return Cart::query()->where('user_id', $userId)->whereIn('id', $ids)->delete();
+        return CartGoods::query()->where('user_id', $userId)->whereIn('id', $ids)->delete();
     }
 }

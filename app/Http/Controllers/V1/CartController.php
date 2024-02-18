@@ -6,18 +6,18 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\Goods;
 use App\Models\Shop;
-use App\Services\CartService;
+use App\Services\CartGoodsService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\CartAddInput;
+use App\Utils\Inputs\CartGoodsInput;
 use App\Utils\Inputs\CartEditInput;
 
 class CartController extends Controller
 {
     public function goodsNumber()
     {
-        $number = CartService::getInstance()->cartGoodsNumber($this->userId());
+        $number = CartGoodsService::getInstance()->cartGoodsNumber($this->userId());
         return $this->success($number);
     }
 
@@ -38,7 +38,7 @@ class CartController extends Controller
             'market_price',
             'number'
         ];
-        $list = CartService::getInstance()->cartList($this->userId(), $cartColumns);
+        $list = CartGoodsService::getInstance()->cartGoodsList($this->userId(), $cartColumns);
         $goodsIds = array_unique($list->pluck('goods_id')->toArray());
         $goodsCategoryIds = array_unique($list->pluck('goods_category_id')->toArray());
         $shopIds = array_unique($list->pluck('shop_id')->toArray());
@@ -132,17 +132,17 @@ class CartController extends Controller
 
     public function fastAdd()
     {
-        /** @var CartAddInput $input */
-        $input = CartAddInput::new();
-        $cart = CartService::getInstance()->addCart($this->userId(), $input, 2);
+        /** @var CartGoodsInput $input */
+        $input = CartGoodsInput::new();
+        $cart = CartGoodsService::getInstance()->addCartGoods($this->userId(), $input, 2);
         return $this->success($cart->id);
     }
 
     public function add()
     {
-        /** @var CartAddInput $input */
-        $input = CartAddInput::new();
-        CartService::getInstance()->addCart($this->userId(), $input);
+        /** @var CartGoodsInput $input */
+        $input = CartGoodsInput::new();
+        CartGoodsService::getInstance()->addCartGoods($this->userId(), $input);
         return $this->goodsNumber();
     }
 
@@ -150,7 +150,7 @@ class CartController extends Controller
     {
         /** @var CartEditInput $input */
         $input = CartEditInput::new();
-        $cart = CartService::getInstance()->editCart($input);
+        $cart = CartGoodsService::getInstance()->editCartGoods($input);
         return $this->success([
             'status' => $cart->status,
             'statusDesc' => $cart->status_desc,
@@ -165,7 +165,7 @@ class CartController extends Controller
     public function delete()
     {
         $ids = $this->verifyArrayNotEmpty('ids', []);
-        CartService::getInstance()->deleteCartList($this->userId(), $ids);
+        CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $ids);
         return $this->success();;
     }
 }

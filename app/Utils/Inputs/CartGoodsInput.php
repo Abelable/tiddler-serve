@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class CartAddInput extends BaseInput
+class CartGoodsInput extends BaseInput
 {
     public $goodsId;
     public $selectedSkuIndex;
