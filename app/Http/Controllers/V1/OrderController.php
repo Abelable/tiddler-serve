@@ -24,7 +24,7 @@ class OrderController extends Controller
     public function preOrderInfo()
     {
         $addressId = $this->verifyId('addressId');
-        $cartIds = $this->verifyArrayNotEmpty('cartIds');
+        $cartGoodsIds = $this->verifyArrayNotEmpty('cartGoodsIds');
 
         $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
         if (is_null($addressId)) {
@@ -33,40 +33,40 @@ class OrderController extends Controller
             $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
         }
 
-        $cartListColumns = ['shop_id', 'goods_image', 'goods_name', 'selected_sku_name', 'price', 'number'];
-        $cartList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartIds, $cartListColumns);
+        $cartGoodsListColumns = ['shop_id', 'image', 'name', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
+        $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
         $freightPrice = 0;
         $totalPrice = 0;
         $totalNumber = 0;
-        foreach ($cartList as $cart) {
-            $price = bcmul($cart->price, $cart->number, 2);
+        foreach ($cartGoodsList as $cartGoods) {
+            $price = bcmul($cartGoods->price, $cartGoods->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
-            $totalNumber = $totalNumber + $cart->number;
+            $totalNumber = $totalNumber + $cartGoods->number;
             // todo 计算运费
         }
         $paymentAmount = bcadd($totalPrice, $freightPrice, 2);
 
-        $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
+        $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
-        $goodsLists = $shopList->map(function (Shop $shop) use ($cartList) {
+        $goodsLists = $shopList->map(function (Shop $shop) use ($cartGoodsList) {
             return [
                 'shopInfo' => $shop,
-                'goodsList' => $cartList->filter(function (CartGoods $cart) use ($shop) {
-                    return $cart->shop_id == $shop->id;
-                })->map(function (CartGoods $cart) {
-                    unset($cart->shop_id);
-                    return $cart;
+                'goodsList' => $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
+                    return $cartGoods->shop_id == $shop->id;
+                })->map(function (CartGoods $cartGoods) {
+                    unset($cartGoods->shop_id);
+                    return $cartGoods;
                 })
             ];
         });
         if (in_array(0, $shopIds)) {
             $goodsLists->prepend([
-                'goodsList' => $cartList->filter(function (CartGoods $cart) {
-                    return $cart->shop_id == 0;
-                })->map(function (CartGoods $cart) {
-                    unset($cart->shop_id);
-                    return $cart;
+                'goodsList' => $cartGoodsList->filter(function (CartGoods $cartGoods) {
+                    return $cartGoods->shop_id == 0;
+                })->map(function (CartGoods $cartGoods) {
+                    unset($cartGoods->shop_id);
+                    return $cartGoods;
                 })
             ]);
         }
