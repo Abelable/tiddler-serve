@@ -73,11 +73,13 @@ class OrderController extends Controller
                     });
                     if (is_null($area)) {
                         $errMsg = $cartGoods->name . '暂不支持配送至当前地址，请更换收货地址';
-                    }
-                    if ($freightTemplate->compute_mode == 1) {
-                        $freightPrice = $area['fee'];
+                        $freightPrice = 0;
                     } else {
-                        $freightPrice = bcmul($area['fee'], $cartGoods->number, 2);
+                        if ($freightTemplate->compute_mode == 1) {
+                            $freightPrice = $area['fee'];
+                        } else {
+                            $freightPrice = bcmul($area['fee'], $cartGoods->number, 2);
+                        }
                     }
                 }
             }
