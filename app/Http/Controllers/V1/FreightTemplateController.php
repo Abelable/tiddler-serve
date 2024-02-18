@@ -19,8 +19,8 @@ class FreightTemplateController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'mode', 'name', 'title', 'compute_mode', 'free_quota', 'area_list', 'express_list', 'express_template_lists'];
-        $detail = FreightTemplateService::getInstance()->getFreightTemplateById($id, $columns);
+        $detail = FreightTemplateService::getInstance()->getFreightTemplateById($id);
+        $detail->area_list = json_decode($detail->area_list);
         return $this->success($detail);
     }
 
@@ -55,14 +55,11 @@ class FreightTemplateController extends Controller
 
     private function update($freightTemplate, FreightTemplateInput $input)
     {
-        $freightTemplate->mode = $input->mode;
         $freightTemplate->name = $input->name;
         $freightTemplate->title = $input->title;
         $freightTemplate->compute_mode = $input->computeMode;
         $freightTemplate->free_quota = $input->freeQuota;
-        $freightTemplate->area_list = $input->areaList;
-        $freightTemplate->express_list = $input->expressList;
-        $freightTemplate->express_template_lists = $input->expressTemplateLists;
+        $freightTemplate->area_list = json_decode($input->areaList);
         $freightTemplate->save();
 
         return $freightTemplate;
