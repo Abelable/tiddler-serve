@@ -58,8 +58,10 @@ class FreightTemplateController extends Controller
         $freightTemplate->name = $input->name;
         $freightTemplate->title = $input->title;
         $freightTemplate->compute_mode = $input->computeMode;
-        $freightTemplate->free_quota = $input->freeQuota;
-        $freightTemplate->area_list = json_decode($input->areaList);
+        if (!is_null($input->freeQuota)) {
+            $freightTemplate->free_quota = $input->freeQuota;
+        }
+        $freightTemplate->area_list = json_encode($input->areaList);
         $freightTemplate->save();
 
         return $freightTemplate;
