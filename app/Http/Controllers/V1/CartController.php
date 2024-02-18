@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
+use App\Models\CartGoods;
 use App\Models\Goods;
 use App\Models\Shop;
 use App\Services\CartGoodsService;
 use App\Services\GoodsService;
 use App\Services\ShopService;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\CartGoodsInput;
 use App\Utils\Inputs\CartEditInput;
 
@@ -29,9 +28,10 @@ class CartController extends Controller
             'status_desc',
             'goods_id',
             'shop_id',
-            'goods_category_id',
-            'goods_image',
-            'goods_name',
+            'category_id',
+            'freight_template_id',
+            'image',
+            'name',
             'selected_sku_name',
             'selected_sku_index',
             'price',
@@ -44,7 +44,7 @@ class CartController extends Controller
         $shopIds = array_unique($list->pluck('shop_id')->toArray());
 
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds)->keyBy('id');
-        $cartGoodsList = $list->map(function (Cart $cart) use ($goodsList) {
+        $cartGoodsList = $list->map(function (CartGoods $cart) use ($goodsList) {
             /** @var Goods $goods */
             $goods = $goodsList->get($cart->goods_id);
             if (is_null($goods) || $goods->status != 1) {
@@ -101,9 +101,9 @@ class CartController extends Controller
         $cartList = $shopList->map(function (Shop $shop) use ($cartGoodsList) {
             return [
                 'shopInfo' => $shop,
-                'goodsList' => $cartGoodsList->filter(function (Cart $cart) use ($shop) {
+                'goodsList' => $cartGoodsList->filter(function (CartGoods $cart) use ($shop) {
                     return $cart->shop_id == $shop->id;
-                })->map(function (Cart $cart) {
+                })->map(function (CartGoods $cart) {
                     unset($cart->shop_id);
                     unset($cart->goods_category_id);
                     return $cart;
@@ -112,9 +112,9 @@ class CartController extends Controller
         });
         if (in_array(0, $shopIds)) {
             $cartList->prepend([
-                'goodsList' => $cartGoodsList->filter(function (Cart $cart) {
+                'goodsList' => $cartGoodsList->filter(function (CartGoods $cart) {
                     return $cart->shop_id == 0;
-                })->map(function (Cart $cart) {
+                })->map(function (CartGoods $cart) {
                     unset($cart->shop_id);
                     unset($cart->goods_category_id);
                     return $cart;
