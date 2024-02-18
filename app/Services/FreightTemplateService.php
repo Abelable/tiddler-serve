@@ -15,4 +15,9 @@ class FreightTemplateService extends BaseService
     {
         return FreightTemplate::query()->find($id, $columns);
     }
+
+    public function getListByIds(array $Ids, $columns = ['*'])
+    {
+        return FreightTemplate::query()->whereIn('id', $Ids)->get($columns);
+    }
 }

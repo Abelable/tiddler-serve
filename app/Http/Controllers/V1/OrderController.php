@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\CartGoods;
+use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartGoodsService;
+use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\ShopService;
@@ -28,24 +31,60 @@ class OrderController extends Controller
 
         $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
         if (is_null($addressId)) {
+            /** @var Address $address */
             $address = AddressService::getInstance()->getDefautlAddress($this->userId(), $addressColumns);
         } else {
+            /** @var Address $address */
             $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
         }
 
         $cartGoodsListColumns = ['shop_id', 'image', 'name', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
         $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
-        $freightPrice = 0;
+        $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
+        $freightTemplateList = FreightTemplateService::getInstance()
+            ->getListByIds($freightTemplateIds)
+            ->map(function (FreightTemplate $freightTemplate) {
+                $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+            })->keyBy('id');
+
+        $errMsg = '';
+        $totalFreightPrice = 0;
         $totalPrice = 0;
         $totalNumber = 0;
+
         foreach ($cartGoodsList as $cartGoods) {
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
             $totalNumber = $totalNumber + $cartGoods->number;
-            // todo 计算运费
+
+            // 计算运费
+            if ($cartGoods->freight_template_id == 0) {
+                $freightPrice = 0;
+            } else {
+                /** @var FreightTemplate $freightTemplate */
+                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
+                if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
+                    $freightPrice = 0;
+                } else {
+                    $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
+                    $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+                        return in_array($cityCode, explode(',', $area['pickedCityCodes']));
+                    });
+                    if (is_null($area)) {
+                        $errMsg = $cartGoods->name . '暂不支持配送至当前地址，请更换收货地址';
+                    }
+                    if ($freightTemplate->compute_mode == 1) {
+                        $freightPrice = $area['fee'];
+                    } else {
+                        $freightPrice = bcmul($area['fee'], $cartGoods->number, 2);
+                    }
+                }
+            }
+            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
         }
-        $paymentAmount = bcadd($totalPrice, $freightPrice, 2);
+
+        $paymentAmount = bcadd($totalPrice, $totalFreightPrice, 2);
 
         $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
@@ -72,9 +111,10 @@ class OrderController extends Controller
         }
 
         return $this->success([
+            'errMsg' => $errMsg,
             'addressInfo' => $address,
             'goodsLists' => $goodsLists,
-            'freightPrice' => $freightPrice,
+            'freightPrice' => $totalFreightPrice,
             'totalPrice' => $totalPrice,
             'totalNumber' => $totalNumber,
             'paymentAmount' => $paymentAmount
@@ -193,7 +233,7 @@ class OrderController extends Controller
         $orderIds = $orderList->pluck('id')->toArray();
         $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
         $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
-        $list = $orderList->map(function (Order $order) use ($groupedGoodsList) {
+        return $orderList->map(function (Order $order) use ($groupedGoodsList) {
             $goodsList = $groupedGoodsList->get($order->id);
             return [
                 'id' => $order->id,
@@ -210,7 +250,6 @@ class OrderController extends Controller
                 'orderSn' => $order->order_sn
             ];
         });
-        return $list;
     }
 
     public function cancel()
