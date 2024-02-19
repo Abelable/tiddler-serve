@@ -9,6 +9,7 @@ use App\Models\TourismNoteComment;
 use App\Models\TourismNoteLike;
 use App\Services\FanService;
 use App\Services\GoodsService;
+use App\Services\KeywordService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -40,6 +41,9 @@ class TourismNoteController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+
         $page = TourismNoteService::getInstance()->search($input);
         $list = $this->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));

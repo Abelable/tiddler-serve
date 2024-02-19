@@ -48,6 +48,18 @@ Route::prefix('fan')->group(function () {
     Route::get('fan_list', 'FanController@fanList');
 });
 
+Route::prefix('keyword')->group(function () {
+    Route::get('list', 'KeywordController@list');
+    Route::post('clear', 'KeywordController@clear');
+});
+
+Route::prefix('mall')->group(function () {
+    Route::prefix('keyword')->group(function () {
+        Route::get('list', 'KeywordController@list');
+        Route::post('clear', 'KeywordController@clear');
+    });
+});
+
 Route::prefix('shop')->group(function () {
     Route::get('category_options', 'ShopController@categoryOptions');
 
@@ -93,6 +105,11 @@ Route::prefix('shop')->group(function () {
 });
 
 Route::prefix('goods')->group(function () {
+    Route::prefix('keyword')->group(function () {
+        Route::get('list', 'KeywordController@list');
+        Route::post('clear', 'KeywordController@clear');
+    });
+
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
     Route::get('search', 'GoodsController@search');

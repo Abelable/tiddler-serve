@@ -9,6 +9,7 @@ use App\Models\ShortVideoComment;
 use App\Models\ShortVideoLike;
 use App\Services\FanService;
 use App\Services\GoodsService;
+use App\Services\KeywordService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
@@ -41,6 +42,9 @@ class ShortVideoController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+
         $page = ShortVideoService::getInstance()->search($input);
         $list = $this->handleVideoList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
