@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
+use App\Services\MallKeywordService;
 use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
@@ -36,6 +37,9 @@ class ScenicController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+
         $page = ScenicService::getInstance()->search($input);
         $list = $this->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));

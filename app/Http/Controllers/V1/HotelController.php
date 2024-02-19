@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
+use App\Services\MallKeywordService;
 use App\Services\ProviderHotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
@@ -36,6 +37,9 @@ class HotelController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+
         $page = HotelService::getInstance()->search($input);
         $list = $this->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));

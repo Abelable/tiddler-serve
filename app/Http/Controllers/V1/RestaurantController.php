@@ -7,6 +7,7 @@ use App\Models\MealTicket;
 use App\Models\Restaurant;
 use App\Models\RestaurantCategory;
 use App\Models\SetMeal;
+use App\Services\MallKeywordService;
 use App\Services\MealTicketService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
@@ -66,6 +67,9 @@ class RestaurantController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+
         $page = RestaurantService::getInstance()->search($input);
         $list = collect($page->items())->map(function (Restaurant $restaurant) {
             return [
