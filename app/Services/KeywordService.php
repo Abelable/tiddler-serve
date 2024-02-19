@@ -3,12 +3,23 @@
 namespace App\Services;
 
 use App\Models\Keyword;
+use Illuminate\Support\Facades\DB;
 
 class KeywordService extends BaseService
 {
+    public function getHotList()
+    {
+        return Keyword::query()
+            ->select('content', DB::raw('count(*) as count'))
+            ->groupBy('content')
+            ->orderByDesc('count')
+            ->take(10)
+            ->get();
+    }
+
     public function getListByUserId($userId, $columns = ['*'])
     {
-        return Keyword::query()->where('user_id', $userId)->get($columns);
+        return Keyword::query()->where('user_id', $userId)->orderBy('created_at', 'desc')->get($columns);
     }
 
     public function clearUserKeywords($userId)

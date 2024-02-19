@@ -55,8 +55,8 @@ Route::prefix('keyword')->group(function () {
 
 Route::prefix('mall')->group(function () {
     Route::prefix('keyword')->group(function () {
-        Route::get('list', 'KeywordController@list');
-        Route::post('clear', 'KeywordController@clear');
+        Route::get('list', 'MallKeywordController@list');
+        Route::post('clear', 'MallKeywordController@clear');
     });
 });
 
@@ -106,8 +106,8 @@ Route::prefix('shop')->group(function () {
 
 Route::prefix('goods')->group(function () {
     Route::prefix('keyword')->group(function () {
-        Route::get('list', 'KeywordController@list');
-        Route::post('clear', 'KeywordController@clear');
+        Route::get('list', 'GoodsKeywordController@list');
+        Route::post('clear', 'GoodsKeywordController@clear');
     });
 
     Route::get('category_options', 'GoodsController@categoryOptions');

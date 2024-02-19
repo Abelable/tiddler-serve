@@ -7,6 +7,15 @@ use App\Services\MallKeywordService;
 
 class MallKeywordController extends Controller
 {
+    protected $except = ['hotList'];
+
+    public function hotList()
+    {
+        $list = MallKeywordService::getInstance()->getHotList();
+        $contentList = $list->pluck('content')->toArray();
+        return $this->success($contentList);
+    }
+
     public function list()
     {
         $list = MallKeywordService::getInstance()->getListByUserId($this->userId());

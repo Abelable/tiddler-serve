@@ -7,6 +7,15 @@ use App\Services\KeywordService;
 
 class KeywordController extends Controller
 {
+    protected $except = ['hotList'];
+
+    public function hotList()
+    {
+        $list = KeywordService::getInstance()->getHotList();
+        $contentList = $list->pluck('content')->toArray();
+        return $this->success($contentList);
+    }
+
     public function list()
     {
         $list = KeywordService::getInstance()->getListByUserId($this->userId());

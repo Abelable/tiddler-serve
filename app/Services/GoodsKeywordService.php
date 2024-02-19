@@ -3,12 +3,22 @@
 namespace App\Services;
 
 use App\Models\GoodsKeyword;
+use Illuminate\Support\Facades\DB;
 
 class GoodsKeywordService extends BaseService
 {
+    public function getHotList()
+    {
+        return GoodsKeyword::query()
+            ->select('content', DB::raw('count(*) as count'))
+            ->groupBy('content')
+            ->orderByDesc('count')
+            ->take(10)
+            ->get();
+    }
     public function getListByUserId($userId, $columns = ['*'])
     {
-        return GoodsKeyword::query()->where('user_id', $userId)->get($columns);
+        return GoodsKeyword::query()->where('user_id', $userId)->orderBy('created_at', 'desc')->get($columns);
     }
 
     public function clearUserKeywords($userId)
