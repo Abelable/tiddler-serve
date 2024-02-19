@@ -51,12 +51,14 @@ Route::prefix('fan')->group(function () {
 Route::prefix('keyword')->group(function () {
     Route::get('list', 'KeywordController@list');
     Route::post('clear', 'KeywordController@clear');
+    Route::get('hot_list', 'KeywordController@hotList');
 });
 
 Route::prefix('mall')->group(function () {
     Route::prefix('keyword')->group(function () {
         Route::get('list', 'MallKeywordController@list');
         Route::post('clear', 'MallKeywordController@clear');
+        Route::get('hot_list', 'MallKeywordController@hotList');
     });
 });
 
@@ -108,6 +110,7 @@ Route::prefix('goods')->group(function () {
     Route::prefix('keyword')->group(function () {
         Route::get('list', 'GoodsKeywordController@list');
         Route::post('clear', 'GoodsKeywordController@clear');
+        Route::get('hot_list', 'GoodsKeywordController@hotList');
     });
 
     Route::get('category_options', 'GoodsController@categoryOptions');
