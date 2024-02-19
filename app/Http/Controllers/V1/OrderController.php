@@ -46,6 +46,7 @@ class OrderController extends Controller
             ->getListByIds($freightTemplateIds)
             ->map(function (FreightTemplate $freightTemplate) {
                 $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+                return $freightTemplate;
             })->keyBy('id');
 
         $errMsg = '';
@@ -69,16 +70,16 @@ class OrderController extends Controller
                 } else {
                     $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
                     $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
-                        return in_array($cityCode, explode(',', $area['pickedCityCodes']));
+                        return in_array($cityCode, explode(',', $area->pickedCityCodes));
                     });
                     if (is_null($area)) {
-                        $errMsg = $cartGoods->name . '暂不支持配送至当前地址，请更换收货地址';
+                        $errMsg = '商品"' . $cartGoods->name . '"暂不支持配送至当前地址，请更换收货地址';
                         $freightPrice = 0;
                     } else {
                         if ($freightTemplate->compute_mode == 1) {
-                            $freightPrice = $area['fee'];
+                            $freightPrice = $area->fee;
                         } else {
-                            $freightPrice = bcmul($area['fee'], $cartGoods->number, 2);
+                            $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
                         }
                     }
                 }
