@@ -86,7 +86,7 @@ class OrderService extends BaseService
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
-            $totalGoodsPrice = bcadd($totalPrice, $price, 2);
+            $totalPrice = bcadd($totalPrice, $price, 2);
 
             // 计算运费
             if ($cartGoods->freight_template_id == 0) {
@@ -133,9 +133,9 @@ class OrderService extends BaseService
             $order->shop_avatar = $shopInfo->avatar;
             $order->shop_name = $shopInfo->name;
         }
-        $order->goods_price = $totalGoodsPrice;
+        $order->goods_price = $totalPrice;
         $order->freight_price = $totalFreightPrice;
-        $order->payment_amount = bcadd($totalGoodsPrice, $totalFreightPrice, 2);
+        $order->payment_amount = bcadd($totalPrice, $totalFreightPrice, 2);
         $order->refund_amount = $order->payment_amount;
         $order->save();
 
