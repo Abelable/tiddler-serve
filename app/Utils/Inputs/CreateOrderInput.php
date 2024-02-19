@@ -5,14 +5,14 @@ namespace App\Utils\Inputs;
 class CreateOrderInput extends BaseInput
 {
     public $addressId;
-    public $cartIds;
+    public $cartGoodsIds;
     public $remarks;
 
     public function rules()
     {
         return [
             'addressId' => 'required|integer|digits_between:1,20',
-            'cartIds' => 'required|array|min:1',
+            'cartGoodsIds' => 'required|array|min:1',
             'remarks' => 'string'
         ];
     }

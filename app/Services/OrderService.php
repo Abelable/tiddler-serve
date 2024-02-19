@@ -4,7 +4,8 @@ namespace App\Services;
 
 use App\Jobs\OverTimeCancelOrder;
 use App\Models\Address;
-use App\Models\Cart;
+use App\Models\CartGoods;
+use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
@@ -77,19 +78,44 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, $cartList, Address $address, Shop $shopInfo = null)
+    public function createOrder($userId, $cartGoodsList, $freightTemplateList, Address $address, Shop $shopInfo = null)
     {
-        $goodsPrice = 0;
-        $freightPrice = 0;
+        $totalPrice = 0;
+        $totalFreightPrice = 0;
 
-        /** @var Cart $cart */
-        foreach ($cartList as $cart) {
-            $price = bcmul($cart->price, $cart->number, 2);
-            $goodsPrice = bcadd($goodsPrice, $price, 2);
-            // todo 计算运费
+        /** @var CartGoods $cartGoods */
+        foreach ($cartGoodsList as $cartGoods) {
+            $price = bcmul($cartGoods->price, $cartGoods->number, 2);
+            $totalGoodsPrice = bcadd($totalPrice, $price, 2);
+
+            // 计算运费
+            if ($cartGoods->freight_template_id == 0) {
+                $freightPrice = 0;
+            } else {
+                /** @var FreightTemplate $freightTemplate */
+                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
+                if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
+                    $freightPrice = 0;
+                } else {
+                    $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
+                    $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+                        return in_array($cityCode, explode(',', $area->pickedCityCodes));
+                    });
+                    if (is_null($area)) {
+                        $freightPrice = 0;
+                    } else {
+                        if ($freightTemplate->compute_mode == 1) {
+                            $freightPrice = $area->fee;
+                        } else {
+                            $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
+                        }
+                    }
+                }
+            }
+            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
 
             // 商品减库存
-            $row = GoodsService::getInstance()->reduceStock($cart->goods_id, $cart->number, $cart->selected_sku_index);
+            $row = GoodsService::getInstance()->reduceStock($cartGoods->goods_id, $cartGoods->number, $cartGoods->selected_sku_index);
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
@@ -107,14 +133,14 @@ class OrderService extends BaseService
             $order->shop_avatar = $shopInfo->avatar;
             $order->shop_name = $shopInfo->name;
         }
-        $order->goods_price = $goodsPrice;
-        $order->freight_price = $freightPrice;
-        $order->payment_amount = bcadd($goodsPrice, $freightPrice, 2);
+        $order->goods_price = $totalGoodsPrice;
+        $order->freight_price = $totalFreightPrice;
+        $order->payment_amount = bcadd($totalGoodsPrice, $totalFreightPrice, 2);
         $order->refund_amount = $order->payment_amount;
         $order->save();
 
         // 生成订单商品快照
-        OrderGoodsService::getInstance()->createList($cartList, $order->id);
+        OrderGoodsService::getInstance()->createList($cartGoodsList, $order->id);
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));

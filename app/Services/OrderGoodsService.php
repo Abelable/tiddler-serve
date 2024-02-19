@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
-use App\Models\Cart;
+use App\Models\CartGoods;
 use App\Models\OrderGoods;
 
 class OrderGoodsService extends BaseService
 {
-    public function createList($cartList, $orderId)
+    public function createList($cartGoodsList, $orderId)
     {
-        /** @var Cart $cart */
-        foreach ($cartList as $cart) {
+        /** @var CartGoods $cartGoods */
+        foreach ($cartGoodsList as $cartGoods) {
             $goods = OrderGoods::new();
             $goods->order_id = $orderId;
-            $goods->goods_id = $cart->goods_id;
-            $goods->image = $cart->goods_image;
-            $goods->name = $cart->goods_name;
-            $goods->selected_sku_name = $cart->selected_sku_name;
-            $goods->selected_sku_index = $cart->selected_sku_index;
-            $goods->price = $cart->price;
-            $goods->number = $cart->number;
+            $goods->goods_id = $cartGoods->goods_id;
+            $goods->image = $cartGoods->image;
+            $goods->name = $cartGoods->name;
+            $goods->selected_sku_name = $cartGoods->selected_sku_name;
+            $goods->selected_sku_index = $cartGoods->selected_sku_index;
+            $goods->price = $cartGoods->price;
+            $goods->number = $cartGoods->number;
             $goods->save();
         }
     }

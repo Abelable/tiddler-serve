@@ -144,28 +144,37 @@ class OrderController extends Controller
             }
 
             // 2.获取购物车商品
-            $cartList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $input->cartIds);
+            $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $input->cartGoodsIds);
 
-            // 3.按商家进行订单拆分，生成对应订单
-            $shopIds = array_unique($cartList->pluck('shop_id')->toArray());
+            // 3.获取运费模板列表
+            $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
+            $freightTemplateList = FreightTemplateService::getInstance()
+                ->getListByIds($freightTemplateIds)
+                ->map(function (FreightTemplate $freightTemplate) {
+                    $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+                    return $freightTemplate;
+                })->keyBy('id');
+
+            // 4.按商家进行订单拆分，生成对应订单
+            $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 
-            $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartList) {
-                $filterCartList = $cartList->filter(function (CartGoods $cart) use ($shop) {
-                    return $cart->shop_id == $shop->id;
+            $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartGoodsList, $freightTemplateList) {
+                $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
+                    return $cartGoods->shop_id == $shop->id;
                 });
-                return OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address, $shop);
+                return OrderService::getInstance()->createOrder($this->userId(), $filterCartGoodsList, $freightTemplateList, $address, $shop);
             });
             if (in_array(0, $shopIds)) {
-                $filterCartList = $cartList->filter(function (CartGoods $cart) {
-                    return $cart->shop_id == 0;
+                $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) {
+                    return $cartGoods->shop_id == 0;
                 });
-                $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartList, $address);
+                $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartGoodsList, $freightTemplateList, $address);
                 $orderIds->push($orderId);
             }
 
             // 4.清空购物车
-            CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $input->cartIds);
+            CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $input->cartGoodsIds);
 
             return $orderIds;
         });

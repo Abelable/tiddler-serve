@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\CartGoods;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CartGoodsInput;
-use App\Utils\Inputs\CartEditInput;
+use App\Utils\Inputs\CartGoodsEditInput;
 
 class CartGoodsService extends BaseService
 {
@@ -60,43 +60,43 @@ class CartGoodsService extends BaseService
         return $cartGoods;
     }
 
-    public function editCartGoods(CartEditInput $input)
+    public function editCartGoods(CartGoodsEditInput $input)
     {
-        $cartId = $input->id;
+        $cartGoodsId = $input->id;
         $goodsId = $input->goodsId;
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        $cart = $this->getExistCartGoods($goodsId, $selectedSkuIndex, 1, $cartId);
-        if (!is_null($cart)) {
+        $cartGoods = $this->getExistCartGoods($goodsId, $selectedSkuIndex, 1, $cartGoodsId);
+        if (!is_null($cartGoods)) {
             $this->throwBusinessException(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
 
         [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
 
-        $cart = $this->getCartGoodsById($cartId);
-        if (is_null($cart)) {
+        $cartGoods = $this->getCartGoodsById($cartGoodsId);
+        if (is_null($cartGoods)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '购物车中未添加该商品');
         }
-        if ($cart->status == 3) {
+        if ($cartGoods->status == 3) {
             $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '购物车商品已下架，无法编辑');
         }
 
         if (count($skuList) != 0 && $selectedSkuIndex != -1) {
-            $cart->selected_sku_index = $selectedSkuIndex;
-            $cart->selected_sku_name = $skuList[$selectedSkuIndex]->name;
-            $cart->price = $skuList[$selectedSkuIndex]->price;
+            $cartGoods->selected_sku_index = $selectedSkuIndex;
+            $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
+            $cartGoods->price = $skuList[$selectedSkuIndex]->price;
         }
 
-        $cart->number = $number;
-        if ($cart->status == 2) {
-            $cart->status = 1;
-            $cart->status_desc = '';
+        $cartGoods->number = $number;
+        if ($cartGoods->status == 2) {
+            $cartGoods->status = 1;
+            $cartGoods->status_desc = '';
         }
-        $cart->save();
-        $cart['stock'] = (count($skuList) != 0 && $selectedSkuIndex != -1) ? $skuList[$selectedSkuIndex]->stock : $goods->stock;
+        $cartGoods->save();
+        $cartGoods['stock'] = (count($skuList) != 0 && $selectedSkuIndex != -1) ? $skuList[$selectedSkuIndex]->stock : $goods->stock;
 
-        return $cart;
+        return $cartGoods;
     }
 
     public function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
