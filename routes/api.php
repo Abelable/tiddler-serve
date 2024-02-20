@@ -54,14 +54,6 @@ Route::prefix('keyword')->group(function () {
     Route::get('hot_list', 'KeywordController@hotList');
 });
 
-Route::prefix('mall')->group(function () {
-    Route::prefix('keyword')->group(function () {
-        Route::get('list', 'MallKeywordController@list');
-        Route::post('clear', 'MallKeywordController@clear');
-        Route::get('hot_list', 'MallKeywordController@hotList');
-    });
-});
-
 Route::prefix('shop')->group(function () {
     Route::get('category_options', 'ShopController@categoryOptions');
 
@@ -360,6 +352,13 @@ Route::prefix('catering')->group(function () {
 });
 
 Route::prefix('mall')->group(function () {
+    Route::prefix('keyword')->group(function () {
+        Route::get('list', 'MallKeywordController@list');
+        Route::post('clear', 'MallKeywordController@clear');
+        Route::get('hot_list', 'MallKeywordController@hotList');
+    });
+
+    Route::get('banner_list', 'MallController@bannerList');
     Route::get('commodity_list', 'MallController@list');
 });
 
@@ -471,6 +470,16 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('approved', 'AuthInfoController@approved');
         Route::post('reject', 'AuthInfoController@reject');
         Route::post('delete', 'AuthInfoController@delete');
+    });
+
+    Route::prefix('mall_banner')->group(function () {
+        Route::post('list', 'MallBannerController@list');
+        Route::get('detail', 'MallBannerController@detail');
+        Route::post('add', 'MallBannerController@add');
+        Route::post('edit', 'MallBannerController@edit');
+        Route::post('up', 'MallBannerController@up');
+        Route::post('down', 'MallBannerController@down');
+        Route::post('delete', 'MallBannerController@delete');
     });
 
     Route::prefix('merchant')->group(function () {

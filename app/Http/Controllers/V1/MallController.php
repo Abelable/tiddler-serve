@@ -16,10 +16,8 @@ class MallController extends Controller
 
     public function bannerList()
     {
-        /** @var BannerPageInput  $input */
-        $input = BannerPageInput::new();
-        $page = MallBannerService::getInstance()->getBannerPage($input);
-        return $this->successPaginate($page);
+        $list = MallBannerService::getInstance()->getBannerList();
+        return $this->success($list);
     }
 
     public function list()

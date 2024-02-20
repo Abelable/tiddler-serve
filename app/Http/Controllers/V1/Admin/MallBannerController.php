@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminRole;
-use App\Services\Admin\RoleService;
+use App\Models\MallBanner;
+use App\Services\MallBannerService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\Admin\BannerInput;
+use App\Utils\Inputs\BannerPageInput;
 
 class MallBannerController extends Controller
 {
@@ -14,58 +15,71 @@ class MallBannerController extends Controller
 
     public function list()
     {
-        $input = PageInput::new();
-        $list = RoleService::getInstance()->getRoleList($input);
+        /** @var BannerPageInput $input */
+        $input = BannerPageInput::new();
+        $list = MallBannerService::getInstance()->getBannerPage($input);
         return $this->successPaginate($list);
     }
 
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $role = RoleService::getInstance()->getRoleById($id);
-        if (is_null($role)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前管理员角色不存在');
+        $banner = MallBannerService::getInstance()->getBannerById($id);
+        if (is_null($banner)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
         }
-        return $this->success($role);
+        return $this->success($banner);
     }
 
     public function add()
     {
-        $name = $this->verifyRequiredString('name');
-        $desc = $this->verifyString('desc');
-
-        $role = RoleService::getInstance()->getRoleByName($name);
-        if (!is_null($role)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '管理员角色已存在');
-        }
-
-        $role = AdminRole::new();
-        $role->name = $name;
-        $role->desc = $desc;
-        $role->save();
-
+        /** @var BannerInput $input */
+        $input = BannerInput::new();
+        $banner = MallBanner::new();
+        MallBannerService::getInstance()->updateBanner($banner, $input);
         return $this->success();
     }
 
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        $name = $this->verifyRequiredString('name');
-        $desc = $this->verifyString('desc');
+        /** @var BannerInput $input */
+        $input = BannerInput::new();
 
-        $role = RoleService::getInstance()->getRoleByName($name);
-        if (!is_null($role)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '管理员角色已存在');
+        $banner = MallBannerService::getInstance()->getBannerById($id);
+        if (is_null($banner)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
         }
 
-        $role = RoleService::getInstance()->getRoleById($id);
-        if (is_null($role)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前管理员角色不存在');
+        MallBannerService::getInstance()->updateBanner($banner, $input);
+
+        return $this->success();
+    }
+
+    public function up()
+    {
+        $id = $this->verifyRequiredId('id');
+        $banner = MallBannerService::getInstance()->getBannerById($id);
+        if (is_null($banner)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
         }
 
-        $role->name = $name;
-        $role->desc = $desc;
-        $role->save();
+        $banner->status = 1;
+        $banner->save();
+
+        return $this->success();
+    }
+
+    public function down()
+    {
+        $id = $this->verifyRequiredId('id');
+        $banner = MallBannerService::getInstance()->getBannerById($id);
+        if (is_null($banner)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
+        }
+
+        $banner->status = 2;
+        $banner->save();
 
         return $this->success();
     }
@@ -73,17 +87,11 @@ class MallBannerController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        $role = RoleService::getInstance()->getRoleById($id);
-        if (is_null($role)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前管理员角色不存在');
+        $banner = MallBannerService::getInstance()->getBannerById($id);
+        if (is_null($banner)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
         }
-        $role->delete();
+        $banner->delete();
         return $this->success();
-    }
-
-    public function options()
-    {
-        $options = RoleService::getInstance()->getRoleOptions(['id', 'name']);
-        return $this->success($options);
     }
 }
