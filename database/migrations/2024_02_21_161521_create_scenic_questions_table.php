@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateScenicQasTable extends Migration
+class CreateScenicQuestionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,13 @@ class CreateScenicQasTable extends Migration
      */
     public function up()
     {
-        Schema::create('scenic_qas', function (Blueprint $table) {
+        Schema::create('scenic_questions', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id')->comment('用户id');
+            $table->integer('scenic_id')->comment('景点id');
+            $table->string('content')->comment('提问内容');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -26,6 +30,6 @@ class CreateScenicQasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('scenic_qas');
+        Schema::dropIfExists('scenic_questions');
     }
 }
