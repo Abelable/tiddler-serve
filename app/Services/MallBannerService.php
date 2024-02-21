@@ -15,7 +15,7 @@ class MallBannerService extends BaseService
             $banner->desc = $input->desc;
         }
         $banner->scene = $input->scene;
-        $banner->value = $input->value;
+        $banner->param = $input->param;
         $banner->save();
         return $banner;
     }
