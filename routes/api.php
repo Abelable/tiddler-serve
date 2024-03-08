@@ -153,6 +153,19 @@ Route::prefix('scenic')->group(function () {
     Route::post('edit', 'ScenicController@edit');
     Route::get('provider_options', 'ScenicController@providerOptions');
 
+    Route::prefix('question')->group(function () {
+        Route::get('list', 'ScenicQAController@questionList');
+        Route::get('detail', 'ScenicQAController@questionDetail');
+        Route::get('add', 'ScenicQAController@addQuestion');
+        Route::get('delete', 'ScenicQAController@deleteQuestion');
+    });
+
+    Route::prefix('answer')->group(function () {
+        Route::get('list', 'ScenicQAController@answerList');
+        Route::get('add', 'ScenicQAController@addAnswer');
+        Route::get('delete', 'ScenicQAController@deleteAnswer');
+    });
+
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'ScenicProviderController@settleIn');
         Route::get('status', 'ScenicProviderController@statusInfo');
@@ -214,6 +227,19 @@ Route::prefix('hotel')->group(function () {
     Route::post('add', 'HotelController@add');
     Route::post('edit', 'HotelController@edit');
     Route::get('provider_options', 'HotelController@providerOptions');
+
+    Route::prefix('question')->group(function () {
+        Route::get('list', 'HotelQAController@questionList');
+        Route::get('detail', 'HotelQAController@questionDetail');
+        Route::get('add', 'HotelQAController@addQuestion');
+        Route::get('delete', 'HotelQAController@deleteQuestion');
+    });
+
+    Route::prefix('answer')->group(function () {
+        Route::get('list', 'HotelQAController@answerList');
+        Route::get('add', 'HotelQAController@addAnswer');
+        Route::get('delete', 'HotelQAController@deleteAnswer');
+    });
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'HotelProviderController@settleIn');
@@ -277,6 +303,19 @@ Route::prefix('catering')->group(function () {
         Route::post('edit', 'RestaurantController@edit');
         Route::post('delete', 'RestaurantController@delete');
         Route::get('user_options', 'RestaurantController@userOptions');
+    });
+
+    Route::prefix('question')->group(function () {
+        Route::get('list', 'CateringQAController@questionList');
+        Route::get('detail', 'CateringQAController@questionDetail');
+        Route::get('add', 'CateringQAController@addQuestion');
+        Route::get('delete', 'CateringQAController@deleteQuestion');
+    });
+
+    Route::prefix('answer')->group(function () {
+        Route::get('list', 'CateringQAController@answerList');
+        Route::get('add', 'CateringQAController@addAnswer');
+        Route::get('delete', 'CateringQAController@deleteAnswer');
     });
 
     Route::prefix('provider')->group(function () {

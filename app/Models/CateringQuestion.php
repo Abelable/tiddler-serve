@@ -29,4 +29,18 @@ namespace App\Models;
  */
 class CateringQuestion extends BaseModel
 {
+    public function answerList()
+    {
+        return $this->hasMany(CateringAnswer::class, 'question_id');
+    }
+
+    public function answersTotal()
+    {
+        return $this->answerList()->count();
+    }
+
+    public function firstAnswer()
+    {
+        return $this->answerList()->orderBy('created_at', 'asc')->first();
+    }
 }
