@@ -18,6 +18,7 @@ class CreateScenicQuestionsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('scenic_id')->comment('景点id');
             $table->string('content')->comment('提问内容');
+            $table->integer('answer_num')->default(0)->comment('评论数量');
             $table->timestamps();
             $table->softDeletes();
         });

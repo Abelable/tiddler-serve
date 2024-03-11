@@ -9,13 +9,17 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $hotel_id 酒店id
  * @property string $content 提问内容
+ * @property int $answer_num 评论数量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelAnswer[] $answerList
+ * @property-read int|null $answer_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelQuestion onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion query()
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion whereAnswerNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelQuestion whereDeletedAt($value)

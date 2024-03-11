@@ -9,13 +9,17 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $scenic_id 景点id
  * @property string $content 提问内容
+ * @property int $answer_num 评论数量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicAnswer[] $answerList
+ * @property-read int|null $answer_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicQuestion onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion whereAnswerNum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicQuestion whereDeletedAt($value)

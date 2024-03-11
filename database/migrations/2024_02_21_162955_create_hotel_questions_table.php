@@ -18,6 +18,7 @@ class CreateHotelQuestionsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('hotel_id')->comment('酒店id');
             $table->string('content')->comment('提问内容');
+            $table->integer('answer_num')->default(0)->comment('评论数量');
             $table->timestamps();
             $table->softDeletes();
         });
