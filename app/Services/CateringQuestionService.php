@@ -11,6 +11,7 @@ class CateringQuestionService extends BaseService
     {
         return CateringQuestion::query()
             ->where('restaurant_id', $restaurantId)
+            ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

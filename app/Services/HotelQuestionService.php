@@ -11,6 +11,7 @@ class HotelQuestionService extends BaseService
     {
         return HotelQuestion::query()
             ->where('hotel_id', $hotelId)
+            ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

@@ -11,6 +11,7 @@ class ScenicQuestionService extends BaseService
     {
         return ScenicQuestion::query()
             ->where('question_id', $questionId)
+            ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

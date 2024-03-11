@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\HotelQuestion;
 use App\Services\HotelAnswerService;
 use App\Services\HotelQuestionService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class HotelQAController extends Controller
 {
@@ -60,18 +62,37 @@ class HotelQAController extends Controller
     {
         $questionId = $this->verifyRequiredId('questionId');
         $content = $this->verifyRequiredString('content');
-        HotelAnswerService::getInstance()->createAnswer($this->userId(), $questionId, $content);
+
+        DB::transaction(function () use ($questionId, $content) {
+            HotelAnswerService::getInstance()->createAnswer($this->userId(), $questionId, $content);
+
+            /** @var HotelQuestion $question */
+            $question = HotelQuestionService::getInstance()->getQuestionById($questionId);
+            $question->answer_num = $question->answer_num + 1;
+            $question->save();
+        });
+
         return $this->success();
     }
 
     public function deleteAnswer()
     {
+        $questionId = $this->verifyRequiredId('questionId');
         $answerId = $this->verifyRequiredId('answerId');
-        $answer = HotelAnswerService::getInstance()->getUserAnswer($this->userId(), $answerId);
-        if (is_null($answer)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '非本人回答，无非删除');
-        }
-        $answer->delete();
+
+        DB::transaction(function () use ($answerId, $questionId) {
+            $answer = HotelAnswerService::getInstance()->getUserAnswer($this->userId(), $answerId);
+            if (is_null($answer)) {
+                return $this->fail(CodeResponse::NOT_FOUND, '非本人回答，无非删除');
+            }
+            $answer->delete();
+
+            /** @var HotelQuestion $question */
+            $question = HotelQuestionService::getInstance()->getQuestionById($questionId);
+            $question->answer_num = max($question->answer_num - 1, 0);
+            $question->save();
+        });
+
         return $this->success();
     }
 }
