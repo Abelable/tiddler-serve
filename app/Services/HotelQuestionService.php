@@ -7,6 +7,15 @@ use App\Utils\Inputs\PageInput;
 
 class HotelQuestionService extends BaseService
 {
+    public function questionList($hotelId, $count, $columns = ['*'])
+    {
+        return HotelQuestion::query()
+            ->where('hotel_id', $hotelId)
+            ->orderBy('answer_num', 'desc')
+            ->take($count)
+            ->get($columns);
+    }
+
     public function questionPage($hotelId, PageInput $input, $columns = ['*'])
     {
         return HotelQuestion::query()
@@ -14,6 +23,11 @@ class HotelQuestionService extends BaseService
             ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function questionTotal($hotelId)
+    {
+        return HotelQuestion::query()->where('hotel_id', $hotelId)->count();
     }
 
     public function getQuestionById($id, $columns = ['*'])

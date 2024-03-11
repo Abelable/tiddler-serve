@@ -154,6 +154,7 @@ Route::prefix('scenic')->group(function () {
     Route::get('provider_options', 'ScenicController@providerOptions');
 
     Route::prefix('question')->group(function () {
+        Route::get('summary', 'ScenicQAController@questionSummary');
         Route::get('list', 'ScenicQAController@questionList');
         Route::get('detail', 'ScenicQAController@questionDetail');
         Route::get('add', 'ScenicQAController@addQuestion');
@@ -229,6 +230,7 @@ Route::prefix('hotel')->group(function () {
     Route::get('provider_options', 'HotelController@providerOptions');
 
     Route::prefix('question')->group(function () {
+        Route::get('summary', 'HotelQAController@questionSummary');
         Route::get('list', 'HotelQAController@questionList');
         Route::get('detail', 'HotelQAController@questionDetail');
         Route::get('add', 'HotelQAController@addQuestion');
@@ -306,6 +308,8 @@ Route::prefix('catering')->group(function () {
     });
 
     Route::prefix('question')->group(function () {
+        Route::get('summary', 'CateringQAController@questionSummary');
+        Route::get('list', 'CateringQAController@questionList');
         Route::get('list', 'CateringQAController@questionList');
         Route::get('detail', 'CateringQAController@questionDetail');
         Route::get('add', 'CateringQAController@addQuestion');

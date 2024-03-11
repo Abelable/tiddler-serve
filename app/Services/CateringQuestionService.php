@@ -7,6 +7,15 @@ use App\Utils\Inputs\PageInput;
 
 class CateringQuestionService extends BaseService
 {
+    public function questionList($restaurantId, $count, $columns = ['*'])
+    {
+        return CateringQuestion::query()
+            ->where('restaurant_id', $restaurantId)
+            ->orderBy('answer_num', 'desc')
+            ->take($count)
+            ->get($columns);
+    }
+
     public function questionPage($restaurantId, PageInput $input, $columns = ['*'])
     {
         return CateringQuestion::query()
@@ -14,6 +23,11 @@ class CateringQuestionService extends BaseService
             ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function questionTotal($restaurantId)
+    {
+        return CateringQuestion::query()->where('restaurant_id', $restaurantId)->count();
     }
 
     public function getQuestionById($id, $columns = ['*'])

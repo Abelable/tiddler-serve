@@ -7,6 +7,15 @@ use App\Utils\Inputs\PageInput;
 
 class ScenicQuestionService extends BaseService
 {
+    public function questionList($scenicId, $count, $columns = ['*'])
+    {
+        return ScenicQuestion::query()
+            ->where('scenic_id', $scenicId)
+            ->orderBy('answer_num', 'desc')
+            ->take($count)
+            ->get($columns);
+    }
+
     public function questionPage($questionId, PageInput $input, $columns = ['*'])
     {
         return ScenicQuestion::query()
@@ -14,6 +23,11 @@ class ScenicQuestionService extends BaseService
             ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function questionTotal($hotelId)
+    {
+        return ScenicQuestion::query()->where('hotel_id', $hotelId)->count();
     }
 
     public function getQuestionById($id, $columns = ['*'])

@@ -30,4 +30,9 @@ class HotelAnswerService extends BaseService
         $answer->save();
         return $answer;
     }
+
+    public function getListByQuestionIds(array $questionIds, $columns = ['*'])
+    {
+        return HotelAnswer::query()->whereIn('question_id', $questionIds)->get($columns);
+    }
 }

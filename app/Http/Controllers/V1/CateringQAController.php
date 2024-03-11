@@ -6,13 +6,44 @@ use App\Http\Controllers\Controller;
 use App\Models\CateringQuestion;
 use App\Services\CateringAnswerService;
 use App\Services\CateringQuestionService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
 class CateringQAController extends Controller
 {
-    protected $except = ['questionList', 'questionDetail', 'answerList'];
+    protected $except = ['questionSummary', 'questionList', 'questionDetail', 'answerList'];
+
+    public function questionSummary()
+    {
+        $restaurantId = $this->verifyRequiredId('restaurantId');
+
+        $total = CateringQuestionService::getInstance()->questionTotal($restaurantId);
+
+        $questionList = CateringQuestionService::getInstance()->questionList($restaurantId, 3);
+        $list = $questionList->map(function (CateringQuestion $question, $index) {
+            if ($index == 0) {
+                return [
+                    'content' => $question->content,
+                    'firstAnswer' => $question->firstAnswer(),
+                ];
+            } else {
+                $userIds = $question->answerList->pluck('user_id')->toArray();
+                $userList = UserService::getInstance()->getListByIds(array_slice($userIds, 0, 3), ['id', 'avatar']);
+                return [
+                    'content' => $question->content,
+                    'answerNum' => $question->answer_num,
+                    'userList' => $userList,
+                ];
+            }
+        });
+
+        return $this->success([
+            'list' => $list,
+            'total' => $total,
+        ]);
+    }
 
     public function questionList()
     {
