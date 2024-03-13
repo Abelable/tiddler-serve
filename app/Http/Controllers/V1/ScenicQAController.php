@@ -25,9 +25,14 @@ class ScenicQAController extends Controller
         $questionList = ScenicQuestionService::getInstance()->questionList($scenicId, 3);
         $list = $questionList->map(function (ScenicQuestion $question, $index) {
             if ($index == 0) {
+                /** @var ScenicAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                $firstAnswer['userInfo'] = $userInfo;
+                unset($firstAnswer->user_id);
                 return [
                     'content' => $question->content,
-                    'firstAnswer' => $question->firstAnswer(),
+                    'firstAnswer' => $firstAnswer,
                 ];
             } else {
                 $userIds = $question->answerList->pluck('user_id')->toArray();

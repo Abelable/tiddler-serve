@@ -25,9 +25,9 @@ class ScenicQuestionService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function questionTotal($hotelId)
+    public function questionTotal($scenicId)
     {
-        return ScenicQuestion::query()->where('hotel_id', $hotelId)->count();
+        return ScenicQuestion::query()->where('scenic_id', $scenicId)->count();
     }
 
     public function getQuestionById($id, $columns = ['*'])
