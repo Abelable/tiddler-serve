@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicAnswer;
 use App\Models\ScenicQuestion;
 use App\Services\ScenicAnswerService;
 use App\Services\ScenicQuestionService;
@@ -85,8 +86,21 @@ class ScenicQAController extends Controller
         $questionId = $this->verifyRequiredId('questionId');
         /** @var PageInput $input */
         $input = PageInput::new();
-        $page = ScenicAnswerService::getInstance()->answerPage($questionId, $input);
-        return $this->successPaginate($page);
+        $columns = ['id', 'user_id', 'content', 'like_number', 'created_at'];
+
+        $page = ScenicAnswerService::getInstance()->answerPage($questionId, $input, $columns);
+        $answerList = collect($page->items());
+
+        $userIds = $answerList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+
+        $list = $answerList->map(function (ScenicAnswer $answer) use ($userList) {
+            $userInfo = $userList->get($answer->user_id);
+            $answer['userInfo'] = $userInfo;
+            unset($answer->user_id);
+            return $answer;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function addAnswer()

@@ -16,10 +16,10 @@ class ScenicQuestionService extends BaseService
             ->get($columns);
     }
 
-    public function questionPage($questionId, PageInput $input, $columns = ['*'])
+    public function questionPage($scenicId, PageInput $input, $columns = ['*'])
     {
         return ScenicQuestion::query()
-            ->where('question_id', $questionId)
+            ->where('scenic_id', $scenicId)
             ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
