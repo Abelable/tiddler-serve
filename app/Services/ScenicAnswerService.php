@@ -21,6 +21,11 @@ class ScenicAnswerService extends BaseService
         return ScenicAnswer::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getUserAnswerByQuestionId($userId, $questionId, $columns = ['*'])
+    {
+        return ScenicAnswer::query()->where('user_id', $userId)->where('question_id', $questionId)->first($columns);
+    }
+
     public function createAnswer($userId, $questionId, $content)
     {
         $answer = ScenicAnswer::new();

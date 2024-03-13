@@ -45,6 +45,6 @@ class ScenicQuestion extends BaseModel
 
     public function firstAnswer()
     {
-        return $this->answerList()->orderBy('created_at', 'asc')->first();
+        return $this->answerList()->orderBy('created_at', 'desc')->first();
     }
 }

@@ -52,7 +52,18 @@ class ScenicQAController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $page = ScenicQuestionService::getInstance()->questionPage($scenicId, $input);
-        return $this->successPaginate($page);
+        $list = collect($page->items())->map(function (ScenicQuestion $question) {
+            if ($question->answer_num > 0) {
+                /** @var ScenicAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                $firstAnswer['userInfo'] = $userInfo;
+                unset($firstAnswer->user_id);
+                $question['firstAnswer'] = $firstAnswer;
+            }
+            return $question;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function questionDetail()
@@ -107,6 +118,11 @@ class ScenicQAController extends Controller
     {
         $questionId = $this->verifyRequiredId('questionId');
         $content = $this->verifyRequiredString('content');
+
+        $userAnswer = ScenicAnswerService::getInstance()->getUserAnswerByQuestionId($this->userId(), $questionId);
+        if (!is_null($userAnswer)) {
+            return  $this->fail(CodeResponse::INVALID_OPERATION, '您已回答过该问题');
+        }
 
         DB::transaction(function () use ($questionId, $content) {
             ScenicAnswerService::getInstance()->createAnswer($this->userId(), $questionId, $content);
