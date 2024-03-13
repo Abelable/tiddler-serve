@@ -13,6 +13,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $userInfo
  * @method static \Illuminate\Database\Eloquent\Builder|HotelAnswer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelAnswer newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelAnswer onlyTrashed()
@@ -31,4 +32,8 @@ namespace App\Models;
  */
 class HotelAnswer extends BaseModel
 {
+    public function userInfo()
+    {
+        return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
+    }
 }

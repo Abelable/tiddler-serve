@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\CateringAnswer;
 use App\Models\CateringQuestion;
 use App\Services\CateringAnswerService;
 use App\Services\CateringQuestionService;
@@ -24,9 +25,14 @@ class CateringQAController extends Controller
         $questionList = CateringQuestionService::getInstance()->questionList($restaurantId, 3);
         $list = $questionList->map(function (CateringQuestion $question, $index) {
             if ($index == 0) {
+                /** @var CateringAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                $firstAnswer['userInfo'] = $userInfo;
+                unset($firstAnswer->user_id);
                 return [
                     'content' => $question->content,
-                    'firstAnswer' => $question->firstAnswer(),
+                    'firstAnswer' => $firstAnswer,
                 ];
             } else {
                 $userIds = $question->answerList->pluck('user_id')->toArray();
@@ -51,7 +57,18 @@ class CateringQAController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $page = CateringQuestionService::getInstance()->questionPage($restaurantId, $input);
-        return $this->successPaginate($page);
+        $list = collect($page->items())->map(function (CateringQuestion $question) {
+            if ($question->answer_num > 0) {
+                /** @var CateringAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                $firstAnswer['userInfo'] = $userInfo;
+                unset($firstAnswer->user_id);
+                $question['firstAnswer'] = $firstAnswer;
+            }
+            return $question;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function questionDetail()
@@ -85,14 +102,32 @@ class CateringQAController extends Controller
         $questionId = $this->verifyRequiredId('questionId');
         /** @var PageInput $input */
         $input = PageInput::new();
-        $page = CateringAnswerService::getInstance()->answerPage($questionId, $input);
-        return $this->successPaginate($page);
+        $columns = ['id', 'user_id', 'content', 'like_number', 'created_at'];
+
+        $page = CateringAnswerService::getInstance()->answerPage($questionId, $input, $columns);
+        $answerList = collect($page->items());
+
+        $userIds = $answerList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+
+        $list = $answerList->map(function (CateringAnswer $answer) use ($userList) {
+            $userInfo = $userList->get($answer->user_id);
+            $answer['userInfo'] = $userInfo;
+            unset($answer->user_id);
+            return $answer;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function addAnswer()
     {
         $questionId = $this->verifyRequiredId('questionId');
         $content = $this->verifyRequiredString('content');
+
+        $userAnswer = CateringAnswerService::getInstance()->getUserAnswerByQuestionId($this->userId(), $questionId);
+        if (!is_null($userAnswer)) {
+            return  $this->fail(CodeResponse::INVALID_OPERATION, '您已回答过该问题');
+        }
 
         DB::transaction(function () use ($questionId, $content) {
             CateringAnswerService::getInstance()->createAnswer($this->userId(), $questionId, $content);

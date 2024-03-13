@@ -13,6 +13,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\User|null $userInfo
  * @method static \Illuminate\Database\Eloquent\Builder|CateringAnswer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringAnswer newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringAnswer onlyTrashed()
@@ -31,4 +32,8 @@ namespace App\Models;
  */
 class CateringAnswer extends BaseModel
 {
+    public function userInfo()
+    {
+        return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
+    }
 }

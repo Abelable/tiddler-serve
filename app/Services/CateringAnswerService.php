@@ -21,6 +21,11 @@ class CateringAnswerService extends BaseService
         return CateringAnswer::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getUserAnswerByQuestionId($userId, $questionId, $columns = ['*'])
+    {
+        return CateringAnswer::query()->where('user_id', $userId)->where('question_id', $questionId)->first($columns);
+    }
+
     public function createAnswer($userId, $questionId, $content)
     {
         $answer = CateringAnswer::new();
