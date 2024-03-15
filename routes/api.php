@@ -110,6 +110,13 @@ Route::prefix('goods')->group(function () {
     Route::get('search', 'GoodsController@search');
     Route::get('detail', 'GoodsController@detail');
     Route::get('user_goods_list', 'GoodsController@userGoodsList');
+
+    Route::prefix('evaluation')->group(function () {
+        Route::get('summary', 'GoodsEvaluationController@summary');
+        Route::get('list', 'GoodsEvaluationController@list');
+        Route::post('add', 'GoodsEvaluationController@add');
+        Route::post('delete', 'GoodsEvaluationController@delete');
+    });
 });
 
 Route::prefix('cart')->group(function () {
@@ -165,6 +172,12 @@ Route::prefix('scenic')->group(function () {
         Route::get('list', 'ScenicQAController@answerList');
         Route::post('add', 'ScenicQAController@addAnswer');
         Route::post('delete', 'ScenicQAController@deleteAnswer');
+    });
+
+    Route::prefix('evaluation')->group(function () {
+        Route::get('list', 'ScenicEvaluationController@list');
+        Route::post('add', 'ScenicEvaluationController@add');
+        Route::post('delete', 'ScenicEvaluationController@delete');
     });
 
     Route::prefix('provider')->group(function () {
@@ -241,6 +254,12 @@ Route::prefix('hotel')->group(function () {
         Route::get('list', 'HotelQAController@answerList');
         Route::post('add', 'HotelQAController@addAnswer');
         Route::post('delete', 'HotelQAController@deleteAnswer');
+    });
+
+    Route::prefix('evaluation')->group(function () {
+        Route::get('list', 'HotelEvaluationController@list');
+        Route::post('add', 'HotelEvaluationController@add');
+        Route::post('delete', 'HotelEvaluationController@delete');
     });
 
     Route::prefix('provider')->group(function () {
@@ -320,6 +339,12 @@ Route::prefix('catering')->group(function () {
         Route::get('list', 'CateringQAController@answerList');
         Route::post('add', 'CateringQAController@addAnswer');
         Route::post('delete', 'CateringQAController@deleteAnswer');
+    });
+
+    Route::prefix('evaluation')->group(function () {
+        Route::get('list', 'CateringEvaluationController@list');
+        Route::post('add', 'CateringEvaluationController@add');
+        Route::post('delete', 'CateringEvaluationController@delete');
     });
 
     Route::prefix('provider')->group(function () {

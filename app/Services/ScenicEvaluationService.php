@@ -2,16 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\HotelEvaluation;
-use App\Utils\Inputs\HotelEvaluationInput;
+use App\Models\ScenicEvaluation;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ScenicEvaluationInput;
 
-class HotelEvaluationService extends BaseService
+class ScenicEvaluationService extends BaseService
 {
-    public function evaluationPage($hotelId, PageInput $input, $columns = ['*'])
+    public function evaluationPage($scenicId, PageInput $input, $columns = ['*'])
     {
-        return HotelEvaluation::query()
-            ->where('hotel_id', $hotelId)
+        return ScenicEvaluation::query()
+            ->where('scenic_id', $scenicId)
             ->orderBy('like_number', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -19,14 +19,14 @@ class HotelEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return HotelEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return ScenicEvaluation::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function createEvaluation($userId, HotelEvaluationInput $input)
+    public function createEvaluation($userId, ScenicEvaluationInput $input)
     {
-        $evaluation = HotelEvaluation::new();
+        $evaluation = ScenicEvaluation::new();
         $evaluation->user_id = $userId;
-        $evaluation->hotel_id = $input->hotelId;
+        $evaluation->scenic_id = $input->scenicId;
         $evaluation->score = $input->score;
         $evaluation->content = $input->content;
         $evaluation->image_list = json_encode($input->imageList);
@@ -36,6 +36,6 @@ class HotelEvaluationService extends BaseService
 
     public function getAverageScore($goodsId)
     {
-        return HotelEvaluation::query()->where('goods_id', $goodsId)->avg('score');
+        return ScenicEvaluation::query()->where('goods_id', $goodsId)->avg('score');
     }
 }

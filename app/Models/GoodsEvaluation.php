@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use phpDocumentor\Reflection\Types\This;
+
 /**
  * App\Models\GoodsEvaluation
  *
