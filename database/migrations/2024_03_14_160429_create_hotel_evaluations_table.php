@@ -17,6 +17,7 @@ class CreateHotelEvaluationsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('hotel_id')->comment('酒店id');
+            $table->float('score')->comment('酒店评分');
             $table->string('content')->comment('评论内容');
             $table->longText('image_list')->comment('评论图片');
             $table->integer('like_number')->default(0)->comment('点赞数');

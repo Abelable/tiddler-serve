@@ -8,6 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $scenic_id 景点id
+ * @property float $score 景点评分
  * @property string $content 评论内容
  * @property string $image_list 评论图片
  * @property int $like_number 点赞数
@@ -25,6 +26,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereLikeNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereScenicId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicEvaluation whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|ScenicEvaluation withTrashed()

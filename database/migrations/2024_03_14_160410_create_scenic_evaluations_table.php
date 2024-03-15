@@ -17,6 +17,7 @@ class CreateScenicEvaluationsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('scenic_id')->comment('景点id');
+            $table->float('score')->comment('景点评分');
             $table->string('content')->comment('评论内容');
             $table->longText('image_list')->comment('评论图片');
             $table->integer('like_number')->default(0)->comment('点赞数');

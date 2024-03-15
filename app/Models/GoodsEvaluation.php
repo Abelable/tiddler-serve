@@ -8,6 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $goods_id 商品id
+ * @property float $score 商品评分
  * @property string $content 评论内容
  * @property string $image_list 评论图片
  * @property int $like_number 点赞数
@@ -25,6 +26,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereLikeNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsEvaluation whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|GoodsEvaluation withTrashed()
