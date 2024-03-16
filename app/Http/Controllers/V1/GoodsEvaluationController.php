@@ -5,10 +5,12 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\GoodsEvaluation;
 use App\Services\GoodsEvaluationService;
+use App\Services\OrderService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsEvaluationInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class GoodsEvaluationController extends Controller
 {
@@ -60,7 +62,12 @@ class GoodsEvaluationController extends Controller
     {
         /** @var GoodsEvaluationInput $input */
         $input = GoodsEvaluationInput::new();
-        GoodsEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+        DB::transaction(function () use ($input) {
+            GoodsEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+            OrderService::getInstance()->finish($this->userId(), $input->orderId);
+        });
+
         return $this->success();
     }
 

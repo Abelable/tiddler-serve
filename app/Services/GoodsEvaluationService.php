@@ -24,14 +24,15 @@ class GoodsEvaluationService extends BaseService
 
     public function createEvaluation($userId, GoodsEvaluationInput $input)
     {
-        $evaluation = GoodsEvaluation::new();
-        $evaluation->user_id = $userId;
-        $evaluation->goods_id = $input->goodsId;
-        $evaluation->score = $input->score;
-        $evaluation->content = $input->content;
-        $evaluation->image_list = json_encode($input->imageList);
-        $evaluation->save();
-        return $evaluation;
+        foreach ($input->goodsIds as $goodsId) {
+            $evaluation = GoodsEvaluation::new();
+            $evaluation->user_id = $userId;
+            $evaluation->goods_id = $goodsId;
+            $evaluation->score = $input->score;
+            $evaluation->content = $input->content;
+            $evaluation->image_list = json_encode($input->imageList);
+            $evaluation->save();
+        }
     }
 
     public function getAverageScore($goodsId)

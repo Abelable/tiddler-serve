@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
  * @method bool canRebuyHandle()
  * @method bool canAftersaleHandle()
  * @method bool canAgreeRefundHandle()
+ * @method bool canFinishHandle()
  * @method bool isPayStatus()
  * @method bool isShipStatus()
  * @method bool isConfirmStatus()
@@ -84,6 +85,10 @@ trait OrderStatusTrait
             OrderEnums::STATUS_CONFIRM,
             OrderEnums::STATUS_AUTO_CONFIRM
         ],
+        'finish' => [
+            OrderEnums::STATUS_CONFIRM,
+            OrderEnums::STATUS_AUTO_CONFIRM,
+        ]
     ];
 
     public function isHadPaid()
@@ -106,7 +111,8 @@ trait OrderStatusTrait
             'confirm' => $this->canConfirmHandle(),
             'refund' => $this->canRefundHandle(),
             'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle()
+            'rebuy' => $this->canRebuyHandle(),
+            'finish' => $this->canFinishHandle(),
         ];
     }
 }

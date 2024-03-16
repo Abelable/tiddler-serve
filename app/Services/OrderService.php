@@ -280,6 +280,22 @@ class OrderService extends BaseService
         return $order;
     }
 
+    public function finish($userId, $orderId)
+    {
+        $order = $this->getOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canFinishHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
+        }
+        $order->status = OrderEnums::STATUS_FINISHED;
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+        return $order;
+    }
+
     public function delete($userId, $orderId)
     {
         $order = $this->getOrderById($userId, $orderId);

@@ -4,7 +4,8 @@ namespace App\Utils\Inputs;
 
 class GoodsEvaluationInput extends BaseInput
 {
-    public $goodsId;
+    public $orderId;
+    public $goodsIds;
     public $content;
     public $score;
     public $imageList;
@@ -12,7 +13,8 @@ class GoodsEvaluationInput extends BaseInput
     public function rules()
     {
         return [
-            'goodsId' => 'required|integer|digits_between:1,20',
+            'orderId' => 'required|integer|digits_between:1,20',
+            'goodsIds' => 'required|array|min:1',
             'content' => 'required|string',
             'score' => 'required|numeric',
             'imageList' => 'required|array',
