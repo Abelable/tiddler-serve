@@ -17,7 +17,7 @@ class GoodsEvaluationInput extends BaseInput
             'goodsIds' => 'required|array|min:1',
             'content' => 'required|string',
             'score' => 'required|numeric',
-            'imageList' => 'required|array',
+            'imageList' => 'array',
         ];
     }
 }
