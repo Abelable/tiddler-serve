@@ -28,7 +28,7 @@ class GoodsEvaluationController extends Controller
         return $this->success([
             'userList' => $userList,
             'total' => $total,
-            'avgScore' => $avgScore,
+            'avgScore' => $avgScore ?: 0,
         ]);
     }
 
