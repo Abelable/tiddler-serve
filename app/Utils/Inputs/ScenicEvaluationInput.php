@@ -4,7 +4,8 @@ namespace App\Utils\Inputs;
 
 class ScenicEvaluationInput extends BaseInput
 {
-    public $scenicId;
+    public $orderId;
+    public $ticketId;
     public $content;
     public $score;
     public $imageList;
@@ -12,7 +13,8 @@ class ScenicEvaluationInput extends BaseInput
     public function rules()
     {
         return [
-            'scenicId' => 'required|integer|digits_between:1,20',
+            'orderId' => 'required|integer|digits_between:1,20',
+            'ticketId' => 'required|integer|digits_between:1,20',
             'content' => 'required|string',
             'score' => 'required|numeric',
             'imageList' => 'required|array',

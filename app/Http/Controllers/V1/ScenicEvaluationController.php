@@ -5,10 +5,13 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicEvaluation;
 use App\Services\ScenicEvaluationService;
+use App\Services\ScenicOrderService;
+use App\Services\TicketScenicService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ScenicEvaluationInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicEvaluationController extends Controller
 {
@@ -42,7 +45,14 @@ class ScenicEvaluationController extends Controller
     {
         /** @var ScenicEvaluationInput $input */
         $input = ScenicEvaluationInput::new();
-        ScenicEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+        $scenicIds = TicketScenicService::getInstance()->getListByTicketId($input->ticketId)->pluck('scenic_id')->toArray();
+
+        DB::transaction(function () use ($scenicIds, $input) {
+            ScenicEvaluationService::getInstance()->createEvaluation($this->userId(), $scenicIds, $input);
+            ScenicOrderService::getInstance()->finish($this->userId(), $input->orderId);
+        });
+
         return $this->success();
     }
 

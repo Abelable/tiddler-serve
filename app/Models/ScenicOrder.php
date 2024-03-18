@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\ScenicOrderStatusTrait;
+
 /**
  * App\Models\ScenicOrder
  *
@@ -59,4 +61,5 @@ namespace App\Models;
  */
 class ScenicOrder extends BaseModel
 {
+    use ScenicOrderStatusTrait;
 }

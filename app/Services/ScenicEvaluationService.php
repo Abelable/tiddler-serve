@@ -22,16 +22,17 @@ class ScenicEvaluationService extends BaseService
         return ScenicEvaluation::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function createEvaluation($userId, ScenicEvaluationInput $input)
+    public function createEvaluation($userId, array $scenicIds, ScenicEvaluationInput $input)
     {
-        $evaluation = ScenicEvaluation::new();
-        $evaluation->user_id = $userId;
-        $evaluation->scenic_id = $input->scenicId;
-        $evaluation->score = $input->score;
-        $evaluation->content = $input->content;
-        $evaluation->image_list = json_encode($input->imageList);
-        $evaluation->save();
-        return $evaluation;
+        foreach ($scenicIds as $scenicId) {
+            $evaluation = ScenicEvaluation::new();
+            $evaluation->user_id = $userId;
+            $evaluation->scenic_id = $scenicId;
+            $evaluation->score = $input->score;
+            $evaluation->content = $input->content;
+            $evaluation->image_list = json_encode($input->imageList);
+            $evaluation->save();
+        }
     }
 
     public function getAverageScore($goodsId)
