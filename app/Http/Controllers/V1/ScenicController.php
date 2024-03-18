@@ -62,7 +62,7 @@ class ScenicController extends Controller
                 'cover' => json_decode($spot->image_list)[0],
                 'name' => $spot->name,
                 'level' => $spot->level,
-                'rate' => $spot->rate,
+                'score' => $spot->score,
                 'longitude' => $spot->longitude,
                 'latitude' => $spot->latitude,
                 'address' => $spot->address,

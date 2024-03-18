@@ -38,7 +38,7 @@ class ScenicService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
-                ->orderBy('rate', 'desc')
+                ->orderBy('score', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
@@ -47,7 +47,7 @@ class ScenicService extends BaseService
     public function search(SearchPageInput $input)
     {
         return ScenicSpot::search($input->keywords)
-            ->orderBy('rate', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
     }
@@ -149,5 +149,13 @@ class ScenicService extends BaseService
     public function getProviderScenicOptions($scenicIds, $columns = ['*'])
     {
         return ScenicSpot::query()->whereNotIn('id', $scenicIds)->get($columns);
+    }
+
+    public function updateScenicAvgScore($scenicId, $avgScore)
+    {
+        $scenic = $this->getScenicById($scenicId);
+        $scenic->score = $avgScore;
+        $scenic->save();
+        return $scenic;
     }
 }

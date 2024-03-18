@@ -32,11 +32,15 @@ class ScenicEvaluationService extends BaseService
             $evaluation->content = $input->content;
             $evaluation->image_list = json_encode($input->imageList);
             $evaluation->save();
+
+            // 更新景点评分
+            $avgScore = $this->getAverageScore($scenicId);
+            ScenicService::getInstance()->updateScenicAvgScore($scenicId, $avgScore);
         }
     }
 
-    public function getAverageScore($goodsId)
+    public function getAverageScore($scenicId)
     {
-        return ScenicEvaluation::query()->where('goods_id', $goodsId)->avg('score');
+        return ScenicEvaluation::query()->where('scenic_id', $scenicId)->avg('score');
     }
 }
