@@ -21,7 +21,7 @@ class CreateScenicSpotsTable extends Migration
             $table->decimal('longitude', 9, 6)->comment('经度');
             $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
-            $table->float('rate')->default(0)->comment('景区评分');
+            $table->float('score')->default(0)->comment('景区评分');
             $table->string('video')->default('')->comment('视频');
             $table->longText('image_list')->comment('图片列表');
             $table->longText('brief')->comment('简介');

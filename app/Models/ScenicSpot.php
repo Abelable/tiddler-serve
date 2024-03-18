@@ -14,7 +14,7 @@ use Laravel\Scout\Searchable;
  * @property string $longitude 经度
  * @property string $latitude 纬度
  * @property string $address 具体地址
- * @property float $rate 景区评分
+ * @property float $score 景区评分
  * @property string $video 视频
  * @property string $image_list 图片列表
  * @property string $brief 简介
@@ -47,7 +47,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot wherePolicyList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereProjectList($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereTipsList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereVideo($value)

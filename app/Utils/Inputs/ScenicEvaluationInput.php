@@ -17,7 +17,7 @@ class ScenicEvaluationInput extends BaseInput
             'ticketId' => 'required|integer|digits_between:1,20',
             'content' => 'required|string',
             'score' => 'required|numeric',
-            'imageList' => 'required|array',
+            'imageList' => 'array',
         ];
     }
 }
