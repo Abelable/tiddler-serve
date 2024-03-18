@@ -106,9 +106,9 @@ class ScenicOrderService extends BaseService
     public function calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num)
     {
         $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-        $priceUnit = array_filter($priceList, function ($item) use ($timeStamp) {
+        $priceUnit = array_values(array_filter($priceList, function ($item) use ($timeStamp) {
                 return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
-            })[0] ?? null;
+            }))[0] ?? null;
         if (is_null($priceUnit)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
         }
