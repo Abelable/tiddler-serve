@@ -11,6 +11,7 @@ use Laravel\Scout\Searchable;
  * @property int $category_id 景区分类id
  * @property string $name 景区名称
  * @property string $level 景区等级
+ * @property float $price 景区门票最低价格
  * @property string $longitude 经度
  * @property string $latitude 纬度
  * @property string $address 具体地址
@@ -46,6 +47,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot wherePolicyList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereProjectList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereTipsList($value)
