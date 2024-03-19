@@ -127,6 +127,7 @@ class ScenicService extends BaseService
         $scenic->name = $input->name;
         $scenic->level = $input->level;
         $scenic->category_id = $input->categoryId;
+        $scenic->price = $input->price;
         if (!empty($input->video)) {
             $scenic->video = $input->video;
         }

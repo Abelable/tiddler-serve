@@ -22,7 +22,7 @@ class ScenicController extends Controller
             'name',
             'level',
             'category_id',
-            'rate',
+            'score',
             'created_at',
             'updated_at'
         ];

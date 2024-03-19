@@ -22,7 +22,7 @@ class HotelController extends Controller
             'grade',
             'category_id',
             'price',
-            'rate',
+            'score',
             'created_at',
             'updated_at'
         ];

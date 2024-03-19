@@ -9,6 +9,7 @@ class ScenicInput extends BaseInput
     public $name;
     public $level;
     public $categoryId;
+    public $price;
     public $longitude;
     public $latitude;
     public $address;
@@ -28,6 +29,7 @@ class ScenicInput extends BaseInput
             'name' => 'required|string',
             'level' => 'string',
             'categoryId' => 'required|integer|digits_between:1,20',
+            'price' => 'required|numeric',
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
             'address' => 'required|string',
