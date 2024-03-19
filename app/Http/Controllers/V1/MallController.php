@@ -33,7 +33,7 @@ class MallController extends Controller
             DB::raw('NULL as cover'),
             DB::raw('NULL as image'),
             'image_list',
-            DB::raw('NULL as price'),
+            'price',
             DB::raw('NULL as market_price'),
             DB::raw('NULL as sales_volume'),
             'longitude',
