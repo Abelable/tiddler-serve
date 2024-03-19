@@ -30,7 +30,7 @@ class CreateHotelsTable extends Migration
             $table->decimal('longitude', 9, 6)->comment('经度');
             $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
-            $table->float('rate')->default(0)->comment('酒店评分');
+            $table->float('score')->default(0)->comment('酒店评分');
             $table->string('feature_tag_list')->default('')->comment('酒店特点');
             $table->string('opening_year')->comment('开业年份');
             $table->string('last_decoration_year')->default('')->comment('最近一次装修年份');

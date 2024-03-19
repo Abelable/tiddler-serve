@@ -34,8 +34,8 @@ class HotelEvaluationService extends BaseService
         return $evaluation;
     }
 
-    public function getAverageScore($goodsId)
+    public function getAverageScore($hotelId)
     {
-        return HotelEvaluation::query()->where('goods_id', $goodsId)->avg('score');
+        return HotelEvaluation::query()->where('hotel_id', $hotelId)->avg('score');
     }
 }

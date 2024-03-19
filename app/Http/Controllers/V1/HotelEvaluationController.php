@@ -5,10 +5,13 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\HotelEvaluation;
 use App\Services\HotelEvaluationService;
+use App\Services\HotelOrderService;
+use App\Services\HotelService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelEvaluationInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class HotelEvaluationController extends Controller
 {
@@ -42,7 +45,16 @@ class HotelEvaluationController extends Controller
     {
         /** @var HotelEvaluationInput $input */
         $input = HotelEvaluationInput::new();
-        HotelEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+        DB::transaction(function () use ($input) {
+            HotelEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+            $avgScore = HotelEvaluationService::getInstance()->getAverageScore($input->hotelId);
+            HotelService::getInstance()->updateHotelAvgScore($input->hotelId, $avgScore);
+
+            HotelOrderService::getInstance()->finish($this->userId(), $input->orderId);
+        });
+
         return $this->success();
     }
 

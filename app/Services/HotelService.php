@@ -188,4 +188,12 @@ class HotelService extends BaseService
     {
         return Hotel::query()->whereNotIn('id', $hotelIds)->get($columns);
     }
+
+    public function updateHotelAvgScore($hotelId, $avgScore)
+    {
+        $hotel = $this->getHotelById($hotelId);
+        $hotel->score = $avgScore;
+        $hotel->save();
+        return $hotel;
+    }
 }

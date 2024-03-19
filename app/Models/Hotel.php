@@ -23,7 +23,7 @@ use Laravel\Scout\Searchable;
  * @property string $longitude 经度
  * @property string $latitude 纬度
  * @property string $address 具体地址
- * @property float $rate 酒店评分
+ * @property float $score 酒店评分
  * @property string $feature_tag_list 酒店特点
  * @property string $opening_year 开业年份
  * @property string $last_decoration_year 最近一次装修年份
@@ -80,13 +80,13 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel wherePreorderTipList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel wherePublicAreaFacility($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereReceptionService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRecreationFacility($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRemindList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRestaurantImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomNum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTrafficService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereUpdatedAt($value)

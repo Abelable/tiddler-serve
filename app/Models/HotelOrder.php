@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\HotelOrderStatusTrait;
+
 /**
  * App\Models\HotelOrder
  *
@@ -57,4 +59,5 @@ namespace App\Models;
  */
 class HotelOrder extends BaseModel
 {
+    use HotelOrderStatusTrait;
 }
