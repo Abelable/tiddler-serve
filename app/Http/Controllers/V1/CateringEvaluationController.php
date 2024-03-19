@@ -9,6 +9,7 @@ use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringEvaluationInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class CateringEvaluationController extends Controller
 {
@@ -42,7 +43,13 @@ class CateringEvaluationController extends Controller
     {
         /** @var CateringEvaluationInput $input */
         $input = CateringEvaluationInput::new();
-        CateringEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+        DB::transaction(function () use ($input) {
+            CateringEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
+
+            $avgScore = CateringEvaluationService::getInstance()->getAverageScore($input->restaurantId);
+
+        });
         return $this->success();
     }
 

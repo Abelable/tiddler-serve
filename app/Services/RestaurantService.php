@@ -123,4 +123,9 @@ class RestaurantService extends BaseService
 
         return $restaurant;
     }
+
+    public function updateRestaurantAvgScore()
+    {
+
+    }
 }

@@ -34,8 +34,8 @@ class CateringEvaluationService extends BaseService
         return $evaluation;
     }
 
-    public function getAverageScore($goodsId)
+    public function getAverageScore($restaurantId)
     {
-        return CateringEvaluation::query()->where('goods_id', $goodsId)->avg('score');
+        return CateringEvaluation::query()->where('restaurant_id', $restaurantId)->avg('score');
     }
 }

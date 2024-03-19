@@ -19,7 +19,7 @@ use Laravel\Scout\Searchable;
  * @property string $longitude 经度
  * @property string $latitude 纬度
  * @property string $address 具体地址
- * @property float $rate 餐馆综合评分
+ * @property float $score 餐馆综合评分
  * @property float $taste_rate 餐馆口味评分
  * @property float $environment_rate 餐馆环境评分
  * @property float $service_rate 餐馆服务评分
@@ -51,7 +51,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePriceImageList($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereServiceRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereTasteRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereTelList($value)

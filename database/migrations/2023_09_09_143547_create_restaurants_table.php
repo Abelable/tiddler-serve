@@ -26,7 +26,7 @@ class CreateRestaurantsTable extends Migration
             $table->decimal('longitude', 9, 6)->comment('经度');
             $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
-            $table->float('rate')->default(0)->comment('餐馆综合评分');
+            $table->float('score')->default(0)->comment('餐馆综合评分');
             $table->float('taste_rate')->default(0)->comment('餐馆口味评分');
             $table->float('environment_rate')->default(0)->comment('餐馆环境评分');
             $table->float('service_rate')->default(0)->comment('餐馆服务评分');
