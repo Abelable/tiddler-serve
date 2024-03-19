@@ -38,7 +38,7 @@ class RestaurantService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
-                ->orderBy('rate', 'desc')
+                ->orderBy('score', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
@@ -47,7 +47,7 @@ class RestaurantService extends BaseService
     public function search(SearchPageInput $input)
     {
         return Restaurant::search($input->keywords)
-            ->orderBy('rate', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
     }
