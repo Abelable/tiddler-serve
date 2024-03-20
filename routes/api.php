@@ -341,7 +341,11 @@ Route::prefix('catering')->group(function () {
         Route::post('delete', 'CateringQAController@deleteAnswer');
     });
 
-
+    Route::prefix('evaluation')->group(function () {
+        Route::get('list', 'CateringEvaluationController@list');
+        Route::post('add', 'CateringEvaluationController@add');
+        Route::post('delete', 'CateringEvaluationController@delete');
+    });
 
     Route::prefix('provider')->group(function () {
         Route::post('settle_in', 'CateringProviderController@settleIn');
@@ -396,12 +400,6 @@ Route::prefix('catering')->group(function () {
             Route::post('cancel', 'SetMealOrderController@cancel');
             Route::post('delete', 'SetMealOrderController@delete');
         });
-
-        Route::prefix('evaluation')->group(function () {
-            Route::get('list', 'SetMealEvaluationController@list');
-            Route::post('add', 'SetMealEvaluationController@add');
-            Route::post('delete', 'SetMealEvaluationController@delete');
-        });
     });
 
     Route::prefix('meal_ticket')->group(function () {
@@ -419,12 +417,6 @@ Route::prefix('catering')->group(function () {
             Route::post('refund', 'MealTicketOrderController@refund');
             Route::post('cancel', 'MealTicketOrderController@cancel');
             Route::post('delete', 'MealTicketOrderController@delete');
-        });
-
-        Route::prefix('evaluation')->group(function () {
-            Route::get('list', 'MealTicketEvaluationController@list');
-            Route::post('add', 'MealTicketEvaluationController@add');
-            Route::post('delete', 'MealTicketEvaluationController@delete');
         });
     });
 });

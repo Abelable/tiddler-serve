@@ -7,13 +7,14 @@ use App\Models\CateringEvaluation;
 use App\Services\CateringEvaluationService;
 use App\Services\MealTicketOrderService;
 use App\Services\RestaurantService;
+use App\Services\SetMealOrderService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringEvaluationInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
-class MealTicketEvaluationController extends Controller
+class CateringEvaluationController extends Controller
 {
     protected $except = ['list'];
 
@@ -52,7 +53,11 @@ class MealTicketEvaluationController extends Controller
             $avgScore = CateringEvaluationService::getInstance()->getAverageScore($input->restaurantId);
             RestaurantService::getInstance()->updateRestaurantAvgScore($input->restaurantId, $avgScore);
 
-            MealTicketOrderService::getInstance()->finish($this->userId(), $input->orderId);
+            if ($input->type == 1) {
+                MealTicketOrderService::getInstance()->finish($this->userId(), $input->orderId);
+            } else {
+                SetMealOrderService::getInstance()->finish($this->userId(), $input->orderId);
+            }
         });
 
         return $this->success();
