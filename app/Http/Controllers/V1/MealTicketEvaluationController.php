@@ -5,13 +5,15 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\CateringEvaluation;
 use App\Services\CateringEvaluationService;
+use App\Services\MealTicketOrderService;
+use App\Services\RestaurantService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringEvaluationInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
-class CateringEvaluationController extends Controller
+class MealTicketEvaluationController extends Controller
 {
     protected $except = ['list'];
 
@@ -48,8 +50,11 @@ class CateringEvaluationController extends Controller
             CateringEvaluationService::getInstance()->createEvaluation($this->userId(), $input);
 
             $avgScore = CateringEvaluationService::getInstance()->getAverageScore($input->restaurantId);
+            RestaurantService::getInstance()->updateRestaurantAvgScore($input->restaurantId, $avgScore);
 
+            MealTicketOrderService::getInstance()->finish($this->userId(), $input->orderId);
         });
+
         return $this->success();
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\MealTicketOrderStatusTrait;
+
 /**
  * App\Models\MealTicketOrder
  *
@@ -57,4 +59,5 @@ namespace App\Models;
  */
 class MealTicketOrder extends BaseModel
 {
+    use MealTicketOrderStatusTrait;
 }

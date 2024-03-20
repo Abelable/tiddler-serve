@@ -13,6 +13,7 @@ class SetMealOrderEnums
     const STATUS_REFUND_CONFIRM = 203;
     const STATUS_CONFIRM = 301;
     const STATUS_AUTO_CONFIRM = 302;
+    const STATUS_FINISHED = 401;
 
     const STATUS_TEXT_MAP = [
         self::STATUS_CREATE => '待付款',
@@ -23,6 +24,7 @@ class SetMealOrderEnums
         self::STATUS_REFUND => '订单取消，退款中',
         self::STATUS_REFUND_CONFIRM => '已退款',
         self::STATUS_CONFIRM => '已确认',
-        self::STATUS_AUTO_CONFIRM => '已确认(系统)'
+        self::STATUS_AUTO_CONFIRM => '已确认(系统)',
+        self::STATUS_FINISHED => '已完成',
     ];
 }

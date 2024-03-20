@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\Traits\SetMealOrderStatusTrait;
+
 /**
  * App\Models\SetMealOrder
  *
@@ -57,4 +59,5 @@ namespace App\Models;
  */
 class SetMealOrder extends BaseModel
 {
+    use SetMealOrderStatusTrait;
 }
