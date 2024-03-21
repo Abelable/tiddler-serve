@@ -149,18 +149,34 @@ class TourismNoteController extends Controller
         /** @var TourismNotePageInput $input */
         $input = TourismNotePageInput::new();
 
-        $columns = ['id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $columns = ['id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $page = TourismNoteService::getInstance()->userPageList($this->userId(), $input, $columns);
         $noteList = collect($page->items());
 
         $noteIds = $noteList->pluck('id')->toArray();
+
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        [
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
+
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
-
-        $list = $noteList->map(function (TourismNote $note) use ($input, $goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
+        $list = $noteList->map(function (TourismNote $note) use (
+            $input,
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList,
+            $collectedUserIdsGroup,
+            $likeUserIdsGroup
+        ) {
             $note->image_list = json_decode($note->image_list);
 
             $note['is_follow'] = true;
@@ -191,9 +207,17 @@ class TourismNoteController extends Controller
                 unset($note['commentList']);
             }
 
-            $goods = $goodsList->get($note->goods_id);
-            $note['goods_info'] = $goods;
-            unset($note->goods_id);
+            /** @var MediaCommodity $commodity */
+            $commodity = $mediaCommodityList->find($note->id);
+            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
+            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
+            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
+            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
+
+            $note['scenic_info'] = $scenicInfo;
+            $note['hotel_info'] = $hotelInfo;
+            $note['restaurant_info'] = $restaurantInfo;
+            $note['goods_info'] = $goodsInfo;
 
             return $note;
         });
@@ -211,7 +235,7 @@ class TourismNoteController extends Controller
         $collectNoteList = collect($page->items());
 
         $noteIds = $collectNoteList->pluck('note_id')->toArray();
-        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
+        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
 
         $authorIds = $noteList->pluck('user_id')->toArray();
@@ -220,10 +244,26 @@ class TourismNoteController extends Controller
 
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
 
-        $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        [
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
 
-        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use ($goodsList, $authorList, $likeUserIdsGroup, $fanIdsGroup, $noteList) {
+        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use (
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList,
+            $authorList,
+            $likeUserIdsGroup,
+            $fanIdsGroup,
+            $noteList
+        ) {
             /** @var TourismNote $note */
             $note = $noteList->get($collect->note_id);
 
@@ -253,9 +293,17 @@ class TourismNoteController extends Controller
             });
             unset($note['commentList']);
 
-            $goods = $goodsList->get($note->goods_id);
-            $note['goods_info'] = $goods;
-            unset($note->goods_id);
+            /** @var MediaCommodity $commodity */
+            $commodity = $mediaCommodityList->find($note->id);
+            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
+            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
+            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
+            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
+
+            $note['scenic_info'] = $scenicInfo;
+            $note['hotel_info'] = $hotelInfo;
+            $note['restaurant_info'] = $restaurantInfo;
+            $note['goods_info'] = $goodsInfo;
 
             return $note;
         });
@@ -282,10 +330,26 @@ class TourismNoteController extends Controller
 
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        [
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
 
-        $list = $likeNoteList->map(function (TourismNoteLike $like) use ($goodsList, $authorList, $collectedUserIdsGroup, $fanIdsGroup, $noteList) {
+        $list = $likeNoteList->map(function (TourismNoteLike $like) use (
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList,
+            $authorList,
+            $collectedUserIdsGroup,
+            $fanIdsGroup,
+            $noteList
+        ) {
             /** @var TourismNote $note */
             $note = $noteList->get($like->note_id);
 
@@ -315,9 +379,17 @@ class TourismNoteController extends Controller
             });
             unset($note['commentList']);
 
-            $goods = $goodsList->get($note->goods_id);
-            $note['goods_info'] = $goods;
-            unset($note->goods_id);
+            /** @var MediaCommodity $commodity */
+            $commodity = $mediaCommodityList->find($note->id);
+            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
+            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
+            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
+            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
+
+            $note['scenic_info'] = $scenicInfo;
+            $note['hotel_info'] = $hotelInfo;
+            $note['restaurant_info'] = $restaurantInfo;
+            $note['goods_info'] = $goodsInfo;
 
             return $note;
         });
