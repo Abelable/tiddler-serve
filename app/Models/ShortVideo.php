@@ -13,7 +13,6 @@ use Laravel\Scout\Searchable;
  * @property string $title 视频标题
  * @property string $cover 封面
  * @property string $video_url 视频地址
- * @property int $goods_id 商品id
  * @property float $longitude 经度
  * @property float $latitude 纬度
  * @property string $address 具体地址
@@ -36,7 +35,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereIsPrivate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShortVideo whereLatitude($value)
@@ -51,7 +49,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShortVideo withoutTrashed()
  * @mixin \Eloquent
- * @property-read \App\Models\Goods|null $goodsInfo
  */
 class ShortVideo extends BaseModel
 {
@@ -69,10 +66,5 @@ class ShortVideo extends BaseModel
     public function authorInfo()
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
-    }
-
-    public function goodsInfo()
-    {
-        return $this->belongsTo(Goods::class, 'goods_id')->select('id', 'name', 'image', 'price', 'market_price', 'stock');
     }
 }

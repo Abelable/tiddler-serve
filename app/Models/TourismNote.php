@@ -37,7 +37,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereIsPrivate($value)
@@ -52,7 +51,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Query\Builder|TourismNote withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TourismNote withoutTrashed()
  * @mixin \Eloquent
- * @property-read \App\Models\Goods|null $goodsInfo
  */
 class TourismNote extends BaseModel
 {
@@ -76,10 +74,5 @@ class TourismNote extends BaseModel
     public function authorInfo()
     {
         return $this->belongsTo(User::class, 'user_id')->select('id', 'nickname', 'avatar');
-    }
-
-    public function goodsInfo()
-    {
-        return $this->belongsTo(Goods::class, 'goods_id')->select('id', 'name', 'image', 'price', 'market_price', 'stock');
     }
 }
