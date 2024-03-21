@@ -13,7 +13,6 @@ use Laravel\Scout\Searchable;
  * @property string $image_list 主图图片列表
  * @property string $title 标题
  * @property string $content 内容
- * @property int $goods_id 商品id
  * @property float $longitude 经度
  * @property float $latitude 纬度
  * @property string $address 具体地址

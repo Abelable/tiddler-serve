@@ -20,7 +20,6 @@ class CreateShortVideosTable extends Migration
             $table->string('title')->comment('视频标题');
             $table->string('cover')->comment('封面');
             $table->string('video_url')->comment('视频地址');
-            $table->integer('goods_id')->default(0)->comment('商品id');
             $table->float('longitude')->default(0)->comment('经度');
             $table->float('latitude')->default(0)->comment('纬度');
             $table->string('address')->default('')->comment('具体地址');

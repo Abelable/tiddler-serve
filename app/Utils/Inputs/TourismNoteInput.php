@@ -7,6 +7,9 @@ class TourismNoteInput extends BaseInput
     public $imageList;
     public $title;
     public $content;
+    public $scenicId;
+    public $hotelId;
+    public $restaurantId;
     public $goodsId;
     public $longitude;
     public $latitude;
@@ -19,6 +22,9 @@ class TourismNoteInput extends BaseInput
             'imageList' => 'required|string',
             'title' => 'required|string',
             'content' => 'required|string',
+            'scenicId' => 'integer|digits_between:1,20',
+            'hotelId' => 'integer|digits_between:1,20',
+            'restaurantId' => 'integer|digits_between:1,20',
             'goodsId' => 'integer|digits_between:1,20',
             'longitude' => 'numeric',
             'latitude' => 'numeric',

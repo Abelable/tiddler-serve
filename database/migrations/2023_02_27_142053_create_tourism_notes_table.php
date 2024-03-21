@@ -20,7 +20,6 @@ class CreateTourismNotesTable extends Migration
             $table->longText('image_list')->comment('主图图片列表');
             $table->string('title')->comment('标题');
             $table->longText('content')->comment('内容');
-            $table->integer('goods_id')->default(0)->comment('商品id');
             $table->float('longitude')->default(0)->comment('经度');
             $table->float('latitude')->default(0)->comment('纬度');
             $table->string('address')->default('')->comment('具体地址');

@@ -3,6 +3,7 @@
 namespace App\Services\Media;
 
 use App\Models\LiveRoom;
+use App\Models\MediaCommodity;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoCollection;
 use App\Models\ShortVideoLike;
@@ -92,5 +93,26 @@ class MediaService extends BaseService
         $noteTimes = TourismNoteCollection::query()->whereIn('note_id', $noteIds)->count();
 
         return $videoTimes + $noteTimes;
+    }
+
+    public function createMediaCommodity($mediaType, $mediaId, $scenicId, $hotelId, $restaurantId, $goodsId)
+    {
+        $mediaCommodity = MediaCommodity::new();
+        $mediaCommodity->media_type = $mediaType;
+        $mediaCommodity->media_id = $mediaId;
+        if (!empty($scenicId)) {
+            $mediaCommodity->scenic_id = $scenicId;
+        }
+        if (!empty($hotelId)) {
+            $mediaCommodity->hotel_id = $hotelId;
+        }
+        if (!empty($restaurantId)) {
+            $mediaCommodity->restaurant_id = $restaurantId;
+        }
+        if (!empty($goodsId)) {
+            $mediaCommodity->goods_id = $goodsId;
+        }
+        $mediaCommodity->save();
+        return $mediaCommodity;
     }
 }
