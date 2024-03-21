@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\MediaCommodity;
 use App\Models\TourismNote;
 use App\Models\TourismNoteCollection;
 use App\Models\TourismNoteComment;
@@ -10,6 +11,7 @@ use App\Models\TourismNoteLike;
 use App\Services\FanService;
 use App\Services\GoodsService;
 use App\Services\KeywordService;
+use App\Services\Media\MediaCommodityService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -55,14 +57,32 @@ class TourismNoteController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
 
-        $goodsIds = $noteList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
-
         $noteIds = $noteList->pluck('id')->toArray();
+
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        [
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
+
         $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
 
-        return $noteList->map(function (TourismNote $note) use ($withComments, $goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $authorList, $fanIdsGroup) {
+        return $noteList->map(function (TourismNote $note) use (
+            $withComments,
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList,
+            $collectedUserIdsGroup,
+            $likeUserIdsGroup,
+            $authorList,
+            $fanIdsGroup
+        ) {
             $isFollow = false;
             $isLike = false;
             $isCollected = false;
@@ -92,6 +112,13 @@ class TourismNoteController extends Controller
                 });
             }
 
+            /** @var MediaCommodity $commodity */
+            $commodity = $mediaCommodityList->find($note->id);
+            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
+            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
+            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
+            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
+
             $note = [
                 'id' => $note->id,
                 'imageList' => json_decode($note->image_list),
@@ -103,7 +130,10 @@ class TourismNoteController extends Controller
                 'shareTimes' => $note->share_times,
                 'address' => $note->address,
                 'authorInfo' => $authorList->get($note->user_id),
-                'goodsInfo' => $goodsList->get($note->goods_id),
+                'scenicInfo' => $scenicInfo,
+                'hotelInfo' => $hotelInfo,
+                'restaurantInfo' => $restaurantInfo,
+                'goodsInfo' => $goodsInfo,
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
@@ -300,9 +330,22 @@ class TourismNoteController extends Controller
         /** @var TourismNoteInput $input */
         $input = TourismNoteInput::new();
 
-        $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
+        DB::transaction(function () use ($input) {
+            $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
+            if (!empty($input->scenicId) || !empty($input->hotelId) || !empty($input->restaurantId) || !empty($input->goodsId)) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    2,
+                    $note->id,
+                    $input->scenicId,
+                    $input->hotelId,
+                    $input->restaurantId,
+                    $input->goodsId,
+                );
+            }
 
-        return $this->success($note);
+        });
+
+        return $this->success();
     }
 
     public function togglePrivate()

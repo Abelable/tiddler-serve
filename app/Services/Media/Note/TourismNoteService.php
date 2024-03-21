@@ -80,9 +80,6 @@ class TourismNoteService extends BaseService
         $note->image_list = $input->imageList;
         $note->title = $input->title;
         $note->content = $input->content;
-        if (!empty($input->goodsId)) {
-            $note->goods_id = $input->goodsId;
-        }
         if (!empty($input->address)) {
             $note->longitude = $input->longitude;
             $note->latitude = $input->latitude;
