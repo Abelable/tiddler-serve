@@ -437,6 +437,7 @@ Route::prefix('media')->group(function () {
     Route::get('follow_list', 'MediaController@followList');
     Route::get('collect_list', 'MediaController@collectList');
     Route::get('like_list', 'MediaController@likeList');
+    Route::get('commodity_relative_list', 'MediaController@commodityMediaList');
 
     Route::prefix('live')->group(function () {
         Route::post('create', 'LivePushController@createRoom');

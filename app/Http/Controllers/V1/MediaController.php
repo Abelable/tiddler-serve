@@ -282,7 +282,7 @@ class MediaController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function getCommodityMediaList()
+    public function commodityMediaList()
     {
         /** @var CommodityMediaPageInput $input */
         $input = CommodityMediaPageInput::new();
