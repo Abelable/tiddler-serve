@@ -15,6 +15,7 @@ use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\CommodityType;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
@@ -157,12 +158,29 @@ class TourismNoteController extends Controller
                 }
             }
 
-            /** @var MediaCommodity $commodity */
-            $commodity = $mediaCommodityList->find($note->id);
-            $scenicInfo = $commodity ? $scenicList->get($commodity->scenic_id) : null;
-            $hotelInfo = $commodity ? $hotelList->get($commodity->hotel_id) : null;
-            $restaurantInfo = $commodity ? $restaurantList->get($commodity->restaurant_id) : null;
-            $goodsInfo = $commodity ? $goodsList->get($commodity->goods_id) : null;
+            $commodityList = $mediaCommodityList->filter(function (MediaCommodity $commodity) use ($note) {
+                return $commodity->media_id == $note->id;
+            })->map(function (MediaCommodity $commodity) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
+                $info = null;
+                switch ($commodity->commodity_type) {
+                    case CommodityType::SCENIC:
+                        $info = $scenicList->get($commodity->commodity_id);
+                        break;
+                    case CommodityType::HOTEL:
+                        $info = $hotelList->get($commodity->commodity_id);
+                        break;
+                    case CommodityType::RESTAURANT:
+                        $info = $restaurantList->get($commodity->commodity_id);
+                        break;
+                    case CommodityType::GOODS:
+                        $info = $goodsList->get($commodity->commodity_id);
+                        break;
+                }
+                return [
+                    'type' => $commodity->commodity_type,
+                    'info' => $info
+                ];
+            });
 
             return [
                 'id' => $note->id,
@@ -175,10 +193,7 @@ class TourismNoteController extends Controller
                 'shareTimes' => $note->share_times,
                 'address' => $note->address,
                 'authorInfo' => $authorList->get($note->user_id),
-                'scenicInfo' => $scenicInfo,
-                'hotelInfo' => $hotelInfo,
-                'restaurantInfo' => $restaurantInfo,
-                'goodsInfo' => $goodsInfo,
+                'commodityList' => $commodityList,
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
@@ -219,7 +234,7 @@ class TourismNoteController extends Controller
 
         $note = TourismNoteService::getInstance()->getUserNote($this->userId(), $id);
         if (is_null($note)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
         $note->is_private = $note->is_private ? 0 : 1;

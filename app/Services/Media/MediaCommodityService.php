@@ -38,22 +38,23 @@ class MediaCommodityService extends BaseService
         $scenicIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
             return $commodityType == CommodityType::SCENIC;
         })->toArray();
+        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, $scenicColumns)->keyBy('id');
+
         $hotelIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
             return $commodityType == CommodityType::HOTEL;
         })->toArray();
+        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, $hotelColumns)->keyBy('id');
+
         $restaurantIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
             return $commodityType == CommodityType::RESTAURANT;
         })->toArray();
+        $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
+
         $goodsIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
             return $commodityType == CommodityType::GOODS;
         })->toArray();
-
-        $mediaCommodityList = $list->keyBy('media_id');
-        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, $scenicColumns)->keyBy('id');
-        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, $hotelColumns)->keyBy('id');
-        $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $goodsColumns)->keyBy('id');
 
-        return [$mediaCommodityList, $scenicList, $hotelList, $restaurantList, $goodsList];
+        return [$list, $scenicList, $hotelList, $restaurantList, $goodsList];
     }
 }
