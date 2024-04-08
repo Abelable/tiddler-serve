@@ -4,6 +4,7 @@ namespace App\Utils\Enums;
 
 class MediaType
 {
-    const VIDEO = 1;
-    const NOTE = 2;
+    const LIVE = 1;
+    const VIDEO = 2;
+    const NOTE = 3;
 }

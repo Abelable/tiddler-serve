@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Services\Media;
+namespace App\Services;
 
 use App\Models\MediaCommodity;
-use App\Services\BaseService;
-use App\Services\GoodsService;
-use App\Services\HotelService;
-use App\Services\RestaurantService;
-use App\Services\ScenicService;
 use App\Utils\Enums\CommodityType;
+use App\Utils\Inputs\CommodityMediaPageInput;
+use App\Utils\Inputs\PageInput;
 
 class MediaCommodityService extends BaseService
 {
@@ -64,5 +61,13 @@ class MediaCommodityService extends BaseService
             ->where('media_type', $mediaType)
             ->where('media_id', $mediaId)
             ->delete();
+    }
+
+    public function getMediaPage(CommodityMediaPageInput $input, $columns=['*'])
+    {
+        return MediaCommodity::query()
+            ->where('commodity_type', $input->commodityType)
+            ->where('commodity_id', $input->commodityId)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 }
