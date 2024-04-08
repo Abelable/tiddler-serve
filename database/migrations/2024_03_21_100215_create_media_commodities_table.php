@@ -17,10 +17,8 @@ class CreateMediaCommoditiesTable extends Migration
             $table->id();
             $table->integer('media_type')->comment('媒体类型：1-短视频，2-图文游记');
             $table->integer('media_id')->comment('媒体id');
-            $table->integer('scenic_id')->default(0)->comment('媒体关联酒店id');
-            $table->integer('hotel_id')->default(0)->comment('媒体关联酒店id');
-            $table->integer('restaurant_id')->default(0)->comment('媒体关联餐馆id');
-            $table->integer('goods_id')->default(0)->comment('媒体关联商品id');
+            $table->integer('commodity_type')->comment('商品类型：1-景点，2-酒店，3-餐馆，4-商品');
+            $table->integer('commodity_id')->comment('商品id');
             $table->timestamps();
             $table->softDeletes();
         });
