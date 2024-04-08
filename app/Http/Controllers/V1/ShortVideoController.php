@@ -3,19 +3,21 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\MediaCommodity;
+use App\Models\ScenicSpot;
 use App\Models\ShortVideo;
-use App\Models\ShortVideoCollection;
 use App\Models\ShortVideoComment;
-use App\Models\ShortVideoLike;
 use App\Services\FanService;
-use App\Services\GoodsService;
 use App\Services\KeywordService;
+use App\Services\Media\MediaCommodityService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\CommodityType;
+use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
@@ -34,7 +36,7 @@ class ShortVideoController extends Controller
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
         $page = ShortVideoService::getInstance()->pageList($input, $authorId != 0 ? [$authorId] : null, $id);
-        $list = $this->handleVideoList(collect($page->items()));
+        $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));
     }
 
@@ -43,46 +45,151 @@ class ShortVideoController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
 
-        KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        if ($this->isLogin()) {
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        }
 
         $page = ShortVideoService::getInstance()->search($input);
-        $list = $this->handleVideoList(collect($page->items()));
+        $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));
     }
 
-    private function handleVideoList($videoList)
+    public function userVideoList()
     {
-        $authorIds = $videoList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
 
-        $goodsIds = $videoList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $page = ShortVideoService::getInstance()->userPageList($input, $this->userId(), $id);
+        $list = $this->handleList(collect($page->items()), true, true);
 
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function likeVideoList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = ShortVideoLikeService::getInstance()->pageList($this->userId(), $input, $id);
+        $videoIds = collect($page->items())->pluck('video_id')->toArray();
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds);
+        $list = $this->handleList($videoList, true, false, true);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function collectVideoList() {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $input, $id);
+        $videoIds = collect($page->items())->pluck('video_id')->toArray();
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds);
+        $list = $this->handleList($videoList, true, false, false, true);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function handleList($videoList, $isLogin, $isUserList = false, $isLikeList = false, $isCollectList = false)
+    {
+        $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price'];
+        $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price'];
+        $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score'];
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
         $videoIds = $videoList->pluck('id')->toArray();
+        $authorIds = $videoList->pluck('user_id')->toArray();
+
         $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
+        [
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::VIDEO, $videoIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
 
-        return $videoList->map(function (ShortVideo $video) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup, $fanIdsGroup, $authorList) {
-            $isFollow = false;
-            $isLike = false;
-            $isCollected = false;
-            if ($this->isLogin()) {
-                $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
-                if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
-                    $isFollow = true;
-                }
-
-                $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
-                if (in_array($this->userId(), $likeUserIds)) {
-                    $isLike = true;
-                }
-
-                $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
-                if (in_array($this->userId(), $collectedUserIds)) {
-                    $isCollected = true;
+        return $videoList->map(function (ShortVideo $video) use (
+            $isUserList,
+            $isCollectList,
+            $isLikeList,
+            $isLogin,
+            $mediaCommodityList,
+            $scenicList,
+            $hotelList,
+            $restaurantList,
+            $goodsList,
+            $collectedUserIdsGroup,
+            $likeUserIdsGroup,
+            $fanIdsGroup,
+            $authorList
+        ) {
+            if ($isUserList) {
+                $isFollow = true;
+            } else {
+                $isFollow = false;
+                if ($isLogin) {
+                    $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
+                    if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
+                        $isFollow = true;
+                    }
                 }
             }
+
+            if ($isLikeList) {
+                $isLike = true;
+            } else {
+                $isLike = false;
+                if ($isLogin) {
+                    $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
+                    if (in_array($this->userId(), $likeUserIds)) {
+                        $isLike = true;
+                    }
+                }
+            }
+
+            if ($isCollectList) {
+                $isCollected = true;
+            } else {
+                $isCollected = false;
+                if ($isLogin) {
+                    $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
+                    if (in_array($this->userId(), $collectedUserIds)) {
+                        $isCollected = true;
+                    }
+                }
+            }
+
+            $commodityList = $mediaCommodityList->filter(function (MediaCommodity $commodity) use ($video) {
+                return $commodity->media_id == $video->id;
+            })->map(function (MediaCommodity $commodity) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
+                $info = null;
+                switch ($commodity->commodity_type) {
+                    case CommodityType::SCENIC:
+                        /** @var ScenicSpot $info */
+                        $info = $scenicList->get($commodity->commodity_id);
+                        $info['cover'] = json_decode($info->image_list)[0];
+                        break;
+                    case CommodityType::HOTEL:
+                        $info = $hotelList->get($commodity->commodity_id);
+                        break;
+                    case CommodityType::RESTAURANT:
+                        $info = $restaurantList->get($commodity->commodity_id);
+                        break;
+                    case CommodityType::GOODS:
+                        $info = $goodsList->get($commodity->commodity_id);
+                        break;
+                }
+                return [
+                    'type' => $commodity->commodity_type,
+                    'info' => $info
+                ];
+            });
+
             return [
                 'id' => $video->id,
                 'cover' => $video->cover,
@@ -94,7 +201,7 @@ class ShortVideoController extends Controller
                 'shareTimes' => $video->share_times,
                 'address' => $video->address,
                 'authorInfo' => $authorList->get($video->user_id),
-                'goodsInfo' => $goodsList->get($video->goods_id),
+                'commodityList' => $commodityList,
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
@@ -102,162 +209,24 @@ class ShortVideoController extends Controller
         });
     }
 
-    public function userVideoList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-
-        $columns = ['id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
-        $page = ShortVideoService::getInstance()->userPageList($input, $this->userId(), $id, $columns);
-        $videoList = collect($page->items());
-
-        $videoIds = $videoList->pluck('id')->toArray();
-        $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
-        $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
-
-        $goodsIds = $videoList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
-
-        $list = $videoList->map(function (ShortVideo $video) use ($goodsList, $collectedUserIdsGroup, $likeUserIdsGroup) {
-            $video['is_follow'] = true;
-
-            $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
-            if (in_array($this->userId(), $likeUserIds)) {
-                $video['is_like'] = true;
-            }
-
-            $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
-            if (in_array($this->userId(), $collectedUserIds)) {
-                $video['is_collected'] = true;
-            }
-
-            $video['author_info'] = [
-                'id' => $this->userId(),
-                'avatar' => $this->user()->avatar,
-                'nickname' => $this->user()->nickname
-            ];
-
-            $goods = $goodsList->get($video->goods_id);
-            $video['goods_info'] = $goods;
-            unset($video->goods_id);
-
-            return $video;
-        });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function collectVideoList() {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-
-        $page = ShortVideoCollectionService::getInstance()->pageList($this->userId(), $input, $id);
-        $collectVideoList = collect($page->items());
-
-        $videoIds = $collectVideoList->pluck('video_id')->toArray();
-        $columns = ['id', 'goods_id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
-
-        $authorIds = $videoList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-
-        $likeUserIdsGroup = ShortVideoLikeService::getInstance()->likeUserIdsGroup($videoIds);
-
-        $goodsIds = $videoList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
-
-        $list = $collectVideoList->map(function (ShortVideoCollection $collect) use ($goodsList, $authorList, $likeUserIdsGroup, $fanIdsGroup, $videoList) {
-            /** @var ShortVideo $video */
-            $video = $videoList->get($collect->video_id);
-
-            $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
-            if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
-                $video['is_follow'] = true;
-            }
-
-            $likeUserIds = $likeUserIdsGroup->get($video->id) ?? [];
-            if (in_array($this->userId(), $likeUserIds)) {
-                $video['is_like'] = true;
-            }
-
-            $video['is_collected'] = true;
-
-            $authorInfo = $authorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
-            unset($video->user_id);
-
-            $goods = $goodsList->get($video->goods_id);
-            $video['goods_info'] = $goods;
-            unset($video->goods_id);
-
-            return $video;
-        });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function likeVideoList() {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-
-        $page = ShortVideoLikeService::getInstance()->pageList($this->userId(), $input, $id);
-        $likeVideoList = collect($page->items());
-
-        $videoIds = $likeVideoList->pluck('video_id')->toArray();
-        $columns = ['id', 'goods_id', 'user_id', 'cover', 'video_url', 'title', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private'];
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds, $columns)->keyBy('id');
-
-        $authorIds = $videoList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-
-        $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
-
-        $goodsIds = $videoList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
-
-        $list = $likeVideoList->map(function (ShortVideoLike $like) use ($goodsList, $authorList, $collectedUserIdsGroup, $fanIdsGroup, $videoList) {
-            /** @var ShortVideo $video */
-            $video = $videoList->get($like->video_id);
-
-            $fansIds = $fanIdsGroup->get($video->user_id) ?? [];
-            if (in_array($this->userId(), $fansIds) || $video->user_id == $this->userId()) {
-                $video['is_follow'] = true;
-            }
-
-            $video['is_like'] = true;
-
-            $collectedUserIds = $collectedUserIdsGroup->get($video->id) ?? [];
-            if (in_array($this->userId(), $collectedUserIds)) {
-                $video['is_collected'] = true;
-            }
-
-            $authorInfo = $authorList->get($video->user_id);
-            $video['author_info'] = $authorInfo;
-            unset($video->user_id);
-
-            $goods = $goodsList->get($video->goods_id);
-            $video['goods_info'] = $goods;
-            unset($video->goods_id);
-
-            return $video;
-        });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
     public function createVideo()
     {
         /** @var ShortVideoInput $input */
         $input = ShortVideoInput::new();
 
-        $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
+        DB::transaction(function () use ($input) {
+            $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
+            foreach ($input->commodityList as $commodity) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    $commodity['type'],
+                    $commodity['id'],
+                );
+            }
+        });
 
-        return $this->success($video);
+        return $this->success();
     }
 
     public function togglePrivate()
@@ -288,6 +257,7 @@ class ShortVideoController extends Controller
             $video->delete();
             ShortVideoCollectionService::getInstance()->deleteList($video->id);
             ShortVideoLikeService::getInstance()->deleteList($video->id);
+            MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
         });
 
         return $this->success();

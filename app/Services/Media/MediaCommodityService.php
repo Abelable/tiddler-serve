@@ -57,4 +57,12 @@ class MediaCommodityService extends BaseService
 
         return [$list, $scenicList, $hotelList, $restaurantList, $goodsList];
     }
+
+    public function deleteList($mediaType, $mediaId)
+    {
+        return MediaCommodity::query()
+            ->where('media_type', $mediaType)
+            ->where('media_id', $mediaId)
+            ->delete();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\MediaCommodity;
+use App\Models\ScenicSpot;
 use App\Models\TourismNote;
 use App\Models\TourismNoteComment;
 use App\Services\FanService;
@@ -91,6 +92,9 @@ class TourismNoteController extends Controller
 
     private function handleList($noteList, $isLogin, $isUserList = false, $isLikeList = false, $isCollectList = false)
     {
+        $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price'];
+        $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price'];
+        $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score'];
         $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
         $noteIds = $noteList->pluck('id')->toArray();
         $authorIds = $noteList->pluck('user_id')->toArray();
@@ -105,7 +109,7 @@ class TourismNoteController extends Controller
             $hotelList,
             $restaurantList,
             $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::NOTE, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
 
         return $noteList->map(function (TourismNote $note) use (
             $isUserList,
@@ -164,7 +168,9 @@ class TourismNoteController extends Controller
                 $info = null;
                 switch ($commodity->commodity_type) {
                     case CommodityType::SCENIC:
+                        /** @var ScenicSpot $info */
                         $info = $scenicList->get($commodity->commodity_id);
+                        $info['cover'] = json_decode($info->image_list)[0];
                         break;
                     case CommodityType::HOTEL:
                         $info = $hotelList->get($commodity->commodity_id);
@@ -256,6 +262,7 @@ class TourismNoteController extends Controller
             $note->delete();
             TourismNoteCollectionService::getInstance()->deleteList($note->id);
             TourismNoteLikeService::getInstance()->deleteList($note->id);
+            MediaCommodityService::getInstance()->deleteList(MediaType::NOTE, $note->id);
         });
 
         return $this->success();
@@ -319,7 +326,7 @@ class TourismNoteController extends Controller
 
     public function share()
     {
-
+        // todo
     }
 
     public function getCommentList()

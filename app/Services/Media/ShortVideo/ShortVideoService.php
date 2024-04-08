@@ -63,9 +63,6 @@ class ShortVideoService extends BaseService
         $video->title = $input->title;
         $video->cover = $input->cover;
         $video->video_url = $input->videoUrl;
-        if (!empty($input->goodsId)) {
-            $video->goods_id = $input->goodsId;
-        }
         if (!empty($input->address)) {
             $video->longitude = $input->longitude;
             $video->latitude = $input->latitude;
