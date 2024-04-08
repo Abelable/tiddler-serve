@@ -15,6 +15,7 @@ use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
@@ -103,7 +104,7 @@ class TourismNoteController extends Controller
             $hotelList,
             $restaurantList,
             $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
+        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::NOTE, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
 
         return $noteList->map(function (TourismNote $note) use (
             $isUserList,

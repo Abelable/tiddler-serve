@@ -8,26 +8,17 @@ use App\Services\GoodsService;
 use App\Services\HotelService;
 use App\Services\RestaurantService;
 use App\Services\ScenicService;
+use App\Utils\Enums\CommodityType;
 
 class MediaCommodityService extends BaseService
 {
-    public function createMediaCommodity($mediaType, $mediaId, $scenicId, $hotelId, $restaurantId, $goodsId)
+    public function createMediaCommodity($mediaType, $mediaId, $commodityType, $commodityId)
     {
         $mediaCommodity = MediaCommodity::new();
         $mediaCommodity->media_type = $mediaType;
         $mediaCommodity->media_id = $mediaId;
-        if (!empty($scenicId)) {
-            $mediaCommodity->scenic_id = $scenicId;
-        }
-        if (!empty($hotelId)) {
-            $mediaCommodity->hotel_id = $hotelId;
-        }
-        if (!empty($restaurantId)) {
-            $mediaCommodity->restaurant_id = $restaurantId;
-        }
-        if (!empty($goodsId)) {
-            $mediaCommodity->goods_id = $goodsId;
-        }
+        $mediaCommodity->commodity_type = $commodityType;
+        $mediaCommodity->commodity_id = $commodityId;
         $mediaCommodity->save();
         return $mediaCommodity;
     }
@@ -42,19 +33,19 @@ class MediaCommodityService extends BaseService
         $columns = ['*']
     )
     {
-        $list = MediaCommodity::query()->where('media_type', $mediaType)->whereIn('id' ,$mediaIds)->get($columns);
+        $list = MediaCommodity::query()->where('media_type', $mediaType)->whereIn('media_id', $mediaIds)->get($columns);
 
-        $scenicIds = $list->pluck('scenic_id')->filter(function ($scenicId) {
-            return $scenicId != 0;
+        $scenicIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
+            return $commodityType == CommodityType::SCENIC;
         })->toArray();
-        $hotelIds = $list->pluck('hotel_id')->filter(function ($hotelId) {
-            return $hotelId != 0;
+        $hotelIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
+            return $commodityType == CommodityType::HOTEL;
         })->toArray();
-        $restaurantIds = $list->pluck('restaurant_id')->filter(function ($restaurantId) {
-            return $restaurantId != 0;
+        $restaurantIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
+            return $commodityType == CommodityType::RESTAURANT;
         })->toArray();
-        $goodsIds = $list->pluck('goods_id')->filter(function ($goodsId) {
-            return $goodsId != 0;
+        $goodsIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
+            return $commodityType == CommodityType::GOODS;
         })->toArray();
 
         $mediaCommodityList = $list->keyBy('media_id');
