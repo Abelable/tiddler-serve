@@ -200,17 +200,14 @@ class TourismNoteController extends Controller
 
         DB::transaction(function () use ($input) {
             $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
-            if (!empty($input->scenicId) || !empty($input->hotelId) || !empty($input->restaurantId) || !empty($input->goodsId)) {
+            foreach ($input->commodityList as $commodity) {
                 MediaCommodityService::getInstance()->createMediaCommodity(
-                    2,
+                    MediaType::NOTE,
                     $note->id,
-                    $input->scenicId,
-                    $input->hotelId,
-                    $input->restaurantId,
-                    $input->goodsId,
+                    $commodity['type'],
+                    $commodity['id'],
                 );
             }
-
         });
 
         return $this->success();
