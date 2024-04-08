@@ -60,7 +60,6 @@ class MediaController extends Controller
             DB::raw('NULL as viewers_number'),
             DB::raw('NULL as praise_number'),
             DB::raw('NULL as notice_time'),
-            'goods_id',
             'created_at',
         ];
         $noteColumns = [
@@ -83,7 +82,6 @@ class MediaController extends Controller
             DB::raw('NULL as viewers_number'),
             DB::raw('NULL as praise_number'),
             DB::raw('NULL as notice_time'),
-            'goods_id',
             'created_at',
         ];
         $liveColumns = [
@@ -106,7 +104,6 @@ class MediaController extends Controller
             'viewers_number',
             'praise_number',
             'notice_time',
-            DB::raw('NULL as goods_id'),
             'created_at',
         ];
 

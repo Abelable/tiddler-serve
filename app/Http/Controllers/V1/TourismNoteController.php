@@ -5,11 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\MediaCommodity;
 use App\Models\TourismNote;
-use App\Models\TourismNoteCollection;
 use App\Models\TourismNoteComment;
-use App\Models\TourismNoteLike;
 use App\Services\FanService;
-use App\Services\GoodsService;
 use App\Services\KeywordService;
 use App\Services\Media\MediaCommodityService;
 use App\Services\Media\Note\TourismNoteCollectionService;
@@ -28,14 +25,14 @@ use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
 {
-    protected $except = ['list'];
+    protected $except = ['list', 'search'];
 
     public function list()
     {
         /** @var TourismNotePageInput $input */
         $input = TourismNotePageInput::new();
         $page = TourismNoteService::getInstance()->pageList($input);
-        $list = $this->handleList(collect($page->items()), $input->withComments);
+        $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));
     }
 
@@ -44,22 +41,62 @@ class TourismNoteController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
 
-        KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        if ($this->isLogin()) {
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        }
 
         $page = TourismNoteService::getInstance()->search($input);
-        $list = $this->handleList(collect($page->items()));
+        $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));
     }
 
-    private function handleList($noteList, $withComments = 0)
+    public function userNoteList()
     {
+        /** @var TourismNotePageInput $input */
+        $input = TourismNotePageInput::new();
+        $page = TourismNoteService::getInstance()->userPageList($this->userId(), $input);
+        $list = $this->handleList(collect($page->items()), true, true);
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function likeNoteList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = TourismNoteLikeService::getInstance()->pageList($this->userId(), $input, $id);
+        $noteIds = collect($page->items())->pluck('note_id')->toArray();
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds);
+        $list = $this->handleList($noteList, true, false, true);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function collectNoteList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $id = $this->verifyId('id', 0);
+
+        $page = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $input, $id);
+        $noteIds = collect($page->items())->pluck('note_id')->toArray();
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds);
+        $list = $this->handleList($noteList, true, false, false, true);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function handleList($noteList, $isLogin, $isUserList = false, $isLikeList = false, $isCollectList = false)
+    {
+        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        $noteIds = $noteList->pluck('id')->toArray();
         $authorIds = $noteList->pluck('user_id')->toArray();
+
+        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
+        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-
-        $noteIds = $noteList->pluck('id')->toArray();
-
-        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
         [
             $mediaCommodityList,
             $scenicList,
@@ -68,11 +105,11 @@ class TourismNoteController extends Controller
             $goodsList
         ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
 
-        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
-        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
-
         return $noteList->map(function (TourismNote $note) use (
-            $withComments,
+            $isUserList,
+            $isCollectList,
+            $isLikeList,
+            $isLogin,
             $mediaCommodityList,
             $scenicList,
             $hotelList,
@@ -83,43 +120,50 @@ class TourismNoteController extends Controller
             $authorList,
             $fanIdsGroup
         ) {
-            $isFollow = false;
-            $isLike = false;
-            $isCollected = false;
-            if ($this->isLogin()) {
-                $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
-                if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
-                    $isFollow = true;
-                }
-
-                $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
-                if (in_array($this->userId(), $likeUserIds)) {
-                    $isLike = true;
-                }
-
-                $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
-                if (in_array($this->userId(), $collectedUserIds)) {
-                    $isCollected = true;
+            if ($isUserList) {
+                $isFollow = true;
+            } else {
+                $isFollow = false;
+                if ($isLogin) {
+                    $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
+                    if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
+                        $isFollow = true;
+                    }
                 }
             }
 
-            if ($withComments == 1) {
-                $comments = $note['commentList']->map(function ($comment) {
-                    return [
-                        'nickname' => $comment['userInfo']->nickname,
-                        'content' => $comment['content']
-                    ];
-                });
+            if ($isLikeList) {
+                $isLike = true;
+            } else {
+                $isLike = false;
+                if ($isLogin) {
+                    $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
+                    if (in_array($this->userId(), $likeUserIds)) {
+                        $isLike = true;
+                    }
+                }
+            }
+
+            if ($isCollectList) {
+                $isCollected = true;
+            } else {
+                $isCollected = false;
+                if ($isLogin) {
+                    $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
+                    if (in_array($this->userId(), $collectedUserIds)) {
+                        $isCollected = true;
+                    }
+                }
             }
 
             /** @var MediaCommodity $commodity */
             $commodity = $mediaCommodityList->find($note->id);
-            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
-            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
-            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
-            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
+            $scenicInfo = $commodity ? $scenicList->get($commodity->scenic_id) : null;
+            $hotelInfo = $commodity ? $hotelList->get($commodity->hotel_id) : null;
+            $restaurantInfo = $commodity ? $restaurantList->get($commodity->restaurant_id) : null;
+            $goodsInfo = $commodity ? $goodsList->get($commodity->goods_id) : null;
 
-            $note = [
+            return [
                 'id' => $note->id,
                 'imageList' => json_decode($note->image_list),
                 'title' => $note->title,
@@ -137,264 +181,15 @@ class TourismNoteController extends Controller
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
-                'createdAt' => $note->created_at,
-            ];
-
-            return $withComments == 1 ? array_merge(['comments' => $comments], $note) : $note;
-        });
-    }
-
-    public function userNoteList()
-    {
-        /** @var TourismNotePageInput $input */
-        $input = TourismNotePageInput::new();
-
-        $columns = ['id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
-        $page = TourismNoteService::getInstance()->userPageList($this->userId(), $input, $columns);
-        $noteList = collect($page->items());
-
-        $noteIds = $noteList->pluck('id')->toArray();
-
-        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
-        [
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
-
-        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
-        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
-
-        $list = $noteList->map(function (TourismNote $note) use (
-            $input,
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList,
-            $collectedUserIdsGroup,
-            $likeUserIdsGroup
-        ) {
-            $note->image_list = json_decode($note->image_list);
-
-            $note['is_follow'] = true;
-
-            $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
-            if (in_array($this->userId(), $likeUserIds)) {
-                $note['is_like'] = true;
-            }
-
-            $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
-            if (in_array($this->userId(), $collectedUserIds)) {
-                $note['is_collected'] = true;
-            }
-
-            $note['author_info'] = [
-                'id' => $this->userId(),
-                'avatar' => $this->user()->avatar,
-                'nickname' => $this->user()->nickname
-            ];
-
-            if ($input->withComments) {
-                $note['comments'] = $note['commentList']->map(function ($comment) {
+                'comments' => $note['commentList']->map(function ($comment) {
                     return [
                         'nickname' => $comment['userInfo']->nickname,
                         'content' => $comment['content']
                     ];
-                });
-                unset($note['commentList']);
-            }
-
-            /** @var MediaCommodity $commodity */
-            $commodity = $mediaCommodityList->find($note->id);
-            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
-            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
-            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
-            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
-
-            $note['scenic_info'] = $scenicInfo;
-            $note['hotel_info'] = $hotelInfo;
-            $note['restaurant_info'] = $restaurantInfo;
-            $note['goods_info'] = $goodsInfo;
-
-            return $note;
+                }),
+                'createdAt' => $note->created_at,
+            ];
         });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function collectNoteList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-
-        $page = TourismNoteCollectionService::getInstance()->pageList($this->userId(), $input, $id);
-        $collectNoteList = collect($page->items());
-
-        $noteIds = $collectNoteList->pluck('note_id')->toArray();
-        $columns = ['id', 'user_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
-        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
-
-        $authorIds = $noteList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-
-        $likeUserIdsGroup = TourismNoteLikeService::getInstance()->likeUserIdsGroup($noteIds);
-
-        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
-        [
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
-
-        $list = $collectNoteList->map(function (TourismNoteCollection $collect) use (
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList,
-            $authorList,
-            $likeUserIdsGroup,
-            $fanIdsGroup,
-            $noteList
-        ) {
-            /** @var TourismNote $note */
-            $note = $noteList->get($collect->note_id);
-
-            $note->image_list = json_decode($note->image_list);
-
-            $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
-            if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
-                $note['is_follow'] = true;
-            }
-
-            $likeUserIds = $likeUserIdsGroup->get($note->id) ?? [];
-            if (in_array($this->userId(), $likeUserIds)) {
-                $note['is_like'] = true;
-            }
-
-            $note['is_collected'] = true;
-
-            $authorInfo = $authorList->get($note->user_id);
-            $note['author_info'] = $authorInfo;
-            unset($note->user_id);
-
-            $note['comments'] = $note['commentList']->map(function ($comment) {
-                return [
-                    'nickname' => $comment['userInfo']->nickname,
-                    'content' => $comment['content']
-                ];
-            });
-            unset($note['commentList']);
-
-            /** @var MediaCommodity $commodity */
-            $commodity = $mediaCommodityList->find($note->id);
-            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
-            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
-            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
-            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
-
-            $note['scenic_info'] = $scenicInfo;
-            $note['hotel_info'] = $hotelInfo;
-            $note['restaurant_info'] = $restaurantInfo;
-            $note['goods_info'] = $goodsInfo;
-
-            return $note;
-        });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function likeNoteList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $id = $this->verifyId('id', 0);
-
-        $page = TourismNoteLikeService::getInstance()->pageList($this->userId(), $input, $id);
-        $likeNoteList = collect($page->items());
-
-        $noteIds = $likeNoteList->pluck('note_id')->toArray();
-        $columns = ['id', 'user_id', 'goods_id', 'image_list', 'title', 'content', 'like_number', 'comments_number', 'collection_times', 'share_times', 'address', 'is_private', 'created_at'];
-        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds, $columns)->keyBy('id');
-
-        $authorIds = $noteList->pluck('user_id')->toArray();
-        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-        $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-
-        $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
-
-        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
-        [
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(2, $noteIds, ['*'], ['*'], ['*'], $goodsColumns);
-
-        $list = $likeNoteList->map(function (TourismNoteLike $like) use (
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList,
-            $authorList,
-            $collectedUserIdsGroup,
-            $fanIdsGroup,
-            $noteList
-        ) {
-            /** @var TourismNote $note */
-            $note = $noteList->get($like->note_id);
-
-            $note->image_list = json_decode($note->image_list);
-
-            $fansIds = $fanIdsGroup->get($note->user_id) ?? [];
-            if (in_array($this->userId(), $fansIds) || $note->user_id == $this->userId()) {
-                $note['is_follow'] = true;
-            }
-
-            $note['is_like'] = true;
-
-            $collectedUserIds = $collectedUserIdsGroup->get($note->id) ?? [];
-            if (in_array($this->userId(), $collectedUserIds)) {
-                $note['is_collected'] = true;
-            }
-
-            $authorInfo = $authorList->get($note->user_id);
-            $note['author_info'] = $authorInfo;
-            unset($note->user_id);
-
-            $note['comments'] = $note['commentList']->map(function ($comment) {
-                return [
-                    'nickname' => $comment['userInfo']->nickname,
-                    'content' => $comment['content']
-                ];
-            });
-            unset($note['commentList']);
-
-            /** @var MediaCommodity $commodity */
-            $commodity = $mediaCommodityList->find($note->id);
-            $scenicInfo = $scenicList->get($commodity->scenic_id) ?: null;
-            $hotelInfo = $hotelList->get($commodity->hotel_id) ?: null;
-            $restaurantInfo = $restaurantList->get($commodity->restaurant_id) ?: null;
-            $goodsInfo = $goodsList->get($commodity->goods_id) ?: null;
-
-            $note['scenic_info'] = $scenicInfo;
-            $note['hotel_info'] = $hotelInfo;
-            $note['restaurant_info'] = $restaurantInfo;
-            $note['goods_info'] = $goodsInfo;
-
-            return $note;
-        });
-
-        return $this->success($this->paginate($page, $list));
     }
 
     public function createNote()
