@@ -9,12 +9,16 @@ use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
+use Illuminate\Support\Facades\DB;
 
 class GoodsService extends BaseService
 {
     public function getAllList(GoodsPageInput $input, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
+        if (!empty($input->goodsIds)) {
+            $query = $query->orderByRaw(DB::raw("FIELD(id, " . implode(',', $input->goodsIds) . ") DESC"));
+        }
         if (!empty($input->shopCategoryId)) {
             $query = $query->where('shop_category_id', $input->shopCategoryId);
         }

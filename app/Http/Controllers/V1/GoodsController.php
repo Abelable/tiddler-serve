@@ -16,7 +16,7 @@ use App\Utils\Inputs\StatusPageInput;
 
 class GoodsController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'detail', 'shopGoodsList'];
+    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'shopGoodsList'];
 
     public function categoryOptions()
     {
@@ -43,14 +43,31 @@ class GoodsController extends Controller
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
 
-        MallKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
-        GoodsKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+        if ($this->isLogin()) {
+            MallKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+            GoodsKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+        }
 
         $page = GoodsService::getInstance()->search($keywords, $input);
         $goodsList = collect($page->items());
         $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function mediaRelativeList()
+    {
+        $keywords = $this->verifyString('keywords');
+        /** @var GoodsPageInput $input */
+        $input = GoodsPageInput::new();
+
+        if (!empty($keywords)) {
+            $page = GoodsService::getInstance()->search($keywords, $input);
+        } else {
+            $page = GoodsService::getInstance()->getAllList($input);
+        }
+
+        return $this->successPaginate($page);
     }
 
     public function detail()
