@@ -58,6 +58,7 @@ class GoodsController extends Controller
     public function mediaRelativeList()
     {
         $keywords = $this->verifyString('keywords');
+
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
 

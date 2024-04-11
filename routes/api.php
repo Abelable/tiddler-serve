@@ -108,7 +108,7 @@ Route::prefix('goods')->group(function () {
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
     Route::get('search', 'GoodsController@search');
-    Route::get('media_relative_list', 'GoodsController@mediaRelativeList');
+    Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
     Route::get('detail', 'GoodsController@detail');
     Route::get('user_goods_list', 'GoodsController@userGoodsList');
 
@@ -155,7 +155,7 @@ Route::prefix('scenic')->group(function () {
     Route::get('list', 'ScenicController@list');
     Route::get('search', 'ScenicController@search');
     Route::get('nearby_list', 'ScenicController@nearbyList');
-    Route::get('media_relative_list', 'ScenicController@mediaRelativeList');
+    Route::post('media_relative_list', 'ScenicController@mediaRelativeList');
     Route::get('detail', 'ScenicController@detail');
     Route::get('options', 'ScenicController@options');
     Route::post('add', 'ScenicController@add');
@@ -238,7 +238,7 @@ Route::prefix('hotel')->group(function () {
     Route::get('list', 'HotelController@list');
     Route::get('search', 'HotelController@search');
     Route::get('nearby_list', 'HotelController@nearbyList');
-    Route::get('media_relative_list', 'HotelController@mediaRelativeList');
+    Route::post('media_relative_list', 'HotelController@mediaRelativeList');
     Route::get('detail', 'HotelController@detail');
     Route::get('options', 'HotelController@options');
     Route::post('add', 'HotelController@add');
@@ -321,7 +321,7 @@ Route::prefix('catering')->group(function () {
         Route::get('category_options', 'RestaurantController@categoryOptions');
         Route::get('list', 'RestaurantController@list');
         Route::get('search', 'RestaurantController@search');
-        Route::get('media_relative_list', 'RestaurantController@mediaRelativeList');
+        Route::post('media_relative_list', 'RestaurantController@mediaRelativeList');
         Route::get('detail', 'RestaurantController@detail');
         Route::get('options', 'RestaurantController@options');
         Route::post('add', 'RestaurantController@add');

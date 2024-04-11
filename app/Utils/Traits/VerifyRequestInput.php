@@ -40,7 +40,7 @@ trait VerifyRequestInput
     {
         return $this->verifyData($key, $default, 'integer');
     }
-    
+
     public function verifyRequiredInteger($key, $default = null)
     {
         return $this->verifyData($key, $default, 'required|integer');
@@ -59,6 +59,11 @@ trait VerifyRequestInput
     public function verifyArrayNotEmpty($key, $default = null)
     {
         return $this->verifyData($key, $default, 'array|min:1');
+    }
+
+    public function verifyArray($key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'array');
     }
 
     public function verifyMobile()
