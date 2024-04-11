@@ -36,6 +36,9 @@ class HotelService extends BaseService
     public function getHotelPage(CommonPageInput $input, $columns=['*'])
     {
         $query = Hotel::query();
+        if (!empty($input->commodityIds)) {
+            $query = $query->orderByRaw(DB::raw("FIELD(id, " . implode(',', $input->commodityIds) . ") DESC"));
+        }
         if (!empty($input->keywords)) {
             $query = $query->where('name', 'like', "%$input->keywords%");
         }
