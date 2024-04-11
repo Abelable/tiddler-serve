@@ -38,7 +38,9 @@ class ScenicController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
 
-        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        if ($this->isLogin()) {
+            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        }
 
         $page = ScenicService::getInstance()->search($input);
         $list = $this->handelList(collect($page->items()));
@@ -63,6 +65,7 @@ class ScenicController extends Controller
                 'name' => $spot->name,
                 'level' => $spot->level,
                 'score' => $spot->score,
+                'price' => $spot->price,
                 'longitude' => $spot->longitude,
                 'latitude' => $spot->latitude,
                 'address' => $spot->address,

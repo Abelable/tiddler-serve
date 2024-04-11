@@ -36,8 +36,8 @@ class HotelService extends BaseService
     public function getHotelPage(CommonPageInput $input, $columns=['*'])
     {
         $query = Hotel::query();
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
+        if (!empty($input->keywords)) {
+            $query = $query->where('name', 'like', "%$input->keywords%");
         }
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
