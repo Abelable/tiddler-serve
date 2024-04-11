@@ -8,7 +8,6 @@ use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\ScenicInput;
-use App\Utils\Inputs\SearchPageInput;
 use Illuminate\Support\Facades\DB;
 
 class ScenicService extends BaseService
@@ -47,7 +46,7 @@ class ScenicService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search(SearchPageInput $input)
+    public function search(CommonPageInput $input)
     {
         return ScenicSpot::search($input->keywords)
             ->orderBy('score', 'desc')

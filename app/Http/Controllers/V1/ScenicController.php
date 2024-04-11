@@ -16,7 +16,7 @@ use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
 {
-    protected $only = ['add', 'edit', 'providerOptions'];
+    protected $only = ['mediaRelativeList', 'add', 'edit', 'providerOptions'];
 
     public function categoryOptions()
     {
@@ -35,8 +35,8 @@ class ScenicController extends Controller
 
     public function search()
     {
-        /** @var SearchPageInput $input */
-        $input = SearchPageInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
         if ($this->isLogin()) {
             MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
@@ -53,6 +53,21 @@ class ScenicController extends Controller
         $input = NearbyPageInput::new();
         $page = ScenicService::getInstance()->getNearbyList($input);
         $list = $this->handelList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function mediaRelativeList()
+    {
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
+
+        if ($input->keywords) {
+            $page = ScenicService::getInstance()->search($input);
+        } else {
+            $page = ScenicService::getInstance()->getScenicPage($input);
+        }
+        $list = $this->handelList(collect($page->items()));
+
         return $this->success($this->paginate($page, $list));
     }
 

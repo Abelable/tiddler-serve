@@ -8,7 +8,6 @@ use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
-use App\Utils\Inputs\SearchPageInput;
 use Illuminate\Support\Facades\DB;
 
 class HotelService extends BaseService
@@ -55,7 +54,7 @@ class HotelService extends BaseService
         return $query->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function search(SearchPageInput $input)
+    public function search(CommonPageInput $input)
     {
         return Hotel::search($input->keywords)
             ->orderBy('score', 'desc')

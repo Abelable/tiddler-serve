@@ -16,11 +16,10 @@ use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\RestaurantInput;
-use App\Utils\Inputs\SearchPageInput;
 
 class RestaurantController extends Controller
 {
-    protected $only = ['edit', 'delete'];
+    protected $only = ['mediaRelativeList', 'edit', 'delete'];
 
     public function categoryOptions()
     {
@@ -65,10 +64,12 @@ class RestaurantController extends Controller
 
     public function search()
     {
-        /** @var SearchPageInput $input */
-        $input = SearchPageInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
-        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        if ($this->isLogin()) {
+            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        }
 
         $page = RestaurantService::getInstance()->search($input);
         $list = collect($page->items())->map(function (Restaurant $restaurant) {
@@ -82,6 +83,29 @@ class RestaurantController extends Controller
                 'address' => $restaurant->address,
             ];
         });
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function mediaRelativeList()
+    {
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
+
+        if ($input->keywords) {
+            $page = RestaurantService::getInstance()->search($input);
+        } else {
+            $page = RestaurantService::getInstance()->getRestaurantPage($input);
+        }
+
+        $list = collect($page->items())->map(function (Restaurant $restaurant) {
+            return [
+                'id' => $restaurant->id,
+                'name' => $restaurant->name,
+                'cover' => $restaurant->cover,
+                'price' => $restaurant->price,
+            ];
+        });
+
         return $this->success($this->paginate($page, $list));
     }
 

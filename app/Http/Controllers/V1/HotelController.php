@@ -12,11 +12,10 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
-use App\Utils\Inputs\SearchPageInput;
 
 class HotelController extends Controller
 {
-    protected $only = ['add', 'edit', 'providerOptions'];
+    protected $only = ['mediaRelativeList', 'add', 'edit', 'providerOptions'];
 
     public function categoryOptions()
     {
@@ -35,10 +34,12 @@ class HotelController extends Controller
 
     public function search()
     {
-        /** @var SearchPageInput $input */
-        $input = SearchPageInput::new();
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
 
-        MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        if ($this->isLogin()) {
+            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+        }
 
         $page = HotelService::getInstance()->search($input);
         $list = $this->handelList(collect($page->items()));
@@ -51,6 +52,21 @@ class HotelController extends Controller
         $input = NearbyPageInput::new();
         $page = HotelService::getInstance()->getNearbyList($input);
         $list = $this->handelList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function mediaRelativeList()
+    {
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
+
+        if ($input->keywords) {
+            $page = HotelService::getInstance()->search($input);
+        } else {
+            $page = HotelService::getInstance()->getHotelPage($input);
+        }
+        $list = $this->handelList(collect($page->items()));
+
         return $this->success($this->paginate($page, $list));
     }
 
