@@ -94,10 +94,10 @@ class ShortVideoController extends Controller
 
     private function handleList($videoList, $isLogin, $isUserList = false, $isLikeList = false, $isCollectList = false)
     {
-        $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price'];
-        $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price'];
-        $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score'];
-        $goodsColumns = ['id', 'name', 'cover', 'price', 'market_price', 'stock', 'sales_volume'];
+        $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price', 'sales_volume'];
+        $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price', 'sales_volume'];
+        $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score', 'sales_volume'];
+        $goodsColumns = ['id', 'name', 'cover', 'price', 'market_price', 'stock', 'sales_volume', 'sales_volume'];
         $videoIds = $videoList->pluck('id')->toArray();
         $authorIds = $videoList->pluck('user_id')->toArray();
 

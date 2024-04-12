@@ -12,7 +12,6 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\ScenicInput;
-use App\Utils\Inputs\SearchPageInput;
 
 class ScenicController extends Controller
 {
