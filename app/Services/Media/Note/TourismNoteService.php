@@ -77,7 +77,7 @@ class TourismNoteService extends BaseService
     {
         $note = TourismNote::new();
         $note->user_id = $userId;
-        $note->image_list = $input->imageList;
+        $note->image_list = json_encode($input->imageList);
         $note->title = $input->title;
         $note->content = $input->content;
         if (!empty($input->address)) {

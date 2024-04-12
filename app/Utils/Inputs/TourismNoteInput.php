@@ -16,7 +16,7 @@ class TourismNoteInput extends BaseInput
     public function rules()
     {
         return [
-            'imageList' => 'required|string',
+            'imageList' => 'required|array',
             'title' => 'required|string',
             'content' => 'required|string',
             '$commodityList' => 'array',
