@@ -169,7 +169,7 @@ class LivePlayController extends Controller
         $page = LiveGoodsService::getInstance()->pageList($id, $input, ['goods_id', 'is_hot']);
         $liveGoodsList = collect($page->items());
         $goodsIds = $liveGoodsList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'cover', 'price', 'market_price', 'stock'])->keyBy('id');
         $list = $liveGoodsList->map(function (LiveGoods $liveGoods) use ($goodsList) {
             $goodsInfo = $goodsList->get($liveGoods->goods_id);
             $goodsInfo['is_hot'] = $liveGoods->is_hot;

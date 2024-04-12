@@ -43,7 +43,7 @@ class CartGoodsService extends BaseService
             $cartGoods->shop_id = $goods->shop_id;
             $cartGoods->category_id = $goods->category_id;
             $cartGoods->freight_template_id = $goods->freight_template_id;
-            $cartGoods->image = $goods->image;
+            $cartGoods->cover = $goods->cover;
             $cartGoods->name = $goods->name;
             if (count($skuList) != 0 && $selectedSkuIndex != -1 ) {
                 $cartGoods->selected_sku_index = $selectedSkuIndex;

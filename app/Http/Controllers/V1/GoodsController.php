@@ -79,7 +79,7 @@ class GoodsController extends Controller
             'id',
             'shop_id',
             'category_id',
-            'image',
+            'cover',
             'video',
             'image_list',
             'default_spec_image',
@@ -110,7 +110,7 @@ class GoodsController extends Controller
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
-            $shopInfo['goods_list'] = GoodsService::getInstance()->getShopTopList($id, $goods->shop_id, 6, ['id', 'image', 'name', 'price']);
+            $shopInfo['goods_list'] = GoodsService::getInstance()->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price']);
             $goods['shop_info'] = $shopInfo;
         }
         unset($goods->shop_id);
@@ -123,7 +123,7 @@ class GoodsController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         /** @var PageInput $input */
         $input = PageInput::new();
-        $columns = ['id', 'image', 'name', 'price', 'market_price', 'sales_volume'];
+        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
         $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
         return $this->successPaginate($list);
     }
@@ -139,7 +139,7 @@ class GoodsController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        $columns = ['id', 'image', 'name', 'price'];
+        $columns = ['id', 'cover', 'name', 'price'];
         $list = GoodsService::getInstance()->getUserGoodsList($this->userId(), $input, $columns);
         return $this->successPaginate($list);
     }
@@ -159,7 +159,7 @@ class GoodsController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $columns = ['id', 'image', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
+        $columns = ['id', 'cover', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
         $list = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
         return $this->successPaginate($list);
     }

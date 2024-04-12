@@ -177,7 +177,7 @@ class LivePushController extends Controller
             });
         } else {
             $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
-            $columns = ['id', 'image', 'name', 'price', 'market_price', 'stock'];
+            $columns = ['id', 'cover', 'name', 'price', 'market_price', 'stock'];
             $goodsList = GoodsService::getInstance()->getLiveUnlistedGoodsList($this->userId(), $goodsIds, $columns);
         }
 

@@ -95,7 +95,7 @@ class TourismNoteController extends Controller
         $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price'];
         $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price'];
         $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score'];
-        $goodsColumns = ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'];
+        $goodsColumns = ['id', 'name', 'cover', 'price', 'market_price', 'stock', 'sales_volume'];
         $noteIds = $noteList->pluck('id')->toArray();
         $authorIds = $noteList->pluck('user_id')->toArray();
 

@@ -132,7 +132,7 @@ class MediaController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
 
         $goodsIds = $mediaList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'image', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, ['id', 'name', 'cover', 'price', 'market_price', 'stock', 'sales_volume'])->keyBy('id');
 
         $list = $mediaList->map(function ($media) use (
             $authorList,

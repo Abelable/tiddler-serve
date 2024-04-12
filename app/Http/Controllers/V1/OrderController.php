@@ -38,7 +38,7 @@ class OrderController extends Controller
             $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
         }
 
-        $cartGoodsListColumns = ['shop_id', 'image', 'name', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
+        $cartGoodsListColumns = ['shop_id', 'cover', 'name', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
         $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
         $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
@@ -243,7 +243,7 @@ class OrderController extends Controller
     {
         $orderList = collect($page->items());
         $orderIds = $orderList->pluck('id')->toArray();
-        $goodsListColumns = ['order_id', 'goods_id', 'image', 'name', 'selected_sku_name', 'price', 'number'];
+        $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
         $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
         return $orderList->map(function (Order $order) use ($groupedGoodsList) {
             $goodsList = $groupedGoodsList->get($order->id);

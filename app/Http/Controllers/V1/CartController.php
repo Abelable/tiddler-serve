@@ -30,7 +30,7 @@ class CartController extends Controller
             'shop_id',
             'category_id',
             'freight_template_id',
-            'image',
+            'cover',
             'name',
             'selected_sku_name',
             'selected_sku_index',

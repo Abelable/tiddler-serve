@@ -111,7 +111,7 @@ class GoodsController extends Controller
     public function ownerList()
     {
         $input = GoodsListInput::new();
-        $columns = ['id', 'image', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
+        $columns = ['id', 'cover', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
         $list = GoodsService::getInstance()->getOwnerGoodsList($input, $columns);
         return $this->successPaginate($list);
     }
