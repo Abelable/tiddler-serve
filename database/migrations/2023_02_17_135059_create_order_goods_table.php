@@ -17,7 +17,7 @@ class CreateOrderGoodsTable extends Migration
             $table->id();
             $table->integer('order_id')->comment('订单id');
             $table->integer('goods_id')->comment('商品id');
-            $table->string('image')->comment('列表图片');
+            $table->string('cover')->comment('列表图片');
             $table->string('name')->comment('商品名称');
             $table->float('price')->comment('商品价格');
             $table->string('selected_sku_name')->comment('选中的规格名称');

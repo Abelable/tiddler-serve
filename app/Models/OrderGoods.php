@@ -36,6 +36,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|OrderGoods withTrashed()
  * @method static \Illuminate\Database\Query\Builder|OrderGoods withoutTrashed()
  * @mixin \Eloquent
+ * @property string $cover 列表图片
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereCover($value)
  */
 class OrderGoods extends BaseModel
 {
