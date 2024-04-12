@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\MediaCommodity;
 use App\Utils\Enums\CommodityType;
 use App\Utils\Inputs\CommodityMediaPageInput;
-use App\Utils\Inputs\PageInput;
 
 class MediaCommodityService extends BaseService
 {
