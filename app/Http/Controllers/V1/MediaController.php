@@ -290,14 +290,14 @@ class MediaController extends Controller
         $page = MediaCommodityService::getInstance()->getMediaPage($input);
         $mediaList = collect($page->items());
 
-        $videoIds = $mediaList->pluck('media_id')->filter(function (MediaCommodity $mediaCommodity) {
+        $videoIds = $mediaList->filter(function (MediaCommodity $mediaCommodity) {
             return $mediaCommodity->media_type == MediaType::VIDEO;
-        })->toArray();
+        })->pluck('media_id')->toArray();
         $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
 
-        $noteIds = $mediaList->pluck('media_id')->filter(function (MediaCommodity $mediaCommodity) {
+        $noteIds = $mediaList->filter(function (MediaCommodity $mediaCommodity) {
             return $mediaCommodity->media_type == MediaType::NOTE;
-        })->toArray();
+        })->pluck('media_id')->toArray();
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds)->keyBy('id');
 
         $list = $mediaList->map(function (MediaCommodity $mediaCommodity) use ($noteList, $videoList) {
