@@ -20,6 +20,7 @@ class CreateHotelsTable extends Migration
             $table->string('english_name')->comment('酒店英文名称');
             $table->integer('grade')->comment('酒店等级：1-经济，2-舒适，3-高档，4-豪华');
             $table->float('price')->comment('酒店最低价格');
+            $table->integer('sales_volume')->default(0)->comment('酒店房间销量');
             $table->string('video')->default('')->comment('视频');
             $table->string('cover')->comment('封面图片');
             $table->longText('appearance_image_list')->comment('外观图片列表');

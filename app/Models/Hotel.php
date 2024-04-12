@@ -13,6 +13,7 @@ use Laravel\Scout\Searchable;
  * @property string $english_name 酒店英文名称
  * @property int $grade 酒店等级：1-经济，2-舒适，3-高档，4-豪华
  * @property float $price 酒店最低价格
+ * @property int $sales_volume 酒店房间销量
  * @property string $video 视频
  * @property string $cover 封面图片
  * @property string $appearance_image_list 外观图片列表
@@ -86,6 +87,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRestaurantImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereRoomNum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTrafficService($value)

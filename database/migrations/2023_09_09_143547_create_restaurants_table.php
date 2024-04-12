@@ -18,6 +18,7 @@ class CreateRestaurantsTable extends Migration
             $table->integer('category_id')->comment('餐馆分类id');
             $table->string('name')->comment('餐馆名称');
             $table->float('price')->comment('餐馆最低价格');
+            $table->integer('sales_volume')->default(0)->comment('餐券销量');
             $table->string('video')->default('')->comment('视频');
             $table->string('cover')->comment('餐馆封面图片');
             $table->longText('food_image_list')->comment('菜品图片列表');

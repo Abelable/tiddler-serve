@@ -11,6 +11,7 @@ use Laravel\Scout\Searchable;
  * @property int $category_id 餐馆分类id
  * @property string $name 餐馆名称
  * @property float $price 餐馆最低价格
+ * @property int $sales_volume 餐券销量
  * @property string $video 视频
  * @property string $cover 餐馆封面图片
  * @property string $food_image_list 菜品图片列表
@@ -51,6 +52,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant wherePriceImageList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereServiceRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Restaurant whereTasteRate($value)

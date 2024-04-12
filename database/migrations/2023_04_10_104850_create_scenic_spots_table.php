@@ -19,6 +19,7 @@ class CreateScenicSpotsTable extends Migration
             $table->string('name')->comment('景区名称');
             $table->string('level')->default('')->comment('景区等级');
             $table->float('price')->comment('景区门票最低价格');
+            $table->integer('sales_volume')->default(0)->comment('景区门票销量');
             $table->decimal('longitude', 9, 6)->comment('经度');
             $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
