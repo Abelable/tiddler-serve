@@ -173,6 +173,7 @@ class ShortVideoController extends Controller
                         /** @var ScenicSpot $info */
                         $info = $scenicList->get($commodity->commodity_id);
                         $info['cover'] = json_decode($info->image_list)[0];
+                        unset($info->image_list);
                         break;
                     case CommodityType::HOTEL:
                         $info = $hotelList->get($commodity->commodity_id);
@@ -184,10 +185,8 @@ class ShortVideoController extends Controller
                         $info = $goodsList->get($commodity->commodity_id);
                         break;
                 }
-                return [
-                    'type' => $commodity->commodity_type,
-                    'info' => $info
-                ];
+                $info['type'] = $commodity->commodity_type;
+                return $info;
             });
 
             return [
