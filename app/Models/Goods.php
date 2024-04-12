@@ -14,7 +14,7 @@ use Laravel\Scout\Searchable;
  * @property string $failure_reason 审核失败原因
  * @property int $category_id 商品分类id
  * @property int $shop_category_id 所属店铺分类id
- * @property string $image 列表图片
+ * @property string $cover 列表图片
  * @property string $video 主图视频
  * @property string $image_list 主图图片列表
  * @property string $detail_image_list 详情图片列表
@@ -38,6 +38,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods query()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDefaultSpecImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeletedAt($value)
@@ -45,7 +46,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFreightTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereName($value)

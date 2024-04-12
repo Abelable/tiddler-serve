@@ -195,7 +195,7 @@ class GoodsService extends BaseService
         $goodsIds,
         $categoryIds,
         $limit = 10,
-        $columns=['id', 'shop_id', 'image', 'name', 'price', 'market_price', 'sales_volume']
+        $columns=['id', 'shop_id', 'cover', 'name', 'price', 'market_price', 'sales_volume']
     )
     {
         $goodsList = $this->getTopListByCategoryIds($goodsIds, $categoryIds, $limit, $columns);
@@ -209,7 +209,7 @@ class GoodsService extends BaseService
         return $goodsList->map(function (Goods $goods) use ($shopList) {
             return [
                 'id' => $goods->id,
-                'image' => $goods->image,
+                'cover' => $goods->cover,
                 'name' => $goods->name,
                 'price' => $goods->price,
                 'marketPrice' => $goods->market_price,
@@ -278,7 +278,7 @@ class GoodsService extends BaseService
             $goods->status = 0;
             $goods->failure_reason = '';
         }
-        $goods->image = $input->image;
+        $goods->cover = $input->cover;
         $goods->video = $input->video ?: '';
         $goods->image_list = json_encode($input->imageList);
         $goods->detail_image_list = json_encode($input->detailImageList);

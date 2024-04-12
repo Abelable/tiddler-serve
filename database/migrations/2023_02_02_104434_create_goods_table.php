@@ -21,7 +21,7 @@ class CreateGoodsTable extends Migration
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('category_id')->comment('商品分类id');
             $table->integer('shop_category_id')->comment('所属店铺分类id');
-            $table->string('image')->comment('列表图片');
+            $table->string('cover')->comment('列表图片');
             $table->string('video')->default('')->comment('主图视频');
             $table->longText('image_list')->comment('主图图片列表');
             $table->longText('detail_image_list')->comment('详情图片列表');

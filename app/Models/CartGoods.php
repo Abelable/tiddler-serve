@@ -14,7 +14,7 @@ namespace App\Models;
  * @property int $goods_id 商品id
  * @property int $category_id 商品分类id
  * @property int $freight_template_id 运费模板id
- * @property string $image 商品图片
+ * @property string $cover 商品图片
  * @property string $name 商品名称
  * @property string $selected_sku_name 选中的规格名称
  * @property int $selected_sku_index 选中的规格索引
@@ -29,12 +29,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Query\Builder|CartGoods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereFreightTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereNumber($value)

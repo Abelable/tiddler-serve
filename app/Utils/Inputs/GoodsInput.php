@@ -4,7 +4,7 @@ namespace App\Utils\Inputs;
 
 class GoodsInput extends BaseInput
 {
-    public $image;
+    public $cover;
     public $video;
     public $imageList;
     public $detailImageList;
@@ -24,7 +24,7 @@ class GoodsInput extends BaseInput
     public function rules()
     {
         return [
-            'image' => 'required|string',
+            'cover' => 'required|string',
             'video' => 'string',
             'imageList' => 'required|array',
             'detailImageList' => 'required|array',
