@@ -172,8 +172,10 @@ class ShortVideoController extends Controller
                     case CommodityType::SCENIC:
                         /** @var ScenicSpot $info */
                         $info = $scenicList->get($commodity->commodity_id);
-                        $info->image_list = json_decode($info->image_list);
-                        $info['cover'] = $info->image_list[0];
+                        if ($info->image_list) {
+                            $info['cover'] = json_decode($info->image_list)[0];
+                            unset($info->image_list);
+                        }
                         break;
                     case CommodityType::HOTEL:
                         $info = $hotelList->get($commodity->commodity_id);
