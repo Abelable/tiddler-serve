@@ -31,24 +31,24 @@ class MediaCommodityService extends BaseService
     {
         $list = MediaCommodity::query()->where('media_type', $mediaType)->whereIn('media_id', $mediaIds)->get($columns);
 
-        $scenicIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
-            return $commodityType == CommodityType::SCENIC;
-        })->toArray();
+        $scenicIds = $list->filter(function (MediaCommodity $mediaCommodity) {
+            return $mediaCommodity->commodity_type == CommodityType::SCENIC;
+        })->pluck('commodity_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, $scenicColumns)->keyBy('id');
 
-        $hotelIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
-            return $commodityType == CommodityType::HOTEL;
-        })->toArray();
+        $hotelIds = $list->filter(function (MediaCommodity $mediaCommodity) {
+            return $mediaCommodity->commodity_type == CommodityType::HOTEL;
+        })->pluck('commodity_id')->toArray();
         $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, $hotelColumns)->keyBy('id');
 
-        $restaurantIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
-            return $commodityType == CommodityType::RESTAURANT;
-        })->toArray();
+        $restaurantIds = $list->filter(function (MediaCommodity $mediaCommodity) {
+            return $mediaCommodity->commodity_type == CommodityType::RESTAURANT;
+        })->pluck('commodity_id')->toArray();
         $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
 
-        $goodsIds = $list->pluck('commodity_id')->filter(function ($commodityType) {
-            return $commodityType == CommodityType::GOODS;
-        })->toArray();
+        $goodsIds = $list->filter(function (MediaCommodity $mediaCommodity) {
+            return $mediaCommodity->commodity_type == CommodityType::GOODS;
+        })->pluck('commodity_id')->toArray();
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $goodsColumns)->keyBy('id');
 
         return [$list, $scenicList, $hotelList, $restaurantList, $goodsList];
