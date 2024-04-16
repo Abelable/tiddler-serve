@@ -42,10 +42,19 @@ class CommonController extends Controller
         $page = $this->verifyRequiredString('page');
 
         $imageData = WxMpServe::new()->getQRCode($scene, $page);
+        $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
 
-        return response($imageData)
-            ->header('Content-Type', 'image/png')
-            ->header('Content-Disposition', 'inline');
+        return $this->success($qrcode);
+    }
+
+    private function fileToBase64($file){
+        $base64_file = '';
+        if(file_exists($file)){
+            $mime_type= mime_content_type($file);
+            $base64_data = base64_encode(file_get_contents($file));
+            $base64_file = 'data:'.$mime_type.';base64,'.$base64_data;
+        }
+        return $base64_file;
     }
 
     public function wxPayNotify()
