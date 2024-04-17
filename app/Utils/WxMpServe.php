@@ -65,6 +65,10 @@ class WxMpServe
 
     public function getQRCode($scene, $page)
     {
-        return $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
+        $result =  $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
+        if (!empty($result['errcode'])) {
+            throw new \Exception('获取微信小程序二维码异常：' . $result['errcode'] . $result['errmsg']);
+        }
+        return $result;
     }
 }
