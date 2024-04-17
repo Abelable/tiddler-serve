@@ -45,6 +45,10 @@ class CommonController extends Controller
         $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
 
         return $this->success($qrcode);
+
+//        return response($imageData)
+//            ->header('Content-Type', 'image/png')
+//            ->header('Content-Disposition', 'inline');
     }
 
     private function fileToBase64($file){
