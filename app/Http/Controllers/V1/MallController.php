@@ -38,6 +38,8 @@ class MallController extends Controller
             'longitude',
             'latitude',
             'address',
+            'feature_tag_list',
+            DB::raw('NULL as facility_list'),
             'created_at',
         ];
         $hotelColumns = [
@@ -53,6 +55,8 @@ class MallController extends Controller
             'longitude',
             'latitude',
             'address',
+            'feature_tag_list',
+            DB::raw('NULL as facility_list'),
             'created_at',
         ];
         $restaurantColumns = [
@@ -68,6 +72,8 @@ class MallController extends Controller
             'longitude',
             'latitude',
             'address',
+            DB::raw('NULL as feature_tag_list'),
+            'facility_list',
             'created_at',
         ];
         $goodsColumns = [
@@ -83,6 +89,8 @@ class MallController extends Controller
             DB::raw('NULL as longitude'),
             DB::raw('NULL as latitude'),
             DB::raw('NULL as address'),
+            DB::raw('NULL as feature_tag_list'),
+            DB::raw('NULL as facility_list'),
             'created_at',
         ];
 
@@ -90,6 +98,12 @@ class MallController extends Controller
         $list = collect($page->items())->map(function ($commodity) {
             if ($commodity['type'] == 1) {
                 $commodity['cover'] = json_decode($commodity['image_list'])[0];
+            }
+            if ($commodity['type'] == 1 || $commodity['type'] == 2) {
+                $commodity['feature_tag_list'] = json_decode($commodity['feature_tag_list']);
+            }
+            if ($commodity['type'] == 3) {
+                $commodity['facility_list'] = json_decode($commodity['facility_list']);
             }
             if ($commodity['type'] == 4 && $commodity->shop_id != 0) {
                 $shopInfo = ShopService::getInstance()->getShopById($commodity->shop_id, ['id', 'type', 'avatar', 'name']);
