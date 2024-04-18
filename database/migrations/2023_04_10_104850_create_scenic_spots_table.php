@@ -33,6 +33,7 @@ class CreateScenicSpotsTable extends Migration
             $table->longText('project_list')->comment('景区项目');
             $table->longText('facility_list')->comment('景区设施');
             $table->longText('tips_list')->comment('游玩贴士');
+            $table->string('feature_tag_list')->default('')->comment('景区特色标签');
             $table->timestamps();
             $table->softDeletes();
         });

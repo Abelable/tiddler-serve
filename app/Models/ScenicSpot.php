@@ -26,6 +26,7 @@ use Laravel\Scout\Searchable;
  * @property string $project_list 景区项目
  * @property string $facility_list 景区设施
  * @property string $tips_list 游玩贴士
+ * @property string $feature_tag_list 景区特色标签
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -39,6 +40,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereFacilityList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereFeatureTagList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereHotlineList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicSpot whereImageList($value)
