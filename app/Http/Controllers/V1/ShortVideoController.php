@@ -23,6 +23,7 @@ use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
@@ -264,9 +265,11 @@ class ShortVideoController extends Controller
         return $this->success();
     }
 
-    public function addShareTimes()
+    public function share()
     {
         $id = $this->verifyRequiredId('id');
+        $scene = $this->verifyRequiredString('scene');
+        $page = $this->verifyRequiredString('page');
 
         /** @var ShortVideo $video */
         $video = ShortVideoService::getInstance()->getVideo($id);
@@ -277,7 +280,11 @@ class ShortVideoController extends Controller
         $shareTimes = $video->share_times + 1;
         $video->share_times = $shareTimes;
         $video->save();
-        return $this->success($shareTimes);
+
+        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+        $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
+
+        return $this->success(['qrcode' => $qrcode, 'shareTimes' => $shareTimes]);
     }
 
     public function toggleLikeStatus()
