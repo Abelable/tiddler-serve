@@ -111,6 +111,7 @@ class ScenicService extends BaseService
         $scenic->facility_list = json_decode($scenic->facility_list);
         $scenic->tips_list = json_decode($scenic->tips_list);
         $scenic->project_list = json_decode($scenic->project_list);
+        $scenic->feature_tag_list = json_decode($scenic->feature_tag_list);
         return $scenic;
     }
 
@@ -144,6 +145,7 @@ class ScenicService extends BaseService
         $scenic->project_list = json_encode($input->projectList);
         $scenic->facility_list = json_encode($input->facilityList);
         $scenic->tips_list = json_encode($input->tipsList);
+        $scenic->feature_tag_list = json_encode($input->featureTagList);
         $scenic->save();
 
         return $scenic;

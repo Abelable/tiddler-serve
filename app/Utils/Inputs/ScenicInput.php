@@ -20,6 +20,7 @@ class ScenicInput extends BaseInput
     public $projectList;
     public $facilityList;
     public $tipsList;
+    public $featureTagList;
 
     public function rules()
     {
@@ -40,6 +41,7 @@ class ScenicInput extends BaseInput
             'projectList' => 'array',
             'facilityList' => 'array',
             'tipsList' => 'array',
+            'featureTagList'=> 'array',
         ];
     }
 }
