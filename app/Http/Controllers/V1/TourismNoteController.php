@@ -269,6 +269,22 @@ class TourismNoteController extends Controller
         return $this->success();
     }
 
+    public function addShareTimes()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        /** @var TourismNote $note */
+        $note = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($note)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
+        }
+
+        $shareTimes = $note->share_times + 1;
+        $note->share_times = $shareTimes;
+        $note->save();
+        return $this->success($shareTimes);
+    }
+
     public function toggleLikeStatus()
     {
         $id = $this->verifyRequiredId('id');
@@ -323,11 +339,6 @@ class TourismNoteController extends Controller
         });
 
         return $this->success($collectionTimes);
-    }
-
-    public function share()
-    {
-        // todo
     }
 
     public function getCommentList()

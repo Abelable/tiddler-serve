@@ -264,6 +264,22 @@ class ShortVideoController extends Controller
         return $this->success();
     }
 
+    public function addShareTimes()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        /** @var ShortVideo $video */
+        $video = ShortVideoService::getInstance()->getVideo($id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+        }
+
+        $shareTimes = $video->share_times + 1;
+        $video->share_times = $shareTimes;
+        $video->save();
+        return $this->success($shareTimes);
+    }
+
     public function toggleLikeStatus()
     {
         $id = $this->verifyRequiredId('id');
@@ -390,11 +406,6 @@ class ShortVideoController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
-    }
-
-    public function share()
-    {
-        // todo
     }
 
     public function deleteComment()
