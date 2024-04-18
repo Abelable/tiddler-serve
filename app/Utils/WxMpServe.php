@@ -34,7 +34,7 @@ class WxMpServe
             throw new \Exception('获取微信小程序access_token异常：' . $result['errcode'] . $result['errmsg']);
         }
         $accessToken = $result['access_token'];
-        Cache::put(self::ACCESS_TOKEN_KEY, $accessToken, now()->addSeconds(6000));
+        Cache::put(self::ACCESS_TOKEN_KEY, $accessToken, now()->addSeconds($result['expires_in']));
         return $accessToken;
     }
 
