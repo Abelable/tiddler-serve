@@ -7,7 +7,7 @@ use App\Models\MealTicket;
 use App\Models\Restaurant;
 use App\Models\RestaurantCategory;
 use App\Models\SetMeal;
-use App\Services\MallKeywordService;
+use App\Services\KeywordService;
 use App\Services\MealTicketService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
@@ -68,7 +68,7 @@ class RestaurantController extends Controller
         $input = CommonPageInput::new();
 
         if ($this->isLogin()) {
-            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
         }
 
         $page = RestaurantService::getInstance()->search($input);

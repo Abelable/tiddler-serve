@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
-use App\Services\MallKeywordService;
+use App\Services\KeywordService;
 use App\Services\ProviderHotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;
@@ -38,7 +38,7 @@ class HotelController extends Controller
         $input = CommonPageInput::new();
 
         if ($this->isLogin()) {
-            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
         }
 
         $page = HotelService::getInstance()->search($input);

@@ -4,9 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\GoodsCategoryService;
-use App\Services\GoodsKeywordService;
 use App\Services\GoodsService;
-use App\Services\MallKeywordService;
+use App\Services\KeywordService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
@@ -44,8 +43,7 @@ class GoodsController extends Controller
         $input = GoodsPageInput::new();
 
         if ($this->isLogin()) {
-            MallKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
-            GoodsKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+            KeywordService::getInstance()->addKeyword($this->userId(), $keywords);
         }
 
         $page = GoodsService::getInstance()->search($keywords, $input);

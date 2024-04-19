@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
-use App\Services\MallKeywordService;
+use App\Services\KeywordService;
 use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
@@ -38,7 +38,7 @@ class ScenicController extends Controller
         $input = CommonPageInput::new();
 
         if ($this->isLogin()) {
-            MallKeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
         }
 
         $page = ScenicService::getInstance()->search($input);

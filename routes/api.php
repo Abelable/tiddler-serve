@@ -99,12 +99,6 @@ Route::prefix('shop')->group(function () {
 });
 
 Route::prefix('goods')->group(function () {
-    Route::prefix('keyword')->group(function () {
-        Route::get('list', 'GoodsKeywordController@list');
-        Route::post('clear', 'GoodsKeywordController@clear');
-        Route::get('hot_list', 'GoodsKeywordController@hotList');
-    });
-
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
     Route::get('search', 'GoodsController@search');
@@ -426,12 +420,6 @@ Route::prefix('catering')->group(function () {
 });
 
 Route::prefix('mall')->group(function () {
-    Route::prefix('keyword')->group(function () {
-        Route::get('list', 'MallKeywordController@list');
-        Route::post('clear', 'MallKeywordController@clear');
-        Route::get('hot_list', 'MallKeywordController@hotList');
-    });
-
     Route::get('banner_list', 'MallController@bannerList');
     Route::get('commodity_list', 'MallController@list');
 });
