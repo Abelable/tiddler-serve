@@ -83,6 +83,7 @@ class ScenicController extends Controller
                 'longitude' => $spot->longitude,
                 'latitude' => $spot->latitude,
                 'address' => $spot->address,
+                'featureTagList' => json_decode($spot->feature_tag_list)
             ];
         });
     }

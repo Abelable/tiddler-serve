@@ -7,7 +7,6 @@ class CommonPageInput extends PageInput
     public $commodityIds;
     public $keywords;
     public $categoryId;
-    public $sort;
 
     public function rules()
     {
@@ -15,7 +14,6 @@ class CommonPageInput extends PageInput
             'commodityIds' => 'array',
             'keywords' => 'string',
             'categoryId' => 'integer|digits_between:1,20',
-            'sort' => 'string',
         ]);
     }
 }
