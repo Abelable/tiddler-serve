@@ -81,6 +81,7 @@ class RestaurantController extends Controller
                 'longitude' => $restaurant->longitude,
                 'latitude' => $restaurant->latitude,
                 'address' => $restaurant->address,
+                'facilityList' => json_decode($restaurant->facility_list)
             ];
         });
         return $this->success($this->paginate($page, $list));
