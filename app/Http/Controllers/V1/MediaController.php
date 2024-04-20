@@ -8,6 +8,7 @@ use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\GoodsService;
+use App\Services\KeywordService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -47,6 +48,10 @@ class MediaController extends Controller
         $keywords = $this->verifyRequiredString('keywords');
         /** @var PageInput $input */
         $input = PageInput::new();
+
+        if ($this->isLogin()) {
+            KeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+        }
 
         $authorIds = UserService::getInstance()->searchUserIds($keywords);
         return $this->getMediaList($input, $authorIds, true, $keywords);
