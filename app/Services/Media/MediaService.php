@@ -14,16 +14,32 @@ use App\Utils\Inputs\PageInput;
 
 class MediaService extends BaseService
 {
-    public function pageList(PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'], $liveColumns = ['*'], $authorIds = null, $withLiveList = true)
+    public function pageList(
+        PageInput $input,
+        $videoColumns = ['*'],
+        $noteColumns = ['*'],
+        $liveColumns = ['*'],
+        $authorIds = null,
+        $withLiveList = true,
+        $keywords = ''
+    )
     {
         $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
         if (!is_null($authorIds)) {
             $videoQuery = $videoQuery->whereIn('user_id', $authorIds);
         }
+        if (!$keywords) {
+            $videoQuery = $videoQuery->where('title', 'like', "%$keywords%");
+        }
 
         $noteQuery = TourismNote::query()->select($noteColumns)->where('is_private', 0)->selectRaw("3 as type");
         if (!is_null($authorIds)) {
             $noteQuery = $noteQuery->whereIn('user_id', $authorIds);
+        }
+        if (!$keywords) {
+            $noteQuery = $noteQuery
+                ->where('title', 'like', "%$keywords%")
+                ->where('content', 'like', "%$keywords%");
         }
 
         $mediaQuery = $videoQuery->union($noteQuery);
@@ -32,6 +48,9 @@ class MediaService extends BaseService
             $liveQuery = LiveRoom::query()->select($liveColumns)->whereIn('status', [1, 3])->selectRaw("1 as type");
             if (!is_null($authorIds)) {
                 $liveQuery = $liveQuery->whereIn('user_id', $authorIds);
+            }
+            if (!$keywords) {
+                $liveQuery = $liveQuery->where('title', 'like', "%$keywords%");
             }
 
             $mediaQuery = $mediaQuery->union($liveQuery);

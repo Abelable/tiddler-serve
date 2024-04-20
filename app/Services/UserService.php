@@ -60,4 +60,10 @@ class UserService extends BaseService
     {
         return User::search($keywords)->get();
     }
+
+    public function searchUserIds($keywords)
+    {
+        $list = $this->searchList($keywords);
+        return $list->pluck('id')->toArray();
+    }
 }

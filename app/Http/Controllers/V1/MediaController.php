@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['list'];
+    protected $except = ['list', 'search'];
 
     public function list()
     {
@@ -42,7 +42,17 @@ class MediaController extends Controller
         return $this->getMediaList($input, $authorIds, false);
     }
 
-    private function getMediaList(PageInput $input, $authorIds = null, $withLiveList = true)
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $authorIds = UserService::getInstance()->searchUserIds($keywords);
+        return $this->getMediaList($input, $authorIds, true, $keywords);
+    }
+
+    private function getMediaList(PageInput $input, $authorIds = null, $withLiveList = true, $keywords = '')
     {
         $videoColumns = [
             'id',
@@ -111,7 +121,7 @@ class MediaController extends Controller
             'created_at',
         ];
 
-        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList);
+        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList, $keywords);
         $mediaList = collect($page->items());
 
         $videoList = $mediaList->filter(function ($media) {
