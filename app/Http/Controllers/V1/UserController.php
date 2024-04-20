@@ -14,7 +14,7 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['authorInfo'];
+    protected $except = ['authorInfo', 'search'];
 
     public function userInfo()
     {
@@ -108,12 +108,17 @@ class UserController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
+
+        $followUserIds = $this->isLogin() ? FanService::getInstance()->followAuthorIds($this->userId()) : [];
+
         $page = UserService::getInstance()->searchPage($input);
-        $list = collect($page->items())->map(function (User $user) {
+        $list = collect($page->items())->map(function (User $user) use ($followUserIds) {
+            $user['isFollow'] = $this->isLogin() && in_array($user->id, $followUserIds);
             unset($user->openid);
             unset($user->unionid);
             return $user;
         });
+
         return $this->success($this->paginate($page, $list));
     }
 }

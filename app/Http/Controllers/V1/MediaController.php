@@ -38,7 +38,7 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
-        $authorIds = FanService::getInstance()->authorIds($this->userId());
+        $authorIds = FanService::getInstance()->followAuthorIds($this->userId());
         return $this->getMediaList($input, $authorIds, false);
     }
 

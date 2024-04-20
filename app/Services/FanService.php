@@ -21,15 +21,23 @@ class FanService extends BaseService
         return $fan;
     }
 
-    public function authorList($fanId, $columns = ['*'])
+    public function followAuthorList($fanId, $columns = ['*'])
     {
         return Fan::query()->where('fan_id', $fanId)->get($columns);
     }
 
-    public function authorIds($fanId)
+    public function followAuthorIds($fanId)
     {
-        $list = $this->authorList($fanId);
+        $list = $this->followAuthorList($fanId);
         return $list->pluck('author_id')->toArray();
+    }
+
+    public function fanPaginate($userId, PageInput $input, $columns=['*'])
+    {
+        return Fan::query()
+            ->where('author_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function fanList($authorId, $columns = ['*'])
@@ -81,14 +89,6 @@ class FanService extends BaseService
     {
         return Fan::query()
             ->where('fan_id', $userId)
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function fanPaginate($userId, PageInput $input, $columns=['*'])
-    {
-        return Fan::query()
-            ->where('author_id', $userId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
