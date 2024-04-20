@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\FanService;
+use App\Services\KeywordService;
 use App\Services\Media\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -109,7 +110,11 @@ class UserController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
 
-        $followUserIds = $this->isLogin() ? FanService::getInstance()->followAuthorIds($this->userId()) : [];
+        $followUserIds = [];
+        if ($this->isLogin()) {
+            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
+            $followUserIds = FanService::getInstance()->followAuthorIds($this->userId());
+        }
 
         $page = UserService::getInstance()->searchPage($input);
         $list = collect($page->items())->map(function (User $user) use ($followUserIds) {
