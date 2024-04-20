@@ -20,20 +20,24 @@ Route::prefix('auth')->group(function () {
     });
 
     Route::get('token_refresh', 'AuthController@refreshToken');
+
+    Route::prefix('info')->group(function () {
+        Route::get('detail', 'AuthInfoController@detail');
+        Route::post('add', 'AuthInfoController@add');
+        Route::post('edit', 'AuthInfoController@edit');
+        Route::post('delete', 'AuthInfoController@delete');
+    });
 });
 
-Route::get('user_info', 'UserController@userInfo');
-Route::post('update_user_info', 'UserController@updateUserInfo');
-Route::get('tim_login_info', 'UserController@timLoginInfo');
-Route::get('author_info', 'UserController@authorInfo');
+Route::prefix('user')->group(function () {
+    Route::get('info', 'UserController@userInfo');
+    Route::post('update', 'UserController@updateUserInfo');
+    Route::get('tim_login_info', 'UserController@timLoginInfo');
+    Route::get('author_info', 'UserController@authorInfo');
+    Route::get('search', 'UserController@search');
+});
+
 Route::get('oss_config', 'CommonController@ossConfig');
-
-Route::prefix('auth_info')->group(function () {
-    Route::get('detail', 'AuthInfoController@detail');
-    Route::post('add', 'AuthInfoController@add');
-    Route::post('edit', 'AuthInfoController@edit');
-    Route::post('delete', 'AuthInfoController@delete');
-});
 
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');

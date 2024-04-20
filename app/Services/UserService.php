@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Utils\Inputs\Admin\UserListInput;
+use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\WxMpRegisterInput;
 
 class UserService extends BaseService
@@ -46,5 +47,17 @@ class UserService extends BaseService
     public function getListByIds($ids, $columns = ['*'])
     {
         return User::query()->whereIn('id', $ids)->get($columns);
+    }
+
+    public function searchPage(SearchPageInput $input)
+    {
+        return User::search($input->keywords)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, 'page', $input->page);
+    }
+
+    public function searchList($keywords)
+    {
+        return User::search($keywords)->get();
     }
 }

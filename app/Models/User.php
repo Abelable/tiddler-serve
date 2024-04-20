@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Laravel\Scout\Searchable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
@@ -63,7 +64,7 @@ use Illuminate\Notifications\Notifiable;
  */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, HasFactory, Notifiable;
+    use Authenticatable, Authorizable, HasFactory, Notifiable, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -97,6 +98,15 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'id' => $this->id,
+            'nickname' => $this->nickname,
+            'signature' => $this->signature,
+        ];
     }
 
     public function merchant()
