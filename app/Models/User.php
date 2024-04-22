@@ -143,4 +143,14 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     {
         return $this->hasOne(AuthInfo::class, 'user_id')->where('status', 1);
     }
+
+    public function followedUsersNumber()
+    {
+        return $this->hasMany(Fan::class, 'fan_id')->count();
+    }
+
+    public function fansNumber()
+    {
+        return $this->hasMany(Fan::class, 'author_id')->count();
+    }
 }
