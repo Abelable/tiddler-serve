@@ -41,11 +41,6 @@ class GoodsController extends Controller
         $keywords = $this->verifyRequiredString('keywords');
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
-
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $keywords);
-        }
-
         $page = GoodsService::getInstance()->search($keywords, $input);
         $goodsList = collect($page->items());
         $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);

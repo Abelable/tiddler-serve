@@ -66,11 +66,6 @@ class RestaurantController extends Controller
     {
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
-
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
-        }
-
         $page = RestaurantService::getInstance()->search($input);
         $list = collect($page->items())->map(function (Restaurant $restaurant) {
             return [

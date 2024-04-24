@@ -36,11 +36,6 @@ class HotelController extends Controller
     {
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
-
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
-        }
-
         $page = HotelService::getInstance()->search($input);
         $list = $this->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));

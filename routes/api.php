@@ -54,6 +54,7 @@ Route::prefix('fan')->group(function () {
 
 Route::prefix('keyword')->group(function () {
     Route::get('list', 'KeywordController@list');
+    Route::post('add', 'KeywordController@add');
     Route::post('clear', 'KeywordController@clear');
     Route::get('hot_list', 'KeywordController@hotList');
 });

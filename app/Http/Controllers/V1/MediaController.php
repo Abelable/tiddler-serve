@@ -48,11 +48,6 @@ class MediaController extends Controller
         $keywords = $this->verifyRequiredString('keywords');
         /** @var PageInput $input */
         $input = PageInput::new();
-
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $keywords);
-        }
-
         $authorIds = UserService::getInstance()->searchUserIds($keywords);
         return $this->getMediaList($input, $authorIds, true, $keywords);
     }

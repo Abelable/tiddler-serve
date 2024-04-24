@@ -45,11 +45,6 @@ class ShortVideoController extends Controller
     {
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
-
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
-        }
-
         $page = ShortVideoService::getInstance()->search($input);
         $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));

@@ -110,11 +110,7 @@ class UserController extends Controller
         /** @var SearchPageInput $input */
         $input = SearchPageInput::new();
 
-        $followUserIds = [];
-        if ($this->isLogin()) {
-            KeywordService::getInstance()->addKeyword($this->userId(), $input->keywords);
-            $followUserIds = FanService::getInstance()->followAuthorIds($this->userId());
-        }
+        $followUserIds = $this->isLogin() ? FanService::getInstance()->followAuthorIds($this->userId()) : [];
 
         $page = UserService::getInstance()->searchPage($input);
         $list = collect($page->items())->map(function (User $user) use ($followUserIds) {

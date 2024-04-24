@@ -23,6 +23,13 @@ class KeywordController extends Controller
         return $this->success($contentList);
     }
 
+    public function add()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+        KeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+        return $this->success();
+    }
+
     public function clear()
     {
         KeywordService::getInstance()->clearUserKeywords($this->userId());
