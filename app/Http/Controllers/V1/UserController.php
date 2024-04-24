@@ -119,8 +119,8 @@ class UserController extends Controller
         $page = UserService::getInstance()->searchPage($input);
         $list = collect($page->items())->map(function (User $user) use ($followUserIds) {
             $user['isFollow'] = $this->isLogin() && in_array($user->id, $followUserIds);
-            unset($user->openid);
-            unset($user->unionid);
+            $user['followedUsersNumber'] = $user->followedUsersNumber();
+            $user['fansNumber'] = $user->fansNumber();
             return $user;
         });
 
