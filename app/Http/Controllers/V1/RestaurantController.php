@@ -31,14 +31,26 @@ class RestaurantController extends Controller
     {
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
-
         $page = RestaurantService::getInstance()->getRestaurantPage($input);
-        $restaurantList = collect($page->items());
+        $list = $this->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
 
+    public function search()
+    {
+        /** @var CommonPageInput $input */
+        $input = CommonPageInput::new();
+        $page = RestaurantService::getInstance()->search($input);
+        $list = $this->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function handleList($restaurantList)
+    {
         $categoryIds = $restaurantList->pluck('category_id')->toArray();
         $categoryList = RestaurantCategoryService::getInstance()->getListByIds($categoryIds)->keyBy('id');
 
-        $list = $restaurantList->map(function (Restaurant $restaurant) use ($categoryList) {
+        return $restaurantList->map(function (Restaurant $restaurant) use ($categoryList) {
             /** @var RestaurantCategory $category */
             $category = $categoryList->get($restaurant->category_id);
             $restaurant['categoryName'] = $category->name;
@@ -58,28 +70,6 @@ class RestaurantController extends Controller
 
             return $restaurant;
         });
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    public function search()
-    {
-        /** @var CommonPageInput $input */
-        $input = CommonPageInput::new();
-        $page = RestaurantService::getInstance()->search($input);
-        $list = collect($page->items())->map(function (Restaurant $restaurant) {
-            return [
-                'id' => $restaurant->id,
-                'name' => $restaurant->name,
-                'cover' => $restaurant->cover,
-                'price' => $restaurant->price,
-                'longitude' => $restaurant->longitude,
-                'latitude' => $restaurant->latitude,
-                'address' => $restaurant->address,
-                'facilityList' => json_decode($restaurant->facility_list)
-            ];
-        });
-        return $this->success($this->paginate($page, $list));
     }
 
     public function mediaRelativeList()

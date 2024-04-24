@@ -28,7 +28,7 @@ class MediaService extends BaseService
         if (!is_null($authorIds)) {
             $videoQuery = $videoQuery->whereIn('user_id', $authorIds);
         }
-        if (!$keywords) {
+        if ($keywords) {
             $videoQuery = $videoQuery->where('title', 'like', "%$keywords%");
         }
 
@@ -36,7 +36,7 @@ class MediaService extends BaseService
         if (!is_null($authorIds)) {
             $noteQuery = $noteQuery->whereIn('user_id', $authorIds);
         }
-        if (!$keywords) {
+        if ($keywords) {
             $noteQuery = $noteQuery
                 ->where('title', 'like', "%$keywords%")
                 ->where('content', 'like', "%$keywords%");
@@ -49,7 +49,7 @@ class MediaService extends BaseService
             if (!is_null($authorIds)) {
                 $liveQuery = $liveQuery->whereIn('user_id', $authorIds);
             }
-            if (!$keywords) {
+            if ($keywords) {
                 $liveQuery = $liveQuery->where('title', 'like', "%$keywords%");
             }
 

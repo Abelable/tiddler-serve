@@ -49,7 +49,7 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $authorIds = UserService::getInstance()->searchUserIds($keywords);
-        return $this->getMediaList($input, $authorIds, true, $keywords);
+        return $this->getMediaList($input, count($authorIds) == 0 ? null :  $authorIds, true, $keywords);
     }
 
     private function getMediaList(PageInput $input, $authorIds = null, $withLiveList = true, $keywords = '')

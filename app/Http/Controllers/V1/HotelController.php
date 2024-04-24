@@ -72,7 +72,7 @@ class HotelController extends Controller
                 'id' => $hotel->id,
                 'cover' => $hotel->cover,
                 'name' => $hotel->name,
-                'english_name' => $hotel->english_name,
+                'englishName' => $hotel->english_name,
                 'price' => $hotel->price,
                 'score' => $hotel->score,
                 'grade' => $hotel->grade,
