@@ -17,7 +17,7 @@ class CartController extends Controller
     public function goodsNumber()
     {
         $number = CartGoodsService::getInstance()->cartGoodsNumber($this->userId());
-        return $this->success($number);
+        return $this->success((int) $number);
     }
 
     public function list()
