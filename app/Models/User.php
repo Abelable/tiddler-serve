@@ -19,7 +19,6 @@ use Illuminate\Notifications\Notifiable;
  * @property string $avatar 用户头像图片
  * @property string $mobile 用户手机号码
  * @property string $openid 小程序openid
- * @property string $unionid 微信unionid
  * @property int $gender 性别：0-未知，1-男，2-女
  * @property string $bg 背景图
  * @property string $birthday 生日
@@ -56,7 +55,6 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereOpenid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSignature($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereUnionid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
@@ -79,8 +77,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      * @var array<int, string>
      */
     protected $hidden = [
-        'openid',
-        'unionid'
+        'openid'
     ];
 
     /**

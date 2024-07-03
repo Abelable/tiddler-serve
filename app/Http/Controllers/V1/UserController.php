@@ -36,7 +36,6 @@ class UserController extends Controller
         $user['fans_number'] = $fansNumber;
 
         unset($user->openid);
-        unset($user->unionid);
         unset($user->created_at);
         unset($user->updated_at);
         unset($user->authInfo);
