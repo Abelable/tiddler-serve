@@ -28,7 +28,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class CommonController extends Controller
 {
-    protected $except = ['wxPayNotify'];
+    protected $except = ['ossConfig', 'wxPayNotify'];
 
     public function ossConfig()
     {
