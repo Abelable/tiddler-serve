@@ -26,7 +26,7 @@ class CreateScenicSpotsTable extends Migration
             $table->float('score')->default(0)->comment('景区评分');
             $table->string('video')->default('')->comment('视频');
             $table->longText('image_list')->comment('图片列表');
-            $table->longText('brief')->comment('简介');
+            $table->string('brief')->default('')->comment('简介');
             $table->longText('open_time_list')->comment('开放时间');
             $table->longText('policy_list')->comment('优待政策');
             $table->longText('hotline_list')->comment('景区热线');

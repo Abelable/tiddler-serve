@@ -128,7 +128,9 @@ class ScenicService extends BaseService
     public function updateScenic(ScenicSpot $scenic, ScenicInput $input)
     {
         $scenic->name = $input->name;
-        $scenic->level = $input->level;
+        if (!empty($input->level)) {
+            $scenic->level = $input->level;
+        }
         $scenic->category_id = $input->categoryId;
         $scenic->price = $input->price;
         if (!empty($input->video)) {
@@ -138,7 +140,9 @@ class ScenicService extends BaseService
         $scenic->latitude = $input->latitude;
         $scenic->longitude = $input->longitude;
         $scenic->address = $input->address;
-        $scenic->brief = $input->brief;
+        if (!empty($input->brief)) {
+            $scenic->brief = $input->brief;
+        }
         $scenic->open_time_list = json_encode($input->openTimeList);
         $scenic->policy_list = json_encode($input->policyList);
         $scenic->hotline_list = json_encode($input->hotlineList);
