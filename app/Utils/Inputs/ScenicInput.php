@@ -34,7 +34,7 @@ class ScenicInput extends BaseInput
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
             'address' => 'required|string',
-            'brief' => 'string',
+            'brief' => 'required|string',
             'openTimeList'=> 'array',
             'policyList' => 'array',
             'hotlineList' => 'array',

@@ -140,9 +140,7 @@ class ScenicService extends BaseService
         $scenic->latitude = $input->latitude;
         $scenic->longitude = $input->longitude;
         $scenic->address = $input->address;
-        if (!empty($input->brief)) {
-            $scenic->brief = $input->brief;
-        }
+        $scenic->brief = $input->brief;
         $scenic->open_time_list = json_encode($input->openTimeList);
         $scenic->policy_list = json_encode($input->policyList);
         $scenic->hotline_list = json_encode($input->hotlineList);
