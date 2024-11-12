@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
 {
-    protected $except = ['list', 'search'];
+    protected $except = ['list', 'search', 'createTempNote'];
 
     public function list()
     {

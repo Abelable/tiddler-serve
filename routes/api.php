@@ -496,7 +496,7 @@ Route::prefix('media')->group(function () {
         Route::get('comment_list', 'TourismNoteController@getCommentList');
         Route::get('reply_comment_list', 'TourismNoteController@getReplyCommentList');
         Route::post('delete_comment', 'TourismNoteController@deleteComment');
-        Route::post('create_temp_note', 'ShortVideoController@createTempNote');
+        Route::post('create_temp_note', 'TourismNoteController@createTempNote');
     });
 });
 

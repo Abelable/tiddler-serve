@@ -19,7 +19,7 @@ class TourismNoteInput extends BaseInput
             'imageList' => 'required|array',
             'title' => 'required|string',
             'content' => 'required|string',
-            '$commodityList' => 'array',
+            'commodityList' => 'array',
             'longitude' => 'numeric',
             'latitude' => 'numeric',
             'address' => 'string',
