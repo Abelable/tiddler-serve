@@ -237,15 +237,18 @@ class TourismNoteController extends Controller
         /** @var TempTourismNoteInput $input */
         $input = TempTourismNoteInput::new();
 
-        DB::transaction(function () use ($input) {
-            $note = TourismNoteService::getInstance()->newNote($input->userId, $input);
-            MediaCommodityService::getInstance()->createMediaCommodity(
-                MediaType::NOTE,
-                $note->id,
-                $input->commodityType,
-                $input->commodityId,
-            );
-        });
+        $note = TourismNoteService::getInstance()->getNoteByTitle($input->title);
+        if (is_null($note)) {
+            DB::transaction(function () use ($input) {
+                $note = TourismNoteService::getInstance()->newNote($input->userId, $input);
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::NOTE,
+                    $note->id,
+                    $input->commodityType,
+                    $input->commodityId,
+                );
+            });
+        }
 
         return $this->success();
     }

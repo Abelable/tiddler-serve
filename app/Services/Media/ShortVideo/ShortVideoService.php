@@ -84,4 +84,9 @@ class ShortVideoService extends BaseService
     {
         return ShortVideo::query()->where('user_id', $userId)->find($id, $columns);
     }
+
+    public function getVideoByTitle($title, $columns = ['*'])
+    {
+        return ShortVideo::query()->where('title', $title)->first($columns);
+    }
 }

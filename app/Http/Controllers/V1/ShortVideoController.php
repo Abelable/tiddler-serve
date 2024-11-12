@@ -232,15 +232,18 @@ class ShortVideoController extends Controller
         /** @var TempShortVideoInput $input */
         $input = TempShortVideoInput::new();
 
-        DB::transaction(function () use ($input) {
-            $video = ShortVideoService::getInstance()->newVideo($input->userId, $input);
-            MediaCommodityService::getInstance()->createMediaCommodity(
-                MediaType::VIDEO,
-                $video->id,
-                $input->commodityType,
-                $input->commodityId,
-            );
-        });
+        $video = ShortVideoService::getInstance()->getVideoByTitle($input->title);
+        if (is_null($video)) {
+            DB::transaction(function () use ($input) {
+                $video = ShortVideoService::getInstance()->newVideo($input->userId, $input);
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    $input->commodityType,
+                    $input->commodityId,
+                );
+            });
+        }
 
         return $this->success();
     }
