@@ -121,4 +121,19 @@ class UserController extends Controller
 
         return $this->success($this->paginate($page, $list));
     }
+
+    public function addTempUser()
+    {
+        $avatar = $this->verifyRequiredString('avatar');
+        $nickname = $this->verifyRequiredString('nickname');
+
+        $user = UserService::getInstance()->getUserByNickname($nickname);
+        if (is_null($user)) {
+            $user = User::new();
+            $user->avatar = $avatar;
+            $user->nickname = $nickname;
+            $user->save();
+        }
+        return $this->success($user->id);
+    }
 }

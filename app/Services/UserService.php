@@ -43,6 +43,11 @@ class UserService extends BaseService
         return User::query()->find($id, $columns);
     }
 
+    public function getUserByNickname($nickname, $columns = ['*'])
+    {
+        return User::query()->where('nickname', $nickname)->first($columns);
+    }
+
     public function getListByIds($ids, $columns = ['*'])
     {
         return User::query()->whereIn('id', $ids)->get($columns);
