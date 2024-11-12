@@ -26,6 +26,11 @@ class UserService extends BaseService
         return User::query()->where('openid', $openid)->first();
     }
 
+    public function getByMobile($mobile)
+    {
+        return User::query()->where('mobile', $mobile)->first();
+    }
+
     public function getUserList(UserListInput $input, $columns = ['*'])
     {
         $query = User::query();

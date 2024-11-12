@@ -23,10 +23,11 @@ class AuthController extends Controller
 
     public function wxMpRegister()
     {
+        /** @var WxMpRegisterInput $input */
         $input = WxMpRegisterInput::new();
 
         $result = WxMpServe::new()->getUserOpenid($input->code);
-        $user = UserService::getInstance()->getByOpenid($result['openid']);
+        $user = UserService::getInstance()->getByMobile($input->mobile);
         if (!is_null($user)) {
             return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
         }
