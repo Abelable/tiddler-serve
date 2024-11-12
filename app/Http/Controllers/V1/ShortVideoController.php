@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
-    protected $except = ['list', 'search', 'createTempVideo'];
+    protected $except = ['list', 'search', 'createTempVideo', 'addLikes'];
 
     public function list()
     {
@@ -454,5 +454,18 @@ class ShortVideoController extends Controller
         });
 
         return $this->success($commentsNumber);
+    }
+
+    public function addLikes()
+    {
+        $list = ShortVideoService::getInstance()->getList();
+        /** @var ShortVideo $video */
+        foreach ($list as $video) {
+            if ($video->like_number == 0) {
+                $video->like_number = mt_rand(100, 180);
+                $video->save();
+            }
+        }
+        return $this->success();
     }
 }

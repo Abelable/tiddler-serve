@@ -478,6 +478,7 @@ Route::prefix('media')->group(function () {
         Route::get('reply_comment_list', 'ShortVideoController@getReplyCommentList');
         Route::post('delete_comment', 'ShortVideoController@deleteComment');
         Route::post('create_temp_video', 'ShortVideoController@createTempVideo');
+        Route::get('add_likes', 'ShortVideoController@addLikes');
     });
 
     Route::prefix('tourism_note')->group(function () {
@@ -497,6 +498,7 @@ Route::prefix('media')->group(function () {
         Route::get('reply_comment_list', 'TourismNoteController@getReplyCommentList');
         Route::post('delete_comment', 'TourismNoteController@deleteComment');
         Route::post('create_temp_note', 'TourismNoteController@createTempNote');
+        Route::get('add_likes', 'TourismNoteController@addLikes');
     });
 });
 

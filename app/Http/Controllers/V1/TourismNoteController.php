@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
 {
-    protected $except = ['list', 'search', 'createTempNote'];
+    protected $except = ['list', 'search', 'createTempNote', 'addLikes'];
 
     public function list()
     {
@@ -460,5 +460,18 @@ class TourismNoteController extends Controller
         });
 
         return $this->success($commentsNumber);
+    }
+
+    public function addLikes()
+    {
+        $list = TourismNoteService::getInstance()->getList();
+        /** @var TourismNote $note */
+        foreach ($list as $note) {
+            if ($note->like_number == 0) {
+                $note->like_number = mt_rand(100, 180);
+                $note->save();
+            }
+        }
+        return $this->success();
     }
 }
