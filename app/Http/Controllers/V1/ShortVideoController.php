@@ -23,12 +23,13 @@ use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
+use App\Utils\Inputs\TempShortVideoInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
-    protected $except = ['list', 'search'];
+    protected $except = ['list', 'search', 'createTempVideo'];
 
     public function list()
     {
@@ -221,6 +222,24 @@ class ShortVideoController extends Controller
                     $commodity['id'],
                 );
             }
+        });
+
+        return $this->success();
+    }
+
+    public function createTempVideo()
+    {
+        /** @var TempShortVideoInput $input */
+        $input = TempShortVideoInput::new();
+
+        DB::transaction(function () use ($input) {
+            $video = ShortVideoService::getInstance()->newVideo($input->userId, $input);
+            MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaType::VIDEO,
+                $video->id,
+                $input->commodityType,
+                $input->commodityId,
+            );
         });
 
         return $this->success();

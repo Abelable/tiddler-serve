@@ -22,6 +22,7 @@ use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
+use App\Utils\Inputs\TempTourismNoteInput;
 use App\Utils\Inputs\TourismNoteInput;
 use App\Utils\Inputs\TourismNotePageInput;
 use App\Utils\WxMpServe;
@@ -226,6 +227,24 @@ class TourismNoteController extends Controller
                     $commodity['id'],
                 );
             }
+        });
+
+        return $this->success();
+    }
+
+    public function createTempNote()
+    {
+        /** @var TempTourismNoteInput $input */
+        $input = TempTourismNoteInput::new();
+
+        DB::transaction(function () use ($input) {
+            $note = TourismNoteService::getInstance()->newNote($input->userId, $input);
+            MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaType::NOTE,
+                $note->id,
+                $input->commodityType,
+                $input->commodityId,
+            );
         });
 
         return $this->success();

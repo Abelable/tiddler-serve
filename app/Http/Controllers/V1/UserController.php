@@ -15,7 +15,7 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['authorInfo', 'search'];
+    protected $except = ['authorInfo', 'search', 'addTempUser'];
 
     public function userInfo()
     {
