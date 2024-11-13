@@ -139,4 +139,17 @@ class HotelController extends Controller
         $options = HotelService::getInstance()->getProviderHotelOptions($providerHotelIds, ['id', 'name']);
         return $this->success($options);
     }
+
+    public function addSales()
+    {
+        $list = HotelService::getInstance()->getList();
+        /** @var Hotel $hotel */
+        foreach ($list as $hotel) {
+            if ($hotel->sales_volume == 0) {
+                $hotel->sales_volume = mt_rand(20, 100);
+                $hotel->save();
+            }
+        }
+        return $this->success();
+    }
 }

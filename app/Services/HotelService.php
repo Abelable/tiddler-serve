@@ -198,4 +198,9 @@ class HotelService extends BaseService
         $hotel->save();
         return $hotel;
     }
+
+    public function getList()
+    {
+        return Hotel::query()->get();
+    }
 }

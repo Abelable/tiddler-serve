@@ -161,6 +161,7 @@ Route::prefix('scenic')->group(function () {
     Route::post('add', 'ScenicController@add');
     Route::post('edit', 'ScenicController@edit');
     Route::get('provider_options', 'ScenicController@providerOptions');
+    Route::get('add_sales', 'ScenicController@addSales');
 
     Route::prefix('question')->group(function () {
         Route::get('summary', 'ScenicQAController@questionSummary');
@@ -244,6 +245,7 @@ Route::prefix('hotel')->group(function () {
     Route::post('add', 'HotelController@add');
     Route::post('edit', 'HotelController@edit');
     Route::get('provider_options', 'HotelController@providerOptions');
+    Route::get('add_sales', 'HotelController@addSales');
 
     Route::prefix('question')->group(function () {
         Route::get('summary', 'HotelQAController@questionSummary');

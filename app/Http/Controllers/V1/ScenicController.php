@@ -138,4 +138,17 @@ class ScenicController extends Controller
         $options = ScenicService::getInstance()->getProviderScenicOptions($providerScenicIds, ['id', 'name']);
         return $this->success($options);
     }
+
+    public function addSales()
+    {
+        $list = ScenicService::getInstance()->getList();
+        /** @var ScenicSpot $scenic */
+        foreach ($list as $scenic) {
+            if ($scenic->price != 0 && $scenic->sales_volume == 0) {
+                $scenic->sales_volume = mt_rand(20, 100);
+                $scenic->save();
+            }
+        }
+        return $this->success();
+    }
 }

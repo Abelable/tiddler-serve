@@ -165,4 +165,9 @@ class ScenicService extends BaseService
         $scenic->save();
         return $scenic;
     }
+
+    public function getList()
+    {
+        return ScenicSpot::query()->get();
+    }
 }
