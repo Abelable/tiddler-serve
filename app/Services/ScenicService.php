@@ -24,7 +24,7 @@ class ScenicService extends BaseService
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getScenicPage(CommonPageInput $input, $columns=['*'])
+    public function getScenicPage(CommonPageInput $input, $columns = ['*'])
     {
         $query = ScenicSpot::query();
         if (!empty($input->commodityIds)) {
