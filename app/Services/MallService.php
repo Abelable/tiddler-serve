@@ -18,6 +18,7 @@ class MallService extends BaseService
         $goodsQuery = Goods::query()->select($goodsColumns)->where('status', 1)->selectRaw("4 as type");
         $mallQuery = $scenicQuery->union($hotelQuery)->union($restaurantQuery)->union($goodsQuery);
         return $mallQuery
+            ->orderBy('sales_volume', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, ['*'], 'page', $input->page);
     }
