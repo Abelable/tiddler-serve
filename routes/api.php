@@ -120,6 +120,8 @@ Route::prefix('goods')->group(function () {
     });
 });
 
+Route::get('gift_goods_list', 'GiftGoodsController@list');
+
 Route::prefix('cart')->group(function () {
     Route::get('goods_number', 'CartController@goodsNumber');
     Route::get('list', 'CartController@list');
@@ -610,6 +612,12 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GoodsController@delete');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
+    });
+
+    Route::prefix('gift_goods')->group(function () {
+        Route::post('list', 'GiftGoodsController@list');
+        Route::post('add', 'GiftGoodsController@add');
+        Route::post('delete', 'GiftGoodsController@delete');
     });
 
     Route::prefix('scenic')->group(function () {
