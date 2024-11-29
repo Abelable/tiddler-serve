@@ -10,7 +10,7 @@ class GiftGoodsController extends Controller
 {
     protected $only = [];
 
-    public function goodsList()
+    public function list()
     {
         $type = $this->verifyRequiredInteger('type');
         $goodsIds = GiftGoodsService::getInstance()->getGoodsList([$type])->pluck('goods_id')->toArray();
