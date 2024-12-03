@@ -24,6 +24,6 @@ class ShopCategoryService extends BaseService
 
     public function getCategoryOptions($columns = ['*'])
     {
-        return ShopCategory::query()->orderBy('id', 'asc')->get($columns);
+        return ShopCategory::query()->orderBy('id', 'asc')->orderBy('sort', 'desc')->get($columns);
     }
 }
