@@ -1,20 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\V1;
+namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\FreightTemplate;
 use App\Services\FreightTemplateService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\FreightTemplateInput;
+use App\Utils\Inputs\PageInput;
 
 class FreightTemplateController extends Controller
 {
+    protected $guard = 'Admin';
+
     public function list()
     {
-        $shopId = $this->user()->shopInfo->id;
-        $list = FreightTemplateService::getInstance()->getListByShopId($shopId, ['id', 'name']);
-        return $this->success($list);
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = FreightTemplateService::getInstance()->getSelfList($input);
+        $list = collect($page->items())->map(function (FreightTemplate $freightTemplate) {
+            $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+            return $freightTemplate;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -29,11 +37,7 @@ class FreightTemplateController extends Controller
     {
         /** @var FreightTemplateInput $input */
         $input = FreightTemplateInput::new();
-
         $freightTemplate = FreightTemplate::new();
-        $shopId = $this->user()->shopInfo->id;
-        $freightTemplate->shop_id = $shopId;
-
         FreightTemplateService::getInstance()->update($freightTemplate, $input);
 
         return $this->success();
@@ -64,5 +68,11 @@ class FreightTemplateController extends Controller
         }
         $freightTemplate->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $options = FreightTemplateService::getInstance()->getFreightTemplateOptions();
+        return $this->success($options);
     }
 }

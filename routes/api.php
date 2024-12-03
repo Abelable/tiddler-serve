@@ -593,6 +593,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'ExpressController@options');
     });
 
+    Route::prefix('freight_template')->group(function () {
+        Route::post('list', 'FreightTemplateController@list');
+        Route::get('detail', 'FreightTemplateController@detail');
+        Route::post('add', 'FreightTemplateController@add');
+        Route::post('edit', 'FreightTemplateController@edit');
+        Route::post('delete', 'FreightTemplateController@delete');
+        Route::get('options', 'FreightTemplateController@options');
+    });
+
     Route::prefix('goods')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'GoodsCategoryController@list');
