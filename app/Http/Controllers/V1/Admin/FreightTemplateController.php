@@ -72,7 +72,7 @@ class FreightTemplateController extends Controller
 
     public function options()
     {
-        $options = FreightTemplateService::getInstance()->getOptions();
+        $options = FreightTemplateService::getInstance()->getSelfOptions(['id', 'name']);
         return $this->success($options);
     }
 }

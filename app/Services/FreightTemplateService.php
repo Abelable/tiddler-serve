@@ -45,8 +45,13 @@ class FreightTemplateService extends BaseService
         return $freightTemplate;
     }
 
-    public function getOptions($columns = ['*'])
+    public function getOptions($shopId, $columns = ['*'])
     {
-        return FreightTemplate::query()->orderBy('id', 'asc')->get($columns);
+        return FreightTemplate::query()->where('shop_id', $shopId)->orderBy('id', 'asc')->get($columns);
+    }
+
+    public function getSelfOptions($columns = ['*'])
+    {
+        return FreightTemplate::query()->where('shop_id', 0)->orderBy('id', 'asc')->get($columns);
     }
 }
