@@ -44,4 +44,9 @@ class FreightTemplateService extends BaseService
 
         return $freightTemplate;
     }
+
+    public function getOptions($columns = ['*'])
+    {
+        return FreightTemplate::query()->orderBy('id', 'asc')->get($columns);
+    }
 }
