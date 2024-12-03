@@ -43,6 +43,7 @@ class GoodsController extends Controller
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
+        $shop->category_ids = json_decode($shop->category_ids);
 
         $merchantColumns = [
             'id',
