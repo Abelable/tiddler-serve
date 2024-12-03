@@ -26,14 +26,13 @@ class GoodsCategoryService extends BaseService
         return GoodsCategory::query()->where('name', $name)->first($columns);
     }
 
-    public function getCategoryOptions($columns = ['*'])
+    public function getCategoryOptions($shopCategoryId = null, $columns = ['id', 'name'])
     {
-        return GoodsCategory::query()->orderBy('id', 'asc')->get($columns);
-    }
-
-    public function getOptionsByShopCategoryId($shopCategoryId, $columns = ['*'])
-    {
-        return GoodsCategory::query()->where('shop_category_id', $shopCategoryId)->get($columns);
+        $query = GoodsCategory::query();
+        if (!is_null($shopCategoryId)) {
+            $query = $query->where('shop_category_id', $shopCategoryId);
+        }
+        return $query->orderBy('id', 'asc')->get($columns);
     }
 
     public function getOptionsByShopCategoryIds(array $shopCategoryIds, $columns = ['*'])
