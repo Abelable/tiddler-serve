@@ -35,7 +35,7 @@ class GoodsController extends Controller
             'merchant_id',
             'avatar',
             'name',
-            'category_id',
+            'category_ids',
             'created_at',
             'updated_at'
         ];
