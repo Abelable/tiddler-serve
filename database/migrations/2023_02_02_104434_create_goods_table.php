@@ -19,8 +19,8 @@ class CreateGoodsTable extends Migration
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
-            $table->integer('category_id')->comment('商品分类id');
             $table->integer('shop_category_id')->comment('所属店铺分类id');
+            $table->integer('category_id')->comment('商品分类id');
             $table->string('cover')->comment('列表图片');
             $table->string('video')->default('')->comment('主图视频');
             $table->longText('image_list')->comment('主图图片列表');
