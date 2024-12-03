@@ -92,7 +92,7 @@ class GoodsCategoryController extends Controller
     public function options()
     {
         $shopCategoryId = $this->verifyId('shopCategoryId');
-        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryId || null);
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryId);
         return $this->success($options);
     }
 }
