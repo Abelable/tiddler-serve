@@ -10,14 +10,16 @@ class GoodsListInput extends PageInput
     public $status;
     public $shopCategoryId;
     public $categoryId;
+    public $shopId;
 
     public function rules()
     {
-        return array_merge([
+        return array_merge(parent::rules(), [
             'name' => 'string',
             'status' => 'integer|in:0,1,2,3',
             'shopCategoryId' => 'integer|digits_between:1,20',
             'categoryId' => 'integer|digits_between:1,20',
-        ], parent::rules());
+            'shopId' => 'integer|digits_between:1,20',
+        ]);
     }
 }

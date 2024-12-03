@@ -18,7 +18,7 @@ class GoodsController extends Controller
     {
         /** @var GoodsListInput $input */
         $input = GoodsListInput::new();
-        $list = GoodsService::getInstance()->getMerchantGoodsList($input);
+        $list = GoodsService::getInstance()->getAdminGoodsList($input);
         return $this->successPaginate($list);
     }
 
@@ -108,14 +108,6 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function ownerList()
-    {
-        $input = GoodsListInput::new();
-        $columns = ['id', 'cover', 'name', 'category_id', 'price', 'stock', 'commission_rate', 'sales_volume', 'status', 'created_at', 'updated_at'];
-        $list = GoodsService::getInstance()->getOwnerGoodsList($input, $columns);
-        return $this->successPaginate($list);
-    }
-
     public function down()
     {
         $id = $this->verifyRequiredId('id');
@@ -128,16 +120,6 @@ class GoodsController extends Controller
         $goods->save();
 
         return $this->success();
-    }
-
-    public function ownerDetail()
-    {
-        $id = $this->verifyRequiredId('id');
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        return $this->success($goods);
     }
 
     public function add()

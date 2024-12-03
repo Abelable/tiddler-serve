@@ -111,16 +111,6 @@ class GoodsController extends Controller
         return $this->success($goods);
     }
 
-    public function shopGoodsList()
-    {
-        $shopId = $this->verifyRequiredId('shopId');
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
-        $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
-        return $this->successPaginate($list);
-    }
-
     public function shopCategoryOptions()
     {
         $shopCategoryIds = json_decode($this->user()->shopInfo->category_ids);
@@ -128,32 +118,43 @@ class GoodsController extends Controller
         return $this->success($options);
     }
 
-    public function userGoodsList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $columns = ['id', 'cover', 'name', 'price'];
-        $list = GoodsService::getInstance()->getUserGoodsList($this->userId(), $input, $columns);
-        return $this->successPaginate($list);
-    }
-
     public function goodsListTotals()
     {
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法查看商家商品');
+        }
+
         return $this->success([
-            GoodsService::getInstance()->getListTotal($this->userId(), 1),
-            GoodsService::getInstance()->getListTotal($this->userId(), 3),
-            GoodsService::getInstance()->getListTotal($this->userId(), 0),
-            GoodsService::getInstance()->getListTotal($this->userId(), 2),
+            GoodsService::getInstance()->getListTotal($shopInfo->id, 1),
+            GoodsService::getInstance()->getListTotal($shopInfo->id, 3),
+            GoodsService::getInstance()->getListTotal($shopInfo->id, 0),
+            GoodsService::getInstance()->getListTotal($shopInfo->id, 2),
         ]);
     }
 
-    public function merchantGoodsList()
+    public function ownerGoodsList()
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
-
         $columns = ['id', 'cover', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
-        $list = GoodsService::getInstance()->getGoodsListByStatus($this->userId(), $input, $columns);
+
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法查看商家商品');
+        }
+
+        $list = GoodsService::getInstance()->getOwnerGoodsList($shopInfo->id, $input, $columns);
+        return $this->successPaginate($list);
+    }
+
+    public function shopGoodsList()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
+        $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
         return $this->successPaginate($list);
     }
 
@@ -178,12 +179,12 @@ class GoodsController extends Controller
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
 
-        $shopId = $this->user()->shop->id;
-        if ($shopId == 0) {
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
         }
 
-        GoodsService::getInstance()->createGoods($this->userId(), $shopId, $input);
+        GoodsService::getInstance()->createGoods($this->userId(), $shopInfo->id, $input);
 
         return $this->success();
     }
@@ -194,7 +195,12 @@ class GoodsController extends Controller
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
 
-        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法编辑商品');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopInfo->id, $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
@@ -211,7 +217,12 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上架商品');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopInfo->id, $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
@@ -228,7 +239,12 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法下架商品');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopInfo->id, $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
@@ -245,7 +261,12 @@ class GoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getUserGoods($this->userId(), $id);
+        $shopInfo = $this->user()->shopInfo;
+        if (is_null($shopInfo)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法删除商品');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopInfo->id, $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }

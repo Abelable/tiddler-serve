@@ -90,11 +90,10 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'GoodsReturnAddressController@delete');
     });
 
-    Route::get('goods_list', 'GoodsController@shopGoodsList');
     Route::prefix('goods')->group(function () {
         Route::get('category_options', 'GoodsController@shopCategoryOptions');
         Route::get('totals', 'GoodsController@goodsListTotals');
-        Route::get('list', 'GoodsController@merchantGoodsList');
+        Route::get('list', 'GoodsController@ownerGoodsList');
         Route::get('info', 'GoodsController@goodsInfo');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
@@ -110,7 +109,7 @@ Route::prefix('goods')->group(function () {
     Route::get('search', 'GoodsController@search');
     Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
     Route::get('detail', 'GoodsController@detail');
-    Route::get('user_goods_list', 'GoodsController@userGoodsList');
+    Route::get('shop_list', 'GoodsController@shopGoodsList');
 
     Route::prefix('evaluation')->group(function () {
         Route::get('summary', 'GoodsEvaluationController@summary');
@@ -615,8 +614,6 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
         Route::post('list', 'GoodsController@list');
         Route::get('detail', 'GoodsController@detail');
-        Route::get('owner_list', 'GoodsController@ownerList');
-        Route::get('owner_detail', 'GoodsController@ownerDetail');
         Route::post('up', 'GoodsController@up');
         Route::post('down', 'GoodsController@down');
         Route::post('reject', 'GoodsController@reject');

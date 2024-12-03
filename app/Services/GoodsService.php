@@ -103,36 +103,27 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getUserGoodsList($userId, PageInput $input, $columns=['*'])
+    public function getOwnerGoodsList($shopId, StatusPageInput $input, $columns=['*'])
     {
         return Goods::query()
-            ->where('user_id', $userId)
-            ->where('status', 1)
+            ->where('shop_id', $shopId)
+            ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getLiveUnlistedGoodsList($userId, $goodsIds, $columns=['*'])
+    public function getLiveUnlistedGoodsList($shopId, $goodsIds, $columns=['*'])
     {
         return Goods::query()
-            ->where('user_id', $userId)
+            ->where('shop_id', $shopId)
             ->where('status', 1)
             ->whereNotIn('id', $goodsIds)
             ->get($columns);
     }
 
-    public function getListTotal($userId, $status)
+    public function getListTotal($shopId, $status)
     {
-        return Goods::query()->where('user_id', $userId)->where('status', $status)->count();
-    }
-
-    public function getGoodsListByStatus($userId, StatusPageInput $input, $columns=['*'])
-    {
-        return Goods::query()
-            ->where('user_id', $userId)
-            ->where('status', $input->status)
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+        return Goods::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 
     public function getGoodsById($id, $columns=['*'])
@@ -140,9 +131,9 @@ class GoodsService extends BaseService
         return Goods::query()->find($id, $columns);
     }
 
-    public function getUserGoods($userId, $id, $columns = ['*'])
+    public function getShopGoods($shopId, $id, $columns = ['*'])
     {
-        return Goods::query()->where('user_id', $userId)->find($id, $columns);
+        return Goods::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
     public function getOnSaleGoods($id, $columns=['*'])
@@ -155,13 +146,14 @@ class GoodsService extends BaseService
         return Goods::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getMerchantGoodsList(GoodsListInput $input, $columns=['*'])
+    public function getAdminGoodsList(GoodsListInput $input, $columns=['*'])
     {
-        $query = Goods::query()
-            ->where('shop_id', '!=', 0)
-            ->whereIn('status', [0, 1, 2]);
+        $query = Goods::query();
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
+        }
+        if (!is_null($input->status)) {
+            $query = $query->where('status', $input->status);
         }
         if (!empty($input->shopCategoryId)) {
             $query = $query->where('shop_category_id', $input->shopCategoryId);
@@ -169,23 +161,8 @@ class GoodsService extends BaseService
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
-        if (!is_null($input->status)) {
-            $query = $query->where('status', $input->status);
-        }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function getOwnerGoodsList(GoodsListInput $input, $columns=['*'])
-    {
-        $query = Goods::query()->where('shop_id', 0);
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
-        }
-        if (!empty($input->status)) {
-            $query = $query->where('status', $input->status);
+        if (!empty($input->shopId)) {
+            $query = $query->where('shop_id', $input->shopId);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
@@ -264,10 +241,9 @@ class GoodsService extends BaseService
         return $goods->cas();
     }
 
-    public function createGoods($userId, $shopId, GoodsInput $input)
+    public function createGoods($shopId, GoodsInput $input)
     {
         $goods = Goods::new();
-        $goods->user_id = $userId;
         $goods->shop_id = $shopId;
         return $this->updateGoods($goods, $input);
     }
