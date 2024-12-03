@@ -19,6 +19,7 @@ use Laravel\Scout\Searchable;
  * @property string $detail_image_list 详情图片列表
  * @property string $default_spec_image 默认规格图片
  * @property string $name 商品名称
+ * @property string $introduction 商品介绍
  * @property int $freight_template_id 运费模板id：0-包邮
  * @property int $return_address_id 退货地址id
  * @property float $price 商品价格
@@ -26,9 +27,11 @@ use Laravel\Scout\Searchable;
  * @property int $stock 商品库存
  * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
+ * @property int $refund_support 是否支持7天无理由：0-不支持，1-支持
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
  * @property int $sales_volume 商品销量
+ * @property float $avg_score 综合评分
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -36,6 +39,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereAvgScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
@@ -46,10 +50,12 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFreightTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereImageList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereIntroduction($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundSupport($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereReturnAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
