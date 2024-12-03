@@ -9,6 +9,8 @@ namespace App\Models;
  * @property string $name 店铺分类名称
  * @property int $deposit 店铺保证金
  * @property string $adapted_merchant_types 适配的商家类型：1-个人，2-企业
+ * @property int $sort 排序
+ * @property int $visible 状态: 0-隐藏,1-显示
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -22,7 +24,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereDeposit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopCategory whereVisible($value)
  * @method static \Illuminate\Database\Query\Builder|ShopCategory withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShopCategory withoutTrashed()
  * @mixin \Eloquent

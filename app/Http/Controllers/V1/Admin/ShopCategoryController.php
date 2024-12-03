@@ -91,4 +91,34 @@ class ShopCategoryController extends Controller
         $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name']);
         return $this->success($options);
     }
+
+    public function editSort() {
+        $id = $this->verifyRequiredId('id');
+        $sort = $this->verifyRequiredInteger('sort');
+
+        $category = ShopCategoryService::getInstance()->getCategoryById($id);
+        if (is_null($category)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺分类不存在');
+        }
+
+        $category->sort = $sort;
+        $category->save();
+
+        return $this->success();
+    }
+
+    public function editVisible() {
+        $id = $this->verifyRequiredId('id');
+        $visible = $this->verifyRequiredInteger('visible');
+
+        $category = ShopCategoryService::getInstance()->getCategoryById($id);
+        if (is_null($category)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺分类不存在');
+        }
+
+        $category->visible = $visible;
+        $category->save();
+
+        return $this->success();
+    }
 }
