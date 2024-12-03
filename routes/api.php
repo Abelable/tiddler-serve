@@ -576,8 +576,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'ShopCategoryController@edit');
             Route::post('delete', 'ShopCategoryController@delete');
             Route::get('options', 'ShopCategoryController@options');
-            Route::post('edit_sort', 'CategoryController@editSort');
-            Route::post('edit_visible', 'CategoryController@editVisible');
+            Route::post('edit_sort', 'ShopCategoryController@editSort');
+            Route::post('edit_visible', 'ShopCategoryController@editVisible');
         });
 
         Route::post('list', 'ShopController@list');
