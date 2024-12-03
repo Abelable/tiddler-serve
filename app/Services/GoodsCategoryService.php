@@ -26,7 +26,7 @@ class GoodsCategoryService extends BaseService
         return GoodsCategory::query()->where('name', $name)->first($columns);
     }
 
-    public function getCategoryOptions($shopCategoryId = null, $columns = ['id', 'name'])
+    public function getCategoryOptions($shopCategoryId = null, $columns = ['*'])
     {
         $query = GoodsCategory::query();
         if (!is_null($shopCategoryId)) {
