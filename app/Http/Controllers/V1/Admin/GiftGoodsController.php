@@ -8,7 +8,7 @@ use App\Services\GiftGoodsService;
 use App\Services\GoodsService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GiftGoodsListInput;
-use App\Utils\Inputs\GiftGoodsPageInput;
+use App\Utils\Inputs\PageInput;
 
 class GiftGoodsController extends Controller
 {
@@ -16,8 +16,8 @@ class GiftGoodsController extends Controller
 
     public function list()
     {
-        /** @var GiftGoodsPageInput $input */
-        $input = GiftGoodsPageInput::new();
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $list = GiftGoodsService::getInstance()->getGoodsPage($input);
         return $this->successPaginate($list);
     }

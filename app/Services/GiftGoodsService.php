@@ -3,15 +3,14 @@
 namespace App\Services;
 
 use App\Models\GiftGoods;
-use App\Utils\Inputs\GiftGoodsPageInput;
 use App\Utils\Inputs\GiftGoodsListInput;
+use App\Utils\Inputs\PageInput;
 
 class GiftGoodsService extends BaseService
 {
-    public function getGoodsPage(GiftGoodsPageInput $input, $columns = ['*'])
+    public function getGoodsPage(PageInput $input, $columns = ['*'])
     {
         return GiftGoods::query()
-            ->where('type', $input->type)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
