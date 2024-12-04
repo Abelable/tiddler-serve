@@ -4,15 +4,17 @@ namespace App\Services;
 
 use App\Models\GiftGoods;
 use App\Utils\Inputs\GiftGoodsListInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsService extends BaseService
 {
-    public function getGoodsPage(PageInput $input, $columns = ['*'])
+    public function getGoodsPage(GiftGoodsPageInput $input, $columns = ['*'])
     {
-        return GiftGoods::query()
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, $columns, 'page', $input->page);
+        $query = GiftGoods::query();
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
+        }
+        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getGoodsList(array $typeList, $columns = ['*'])

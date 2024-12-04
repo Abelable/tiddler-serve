@@ -9,7 +9,7 @@ class GiftGoodsPageInput extends PageInput
     public function rules()
     {
         return array_merge(parent::rules(), [
-            'type' => 'required|integer|in:1,2',
+            'type' => 'integer|in:1,2',
         ]);
     }
 }
