@@ -112,6 +112,11 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getSelfGoodsList($columns = ['*'])
+    {
+        return Goods::query()->where('shop_id', 0)->get($columns);
+    }
+
     public function getLiveUnlistedGoodsList($shopId, $goodsIds, $columns=['*'])
     {
         return Goods::query()

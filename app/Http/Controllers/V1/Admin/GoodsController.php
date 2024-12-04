@@ -146,4 +146,10 @@ class GoodsController extends Controller
 
         return $this->success();
     }
+
+    public function selfGoodsOptions()
+    {
+        $options = GoodsService::getInstance()->getSelfGoodsList(['id', 'name', 'cover']);
+        return $this->success($options);
+    }
 }
