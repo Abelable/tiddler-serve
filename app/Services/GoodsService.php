@@ -263,6 +263,9 @@ class GoodsService extends BaseService
         $goods->detail_image_list = json_encode($input->detailImageList);
         $goods->default_spec_image = $input->defaultSpecImage;
         $goods->name = $input->name;
+        if (!empty($input->introduction)) {
+            $goods->introduction = $input->introduction;
+        }
         $goods->freight_template_id = $input->freightTemplateId;
         $goods->category_id = $input->categoryId;
         $goods->return_address_id = $input->returnAddressId;
@@ -273,6 +276,7 @@ class GoodsService extends BaseService
         $goods->promotion_commission_rate = $input->promotionCommissionRate;
         $goods->spec_list = json_encode($input->specList);
         $goods->sku_list = json_encode($input->skuList);
+        $goods->refund_support = $input->refundSupport;
         $goods->save();
 
         return $goods;

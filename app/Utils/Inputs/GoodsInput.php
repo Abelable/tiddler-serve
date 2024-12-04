@@ -10,6 +10,7 @@ class GoodsInput extends BaseInput
     public $detailImageList;
     public $defaultSpecImage;
     public $name;
+    public $introduction;
     public $freightTemplateId;
     public $categoryId;
     public $returnAddressId;
@@ -20,6 +21,7 @@ class GoodsInput extends BaseInput
     public $promotionCommissionRate;
     public $specList;
     public $skuList;
+    public $refundSupport;
 
     public function rules()
     {
@@ -30,16 +32,18 @@ class GoodsInput extends BaseInput
             'detailImageList' => 'required|array',
             'defaultSpecImage' => 'required|string',
             'name' => 'required|string',
+            'introduction' => 'string',
             'freightTemplateId' => 'required|integer|digits_between:1,20',
             'categoryId' => 'required|integer|digits_between:1,20',
-            'returnAddressId' => 'required|integer|digits_between:1,20',
+            'returnAddressId' => 'integer|digits_between:1,20',
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'stock' => 'required|integer',
-            'salesCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'numeric',
             'promotionCommissionRate' => 'required|numeric',
             'specList' => 'required|array',
             'skuList' => 'required|array',
+            'refundSupport' => 'required|integer|in:0,1',
         ];
     }
 }
