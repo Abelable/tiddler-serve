@@ -13,8 +13,10 @@ class GiftGoodsController extends Controller
     public function list()
     {
         $type = $this->verifyRequiredInteger('type');
+        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
+
         $goodsIds = GiftGoodsService::getInstance()->getGoodsList([$type])->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds);
+        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $columns);
         $list = $goodsList->map(function ($goods) {
             $goods['isGift'] = 1;
             return $goods;
