@@ -267,12 +267,17 @@ class GoodsService extends BaseService
             $goods->introduction = $input->introduction;
         }
         $goods->freight_template_id = $input->freightTemplateId;
+        $goods->shop_category_id = $input->shopCategoryId;
         $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId;
+        if (!empty($input->returnAddressId)) {
+            $goods->return_address_id = $input->returnAddressId;
+        }
         $goods->price = $input->price;
         $goods->market_price = $input->marketPrice ?: 0;
         $goods->stock = $input->stock;
-        $goods->sales_commission_rate = $input->salesCommissionRate;
+        if (!empty($input->salesCommissionRate)) {
+            $goods->sales_commission_rate = $input->salesCommissionRate;
+        }
         $goods->promotion_commission_rate = $input->promotionCommissionRate;
         $goods->spec_list = json_encode($input->specList);
         $goods->sku_list = json_encode($input->skuList);
