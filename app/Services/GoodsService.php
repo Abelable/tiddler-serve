@@ -254,6 +254,9 @@ class GoodsService extends BaseService
             $goods->status = 0;
             $goods->failure_reason = '';
         }
+        if ($goods->shop_id == 0 && $goods->status == 0) {
+            $goods->status = 1;
+        }
         $goods->cover = $input->cover;
         $goods->video = $input->video ?: '';
         $goods->image_list = json_encode($input->imageList);

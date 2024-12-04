@@ -184,7 +184,7 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
         }
 
-        GoodsService::getInstance()->createGoods($this->userId(), $shopInfo->id, $input);
+        GoodsService::getInstance()->createGoods($shopInfo->id, $input);
 
         return $this->success();
     }

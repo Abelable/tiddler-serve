@@ -127,7 +127,7 @@ class GoodsController extends Controller
     {
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
-        GoodsService::getInstance()->createGoods(0, 0, $input);
+        GoodsService::getInstance()->createGoods(0, $input);
         return $this->success();
     }
 
