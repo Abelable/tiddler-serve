@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GiftGoods;
 use App\Services\GiftGoodsService;
 use App\Services\GoodsService;
+use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsController extends Controller
 {
@@ -13,9 +14,10 @@ class GiftGoodsController extends Controller
 
     public function list()
     {
-        $type = $this->verifyRequiredInteger('type');
+        /** @var GiftGoodsPageInput $input */
+        $input = GiftGoodsPageInput::new();
 
-        $page = GiftGoodsService::getInstance()->getGoodsPage($type);
+        $page = GiftGoodsService::getInstance()->getGoodsPage($input);
         $giftGoodsList = collect($page->items());
 
         $goodsIds = $giftGoodsList->pluck('goods_id')->toArray();
@@ -28,6 +30,6 @@ class GiftGoodsController extends Controller
             return $goods;
         });
 
-        return $this->success($list);
+        return $this->success($this->paginate($page, $list));
     }
 }
