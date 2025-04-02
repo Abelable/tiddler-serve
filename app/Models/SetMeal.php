@@ -16,6 +16,7 @@ namespace App\Models;
  * @property float $original_price 套餐原价
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
+ * @property float $promotion_commission_upper_limit 推广佣金上限
  * @property int $sales_volume 销量
  * @property string $package_details 套餐详情
  * @property int $validity_days 有效天数
@@ -46,6 +47,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePerTableUsageLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSalesVolume($value)

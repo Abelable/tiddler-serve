@@ -22,8 +22,9 @@ class CreateHotelRoomsTable extends Migration
             $table->integer('type_id')->comment('房间类型id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
-            $table->float('sales_commission_rate')->comment('销售佣金比例');
-            $table->float('promotion_commission_rate')->comment('推广佣金比例');
+            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例');
+            $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例');
+            $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
             $table->integer('breakfast_num')->comment('早餐份数');
             $table->integer('guest_num')->comment('可入住客人数量');
             $table->integer('cancellable')->comment('免费取消：0-不可取消，1-可免费取消');

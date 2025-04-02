@@ -21,8 +21,9 @@ class CreateMealTicketsTable extends Migration
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->float('price')->comment('代金券价格');
             $table->float('original_price')->comment('抵扣原价');
-            $table->float('sales_commission_rate')->comment('销售佣金比例');
-            $table->float('promotion_commission_rate')->comment('推广佣金比例');
+            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例');
+            $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例');
+            $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
             $table->integer('sales_volume')->default(0)->comment('代金券销量');
             $table->integer('validity_days')->default(0)->comment('有效天数');
             $table->string('validity_start_time')->default('')->comment('范围有效期开始时间');

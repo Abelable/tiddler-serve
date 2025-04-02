@@ -18,6 +18,7 @@ namespace App\Models;
  * @property float $market_price 门票市场价格
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
+ * @property float $promotion_commission_upper_limit 推广佣金上限
  * @property int $sales_volume 门票销量
  * @property string $fee_include_tips 费用包含说明
  * @property string $fee_not_include_tips 费用不含说明
@@ -65,6 +66,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereNeedExchange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundTips($value)

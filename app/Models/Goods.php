@@ -27,6 +27,7 @@ use Laravel\Scout\Searchable;
  * @property int $stock 商品库存
  * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
+ * @property float $promotion_commission_upper_limit 推广佣金上限
  * @property int $refund_support 是否支持7天无理由：0-不支持，1-支持
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
@@ -55,6 +56,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundSupport($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereReturnAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)

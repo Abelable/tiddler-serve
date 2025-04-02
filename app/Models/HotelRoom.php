@@ -15,6 +15,7 @@ namespace App\Models;
  * @property string $failure_reason 审核失败原因
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
+ * @property float $promotion_commission_upper_limit 推广佣金上限
  * @property int $breakfast_num 早餐份数
  * @property int $guest_num 可入住客人数量
  * @property int $cancellable 免费取消：0-不可取消，1-可免费取消
@@ -39,6 +40,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePriceList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSalesVolume($value)
