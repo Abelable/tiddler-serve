@@ -8,10 +8,11 @@ namespace App\Models;
  * @property int $id
  * @property int $shop_category_id 店铺分类id
  * @property string $name 商品分类名称
- * @property int $min_sales_commission_rate 最小销售佣金比例
- * @property int $max_sales_commission_rate 最大销售佣金比例
- * @property int $min_promotion_commission_rate 最小推广佣金比例
- * @property int $max_promotion_commission_rate 最大推广佣金比例
+ * @property float $min_sales_commission_rate 最小销售佣金比例
+ * @property float $max_sales_commission_rate 最大销售佣金比例
+ * @property float $min_promotion_commission_rate 最小推广佣金比例
+ * @property float $max_promotion_commission_rate 最大推广佣金比例
+ * @property float $promotion_commission_upper_limit 推广佣金上限（元）
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -27,6 +28,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMinPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMinSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereShopCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|GoodsCategory withTrashed()
