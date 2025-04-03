@@ -51,6 +51,7 @@ class GoodsCategoryController extends Controller
         $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
         $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
         $category->max_promotion_commission_rate = $input->maxPromotionCommissionRate;
+        $category->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
         $category->save();
 
         return $this->success();
@@ -73,6 +74,7 @@ class GoodsCategoryController extends Controller
         $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
         $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
         $category->max_promotion_commission_rate = $input->maxPromotionCommissionRate;
+        $category->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
         $category->save();
 
         return $this->success();
