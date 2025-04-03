@@ -13,6 +13,7 @@ class ScenicTicketInput extends BaseInput
     public $specList;
     public $salesCommissionRate;
     public $promotionCommissionRate;
+    public $promotionCommissionUpperLimit;
     public $feeIncludeTips;
     public $feeNotIncludeTips;
     public $bookingTime;
@@ -40,8 +41,9 @@ class ScenicTicketInput extends BaseInput
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'specList' => 'required|array|min:1',
-            'salesCommissionRate' => 'required|numeric',
-            'promotionCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'numeric',
+            'promotionCommissionRate' => 'numeric',
+            'promotionCommissionUpperLimit' => 'numeric',
             'feeIncludeTips' => 'string',
             'feeNotIncludeTips' => 'string',
             'bookingTime' => 'required|string',

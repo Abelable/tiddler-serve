@@ -10,6 +10,7 @@ class HotelRoomInput extends BaseInput
     public $priceList;
     public $salesCommissionRate;
     public $promotionCommissionRate;
+    public $promotionCommissionUpperLimit;
     public $breakfastNum;
     public $guestNum;
     public $cancellable;
@@ -21,8 +22,9 @@ class HotelRoomInput extends BaseInput
             'typeId' => 'required|integer|digits_between:1,20',
             'price' => 'required|numeric',
             'priceList' => 'required|array|min:1',
-            'salesCommissionRate' => 'required|numeric',
-            'promotionCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'numeric',
+            'promotionCommissionRate' => 'numeric',
+            'promotionCommissionUpperLimit' => 'numeric',
             'breakfastNum' => 'required|integer',
             'guestNum' => 'required|integer',
             'cancellable' => 'required|integer|in:0,1',

@@ -75,8 +75,9 @@ class MealTicketService extends BaseService
         }
         $ticket->price = $input->price;
         $ticket->original_price = $input->originalPrice;
-        $ticket->sales_commission_rate = $input->salesCommissionRate;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        $ticket->sales_commission_rate = $input->salesCommissionRate ?: 0;
+        $ticket->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
+        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
         $ticket->validity_days = $input->validityDays ?: 0;
         $ticket->validity_start_time = $input->validityStartTime ?: '';
         $ticket->validity_end_time = $input->validityEndTime ?: '';

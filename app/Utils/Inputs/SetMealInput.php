@@ -11,6 +11,7 @@ class SetMealInput extends BaseInput
     public $originalPrice;
     public $salesCommissionRate;
     public $promotionCommissionRate;
+    public $promotionCommissionUpperLimit;
     public $packageDetails;
     public $validityDays;
     public $validityStartTime;
@@ -29,8 +30,9 @@ class SetMealInput extends BaseInput
             'name' => 'required|string',
             'price' => 'required|numeric',
             'originalPrice' => 'numeric',
-            'salesCommissionRate' => 'required|numeric',
-            'promotionCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'numeric',
+            'promotionCommissionRate' => 'numeric',
+            'promotionCommissionUpperLimit' => 'numeric',
             'packageDetails' => 'required|array|min:1',
             'validityDays' => 'integer',
             'validityStartTime' => 'string',

@@ -268,22 +268,17 @@ class GoodsService extends BaseService
         $goods->detail_image_list = json_encode($input->detailImageList);
         $goods->default_spec_image = $input->defaultSpecImage;
         $goods->name = $input->name;
-        if (!empty($input->introduction)) {
-            $goods->introduction = $input->introduction;
-        }
+        $goods->introduction = $input->introduction ?: '';
         $goods->freight_template_id = $input->freightTemplateId;
         $goods->shop_category_id = $input->shopCategoryId;
         $goods->category_id = $input->categoryId;
-        if (!empty($input->returnAddressId)) {
-            $goods->return_address_id = $input->returnAddressId;
-        }
+        $goods->return_address_id = $input->returnAddressId ?: 0;
         $goods->price = $input->price;
         $goods->market_price = $input->marketPrice ?: 0;
         $goods->stock = $input->stock;
-        if (!empty($input->salesCommissionRate)) {
-            $goods->sales_commission_rate = $input->salesCommissionRate;
-        }
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
+        $goods->sales_commission_rate = $input->salesCommissionRate ?: 0;
+        $goods->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
+        $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
         $goods->spec_list = json_encode($input->specList);
         $goods->sku_list = json_encode($input->skuList);
         $goods->refund_support = $input->refundSupport;

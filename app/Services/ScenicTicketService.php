@@ -81,8 +81,9 @@ class ScenicTicketService extends BaseService
         $ticket->brief_name = $input->briefName;
         $ticket->price = $input->price;
         $ticket->market_price = $input->marketPrice ?: '';
-        $ticket->sales_commission_rate = $input->salesCommissionRate;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        $ticket->sales_commission_rate = $input->salesCommissionRate ?: 0;
+        $ticket->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
+        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
         $ticket->fee_include_tips = $input->feeIncludeTips ?: '';
         $ticket->fee_not_include_tips = $input->feeNotIncludeTips ?: '';
         $ticket->booking_time = $input->bookingTime;

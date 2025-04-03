@@ -9,6 +9,7 @@ class MealTicketInput extends BaseInput
     public $originalPrice;
     public $salesCommissionRate;
     public $promotionCommissionRate;
+    public $promotionCommissionUpperLimit;
     public $validityDays;
     public $validityStartTime;
     public $validityEndTime;
@@ -27,8 +28,9 @@ class MealTicketInput extends BaseInput
             'restaurantIds' => 'required|array|min:1',
             'price' => 'required|numeric',
             'originalPrice' => 'numeric',
-            'salesCommissionRate' => 'required|numeric',
-            'promotionCommissionRate' => 'required|numeric',
+            'salesCommissionRate' => 'numeric',
+            'promotionCommissionRate' => 'numeric',
+            'promotionCommissionUpperLimit' => 'numeric',
             'validityDays' => 'integer',
             'validityStartTime' => 'string',
             'validityEndTime' => 'string',
