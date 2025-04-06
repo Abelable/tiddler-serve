@@ -36,7 +36,7 @@ class AuthController extends Controller
             return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
         }
 
-        $token =  DB::transaction(function () use ($input, $result) {
+        $token = DB::transaction(function () use ($input, $result) {
             // 用户注册
             $user = UserService::getInstance()->register($result['openid'], $input);
 
