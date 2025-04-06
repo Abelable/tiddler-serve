@@ -12,29 +12,29 @@ use Illuminate\Support\Facades\DB;
 
 class PromoterService extends BaseService
 {
-    public function create($userId, $level, $scene)
+    public function adminCreate($userId, $level, $scene)
     {
         $promoter = Promoter::new();
         $promoter->user_id = $userId;
         $promoter->level = $level;
         $promoter->scene = $scene;
+        $promoter->path = 1;
         $promoter->save();
         return $promoter;
     }
 
-    public function toBePromoter($userId)
+    public function toBePromoter($userId, $path, array $goodsIds)
     {
         $promoter = $this->getExactPromoter($userId, PromoterScene::LEVEL_PROMOTER, PromoterScene::SCENE_PROMOTER);
-        if (!is_null($promoter)) {
-            $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '您已经是推广员');
+        if (is_null($promoter)) {
+            $promoter = Promoter::new();
+            $promoter->user_id = $userId;
+            $promoter->level = PromoterScene::LEVEL_PROMOTER;
+            $promoter->scene = PromoterScene::SCENE_PROMOTER;
+            $promoter->path = $path;
+            $promoter->gift_goods_ids = implode(',', $goodsIds);
+            $promoter->save();
         }
-
-        $promoter = Promoter::new();
-        $promoter->user_id = $userId;
-        $promoter->level = PromoterScene::LEVEL_PROMOTER;
-        $promoter->scene = PromoterScene::SCENE_PROMOTER;
-        $promoter->save();
-        return $promoter;
     }
 
     public function toBeC1Organizer($userId)
@@ -97,7 +97,11 @@ class PromoterService extends BaseService
 
     public function getExactPromoter($userId, $level, $scene, $columns = ['*'])
     {
-        return Promoter::query()->where('user_id', $userId)->where('level', $level)->where('scene', $scene)->first($columns);
+        return Promoter::query()
+            ->where('user_id', $userId)
+            ->where('level', $level)
+            ->where('scene', $scene)
+            ->first($columns);
     }
 
     public function getListByUserIds(array $userIds, $columns = ['*'])
@@ -111,7 +115,9 @@ class PromoterService extends BaseService
         if (!empty($input->level)) {
             $query->where('level', $input->level);
         }
-       return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getOptions($columns = ['*'])
@@ -131,7 +137,10 @@ class PromoterService extends BaseService
 
     public function getPromoterPageByUserIds(array $userIds, SearchPageInput $input, $columns = ['*'])
     {
-        return Promoter::query()->whereIn('user_id', $userIds)->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return Promoter::query()
+            ->whereIn('user_id', $userIds)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function promoterCountSum()
@@ -188,5 +197,60 @@ class PromoterService extends BaseService
         }
 
         return $weeklyGrowthRate;
+    }
+
+    public function getRecentlyPromoter($userId, $days = 7, $columns = ['*'])
+    {
+        return Promoter::query()
+            ->where('user_id', $userId)
+            ->where('created_at', '>=', now()->subDays($days))
+            ->first($columns);
+    }
+
+    public function getUserPromoterByPathList($userId, array $pathList, $columns = ['*'])
+    {
+        return Promoter::query()->where('user_id', $userId)->whereIn('path', $pathList)->first($columns);
+    }
+
+    public function getPromoterLevelsCount()
+    {
+        return Promoter::query()
+            ->select('level', DB::raw('COUNT(*) as number'))
+            ->whereIn('level', [1, 2, 3, 4])
+            ->groupBy('level')
+            ->get();
+    }
+
+    public function getTopPromoterPage(PageInput $input, $columns = ['*'])
+    {
+        return Promoter::query()
+            ->select('*', DB::raw('(commission_sum + team_commission_sum) as total_commission'))
+            ->orderByDesc('promoted_user_number')
+            ->orderByDesc('total_commission')
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function updatePromotedUserCount($userId, $count = 1)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->promoted_user_number = $promoter->promoted_user_number + $count;
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function updateCommissionSum($userId, $commission)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->commission_sum = bcadd($promoter->commission_sum, $commission, 2);
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function updateTeamCommissionSum($userId, $commission)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->team_commission_sum = bcadd($promoter->team_commission_sum, $commission, 2);
+        $promoter->save();
+        return $promoter;
     }
 }
