@@ -26,7 +26,7 @@ class UserController extends Controller
 
         $user['promoterId'] = $user->promoterInfo->id ?? 0;
         $user['level'] = $user->promoterInfo->level ?? 0;
-        $user['superiorId'] = $user->superiorId();
+        $user['superiorId'] = $user->superiorId() ?? 0;
 
         $user['authInfoId'] = $user->authInfo->id ?? 0;
 
