@@ -112,6 +112,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasOne(Promoter::class, 'user_id');
     }
 
+    public function superiorId() {
+        return $this->hasOne(Relation::class, 'user_id')->value('superior_id');
+    }
+
     public function merchant()
     {
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
