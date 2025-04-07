@@ -15,6 +15,7 @@ class CreatePromotersTable extends Migration
     {
         Schema::create('promoters', function (Blueprint $table) {
             $table->id();
+            $table->integer('status')->default(1)->comment('状态：1-身份正常，2-身份失效');
             $table->integer('user_id')->comment('用户id');
             $table->integer('level')->comment('用户等级：1-推广员，2-组织者C1，3-C2，4-C3，5-委员会');
             $table->integer('scene')->comment('场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300');
@@ -23,6 +24,7 @@ class CreatePromotersTable extends Migration
             $table->integer('promoted_user_number')->default(0)->comment('推广人数');
             $table->float('commission_sum')->default(0)->comment('累计商品佣金');
             $table->float('team_commission_sum')->default(0)->comment('累计团队佣金');
+            $table->string('expiration_time')->default('')->comment('身份失效时间');
             $table->timestamps();
             $table->softDeletes();
         });

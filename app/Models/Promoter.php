@@ -6,6 +6,7 @@ namespace App\Models;
  * App\Models\Promoter
  *
  * @property int $id
+ * @property int $status 状态：1-身份正常，2-身份失效
  * @property int $user_id 用户id
  * @property int $level 用户等级：1-推广员，2-组织者C1，3-C2，4-C3，5-委员会
  * @property int $scene 场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300
@@ -14,6 +15,7 @@ namespace App\Models;
  * @property int $promoted_user_number 推广人数
  * @property float $commission_sum 累计商品佣金
  * @property float $team_commission_sum 累计团队佣金
+ * @property string $expiration_time 身份失效时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -24,12 +26,14 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereExpirationTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereGiftGoodsIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePromotedUserNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereScene($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereTeamCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereUserId($value)
