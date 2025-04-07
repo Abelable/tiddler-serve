@@ -16,7 +16,7 @@ class CreateRelationsTable extends Migration
         Schema::create('relations', function (Blueprint $table) {
             $table->id();
             $table->integer('superior_id')->comment('上级id');
-            $table->integer('fan_id')->comment('粉丝id');
+            $table->integer('user_id')->comment('用户id');
             $table->timestamps();
             $table->softDeletes();
         });

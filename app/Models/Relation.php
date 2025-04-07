@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $superior_id 上级id
- * @property int $fan_id 粉丝id
+ * @property int $user_id 用户id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -17,10 +17,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Relation query()
  * @method static \Illuminate\Database\Eloquent\Builder|Relation whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Relation whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Relation whereFanId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Relation whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Relation whereSuperiorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Relation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Relation whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|Relation withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Relation withoutTrashed()
  * @mixin \Eloquent

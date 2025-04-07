@@ -8,33 +8,33 @@ use Illuminate\Support\Carbon;
 
 class RelationService extends BaseService
 {
-    public function banding($superiorId, $fanId)
+    public function banding($superiorId, $userId)
     {
-        $relation = $this->getRelation($superiorId, $fanId);
+        $relation = $this->getRelation($superiorId, $userId);
         if (!is_null($relation)) {
             $this->throwBusinessException(CodeResponse::DATA_EXISTED, '上下级关系已存在');
         }
 
         $relation = Relation::new();
         $relation->superior_id = $superiorId;
-        $relation->fan_id = $fanId;
+        $relation->user_id = $userId;
         $relation->save();
         return $relation;
     }
 
-    public function getRelation($superiorId, $fanId, $columns = ['*'])
+    public function getRelation($superiorId, $userId, $columns = ['*'])
     {
-        return Relation::query()->where('superior_id', $superiorId)->where('fan_id', $fanId)->first($columns);
+        return Relation::query()->where('superior_id', $superiorId)->where('user_id', $userId)->first($columns);
     }
 
-    public function getRelationByFanId($fanId, $columns = ['*'])
+    public function getRelationByFanId($userId, $columns = ['*'])
     {
-        return Relation::query()->where('fan_id', $fanId)->first($columns);
+        return Relation::query()->where('user_id', $userId)->first($columns);
     }
 
-    public function getListByFanIds(array $fanIds, $columns = ['*'])
+    public function getListByFanIds(array $userIds, $columns = ['*'])
     {
-        return Relation::query()->whereIn('fan_id', $fanIds)->get($columns);
+        return Relation::query()->whereIn('user_id', $userIds)->get($columns);
     }
 
     public function getListBySuperiorId($superiorId, $columns = ['*'])
@@ -62,9 +62,9 @@ class RelationService extends BaseService
         return Relation::query()->whereDate('created_at', Carbon::today())->where('superior_id', $superiorId)->get($columns);
     }
 
-    public function getSuperiorId($fanId, $columns = ['*'])
+    public function getSuperiorId($userId, $columns = ['*'])
     {
-        $relation = Relation::query()->where('fan_id', $fanId)->first($columns);
+        $relation = Relation::query()->where('user_id', $userId)->first($columns);
         return $relation->superior_id ?? null;
     }
 
