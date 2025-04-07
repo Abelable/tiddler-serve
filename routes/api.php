@@ -37,6 +37,7 @@ Route::prefix('user')->group(function () {
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
     Route::get('add_temp_user', 'UserController@addTempUser');
+    Route::get('supply_user_mobile', 'UserController@supplyUserMobile');
 });
 
 Route::get('oss_config', 'CommonController@ossConfig');

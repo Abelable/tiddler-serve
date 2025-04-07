@@ -11,6 +11,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\UserInfoInput;
 use App\Utils\TimServe;
+use function PHPSTORM_META\map;
 
 class UserController extends Controller
 {
@@ -150,8 +151,21 @@ class UserController extends Controller
             $user = User::new();
             $user->avatar = $avatar;
             $user->nickname = $nickname;
+            $user->mobile = $user::generateMobile();
             $user->save();
         }
         return $this->success($user->id);
+    }
+
+    public function supplyUserMobile()
+    {
+        $list = User::query()->get();
+        $list->map(function (User $user) {
+            if (!$user->mobile) {
+                $user->mobile = $user::generateMobile();
+                $user->save();
+            }
+        });
+        return $this->success();
     }
 }
