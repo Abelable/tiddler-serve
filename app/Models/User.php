@@ -34,6 +34,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read \App\Models\Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property-read \App\Models\Promoter|null $promoterInfo
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
  * @property-read \App\Models\ScenicShop|null $scenicShop
  * @property-read \App\Models\Shop|null $shopInfo
@@ -104,6 +105,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
             'nickname' => $this->nickname,
             'signature' => $this->signature,
         ];
+    }
+
+    public function promoterInfo()
+    {
+        return $this->hasOne(Promoter::class, 'user_id');
     }
 
     public function merchant()

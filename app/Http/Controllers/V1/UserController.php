@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\FanService;
-use App\Services\KeywordService;
 use App\Services\Media\MediaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -15,7 +14,7 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['authorInfo', 'search', 'addTempUser'];
+    protected $except = ['superiorInfo', 'authorInfo', 'search', 'addTempUser'];
 
     public function userInfo()
     {
@@ -25,24 +24,30 @@ class UserController extends Controller
         $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($this->userId());
         $fansNumber = FanService::getInstance()->fansNumber($this->userId());
 
+        $user['promoterId'] = $user->promoterInfo->id ?? 0;
+        $user['level'] = $user->promoterInfo->level ?? 0;
+
         $user['authInfoId'] = $user->authInfo->id ?? 0;
+
         $user['merchantId'] = $user->merchant->id ?? 0;
         $user['scenicProviderId'] = $user->scenicProvider->id ?? 0;
         $user['hotelProviderId'] = $user->hotelProvider->id ?? 0;
         $user['cateringProviderId'] = $user->cateringProvider->id ?? 0;
+
         $user['be_liked_times'] = $beLikedTimes;
         $user['be_collected_times'] = $beCollectedTimes;
         $user['followed_author_number'] = $followedAuthorNumbers;
         $user['fans_number'] = $fansNumber;
 
         unset($user->openid);
-        unset($user->created_at);
-        unset($user->updated_at);
+        unset($user->promoterInfo);
         unset($user->authInfo);
         unset($user->merchant);
         unset($user->scenicProvider);
         unset($user->hotelProvider);
         unset($user->cateringProvider);
+        unset($user->created_at);
+        unset($user->updated_at);
 
         return $this->success($user);
     }
@@ -80,6 +85,18 @@ class UserController extends Controller
         $timServe->updateUserInfo($this->userId(), $this->user()->nickname, $this->user()->avatar);
         $loginInfo = $timServe->getLoginInfo($this->userId());
         return $this->success($loginInfo);
+    }
+
+    public function superiorInfo()
+    {
+        $superiorId = $this->verifyRequiredId('superiorId');
+
+        $superiorInfo = UserService::getInstance()->getUserById($superiorId, ['id', 'mobile', 'avatar', 'nickname', 'gender', 'wx_qrcode', 'signature']);
+        if (is_null($superiorInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户上级不存在');
+        }
+
+        return $this->success($superiorInfo);
     }
 
     public function authorInfo()

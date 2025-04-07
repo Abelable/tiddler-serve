@@ -33,6 +33,7 @@ Route::prefix('user')->group(function () {
     Route::get('info', 'UserController@userInfo');
     Route::post('update', 'UserController@updateUserInfo');
     Route::get('tim_login_info', 'UserController@timLoginInfo');
+    Route::get('superior_info', 'UserController@superiorInfo');
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
     Route::get('add_temp_user', 'UserController@addTempUser');
