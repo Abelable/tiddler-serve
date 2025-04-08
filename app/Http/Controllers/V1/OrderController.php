@@ -225,7 +225,7 @@ class OrderController extends Controller
                     return $freightTemplate;
                 })->keyBy('id');
 
-            // 4.按商家进行订单拆分，生成对应订单
+            // 4.按店铺进行订单拆分，生成对应订单
             $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 

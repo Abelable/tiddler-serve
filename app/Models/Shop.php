@@ -13,7 +13,7 @@ namespace App\Models;
  * @property string $category_ids 店铺分类id
  * @property int $type 店铺类型：1-个人，2-企业
  * @property string $cover 店铺封面图片
- * @property string $avatar 店铺头像
+ * @property string $logo 店铺logo
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -21,12 +21,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Shop newQuery()
  * @method static \Illuminate\Database\Query\Builder|Shop onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Shop query()
- * @method static \Illuminate\Database\Eloquent\Builder|Shop whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCategoryIds($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Shop whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereMerchantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereStatus($value)

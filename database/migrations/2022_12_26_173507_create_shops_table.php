@@ -22,7 +22,7 @@ class CreateShopsTable extends Migration
             $table->string('category_ids')->comment('店铺分类id');
             $table->integer('type')->comment('店铺类型：1-个人，2-企业');
             $table->string('cover')->default('')->comment('店铺封面图片');
-            $table->string('avatar')->comment('店铺头像');
+            $table->string('logo')->comment('店铺logo');
             $table->timestamps();
             $table->softDeletes();
         });
