@@ -150,15 +150,16 @@ class CartController extends Controller
     {
         /** @var CartGoodsEditInput $input */
         $input = CartGoodsEditInput::new();
-        $cartGoods = CartGoodsService::getInstance()->editCartGoods($input);
+        $cartGoods = CartGoodsService::getInstance()->editCartGoods($this->userId(), $input);
         return $this->success([
             'status' => $cartGoods->status,
             'statusDesc' => $cartGoods->status_desc,
             'selectedSkuIndex' => $cartGoods->selected_sku_index,
             'selectedSkuName' => $cartGoods->selected_sku_name,
             'price' => $cartGoods->price,
+            'marketPrice' => $cartGoods->market_price,
             'number' => $cartGoods->number,
-            'stock' => $cartGoods['stock'],
+            'numberLimit' => $cartGoods['numberLimit'],
         ]);
     }
 

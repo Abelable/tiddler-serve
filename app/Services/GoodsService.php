@@ -281,7 +281,7 @@ class GoodsService extends BaseService
         $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
         $goods->spec_list = json_encode($input->specList);
         $goods->sku_list = json_encode($input->skuList);
-        $goods->refund_support = $input->refundSupport;
+        $goods->refund_status = $input->refundStatus;
         $goods->save();
 
         return $goods;

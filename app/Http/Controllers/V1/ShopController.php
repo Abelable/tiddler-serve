@@ -92,7 +92,7 @@ class ShopController extends Controller
 
     public function myShopInfo()
     {
-        $columns = ['id', 'category_ids', 'name', 'type', 'avatar', 'cover'];
+        $columns = ['id', 'category_ids', 'name', 'type', 'logo', 'cover'];
         $shop = ShopService::getInstance()->getShopByUserId($this->userId(), $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');

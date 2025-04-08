@@ -23,7 +23,7 @@ class GoodsInput extends BaseInput
     public $promotionCommissionUpperLimit;
     public $specList;
     public $skuList;
-    public $refundSupport;
+    public $refundStatus;
 
     public function rules()
     {
@@ -47,7 +47,7 @@ class GoodsInput extends BaseInput
             'promotionCommissionUpperLimit' => 'numeric',
             'specList' => 'required|array',
             'skuList' => 'required|array',
-            'refundSupport' => 'required|integer|in:0,1',
+            'refundStatus' => 'required|integer|in:0,1',
         ];
     }
 }

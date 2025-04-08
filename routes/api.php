@@ -84,12 +84,20 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'FreightTemplateController@delete');
     });
 
-    Route::prefix('goods_return_address')->group(function () {
-        Route::get('list', 'GoodsReturnAddressController@list');
-        Route::get('detail', 'GoodsReturnAddressController@detail');
-        Route::post('add', 'GoodsReturnAddressController@add');
-        Route::post('edit', 'GoodsReturnAddressController@edit');
-        Route::post('delete', 'GoodsReturnAddressController@delete');
+    Route::prefix('refund_address')->group(function () {
+        Route::get('list', 'ShopRefundAddressController@list');
+        Route::get('detail', 'ShopRefundAddressController@detail');
+        Route::post('add', 'ShopRefundAddressController@add');
+        Route::post('edit', 'ShopRefundAddressController@edit');
+        Route::post('delete', 'ShopRefundAddressController@delete');
+    });
+
+    Route::prefix('pickup_address')->group(function () {
+        Route::get('list', 'ShopPickupAddressController@list');
+        Route::get('detail', 'ShopPickupAddressController@detail');
+        Route::post('add', 'ShopPickupAddressController@add');
+        Route::post('edit', 'ShopPickupAddressController@edit');
+        Route::post('delete', 'ShopPickupAddressController@delete');
     });
 
     Route::prefix('goods')->group(function () {

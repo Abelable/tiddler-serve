@@ -9,12 +9,15 @@ use App\Models\Coupon;
 use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\Shop;
+use App\Services\AccountService;
 use App\Services\AddressService;
 use App\Services\CartGoodsService;
 use App\Services\CouponService;
 use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
+use App\Services\PromoterService;
+use App\Services\RelationService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
@@ -208,26 +211,68 @@ class OrderController extends Controller
 
         $orderIds = DB::transaction(function () use ($input) {
             // 1.获取地址
-            $address = AddressService::getInstance()->getById($this->userId(), $input->addressId);
-            if (is_null($address)) {
-                return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+            $address = null;
+            if ($input->deliveryMode == 1) {
+                $address = AddressService::getInstance()->getById($this->userId(), $input->addressId);
+                if (is_null($address)) {
+                    return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+                }
             }
 
-            // 2.获取购物车商品
+            // 2.获取优惠券
+            $coupon = null;
+            if (!is_null($input->couponId) && $input->couponId != 0) {
+                $userCoupon = UserCouponService::getInstance()->getUserCoupon($this->userId(), $input->couponId);
+                if (is_null($userCoupon)) {
+                    return $this->fail(CodeResponse::NOT_FOUND, '优惠券无法使用');
+                }
+                $coupon = CouponService::getInstance()->getAvailableCouponById($input->couponId);
+                if (is_null($coupon)) {
+                    return $this->fail(CodeResponse::NOT_FOUND, '优惠券不存在');
+                }
+            }
+
+            // 3.判断余额状态
+            if (!is_null($input->useBalance) && $input->useBalance != 0) {
+                $account = AccountService::getInstance()->getUserAccount($this->userId());
+                if ($account->status == 0 || $account->balance <= 0) {
+                    return $this->fail(CodeResponse::NOT_FOUND, '余额异常不可用，请联系客服解决问题');
+                }
+            }
+
+            // 4.获取购物车商品
             $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $input->cartGoodsIds);
 
-            // 3.获取运费模板列表
-            $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
-            $freightTemplateList = FreightTemplateService::getInstance()
-                ->getListByIds($freightTemplateIds)
-                ->map(function (FreightTemplate $freightTemplate) {
-                    $freightTemplate->area_list = json_decode($freightTemplate->area_list);
-                    return $freightTemplate;
-                })->keyBy('id');
+            // 5.获取运费模板列表
+            $freightTemplateList = null;
+            if ($input->deliveryMode == 1) {
+                $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
+                $freightTemplateList = FreightTemplateService::getInstance()
+                    ->getListByIds($freightTemplateIds)
+                    ->map(function (FreightTemplate $freightTemplate) {
+                        $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+                        return $freightTemplate;
+                    })->keyBy('id');
+            }
 
-            // 4.按店铺进行订单拆分，生成对应订单
+            // 6.按店铺进行订单拆分，生成对应订单
             $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
+
+            $userId = $this->userId();
+            $superiorId = $this->user()->superiorId();
+            $promoterInfo = $this->user()->promoterInfo;
+
+            $superiorInfo = null;
+            $managerId = null;
+            $managerInfo = null;
+            if (!is_null($superiorId)) {
+                $superiorInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
+                $managerId = RelationService::getInstance()->getSuperiorId($superiorId);
+                if (!is_null($managerId)) {
+                    $managerInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
+                }
+            }
 
             $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartGoodsList, $freightTemplateList) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {

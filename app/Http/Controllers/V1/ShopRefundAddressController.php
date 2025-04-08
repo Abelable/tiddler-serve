@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\GoodsReturnAddress;
-use App\Services\GoodsReturnAddressService;
+use App\Models\ShopRefundAddress;
+use App\Services\ShopRefundAddressService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\GoodsReturnAddressInput;
+use App\Utils\Inputs\ShopRefundAddressInput;
 
-class GoodsReturnAddressController extends Controller
+class ShopRefundAddressController extends Controller
 {
     public function list()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $columns = ['id', 'consignee_name', 'mobile', 'address_detail'];
-        $list = GoodsReturnAddressService::getInstance()->getListByUserId($this->userId(), $columns);
+        $list = ShopRefundAddressService::getInstance()->getListByShopId($shopId, $columns);
         return $this->success($list);
     }
 
@@ -21,17 +22,18 @@ class GoodsReturnAddressController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'consignee_name', 'mobile', 'address_detail', 'supplement'];
-        $detail = GoodsReturnAddressService::getInstance()->getAddressById($id, $columns);
+        $detail = ShopRefundAddressService::getInstance()->getAddressById($id, $columns);
         return $this->success($detail);
     }
 
     public function add()
     {
-        /** @var GoodsReturnAddressInput $input */
-        $input = GoodsReturnAddressInput::new();
+        /** @var ShopRefundAddressInput $input */
+        $input = ShopRefundAddressInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $address = GoodsReturnAddress::new();
-        $address->user_id = $this->userId();
+        $address = ShopRefundAddress::new();
+        $address->shop_id = $shopId;
 
         $this->update($address, $input);
 
@@ -41,10 +43,10 @@ class GoodsReturnAddressController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        /** @var GoodsReturnAddressInput $input */
-        $input = GoodsReturnAddressInput::new();
+        /** @var ShopRefundAddressInput $input */
+        $input = ShopRefundAddressInput::new();
 
-        $address = GoodsReturnAddressService::getInstance()->getAddressById($id);
+        $address = ShopRefundAddressService::getInstance()->getAddressById($id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
         }
@@ -54,7 +56,7 @@ class GoodsReturnAddressController extends Controller
         return $this->success();
     }
 
-    private function update($address, GoodsReturnAddressInput $input)
+    private function update($address, ShopRefundAddressInput $input)
     {
         $address->consignee_name = $input->consigneeName;
         $address->mobile = $input->mobile;
@@ -70,7 +72,7 @@ class GoodsReturnAddressController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        $address = GoodsReturnAddressService::getInstance()->getAddressById($id);
+        $address = ShopRefundAddressService::getInstance()->getAddressById($id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
         }

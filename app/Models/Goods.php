@@ -8,9 +8,9 @@ use Laravel\Scout\Searchable;
  * App\Models\Goods
  *
  * @property int $id
- * @property int $shop_id 店铺id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
+ * @property int $shop_id 店铺id
  * @property int $shop_category_id 所属店铺分类id
  * @property int $category_id 商品分类id
  * @property string $cover 列表图片
@@ -21,14 +21,15 @@ use Laravel\Scout\Searchable;
  * @property string $name 商品名称
  * @property string $introduction 商品介绍
  * @property int $freight_template_id 运费模板id：0-包邮
- * @property int $return_address_id 退货地址id
  * @property float $price 商品价格
  * @property float $market_price 市场价格
  * @property int $stock 商品库存
  * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
- * @property int $refund_support 是否支持7天无理由：0-不支持，1-支持
+ * @property int $delivery_method 提货方式：1-快递，2-自提，3-快递/自提
+ * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property int $number_limit 限购数量
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
  * @property int $sales_volume 商品销量
@@ -46,6 +47,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDefaultSpecImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeliveryMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDetailImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFreightTemplateId($value)
@@ -54,11 +56,11 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereIntroduction($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereMarketPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereNumberLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionUpperLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundSupport($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereReturnAddressId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopCategoryId($value)

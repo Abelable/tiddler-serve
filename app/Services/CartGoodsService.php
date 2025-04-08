@@ -30,28 +30,56 @@ class CartGoodsService extends BaseService
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
+        $goods = GoodsService::getInstance()->getOnSaleGoods($goodsId);
+        if (is_null($goods)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+        $skuList = json_decode($goods->sku_list);
+        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
+            $stock = $skuList[$selectedSkuIndex]->stock;
+            if ($stock == 0 || $number > $stock) {
+                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '所选规格库存不足');
+            }
+        }
+        if ($goods->stock == 0 || $number > $goods->stock) {
+            $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '商品库存不足');
+        }
 
-        $cartGoods = $this->getExistCartGoods($goodsId, $selectedSkuIndex, $scene);
-        if (!is_null($cartGoods)) {
-            $cartGoods->number = $scene == 1 ? ($cartGoods->number + $number) : $number;
+        $cartGoods = $this->getExistCartGoods($userId, $goodsId, $selectedSkuIndex, $scene);
+        if (!is_null($cartGoods) && $scene == 1) {
+            $cartGoods->number = $cartGoods->number + $number;
         } else {
+            if (!is_null($cartGoods) && $scene == 2) {
+                $cartGoods->delete();
+            }
+
+            $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+
             $cartGoods = CartGoods::new();
             $cartGoods->scene = $scene;
             $cartGoods->user_id = $userId;
             $cartGoods->goods_id = $goodsId;
             $cartGoods->shop_id = $goods->shop_id;
-            $cartGoods->category_id = $goods->category_id;
             $cartGoods->freight_template_id = $goods->freight_template_id;
             $cartGoods->cover = $goods->cover;
             $cartGoods->name = $goods->name;
+            $cartGoods->refund_status = $goods->refund_status;
+            $cartGoods->delivery_method = $goods->delivery_method;
+            $cartGoods->is_gift = in_array($goodsId, $giftGoodsIds) ? 1 : 0;
             if (count($skuList) != 0 && $selectedSkuIndex != -1 ) {
                 $cartGoods->selected_sku_index = $selectedSkuIndex;
                 $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
                 $cartGoods->price = $skuList[$selectedSkuIndex]->price;
+                $cartGoods->sales_commission_rate = $skuList[$selectedSkuIndex]->salesCommissionRate ?? $goods->sales_commission_rate;
             } else {
                 $cartGoods->price = $goods->price;
+                $cartGoods->sales_commission_rate = $goods->sales_commission_rate;
             }
+
+            // todo 优惠分享佣金逻辑
+            $cartGoods->promotion_commission_rate = $goods->promotion_commission_rate ?? 10;
+            $cartGoods->promotion_commission_upper_limit = $goods->promotion_commission_upper_limit ?? 20;
+
             $cartGoods->market_price = $goods->market_price;
             $cartGoods->number = $number;
         }
@@ -60,19 +88,33 @@ class CartGoodsService extends BaseService
         return $cartGoods;
     }
 
-    public function editCartGoods(CartGoodsEditInput $input)
+    public function editCartGoods($userId, CartGoodsEditInput $input)
     {
         $cartGoodsId = $input->id;
         $goodsId = $input->goodsId;
         $selectedSkuIndex = $input->selectedSkuIndex;
         $number = $input->number;
 
-        $cartGoods = $this->getExistCartGoods($goodsId, $selectedSkuIndex, 1, $cartGoodsId);
+        $cartGoods = $this->getExistCartGoods($userId, $goodsId, $selectedSkuIndex, 1, $cartGoodsId);
         if (!is_null($cartGoods)) {
             $this->throwBusinessException(CodeResponse::DATA_EXISTED, '购物车中已存在当前规格商品');
         }
 
-        [$goods, $skuList] = $this->validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number);
+        $goods = GoodsService::getInstance()->getOnSaleGoods($goodsId);
+        if (is_null($goods)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $skuList = json_decode($goods->sku_list);
+        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
+            $stock = $skuList[$selectedSkuIndex]->stock;
+            if ($stock == 0 || $number > $stock) {
+                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '所选规格库存不足');
+            }
+        }
+        if ($goods->stock == 0 || $number > $goods->stock) {
+            $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '商品库存不足');
+        }
 
         $cartGoods = $this->getCartGoodsById($cartGoodsId);
         if (is_null($cartGoods)) {
@@ -86,6 +128,8 @@ class CartGoodsService extends BaseService
             $cartGoods->selected_sku_index = $selectedSkuIndex;
             $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
             $cartGoods->price = $skuList[$selectedSkuIndex]->price;
+            $cartGoods->market_price = $skuList[$selectedSkuIndex]->originalPrice ?? $goods->market_price;
+            $cartGoods->sales_commission_rate = $skuList[$selectedSkuIndex]->salesCommissionRate ?? $goods->sales_commission_rate;
         }
 
         $cartGoods->number = $number;
@@ -94,7 +138,39 @@ class CartGoodsService extends BaseService
             $cartGoods->status_desc = '';
         }
         $cartGoods->save();
-        $cartGoods['stock'] = (count($skuList) != 0 && $selectedSkuIndex != -1) ? $skuList[$selectedSkuIndex]->stock : $goods->stock;
+
+        // 限购逻辑
+        $orderGoodsList = OrderGoodsService::getInstance()->getRecentlyUserListByGoodsIds($userId, [$goodsId]);
+        $userPurchasedList = collect($orderGoodsList)->groupBy(function ($item) {
+            return $item['selected_sku_name'] . '|' . $item['selected_sku_index'];
+        })->map(function ($groupedItems) {
+            return [
+                'selected_sku_name' => $groupedItems->first()['selected_sku_name'],
+                'selected_sku_index' => $groupedItems->first()['selected_sku_index'],
+                'number' => $groupedItems->sum('number'),
+            ];
+        });
+        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
+            $sku = $skuList[$selectedSkuIndex];
+            $numberLimit = $sku->limit ?? $goods->number_limit;
+            $stock = $sku->stock ?? $goods->stock;
+            if ($numberLimit != 0) {
+                $userPurchasedNumber = $userPurchasedList->filter(function ($item) use ($cartGoods) {
+                    return $item['selected_sku_index'] == $cartGoods->selected_sku_index
+                        && $item['selected_sku_name'] == $cartGoods->selected_sku_name;
+                })->first()['number'] ?? 0;
+                $cartGoods['numberLimit'] = min($numberLimit, $stock) - $userPurchasedNumber;
+            } else {
+                $cartGoods['numberLimit'] = $stock;
+            }
+        } else {
+            if ($goods->number_limit != 0) {
+                $userPurchasedNumber = $userPurchasedList->first()['number'] ?? 0;
+                $cartGoods['numberLimit'] = min($goods->number_limit, $goods->stock) - $userPurchasedNumber;
+            } else {
+                $cartGoods['numberLimit'] = $goods->stock;
+            }
+        }
 
         return $cartGoods;
     }
@@ -122,13 +198,14 @@ class CartGoodsService extends BaseService
         return [$goods, $skuList];
     }
 
-    public function getExistCartGoods($goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])
+    public function getExistCartGoods($userId, $goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])
     {
         $query = CartGoods::query();
         if ($id != 0) {
             $query = $query->where('id', '!=', $id);
         }
         return $query
+            ->where('user_id', $userId)
             ->where('goods_id', $goodsId)
             ->where('selected_sku_index', $selectedSkuIndex)
             ->where('scene', $scene)
