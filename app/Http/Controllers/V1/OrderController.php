@@ -5,15 +5,18 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\CartGoods;
+use App\Models\Coupon;
 use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\Shop;
 use App\Services\AddressService;
 use App\Services\CartGoodsService;
+use App\Services\CouponService;
 use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\ShopService;
+use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
@@ -26,33 +29,51 @@ class OrderController extends Controller
 {
     public function preOrderInfo()
     {
-        $addressId = $this->verifyId('addressId');
         $cartGoodsIds = $this->verifyArrayNotEmpty('cartGoodsIds');
+        $deliveryMode = $this->verifyRequiredInteger('deliveryMode');
+        $addressId = $this->verifyId('addressId');
+        $couponId = $this->verifyId('couponId');
+        $useBalance = $this->verifyBoolean('useBalance', false);
 
-        $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
-        if (is_null($addressId)) {
-            /** @var Address $address */
-            $address = AddressService::getInstance()->getDefautlAddress($this->userId(), $addressColumns);
-        } else {
-            /** @var Address $address */
-            $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
-        }
-
-        $cartGoodsListColumns = ['shop_id', 'cover', 'name', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
+        $cartGoodsListColumns = ['shop_id', 'goods_id', 'cover', 'name', 'is_gift', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
         $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
-        $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
-        $freightTemplateList = FreightTemplateService::getInstance()
-            ->getListByIds($freightTemplateIds)
-            ->map(function (FreightTemplate $freightTemplate) {
-                $freightTemplate->area_list = json_decode($freightTemplate->area_list);
-                return $freightTemplate;
-            })->keyBy('id');
+        $address = null;
+        if ($deliveryMode == 1) {
+            $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
+            if (is_null($addressId)) {
+                /** @var Address $address */
+                $address = AddressService::getInstance()->getDefaultAddress($this->userId(), $addressColumns);
+            } else {
+                /** @var Address $address */
+                $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
+            }
+
+            $freightTemplateIds = $cartGoodsList->pluck('freight_template_id')->toArray();
+            $freightTemplateList = FreightTemplateService::getInstance()
+                ->getListByIds($freightTemplateIds)
+                ->map(function (FreightTemplate $freightTemplate) {
+                    $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+                    return $freightTemplate;
+                })->keyBy('id');
+        }
 
         $errMsg = '';
         $totalFreightPrice = 0;
+        $couponDenomination = 0;
+        $deductionBalance = 0;
         $totalPrice = 0;
         $totalNumber = 0;
+
+        // 优惠券逻辑
+        $couponList = $this->getCouponList($cartGoodsList);
+        if (count($couponList) != 0) {
+            if (is_null($couponId)) {
+                $couponDenomination = $couponList->first()->denomination;
+            } else if ($couponId != 0) {
+                $couponDenomination = $couponList->keyBy('id')->get($couponId)->denomination;
+            }
+        }
 
         foreach ($cartGoodsList as $cartGoods) {
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
@@ -60,34 +81,50 @@ class OrderController extends Controller
             $totalNumber = $totalNumber + $cartGoods->number;
 
             // 计算运费
-            if ($cartGoods->freight_template_id == 0) {
-                $freightPrice = 0;
-            } else {
-                /** @var FreightTemplate $freightTemplate */
-                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
+            if ($deliveryMode == 1) {
+                if (is_null($address) || $cartGoods->freight_template_id == 0) {
                     $freightPrice = 0;
                 } else {
-                    $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
-                    $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
-                        return in_array($cityCode, explode(',', $area->pickedCityCodes));
-                    });
-                    if (is_null($area)) {
-                        $errMsg = '商品"' . $cartGoods->name . '"暂不支持配送至当前地址，请更换收货地址';
+                    /** @var FreightTemplate $freightTemplate */
+                    $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
+                    if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
                         $freightPrice = 0;
                     } else {
-                        if ($freightTemplate->compute_mode == 1) {
-                            $freightPrice = $area->fee;
+                        $cityCode = json_decode($address->region_code_list)[1];
+                        if (strlen($cityCode) != 6) {
+                            $errMsg = '收货地址异常，请编辑更新地址，建议手动获取地址省市区';
+                            $freightPrice = 0;
                         } else {
-                            $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
+                            $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+                                return in_array(substr($cityCode, 0, 4), explode(',', $area->pickedCityCodes));
+                            });
+                            if (is_null($area)) {
+                                $errMsg = '商品"' . $cartGoods->name . '"暂不支持配送至当前地址，请更换收货地址';
+                                $freightPrice = 0;
+                            } else {
+                                if ($freightTemplate->compute_mode == 1) {
+                                    $freightPrice = $area->fee;
+                                } else {
+                                    $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
+                                }
+                            }
                         }
                     }
                 }
+                $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
             }
-            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
         }
 
         $paymentAmount = bcadd($totalPrice, $totalFreightPrice, 2);
+        $paymentAmount = bcsub($paymentAmount, $couponDenomination, 2);
+
+        // 余额逻辑
+        $account = AccountService::getInstance()->getUserAccount($this->userId());
+        $accountBalance = $account->status == 1 ? $account->balance : 0;
+        if ($useBalance) {
+            $deductionBalance = min($paymentAmount, $accountBalance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+        }
 
         $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
         $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
@@ -118,10 +155,43 @@ class OrderController extends Controller
             'addressInfo' => $address,
             'goodsLists' => $goodsLists,
             'freightPrice' => $totalFreightPrice,
+            'couponList' => $couponList,
+            'couponDenomination' => $couponDenomination,
             'totalPrice' => $totalPrice,
             'totalNumber' => $totalNumber,
+            'accountBalance' => $accountBalance,
+            'deductionBalance' => $deductionBalance,
             'paymentAmount' => $paymentAmount
         ]);
+    }
+
+    private function getCouponList($cartGoodsList)
+    {
+        $couponIds = UserCouponService::getInstance()->getUserCouponList($this->userId())->pluck('coupon_id')->toArray();
+        $couponList = CouponService::getInstance()->getAvailableCouponListByIds($couponIds)->keyBy('goods_id');
+        return $cartGoodsList->map(function (CartGoods $cartGoods) use ($couponList) {
+            /** @var Coupon $coupon */
+            $coupon = $couponList->get($cartGoods->goods_id);
+            if (!is_null($coupon)) {
+                switch ($coupon->type) {
+                    case 1:
+                        return $coupon;
+                    case 2:
+                        if ($cartGoods->number >= $coupon->num_limit) {
+                            return $coupon;
+                        } else {
+                            return null;
+                        }
+                    case 3:
+                        if (bcmul($cartGoods->price, $cartGoods->number, 2) >= $coupon->price_limit) {
+                            return $coupon;
+                        } else {
+                            return null;
+                        }
+                }
+            }
+            return null;
+        })->filter()->sortBy('denomination');
     }
 
     public function submit()
