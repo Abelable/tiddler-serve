@@ -21,7 +21,7 @@ class MerchantInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
-    public $shopAvatar;
+    public $shopLogo;
     public $shopName;
     public $shopCategoryIds;
     public $shopCover;
@@ -46,7 +46,7 @@ class MerchantInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
-            'shopAvatar' => 'required|string',
+            'shopLogo' => 'required|string',
             'shopName' => 'required|string',
             'shopCategoryIds' => 'required|array|min:1',
             'shopCover' => 'string',
