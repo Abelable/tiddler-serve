@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\HotelShop;
-use App\Utils\Inputs\Admin\ShopListInput;
+use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\HotelProviderInput;
 
 class HotelShopService extends BaseService
@@ -23,7 +23,7 @@ class HotelShopService extends BaseService
         return $shop;
     }
 
-    public function getShopList(ShopListInput $input, $columns = ['*'])
+    public function getShopList(ShopPageInput $input, $columns = ['*'])
     {
         $query = HotelShop::query();
         if (!empty($input->name)) {

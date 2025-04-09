@@ -16,10 +16,9 @@ class CreateMerchantsTable extends Migration
         Schema::create('merchants', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('用户id');
-            $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
+            $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('type')->comment('商家类型：1-个人，2-企业');
-            $table->integer('deposit')->comment('商家保证金');
             $table->string('company_name')->default('')->comment('企业名称');
             $table->string('region_desc')->comment('省市区描述');
             $table->string('region_code_list')->comment('省市区编码');

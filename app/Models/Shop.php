@@ -9,6 +9,7 @@ namespace App\Models;
  * @property int $status 状态：0-未支付保证金，1-已支付保证金
  * @property int $user_id 用户id
  * @property int $merchant_id 商家id
+ * @property float $deposit 店铺保证金
  * @property string $name 店铺名称
  * @property string $category_ids 店铺分类id
  * @property int $type 店铺类型：1-个人，2-企业
@@ -25,6 +26,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Shop whereDeposit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereMerchantId($value)

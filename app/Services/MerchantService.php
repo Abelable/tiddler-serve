@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Merchant;
-use App\Utils\Inputs\MerchantListInput;
+use App\Utils\Inputs\MerchantPageInput;
 use App\Utils\Inputs\MerchantInput;
 
 class MerchantService extends BaseService
@@ -13,7 +13,6 @@ class MerchantService extends BaseService
         $merchant = Merchant::new();
         $merchant->user_id = $userId;
         $merchant->type = $input->type;
-        $merchant->deposit = $input->deposit;
         if ($input->type == 2) {
             $merchant->company_name = $input->companyName;
             $merchant->business_license_photo = $input->businessLicensePhoto;
@@ -36,7 +35,7 @@ class MerchantService extends BaseService
         return $merchant;
     }
 
-    public function getMerchantList(MerchantListInput $input, $columns = ['*'])
+    public function getMerchantList(MerchantPageInput $input, $columns = ['*'])
     {
         $query = Merchant::query();
         if (!empty($input->type)) {
@@ -67,16 +66,5 @@ class MerchantService extends BaseService
     public function getMerchantListByIds(array $ids, $columns = ['*'])
     {
         return Merchant::query()->whereIn('id', $ids)->get($columns);
-    }
-
-    public function paySuccess(int $merchantId)
-    {
-        $merchant = $this->getMerchantById($merchantId);
-        if (is_null($merchant)) {
-            $this->throwBadArgumentValue();
-        }
-        $merchant->status = 2;
-        $merchant->save();
-        return $merchant;
     }
 }

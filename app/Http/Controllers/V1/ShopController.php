@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShopCategory;
 use App\Services\ExpressService;
-use App\Services\MerchantOrderService;
+use App\Services\ShopDepositPaymentLogService;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
 use App\Services\ShopService;
@@ -40,7 +40,9 @@ class ShopController extends Controller
 
         DB::transaction(function () use ($input) {
             $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
-            ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
+            $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
+            ShopDepositPaymentLogService::getInstance()
+                ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
         });
 
         return $this->success();
@@ -48,23 +50,24 @@ class ShopController extends Controller
 
     public function merchantStatusInfo()
     {
-        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId(), ['id', 'status', 'failure_reason', 'type']);
-        $merchantOrder = MerchantOrderService::getInstance()->getMerchantOrderByUserId($this->userId(), ['id']);
+        $merchant = $this->user()->merchant;
+        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
+        $shop = ShopService::getInstance()->getShopByMerchantId($merchant->id);
 
         return $this->success($merchant ? [
             'id' => $merchant->id,
             'status' => $merchant->status,
             'failureReason' => $merchant->failure_reason,
-            'deposit' => $merchant->deposit,
-            'orderId' => $merchantOrder ? $merchantOrder->id : 0
+            'deposit' => $shop->deposit,
+            'shopId' => $shop->id
         ] : null);
     }
 
     public function payDeposit()
     {
-        $orderId = $this->verifyRequiredId('orderId');
-        $order = MerchantOrderService::getInstance()->getWxPayOrder($this->userId(), $orderId, $this->user()->openid);
-        $payParams = Pay::wechat()->miniapp($order);
+        $shopId = $this->verifyRequiredId('shopId');
+        $wxPayOrder = ShopService::getInstance()->createWxPayOrder($shopId, $this->userId(), $this->user()->openid);
+        $payParams = Pay::wechat()->miniapp($wxPayOrder);
         return $this->success($payParams);
     }
 
@@ -92,6 +95,7 @@ class ShopController extends Controller
 
     public function myShopInfo()
     {
+        // todo 目前一个用户对应一个商家，一个商家对应一个店铺，可以暂时用用户id获取店铺，之后一个商家有多个店铺，需要传入店铺id
         $columns = ['id', 'category_ids', 'name', 'type', 'logo', 'cover'];
         $shop = ShopService::getInstance()->getShopByUserId($this->userId(), $columns);
         if (is_null($shop)) {

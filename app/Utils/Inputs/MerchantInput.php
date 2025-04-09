@@ -30,7 +30,7 @@ class MerchantInput extends BaseInput
     {
         return [
             'type' => 'required|integer|in:1,2',
-            'deposit' => 'required|integer',
+            'deposit' => 'required|numeric',
             'companyName' => 'required_if:type,2',
             'regionDesc' => 'required|string',
             'regionCodeList' => 'required|string',

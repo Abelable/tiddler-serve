@@ -10,8 +10,7 @@ use App\Services\HotelProviderOrderService;
 use App\Services\HotelProviderService;
 use App\Services\HotelShopService;
 use App\Services\MealTicketOrderService;
-use App\Services\MerchantOrderService;
-use App\Services\MerchantService;
+use App\Services\ShopDepositPaymentLogService;
 use App\Services\OrderService;
 use App\Services\RestaurantService;
 use App\Services\ScenicOrderService;
@@ -65,12 +64,11 @@ class CommonController extends Controller
     {
         $data = Pay::wechat()->verify()->toArray();
 
-        if (strpos($data['body'], 'merchant_order_sn')) {
-            Log::info('merchant_wx_pay_notify', $data);
+        if (strpos($data['body'], 'shop_id')) {
+            Log::info('shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $order = MerchantOrderService::getInstance()->wxPaySuccess($data);
-                MerchantService::getInstance()->paySuccess($order->merchant_id);
-                ShopService::getInstance()->paySuccess($order->merchant_id);
+                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                ShopService::getInstance()->paySuccess($log->shop_id);
             });
         }
 

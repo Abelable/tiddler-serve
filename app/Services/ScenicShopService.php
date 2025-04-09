@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\ScenicShop;
-use App\Utils\Inputs\Admin\ShopListInput;
+use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\ScenicProviderInput;
 
 class ScenicShopService extends BaseService
@@ -23,7 +23,7 @@ class ScenicShopService extends BaseService
         return $shop;
     }
 
-    public function getShopList(ShopListInput $input, $columns = ['*'])
+    public function getShopList(ShopPageInput $input, $columns = ['*'])
     {
         $query = ScenicShop::query();
         if (!empty($input->name)) {

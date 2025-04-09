@@ -103,7 +103,8 @@ Route::prefix('shop')->group(function () {
     Route::prefix('goods')->group(function () {
         Route::get('category_options', 'GoodsController@shopCategoryOptions');
         Route::get('totals', 'GoodsController@goodsListTotals');
-        Route::get('list', 'GoodsController@ownerGoodsList');
+        Route::get('list', 'GoodsController@shopGoodsList');
+        Route::get('on_sale_list', 'GoodsController@shopOnSaleGoodsList');
         Route::get('info', 'GoodsController@goodsInfo');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
@@ -119,7 +120,6 @@ Route::prefix('goods')->group(function () {
     Route::get('search', 'GoodsController@search');
     Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
     Route::get('detail', 'GoodsController@detail');
-    Route::get('shop_list', 'GoodsController@shopGoodsList');
 
     Route::prefix('evaluation')->group(function () {
         Route::get('summary', 'GoodsEvaluationController@summary');
@@ -574,7 +574,6 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'MerchantController@detail');
         Route::post('approved', 'MerchantController@approved');
         Route::post('reject', 'MerchantController@reject');
-        Route::post('order_list', 'MerchantController@orderList');
     });
 
     Route::prefix('shop')->group(function () {
@@ -591,6 +590,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
         Route::post('list', 'ShopController@list');
         Route::get('detail', 'ShopController@detail');
+        Route::post('deposit_payment_logs', 'ShopController@depositPaymentLogs');
     });
 
     Route::prefix('express')->group(function () {

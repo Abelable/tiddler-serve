@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class MerchantListInput extends PageInput
+class MerchantPageInput extends PageInput
 {
     public $type;
     public $status;

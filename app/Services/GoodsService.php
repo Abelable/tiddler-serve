@@ -91,19 +91,18 @@ class GoodsService extends BaseService
             ->get($columns);
     }
 
-    public function getShopGoodsList($shopId, PageInput $input, $columns=['*'])
+    public function getShopOnSaleGoodsList($shopId, PageInput $input, $columns=['*'])
     {
         return Goods::query()
             ->where('status', 1)
             ->where('shop_id', $shopId)
-            ->orderBy('sales_volume', 'desc')
             ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('promotion_commission_rate', 'desc')
+            ->orderBy('sales_volume', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getOwnerGoodsList($shopId, StatusPageInput $input, $columns=['*'])
+    public function getShopGoodsList($shopId, StatusPageInput $input, $columns=['*'])
     {
         return Goods::query()
             ->where('shop_id', $shopId)

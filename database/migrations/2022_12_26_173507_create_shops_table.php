@@ -18,6 +18,7 @@ class CreateShopsTable extends Migration
             $table->integer('status')->default(0)->comment('状态：0-未支付保证金，1-已支付保证金');
             $table->integer('user_id')->comment('用户id');
             $table->integer('merchant_id')->comment('商家id');
+            $table->float('deposit')->comment('店铺保证金');
             $table->string('name')->comment('店铺名称');
             $table->string('category_ids')->comment('店铺分类id');
             $table->integer('type')->comment('店铺类型：1-个人，2-企业');

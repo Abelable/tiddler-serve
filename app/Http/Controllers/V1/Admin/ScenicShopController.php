@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\ShopListInput;
+use App\Utils\Inputs\Admin\ShopPageInput;
 
 class ScenicShopController extends Controller
 {
@@ -13,7 +13,8 @@ class ScenicShopController extends Controller
 
     public function list()
     {
-        $input = ShopListInput::new();
+        /** @var ShopPageInput $input */
+        $input = ShopPageInput::new();
         $list = ScenicShopService::getInstance()->getShopList($input);
         return $this->successPaginate($list);
     }
