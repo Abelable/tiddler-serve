@@ -4,14 +4,17 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\GoodsCategoryService;
+use App\Services\GoodsPickupAddressService;
+use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
-use App\Services\KeywordService;
+use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\StatusPageInput;
+use Illuminate\Support\Facades\DB;
 
 class GoodsController extends Controller
 {
@@ -171,11 +174,16 @@ class GoodsController extends Controller
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
 
-        if (!in_array($shopId, $this->user()->shopInfoIds())) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if (!in_array($shopId, $this->user()->shopInfoIds()) && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限上传商品');
         }
 
-        GoodsService::getInstance()->createGoods($shopId, $input);
+        DB::transaction(function () use ($input, $shopId) {
+            $goods = GoodsService::getInstance()->createGoods($shopId, $input);
+            GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds ?: []);
+            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds ?: []);
+        });
 
         return $this->success();
     }
@@ -187,8 +195,9 @@ class GoodsController extends Controller
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
 
-        if (!in_array($shopId, $this->user()->shopInfoIds())) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上传商品');
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if (!in_array($shopId, $this->user()->shopInfoIds()) && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -199,7 +208,11 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::FORBIDDEN, '当前状态下商品，无法编辑');
         }
 
-        GoodsService::getInstance()->updateGoods($goods, $input);
+        DB::transaction(function () use ($goods, $input, $shopId) {
+            GoodsService::getInstance()->updateGoods($goods, $input);
+            GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds ?: []);
+            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds ?: []);
+        });
 
         return $this->success();
     }

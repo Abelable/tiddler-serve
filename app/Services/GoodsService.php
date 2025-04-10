@@ -261,6 +261,8 @@ class GoodsService extends BaseService
         if ($goods->shop_id == 0 && $goods->status == 0) {
             $goods->status = 1;
         }
+        $goods->shop_category_id = $input->shopCategoryId;
+        $goods->category_id = $input->categoryId;
         $goods->cover = $input->cover;
         $goods->video = $input->video ?: '';
         $goods->image_list = json_encode($input->imageList);
@@ -269,17 +271,16 @@ class GoodsService extends BaseService
         $goods->name = $input->name;
         $goods->introduction = $input->introduction ?: '';
         $goods->freight_template_id = $input->freightTemplateId;
-        $goods->shop_category_id = $input->shopCategoryId;
-        $goods->category_id = $input->categoryId;
-        $goods->return_address_id = $input->returnAddressId ?: 0;
         $goods->price = $input->price;
         $goods->market_price = $input->marketPrice ?: 0;
-        $goods->stock = $input->stock;
         $goods->sales_commission_rate = $input->salesCommissionRate ?: 0;
         $goods->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
         $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
+        $goods->stock = $input->stock;
+        $goods->number_limit = $input->numberLimit ?? 0;
         $goods->spec_list = json_encode($input->specList);
         $goods->sku_list = json_encode($input->skuList);
+        $goods->delivery_mode = $input->deliveryMode;
         $goods->refund_status = $input->refundStatus;
         $goods->save();
 

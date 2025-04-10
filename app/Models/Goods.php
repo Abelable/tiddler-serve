@@ -23,15 +23,15 @@ use Laravel\Scout\Searchable;
  * @property int $freight_template_id 运费模板id：0-包邮
  * @property float $price 商品价格
  * @property float $market_price 市场价格
- * @property int $stock 商品库存
  * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
- * @property int $delivery_method 提货方式：1-快递，2-自提，3-快递/自提
- * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property int $stock 商品库存
  * @property int $number_limit 限购数量
  * @property string $spec_list 商品规格列表
  * @property string $sku_list 商品sku
+ * @property int $delivery_mode 提货方式：1-快递，2-自提，3-快递/自提
+ * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
  * @property int $sales_volume 商品销量
  * @property float $avg_score 综合评分
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -47,7 +47,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDefaultSpecImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeletedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeliveryMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDeliveryMode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereDetailImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereFreightTemplateId($value)

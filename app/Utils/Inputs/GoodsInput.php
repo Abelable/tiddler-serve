@@ -4,6 +4,8 @@ namespace App\Utils\Inputs;
 
 class GoodsInput extends BaseInput
 {
+    public $shopCategoryId;
+    public $categoryId;
     public $cover;
     public $video;
     public $imageList;
@@ -12,22 +14,25 @@ class GoodsInput extends BaseInput
     public $name;
     public $introduction;
     public $freightTemplateId;
-    public $shopCategoryId;
-    public $categoryId;
-    public $returnAddressId;
     public $price;
     public $marketPrice;
-    public $stock;
     public $salesCommissionRate;
     public $promotionCommissionRate;
     public $promotionCommissionUpperLimit;
+    public $stock;
+    public $numberLimit;
     public $specList;
     public $skuList;
+    public $deliveryMode;
+    public $pickupAddressIds;
     public $refundStatus;
+    public $refundAddressIds;
 
     public function rules()
     {
         return [
+            'shopCategoryId' => 'required|integer|digits_between:1,20',
+            'categoryId' => 'required|integer|digits_between:1,20',
             'cover' => 'required|string',
             'video' => 'string',
             'imageList' => 'required|array',
@@ -36,18 +41,19 @@ class GoodsInput extends BaseInput
             'name' => 'required|string',
             'introduction' => 'string',
             'freightTemplateId' => 'required|integer|digits_between:1,20',
-            'shopCategoryId' => 'required|integer|digits_between:1,20',
-            'categoryId' => 'required|integer|digits_between:1,20',
-            'returnAddressId' => 'integer|digits_between:1,20',
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
-            'stock' => 'required|integer',
             'salesCommissionRate' => 'numeric',
             'promotionCommissionRate' => 'numeric',
             'promotionCommissionUpperLimit' => 'numeric',
+            'stock' => 'required|integer',
+            'numberLimit' => 'integer|digits_between:1,20',
             'specList' => 'required|array',
             'skuList' => 'required|array',
+            'deliveryMode' => 'required|integer|in:1,2,3',
+            'pickupAddressIds' => 'array',
             'refundStatus' => 'required|integer|in:0,1',
+            'refundAddressIds' => 'array',
         ];
     }
 }
