@@ -60,19 +60,22 @@ class CartGoodsService extends BaseService
             $cartGoods->user_id = $userId;
             $cartGoods->goods_id = $goodsId;
             $cartGoods->shop_id = $goods->shop_id;
+            $cartGoods->shop_category_id = $goods->shop_category_id;
             $cartGoods->freight_template_id = $goods->freight_template_id;
+            $cartGoods->refund_status = $goods->refund_status;
+            $cartGoods->delivery_mode = $goods->delivery_mode;
+            $cartGoods->is_gift = in_array($goodsId, $giftGoodsIds) ? 1 : 0;
             $cartGoods->cover = $goods->cover;
             $cartGoods->name = $goods->name;
-            $cartGoods->refund_status = $goods->refund_status;
-            $cartGoods->delivery_method = $goods->delivery_method;
-            $cartGoods->is_gift = in_array($goodsId, $giftGoodsIds) ? 1 : 0;
             if (count($skuList) != 0 && $selectedSkuIndex != -1 ) {
                 $cartGoods->selected_sku_index = $selectedSkuIndex;
                 $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
                 $cartGoods->price = $skuList[$selectedSkuIndex]->price;
+                $cartGoods->market_price = $skuList[$selectedSkuIndex]->originalPrice ?? $goods->market_price;
                 $cartGoods->sales_commission_rate = $skuList[$selectedSkuIndex]->salesCommissionRate ?? $goods->sales_commission_rate;
             } else {
                 $cartGoods->price = $goods->price;
+                $cartGoods->market_price = $goods->market_price;
                 $cartGoods->sales_commission_rate = $goods->sales_commission_rate;
             }
 
@@ -80,7 +83,6 @@ class CartGoodsService extends BaseService
             $cartGoods->promotion_commission_rate = $goods->promotion_commission_rate ?? 10;
             $cartGoods->promotion_commission_upper_limit = $goods->promotion_commission_upper_limit ?? 20;
 
-            $cartGoods->market_price = $goods->market_price;
             $cartGoods->number = $number;
         }
         $cartGoods->save();
@@ -173,29 +175,6 @@ class CartGoodsService extends BaseService
         }
 
         return $cartGoods;
-    }
-
-    public function validateCartGoodsStatus($goodsId, $selectedSkuIndex, $number)
-    {
-        $goods = GoodsService::getInstance()->getOnSaleGoods($goodsId);
-
-        if (is_null($goods)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-
-        $skuList = json_decode($goods->sku_list);
-
-        if (count($skuList) != 0 && $selectedSkuIndex != -1) {
-            $stock = $skuList[$selectedSkuIndex]->stock;
-            if ($stock == 0 || $number > $stock) {
-                $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '所选规格库存不足');
-            }
-        }
-        if ($goods->stock == 0 || $number > $goods->stock) {
-            $this->throwBusinessException(CodeResponse::CART_INVALID_OPERATION, '商品库存不足');
-        }
-
-        return [$goods, $skuList];
     }
 
     public function getExistCartGoods($userId, $goodsId, $selectedSkuIndex, $scene, $id = 0, $columns = ['*'])

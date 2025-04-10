@@ -8,6 +8,7 @@ use App\Models\Goods;
 use App\Models\Shop;
 use App\Services\CartGoodsService;
 use App\Services\GoodsService;
+use App\Services\OrderGoodsService;
 use App\Services\ShopService;
 use App\Utils\Inputs\CartGoodsInput;
 use App\Utils\Inputs\CartGoodsEditInput;
@@ -28,72 +29,135 @@ class CartController extends Controller
             'status_desc',
             'goods_id',
             'shop_id',
-            'category_id',
+            'shop_category_id',
             'freight_template_id',
+            'is_gift',
             'cover',
             'name',
             'selected_sku_name',
             'selected_sku_index',
             'price',
             'market_price',
-            'number'
+            'sales_commission_rate',
+            'promotion_commission_rate',
+            'promotion_commission_upper_limit',
+            'number',
+            'created_at',
+            'updated_at',
         ];
         $list = CartGoodsService::getInstance()->cartGoodsList($this->userId(), $cartGoodsColumns);
         $goodsIds = array_unique($list->pluck('goods_id')->toArray());
-        $goodsCategoryIds = array_unique($list->pluck('goods_category_id')->toArray());
         $shopIds = array_unique($list->pluck('shop_id')->toArray());
 
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds)->keyBy('id');
-        $cartGoodsList = $list->map(function (CartGoods $cartGoods) use ($goodsList) {
+        $groupedOrderGoodsList = OrderGoodsService::getInstance()
+            ->getRecentlyUserListByGoodsIds($this->userId(), $goodsIds)->groupBy('goods_id');
+
+        $cartGoodsList = $list->map(function (CartGoods $cartGoods) use ($groupedOrderGoodsList, $goodsList) {
             /** @var Goods $goods */
             $goods = $goodsList->get($cartGoods->goods_id);
+
             if (is_null($goods) || $goods->status != 1) {
                 $cartGoods->status = 3;
                 $cartGoods->status_desc = '商品已下架';
                 $cartGoods->save();
                 return $cartGoods;
             }
-            $skuList = json_decode($goods->sku_list);
-            if (count($skuList) == 0) {
-                if ($cartGoods->number > $goods->stock) {
-                    if ($goods->stock != 0) {
-                        $cartGoods->number = $goods->stock;
-                        $cartGoods->save();
-                        $cartGoods['stock'] = $goods->stock;
-                    } else {
-                        $cartGoods->status = 3;
-                        $cartGoods->status_desc = '商品暂无库存';
-                        $cartGoods->save();
-                    }
-                } else {
-                    $cartGoods['stock'] = $goods->stock;
-                }
-                return $cartGoods;
-            }
-            $sku = $skuList[$cartGoods->selected_sku_index];
-            if (is_null($sku) || $cartGoods->selected_sku_name != $sku->name) {
-                $cartGoods->status = 2;
-                $cartGoods->status_desc = '商品规格不存在';
-                $cartGoods->selected_sku_index = -1;
-                $cartGoods->selected_sku_name = '';
+            if ($goods->stock == 0) {
+                $cartGoods->status = 3;
+                $cartGoods->status_desc = '商品暂无库存';
                 $cartGoods->save();
                 return $cartGoods;
             }
-            if ($cartGoods->number > $sku->stock) {
-                if ($sku->stock != 0) {
-                    $cartGoods->number = $sku->stock;
+
+            // 限购逻辑
+            $orderGoodsList = $groupedOrderGoodsList->get($cartGoods->goods_id);
+            $userPurchasedList = collect($orderGoodsList)->groupBy(function ($item) {
+                return $item['selected_sku_name'] . '|' . $item['selected_sku_index'];
+            })->map(function ($groupedItems) {
+                return [
+                    'selected_sku_name' => $groupedItems->first()['selected_sku_name'],
+                    'selected_sku_index' => $groupedItems->first()['selected_sku_index'],
+                    'number' => $groupedItems->sum('number'),
+                ];
+            });
+
+            $skuList = json_decode($goods->sku_list);
+            if (count($skuList) != 0) {
+                $sku = $skuList[$cartGoods->selected_sku_index];
+                if (is_null($sku) || $cartGoods->selected_sku_name != $sku->name) {
+                    $cartGoods->status = 2;
+                    $cartGoods->status_desc = '商品规格不存在';
+                    $cartGoods->selected_sku_index = -1;
+                    $cartGoods->selected_sku_name = '';
                     $cartGoods->save();
-                    $cartGoods['stock'] = $sku->stock;
-                } else {
+                    return $cartGoods;
+                }
+                if ($sku->stock == 0) {
                     $cartGoods->status = 2;
                     $cartGoods->status_desc = '当前规格暂无库存';
                     $cartGoods->selected_sku_index = -1;
                     $cartGoods->selected_sku_name = '';
                     $cartGoods->save();
+                    return $cartGoods;
+                }
+
+                if ($cartGoods->price != $sku->price) {
+                    $cartGoods->price = $sku->price;
+                    $cartGoods->save();
+                }
+                if (isset($sku->originalPrice) && $cartGoods->market_price != $sku->originalPrice) {
+                    $cartGoods->market_price = $sku->originalPrice;
+                    $cartGoods->save();
+                }
+                if (isset($sku->commissionRate) && $cartGoods->commission_rate != $sku->commissionRate) {
+                    $cartGoods->commission_rate = $sku->commissionRate;
+                    $cartGoods->save();
+                }
+                if ($cartGoods->number > $sku->stock) {
+                    $cartGoods->number = $sku->stock;
+                    $cartGoods->save();
+                }
+
+                // 限购逻辑
+                $numberLimit = $sku->limit ?? $goods->number_limit;
+                $stock = $sku->stock ?? $goods->stock;
+                if ($numberLimit != 0) {
+                    $userPurchasedNumber = $userPurchasedList->filter(function ($item) use ($cartGoods) {
+                        return $item['selected_sku_index'] == $cartGoods->selected_sku_index
+                            && $item['selected_sku_name'] == $cartGoods->selected_sku_name;
+                    })->first()['number'] ?? 0;
+                    $cartGoods['numberLimit'] = min($numberLimit, $stock) - $userPurchasedNumber;
+                } else {
+                    $cartGoods['numberLimit'] = $stock;
                 }
             } else {
-                $cartGoods['stock'] = $sku->stock;
+                if ($cartGoods->price != $goods->price) {
+                    $cartGoods->price = $goods->price;
+                    $cartGoods->save();
+                }
+                if ($cartGoods->market_price != $goods->market_price) {
+                    $cartGoods->market_price = $goods->market_price;
+                    $cartGoods->save();
+                }
+                if ($cartGoods->commission_rate != $goods->commission_rate) {
+                    $cartGoods->commission_rate = $goods->commission_rate;
+                    $cartGoods->save();
+                }
+                if ($cartGoods->number > $goods->stock) {
+                    $cartGoods->number = $goods->stock;
+                    $cartGoods->save();
+                }
+
+                // 限购逻辑
+                if ($goods->number_limit != 0) {
+                    $userPurchasedNumber = $userPurchasedList->first()['number'] ?? 0;
+                    $cartGoods['numberLimit'] = min($goods->number_limit, $goods->stock) - $userPurchasedNumber;
+                } else {
+                    $cartGoods['numberLimit'] = $goods->stock;
+                }
             }
+
             return $cartGoods;
         });
 
@@ -122,12 +186,7 @@ class CartController extends Controller
             ]);
         }
 
-        $recommendGoodsList = GoodsService::getInstance()->getRecommendGoodsList($goodsIds, $goodsCategoryIds);
-
-        return $this->success([
-            'cartList' => $cartList,
-            'recommendGoodsList' => $recommendGoodsList
-        ]);
+        return $this->success($cartList);
     }
 
     public function fastAdd()
@@ -167,6 +226,6 @@ class CartController extends Controller
     {
         $ids = $this->verifyArrayNotEmpty('ids', []);
         CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $ids);
-        return $this->success();;
+        return $this->success();
     }
 }

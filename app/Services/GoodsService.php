@@ -8,6 +8,7 @@ use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\RecommendGoodsPageInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -29,10 +30,9 @@ class GoodsService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
-                ->orderBy('sales_volume', 'desc')
-                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('promotion_commission_rate', 'desc')
+                ->orderBy('avg_score', 'desc')
+                ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit, $columns, 'page', $input->page);
@@ -48,30 +48,29 @@ class GoodsService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
-                ->orderBy('sales_volume', 'desc')
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('promotion_commission_rate', 'desc')
+                ->orderBy('avg_score', 'desc')
+                ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit,'page', $input->page);
     }
 
 
-    public function getTopListByCategoryIds(array $goodsIds, array $categoryIds, $limit, $columns=['*'])
+    public function getTopListByCategoryIds(array $goodsIds, array $shopCategoryIds, $limit, $columns=['*'])
     {
         $query = Goods::query()->where('status', 1);
 
         if (!empty($categoryIds)) {
-            $query = $query->whereIn('category_id', $categoryIds);
+            $query = $query->whereIn('shop_category_id', $shopCategoryIds);
         }
         if (!empty($goodsIds)) {
             $query = $query->whereNotIn('id', $goodsIds);
         }
         return $query
-                ->orderBy('sales_volume', 'desc')
-                ->orderByRaw("CASE WHEN shop_id = 0 THEN 0 ELSE 1 END")
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('promotion_commission_rate', 'desc')
+                ->orderBy('avg_score', 'desc')
+                ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
                 ->get($columns);
@@ -83,9 +82,9 @@ class GoodsService extends BaseService
             ->where('status', 1)
             ->where('shop_id', $shopId)
             ->where('id', '!=', $goodsId)
-            ->orderBy('sales_volume', 'desc')
             ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('promotion_commission_rate', 'desc')
+            ->orderBy('avg_score', 'desc')
+            ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->take($limit)
             ->get($columns);
@@ -97,7 +96,9 @@ class GoodsService extends BaseService
             ->where('status', 1)
             ->where('shop_id', $shopId)
             ->orderBy('sales_commission_rate', 'desc')
+            ->orderBy('avg_score', 'desc')
             ->orderBy('sales_volume', 'desc')
+            ->orderBy('created_at', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
@@ -171,33 +172,24 @@ class GoodsService extends BaseService
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getRecommendGoodsList
-    (
-        $goodsIds,
-        $categoryIds,
-        $limit = 10,
-        $columns=['id', 'shop_id', 'cover', 'name', 'price', 'market_price', 'sales_volume']
-    )
+    public function getRecommendGoodsList(RecommendGoodsPageInput $input, $columns=['*'])
     {
-        $goodsList = $this->getTopListByCategoryIds($goodsIds, $categoryIds, $limit, $columns);
-        return $this->addShopInfoToGoodsList($goodsList);
-    }
-
-    public function addShopInfoToGoodsList($goodsList)
-    {
-        $shopIds = $goodsList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
-        return $goodsList->map(function (Goods $goods) use ($shopList) {
-            return [
-                'id' => $goods->id,
-                'cover' => $goods->cover,
-                'name' => $goods->name,
-                'price' => $goods->price,
-                'marketPrice' => $goods->market_price,
-                'salesVolume' => $goods->sales_volume,
-                'shopInfo' => $shopList->get($goods->shop_id) ?: null,
-            ];
-        });
+        $query = Goods::query()->where('status', 1);
+        if (count($input->goodsIds) != 0) {
+            $query = $query->whereNotIn('id', $input->goodsIds);
+        }
+        if (count($input->shopCategoryIds) != 0) {
+            $query->whereHas('categories', function ($q) use ($input) {
+                $q->whereIn('shop_category_id', $input->shopCategoryIds);
+            });
+        }
+        return $query
+            ->orderBy('sale_commission_rate', 'desc')
+            ->orderBy('avg_score', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function reduceStock($id, $number, $selectedSkuIndex = -1)

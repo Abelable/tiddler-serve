@@ -3,16 +3,24 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Address;
+use App\Models\Coupon;
+use App\Models\Goods;
+use App\Services\AddressService;
+use App\Services\CouponService;
+use App\Services\GiftGoodsService;
 use App\Services\GoodsCategoryService;
 use App\Services\GoodsPickupAddressService;
 use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
+use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\RecommendGoodsPageInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -31,11 +39,17 @@ class GoodsController extends Controller
     {
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
-
         $page = GoodsService::getInstance()->getAllList($input);
-        $goodsList = collect($page->items());
-        $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
+        $list = $this->supplementGoodsList($page);
+        return $this->success($this->paginate($page, $list));
+    }
 
+    public function recommendList()
+    {
+        /** @var RecommendGoodsPageInput $input */
+        $input = RecommendGoodsPageInput::new();
+        $page = GoodsService::getInstance()->getRecommendGoodsList($input);
+        $list = $this->supplementGoodsList($page);
         return $this->success($this->paginate($page, $list));
     }
 
@@ -45,10 +59,33 @@ class GoodsController extends Controller
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
         $page = GoodsService::getInstance()->search($keywords, $input);
-        $goodsList = collect($page->items());
-        $list = GoodsService::getInstance()->addShopInfoToGoodsList($goodsList);
-
+        $list = $this->supplementGoodsList($page);
         return $this->success($this->paginate($page, $list));
+    }
+
+    private function supplementGoodsList($page)
+    {
+        $goodsList = collect($page->items());
+        $goodsIds = $goodsList->pluck('id')->toArray();
+        $shopIds = $goodsList->pluck('shop_id')->toArray();
+
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name'])->keyBy('id');
+        $groupedCouponList = CouponService::getInstance()
+            ->getCouponListByGoodsIds($goodsIds, ['goods_id', 'name', 'denomination', 'type', 'num_limit', 'price_limit'])
+            ->groupBy('goods_id');
+        $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList([1, 2])->pluck('goods_id')->toArray();
+
+        return $goodsList->map(function (Goods $goods) use ($shopList, $groupedCouponList, $giftGoodsIds) {
+            $shopInfo = $goods->shop_id != 0 ? $shopList->get($goods->shop_id) : null;
+            $goods['shopInfo'] = $shopInfo;
+
+            $couponList = $groupedCouponList->get($goods->id);
+            $goods['couponList'] = $couponList ?: [];
+
+            $goods['isGift'] = in_array($goods->id, $giftGoodsIds) ? 1 : 0;
+
+            return $goods;
+        });
     }
 
     public function mediaRelativeList()
@@ -70,23 +107,33 @@ class GoodsController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+        $addressId = $this->verifyId('addressId');
 
         $columns = [
             'id',
+            'status',
             'shop_id',
-            'category_id',
+            'shop_category_id',
+            'freight_template_id',
             'cover',
             'video',
             'image_list',
             'default_spec_image',
+            'detail_image_list',
             'name',
+            'introduction',
             'price',
             'market_price',
+            'sales_commission_rate',
+            'promotion_commission_rate',
+            'promotion_commission_upper_limit',
             'stock',
+            'number_limit',
             'sales_volume',
-            'detail_image_list',
             'spec_list',
-            'sku_list'
+            'sku_list',
+            'refund_status',
+            'delivery_mode',
         ];
         $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
         if (is_null($goods)) {
@@ -98,8 +145,40 @@ class GoodsController extends Controller
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
-        $goods['recommend_goods_list'] = GoodsService::getInstance()->getRecommendGoodsList([$id], [$goods->category_id]);
-        unset($goods->category_id);
+        if ($this->isLogin()) {
+            $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
+            if (is_null($addressId)) {
+                /** @var Address $address */
+                $address = AddressService::getInstance()->getDefaultAddress($this->userId(), $addressColumns);
+            } else {
+                /** @var Address $address */
+                $address = AddressService::getInstance()->getById($this->userId(), $addressId, $addressColumns);
+            }
+            $goods['addressInfo'] = $address;
+        }
+
+        $couponList = CouponService::getInstance()->getCouponListByGoodsId($goods->id);
+        if ($this->isLogin()) {
+            $receivedCouponIds = UserCouponService::getInstance()->getUserCouponList($this->userId())->pluck('coupon_id')->toArray();
+            $usedCountList = UserCouponService::getInstance()
+                ->getUsedCount($this->userId())
+                ->keyBy('coupon_id')
+                ->map(function($item) {
+                    return $item->receive_count;
+                });
+            $couponList = $couponList->map(function (Coupon $coupon) use ($receivedCouponIds, $usedCountList) {
+                if (in_array($coupon->id, $receivedCouponIds)) {
+                    $coupon['isReceived'] = 1;
+                } elseif ($coupon->receive_limit != 0 && $usedCountList->get($coupon->id) >= $coupon->receive_limit) {
+                    $coupon['isUsed'] = 1;
+                }
+                return $coupon;
+            });
+        }
+        $goods['couponList'] = $couponList;
+
+        $giftGoods = GiftGoodsService::getInstance()->getGoodsByGoodsId($goods->id);
+        $goods['isGift'] = !is_null($giftGoods) ? 1 : 0;
 
         if ($goods->shop_id != 0) {
             $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'avatar', 'name']);
@@ -110,6 +189,11 @@ class GoodsController extends Controller
             $goods['shop_info'] = $shopInfo;
         }
         unset($goods->shop_id);
+
+        if ($goods->freight_template_id != 0) {
+            $goods['freightTemplateInfo'] = $goods->freightTemplateInfo;
+            unset($goods->freight_template_id);
+        }
 
         return $this->success($goods);
     }

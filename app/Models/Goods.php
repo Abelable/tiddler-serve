@@ -37,6 +37,11 @@ use Laravel\Scout\Searchable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\FreightTemplate|null $freightTemplateInfo
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsPickupAddress[] $pickupAddressList
+ * @property-read int|null $pickup_address_list_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsRefundAddress[] $refundAddressList
+ * @property-read int|null $refund_address_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
@@ -87,5 +92,30 @@ class Goods extends BaseModel
     public function toSearchableArray()
     {
         return $this->only('id', 'name');
+    }
+
+    public function freightTemplateInfo()
+    {
+        return $this->belongsTo(FreightTemplate::class, 'freight_template_id');
+    }
+
+    public function refundAddressList()
+    {
+        return $this->hasMany(GoodsRefundAddress::class, 'goods_id');
+    }
+
+    public function refundAddressIds()
+    {
+        return $this->refundAddressList()->pluck('refund_address_id');
+    }
+
+    public function pickupAddressList()
+    {
+        return $this->hasMany(GoodsPickupAddress::class, 'goods_id');
+    }
+
+    public function pickupAddressIds()
+    {
+        return $this->pickupAddressList()->pluck('pickup_address_id');
     }
 }
