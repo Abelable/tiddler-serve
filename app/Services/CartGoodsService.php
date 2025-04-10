@@ -76,7 +76,7 @@ class CartGoodsService extends BaseService
                 $cartGoods->sales_commission_rate = $goods->sales_commission_rate;
             }
 
-            // todo 优惠分享佣金逻辑
+            // todo 优化分享佣金逻辑
             $cartGoods->promotion_commission_rate = $goods->promotion_commission_rate ?? 10;
             $cartGoods->promotion_commission_upper_limit = $goods->promotion_commission_upper_limit ?? 20;
 
