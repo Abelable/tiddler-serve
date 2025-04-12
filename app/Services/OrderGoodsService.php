@@ -28,6 +28,8 @@ class OrderGoodsService extends BaseService
             $goods->sales_commission_rate = $cartGoods->sales_commission_rate;
             $goods->promotion_commission_rate = $cartGoods->promotion_commission_rate;
             $goods->promotion_commission_upper_limit = $cartGoods->promotion_commission_upper_limit;
+            $goods->superior_promotion_commission_rate = $cartGoods->superior_promotion_commission_rate;
+            $goods->superior_promotion_commission_upper_limit = $cartGoods->superior_promotion_commission_upper_limit;
             $goods->number = $cartGoods->number;
             $goods->save();
         }

@@ -269,6 +269,8 @@ class GoodsService extends BaseService
         $goods->sales_commission_rate = $input->salesCommissionRate ?: 0;
         $goods->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
         $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
+        $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate ?: 0;
+        $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit ?: 0;
         $goods->stock = $input->stock;
         $goods->number_limit = $input->numberLimit ?? 0;
         $goods->spec_list = json_encode($input->specList);

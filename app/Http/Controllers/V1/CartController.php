@@ -41,6 +41,8 @@ class CartController extends Controller
             'sales_commission_rate',
             'promotion_commission_rate',
             'promotion_commission_upper_limit',
+            'superior_promotion_commission_rate',
+            'superior_promotion_commission_upper_limit',
             'number',
             'created_at',
             'updated_at',
@@ -82,6 +84,23 @@ class CartController extends Controller
                 ];
             });
 
+            if ($cartGoods->promotion_commission_rate != $goods->promotion_commission_rate) {
+                $cartGoods->promotion_commission_rate = $goods->promotion_commission_rate;
+                $cartGoods->save();
+            }
+            if ($cartGoods->promotion_commission_upper_limit != $goods->promotion_commission_upper_limit) {
+                $cartGoods->promotion_commission_upper_limit = $goods->promotion_commission_upper_limit;
+                $cartGoods->save();
+            }
+            if ($cartGoods->superior_promotion_commission_rate != $goods->superior_promotion_commission_rate) {
+                $cartGoods->superior_promotion_commission_rate = $goods->superior_promotion_commission_rate;
+                $cartGoods->save();
+            }
+            if ($cartGoods->superior_promotion_commission_upper_limit != $goods->superior_promotion_commission_upper_limit) {
+                $cartGoods->superior_promotion_commission_upper_limit = $goods->superior_promotion_commission_upper_limit;
+                $cartGoods->save();
+            }
+
             $skuList = json_decode($goods->sku_list);
             if (count($skuList) != 0) {
                 $sku = $skuList[$cartGoods->selected_sku_index];
@@ -110,8 +129,8 @@ class CartController extends Controller
                     $cartGoods->market_price = $sku->originalPrice;
                     $cartGoods->save();
                 }
-                if (isset($sku->commissionRate) && $cartGoods->commission_rate != $sku->commissionRate) {
-                    $cartGoods->commission_rate = $sku->commissionRate;
+                if (isset($sku->salesCommissionRate) && $cartGoods->sales_commission_rate != $sku->salesCommissionRate) {
+                    $cartGoods->sales_commission_rate = $sku->salesCommissionRate;
                     $cartGoods->save();
                 }
                 if ($cartGoods->number > $sku->stock) {
@@ -140,10 +159,12 @@ class CartController extends Controller
                     $cartGoods->market_price = $goods->market_price;
                     $cartGoods->save();
                 }
-                if ($cartGoods->commission_rate != $goods->commission_rate) {
-                    $cartGoods->commission_rate = $goods->commission_rate;
+
+                if ($cartGoods->sales_commission_rate != $goods->sales_commission_rate) {
+                    $cartGoods->sales_commission_rate = $goods->sales_commission_rate;
                     $cartGoods->save();
                 }
+
                 if ($cartGoods->number > $goods->stock) {
                     $cartGoods->number = $goods->stock;
                     $cartGoods->save();

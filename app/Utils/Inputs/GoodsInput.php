@@ -19,6 +19,8 @@ class GoodsInput extends BaseInput
     public $salesCommissionRate;
     public $promotionCommissionRate;
     public $promotionCommissionUpperLimit;
+    public $superiorPromotionCommissionRate;
+    public $superiorPromotionCommissionUpperLimit;
     public $stock;
     public $numberLimit;
     public $specList;
@@ -46,6 +48,8 @@ class GoodsInput extends BaseInput
             'salesCommissionRate' => 'numeric',
             'promotionCommissionRate' => 'numeric',
             'promotionCommissionUpperLimit' => 'numeric',
+            'superiorPromotionCommissionRate' => 'numeric',
+            'superiorPromotionCommissionUpperLimit' => 'numeric',
             'stock' => 'required|integer',
             'numberLimit' => 'integer|digits_between:1,20',
             'specList' => 'required|array',
