@@ -36,8 +36,8 @@ class CreateCartGoodsTable extends Migration
             $table->float('sales_commission_rate')->comment('销售佣金比例%');
             $table->float('promotion_commission_rate')->comment('推广佣金比例%');
             $table->float('promotion_commission_upper_limit')->comment('推广佣金上限');
-            $table->float('superior_promotion_commission_rate')->default(0)->comment('上级推广佣金比例%');
-            $table->float('superior_promotion_commission_upper_limit')->default(0)->comment('上级推广佣金上限');
+            $table->float('superior_promotion_commission_rate')->comment('上级推广佣金比例%');
+            $table->float('superior_promotion_commission_upper_limit')->comment('上级推广佣金上限');
             $table->integer('number')->comment('商品数量');
             $table->timestamps();
             $table->softDeletes();
