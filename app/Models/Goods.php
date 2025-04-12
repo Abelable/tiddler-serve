@@ -26,6 +26,8 @@ use Laravel\Scout\Searchable;
  * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $stock 商品库存
  * @property int $number_limit 限购数量
  * @property string $spec_list 商品规格列表
@@ -74,6 +76,8 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSpecList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereStock($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereVideo($value)
  * @method static \Illuminate\Database\Query\Builder|Goods withTrashed()

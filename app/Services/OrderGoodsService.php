@@ -9,18 +9,25 @@ use Illuminate\Support\Facades\DB;
 
 class OrderGoodsService extends BaseService
 {
-    public function createList($cartGoodsList, $orderId)
+    public function createList($cartGoodsList, $orderId, $userId)
     {
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             $goods = OrderGoods::new();
+            $goods->user_id = $userId;
             $goods->order_id = $orderId;
             $goods->goods_id = $cartGoods->goods_id;
+            $goods->shop_id = $cartGoods->shop_id;
+            $goods->is_gift = $cartGoods->is_gift;
+            $goods->refund_status = $cartGoods->refund_status;
             $goods->cover = $cartGoods->cover;
             $goods->name = $cartGoods->name;
             $goods->selected_sku_name = $cartGoods->selected_sku_name;
             $goods->selected_sku_index = $cartGoods->selected_sku_index;
             $goods->price = $cartGoods->price;
+            $goods->sales_commission_rate = $cartGoods->sales_commission_rate;
+            $goods->promotion_commission_rate = $cartGoods->promotion_commission_rate;
+            $goods->promotion_commission_upper_limit = $cartGoods->promotion_commission_upper_limit;
             $goods->number = $cartGoods->number;
             $goods->save();
         }

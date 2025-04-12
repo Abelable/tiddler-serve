@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Jobs\OverTimeCancelOrder;
 use App\Models\Address;
 use App\Models\CartGoods;
+use App\Models\Coupon;
 use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
+use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -78,10 +80,11 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, $cartGoodsList, $freightTemplateList, Address $address, Shop $shopInfo = null)
+    public function createOrder($userId, $cartGoodsList, CreateOrderInput $input, $freightTemplateList = null, Address $address = null, Coupon $coupon = null, Shop $shopInfo = null)
     {
         $totalPrice = 0;
         $totalFreightPrice = 0;
+        $couponDenomination = 0;
 
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
@@ -89,63 +92,99 @@ class OrderService extends BaseService
             $totalPrice = bcadd($totalPrice, $price, 2);
 
             // 计算运费
-            if ($cartGoods->freight_template_id == 0) {
-                $freightPrice = 0;
-            } else {
-                /** @var FreightTemplate $freightTemplate */
-                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
+            if ($input->deliveryMode == 1) {
+                if ($cartGoods->freight_template_id == 0) {
                     $freightPrice = 0;
                 } else {
-                    $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
-                    $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
-                        return in_array($cityCode, explode(',', $area->pickedCityCodes));
-                    });
-                    if (is_null($area)) {
-                        $freightPrice = 0;
-                    } else {
-                        if ($freightTemplate->compute_mode == 1) {
-                            $freightPrice = $area->fee;
-                        } else {
-                            $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
-                        }
-                    }
+                    $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
+                    $freightPrice = $this->calcFreightPrice($freightTemplate, $address, $price, $cartGoods->number);
                 }
+                $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
             }
-            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
 
-            // 商品减库存
+            // 优惠券
+            if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
+                $couponDenomination = $coupon->denomination;
+            }
+
+            // 商品减库存加销量
             $row = GoodsService::getInstance()->reduceStock($cartGoods->goods_id, $cartGoods->number, $cartGoods->selected_sku_index);
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
         }
 
+        $paymentAmount = bcadd($totalPrice, $totalFreightPrice, 2);
+        $paymentAmount = bcsub($paymentAmount, $couponDenomination, 2);
+
+        $orderSn = $this->generateOrderSn();
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($userId);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+
+            // 更新余额
+            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn);
+        }
+
         $order = Order::new();
-        $order->order_sn = $this->generateOrderSn();
+        $order->order_sn = $orderSn;
         $order->status = OrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
-        $order->consignee = $address->name;
-        $order->mobile = $address->mobile;
-        $order->address = $address->region_desc . ' ' . $address->address_detail;
+        $order->delivery_mode = $input->deliveryMode;
+        if ($input->deliveryMode == 1) {
+            $order->consignee = $address->name;
+            $order->mobile = $address->mobile;
+            $order->address = $address->region_desc . ' ' . $address->address_detail;
+            $order->freight_price = $totalFreightPrice;
+        } else {
+            $order->pickup_address_id = $input->pickupAddressId;
+            $order->pickup_time = $input->pickupTime;
+            $order->pickup_mobile = $input->pickupMobile;
+        }
         if (!is_null($shopInfo)) {
             $order->shop_id = $shopInfo->id;
-            $order->shop_logo = $shopInfo->avatar;
+            $order->shop_logo = $shopInfo->logo;
             $order->shop_name = $shopInfo->name;
         }
         $order->goods_price = $totalPrice;
-        $order->freight_price = $totalFreightPrice;
-        $order->payment_amount = bcadd($totalPrice, $totalFreightPrice, 2);
-        $order->refund_amount = $order->payment_amount;
+        if (!is_null($coupon)) {
+            $order->coupon_id = $coupon->id;
+            $order->coupon_denomination = $couponDenomination;
+        }
+        $order->deduction_balance = $deductionBalance;
+        $order->payment_amount = $paymentAmount;
+        $order->refund_amount = $paymentAmount;
         $order->save();
-
-        // 生成订单商品快照
-        OrderGoodsService::getInstance()->createList($cartGoodsList, $order->id);
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
         return $order->id;
+    }
+
+    public function calcFreightPrice(FreightTemplate $freightTemplate, Address $address, $totalPrice, $goodsNumber)
+    {
+        if ($freightTemplate->free_quota != 0 && $totalPrice > $freightTemplate->free_quota) {
+            $freightPrice = 0;
+        } else {
+            $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
+            $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+                return in_array($cityCode, explode(',', $area->pickedCityCodes));
+            });
+            if (is_null($area)) {
+                $freightPrice = 0;
+            } else {
+                if ($freightTemplate->compute_mode == 1) {
+                    $freightPrice = $area->fee;
+                } else {
+                    $freightPrice = bcmul($area->fee, $goodsNumber, 2);
+                }
+            }
+        }
+        return $freightPrice;
     }
 
     public function createWxPayOrder($userId, array $orderIds, $openid)

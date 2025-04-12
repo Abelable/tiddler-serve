@@ -38,7 +38,7 @@ class OrderController extends Controller
         $couponId = $this->verifyId('couponId');
         $useBalance = $this->verifyBoolean('useBalance', false);
 
-        $cartGoodsListColumns = ['shop_id', 'goods_id', 'cover', 'name', 'is_gift', 'freight_template_id', 'selected_sku_name', 'price', 'number'];
+        $cartGoodsListColumns = ['shop_id', 'goods_id', 'is_gift', 'delivery_mode', 'freight_template_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
         $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
         $address = null;
@@ -274,17 +274,30 @@ class OrderController extends Controller
                 }
             }
 
-            $orderIds = $shopList->map(function (Shop $shop) use ($address, $cartGoodsList, $freightTemplateList) {
+            $orderIds = $shopList->map(function (Shop $shop) use ($input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
                     return $cartGoods->shop_id == $shop->id;
                 });
-                return OrderService::getInstance()->createOrder($this->userId(), $filterCartGoodsList, $freightTemplateList, $address, $shop);
+
+                // 7.生成订单
+                $orderId = OrderService::getInstance()
+                    ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon, $shop);
+
+                // 8.生成订单商品快照
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
+                return $orderId;
             });
             if (in_array(0, $shopIds)) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) {
                     return $cartGoods->shop_id == 0;
                 });
-                $orderId = OrderService::getInstance()->createOrder($this->userId(), $filterCartGoodsList, $freightTemplateList, $address);
+
+                // 7.生成订单
+                $orderId = OrderService::getInstance()
+                    ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon);
+
+                // 8.生成订单商品快照
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
                 $orderIds->push($orderId);
             }
 

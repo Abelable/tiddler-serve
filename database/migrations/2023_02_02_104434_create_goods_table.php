@@ -33,6 +33,8 @@ class CreateGoodsTable extends Migration
             $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例%');
             $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例%');
             $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
+            $table->float('superior_promotion_commission_rate')->default(0)->comment('上级推广佣金比例%');
+            $table->float('superior_promotion_commission_upper_limit')->default(0)->comment('上级推广佣金上限');
             $table->integer('stock')->comment('商品库存');
             $table->integer('number_limit')->default(0)->comment('限购数量');
             $table->longText('spec_list')->comment('商品规格列表');
