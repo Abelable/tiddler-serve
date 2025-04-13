@@ -15,17 +15,16 @@ class CreateCommissionsTable extends Migration
     {
         Schema::create('commissions', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)->comment('佣金状态：0-订单待支付，1-待结算, 2-可提现，3-已结算');
-            $table->integer('scene')->comment('场景：1-自购，2-分享');
+            $table->integer('status')->default(0)->comment('佣金状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算');
+            $table->integer('scene')->comment('场景：1-自购 2-直推分享 3-间推分享 4-直推团队 5-间推团队');
+            $table->integer('promoter_id')->comment('推广员id');
+            $table->integer('promoter_level')->comment('推广员等级');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('superior_id')->default(0)->comment('上级id');
             $table->integer('order_id')->comment('订单id');
-            $table->integer('commodity_id')->comment('商品id');
-            $table->integer('commodity_type')->comment('商品类型：1-景点，2-酒店，3-餐馆，4-商品');
-            $table->float('total_price')->comment('商品总价');
-            $table->float('coupon_denomination')->default(0)->comment('优惠券抵扣');
-            $table->float('commission_base')->comment('商品佣金计算基数');
-            $table->float('commission_rate')->comment('商品佣金比例');
+            $table->integer('product_type')->comment('产品类型：1-景点，2-酒店，3-餐馆，4-商品');
+            $table->integer('product_id')->comment('产品id');
+            $table->float('commission_base')->comment('佣金基数');
+            $table->float('commission_rate')->comment('佣金系数');
             $table->float('commission_amount')->comment('佣金金额');
             $table->timestamps();
             $table->softDeletes();

@@ -6,17 +6,16 @@ namespace App\Models;
  * App\Models\Commission
  *
  * @property int $id
- * @property int $status 佣金状态：0-订单待支付，1-待结算, 2-可提现，3-已结算
- * @property int $scene 场景：1-自购，2-分享
+ * @property int $status 佣金状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算
+ * @property int $scene 场景：1-自购 2-直推分享 3-间推分享 4-直推团队 5-间推团队
+ * @property int $promoter_id 推广员id
+ * @property int $promoter_level 推广员等级
  * @property int $user_id 用户id
- * @property int $superior_id 上级id
  * @property int $order_id 订单id
- * @property int $commodity_id 商品id
- * @property int $commodity_type 商品类型：1-景点，2-酒店，3-餐馆，4-商品
- * @property float $total_price 商品总价
- * @property float $coupon_denomination 优惠券抵扣
- * @property float $commission_base 商品佣金计算基数
- * @property float $commission_rate 商品佣金比例
+ * @property int $product_type 产品类型：1-景点，2-酒店，3-餐馆，4-商品
+ * @property int $product_id 产品id
+ * @property float $commission_base 佣金基数
+ * @property float $commission_rate 佣金系数
  * @property float $commission_amount 佣金金额
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -28,17 +27,16 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionBase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionRate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommodityId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommodityType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCouponDenomination($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePromoterId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePromoterLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereSuperiorId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|Commission withTrashed()
