@@ -25,6 +25,7 @@ class CreateCommissionsTable extends Migration
             $table->integer('product_id')->comment('产品id');
             $table->float('commission_base')->comment('佣金基数');
             $table->float('commission_rate')->comment('佣金系数');
+            $table->float('commission_limit')->default(0)->comment('佣金上限');
             $table->float('commission_amount')->comment('佣金金额');
             $table->timestamps();
             $table->softDeletes();

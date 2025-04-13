@@ -12,6 +12,7 @@ use App\Models\Shop;
 use App\Services\AccountService;
 use App\Services\AddressService;
 use App\Services\CartGoodsService;
+use App\Services\CommissionService;
 use App\Services\CouponService;
 use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
@@ -260,20 +261,20 @@ class OrderController extends Controller
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 
             $userId = $this->userId();
-            $promoterInfo = $this->user()->promoterInfo;
-            $superiorId = $this->user()->superiorId();
-            $superiorInfo = null;
-            $managerId = null;
-            $managerInfo = null;
-            if (!is_null($superiorId)) {
-                $superiorInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
-                $managerId = RelationService::getInstance()->getSuperiorId($superiorId);
-                if (!is_null($managerId)) {
-                    $managerInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
+            $userLevel = $this->user()->promoterInfo->level ?: 0;
+            $superiorId = $this->user()->superiorId() ?: 0;
+            $superiorLevel = 0;
+            $upperSuperiorId = 0;
+            $upperSuperiorLevel = 0;
+            if ($superiorId != 0) {
+                $superiorLevel = PromoterService::getInstance()->getPromoterByUserId($superiorId)->level;
+                $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId) ?: 0;
+                if ($upperSuperiorId != 0) {
+                    $upperSuperiorLevel = PromoterService::getInstance()->getPromoterByUserId($upperSuperiorId)->level;
                 }
             }
 
-            $orderIds = $shopList->map(function (Shop $shop) use ($input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
+            $orderIds = $shopList->map(function (Shop $shop) use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
                     return $cartGoods->shop_id == $shop->id;
                 });
@@ -285,45 +286,10 @@ class OrderController extends Controller
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
 
-                // 9.生成商品佣金记录 - 原则：C级才可以拿间推佣金
-                // 10.生成团队佣金记录（暂定团队佣金系数：C1 - 10%，C2 - 20%，C3 - 30%, 计算公式：直推/间推推广员佣金 * 佣金系数）
-                /**
-                 * 场景值scene：1-自购 2-直推分享 3-间推分享 4-直推团队 5-间推团队
-                 * A-普通用户: user_id = 1, promoter_level = 0
-                 * B-推广员: user_id = 2, promoter_level = 1
-                 * C-推广员: user_id = 3, promoter_level = 1
-                 * D-推广员: user_id = 4, promoter_level = 1
-                 * E-C1: user_id = 5, promoter_level = 2
-                 *
-                 * 场景1「A」: 普通用户没有上级 - 不需要生成佣金记录
-                 *
-                 * 场景2「A-B/A-B-C」: 普通用户上级为推广员，没有上上级，或上上级为推广员 - 生成30%上级佣金（分享场景）
-                 * status scene = 2 promoter_id = 2 promoter_level = 1 user_id = 1 order_id goods_id commission_base = 100 commission_rate = 30% commission_amount = 30
-                 *
-                 * 场景3「A-B-E」: 普通用户上级为推广员，上上级为C级 - 生成30%上级佣金（分享场景）、10%上上级佣金（分享场景），生成团队佣金（直推场景）= 30%上级佣金 * 10%（C1的团队佣金系数）
-                 * status scene = 2 promoter_id = 2 promoter_level = 1 user_id = 1 order_id goods_id commission_base = 100 commission_rate = 30% commission_amount = 30
-                 * status scene = 3 promoter_id = 5 promoter_level = 2 user_id = 1 order_id goods_id commission_base = 100 commission_rate = 10% commission_amount = 10
-                 * status scene = 4 promoter_id = 5 promoter_level = 2 user_id = 1 order_id goods_id commission_base = 30 commission_rate = 10% commission_amount = 3
-                 *
-                 * 场景4「A-E」: 普通用户上级为C级 - 生成40%上级佣金（分享场景）
-                 * status scene = 2 promoter_id = 5 promoter_level = 2 user_id = 1 order_id goods_id commission_base = 100 commission_rate = 40% commission_amount = 40
-                 *
-                 * 场景5「B/B-C/B-C-D」: 推广员没有上级，或上级为推广员，且没有上上级，或上上级为推广员 - 生成30%自购佣金（自购场景）
-                 * status scene = 1 promoter_id = 2 promoter_level = 1 user_id = 2 order_id goods_id commission_base = 100 commission_rate = 30% commission_amount = 30
-                 *
-                 * 场景6「B-C-E」: 推广员上级为推广员，上上级为C级 - 生成30%自购佣金（自购场景）、10%上上级佣金（分享场景），生成团队佣金（间推场景）= 30%自购佣金 * 10%（C1的团队佣金系数）
-                 * status scene = 1 promoter_id = 2 promoter_level = 1 user_id = 2 order_id goods_id commission_base = 100 commission_rate = 30% commission_amount = 30
-                 * status scene = 3 promoter_id = 5 promoter_level = 2 user_id = 2 order_id goods_id commission_base = 100 commission_rate = 10% commission_amount = 10
-                 * status scene = 5 promoter_id = 5 promoter_level = 2 user_id = 2 order_id goods_id commission_base = 30 commission_rate = 10% commission_amount = 3
-                 *
-                 * 场景7「B-E」: 推广员上级为C级 - 生成30%自购佣金（自购场景）、10%上级佣金（分享场景），生成团队佣金（直推场景）= 30%自购佣金 * 10%（C1的团队佣金系数）
-                 * status scene = 1 promoter_id = 2 promoter_level = 1 user_id = 2 order_id goods_id commission_base = 100 commission_rate = 30% commission_amount = 30
-                 * status scene = 3 promoter_id = 5 promoter_level = 2 user_id = 2 order_id goods_id commission_base = 100 commission_rate = 10% commission_amount = 10
-                 * status scene = 4 promoter_id = 5 promoter_level = 2 user_id = 2 order_id goods_id commission_base = 30 commission_rate = 10% commission_amount = 3
-                 *
-                 * 场景8「E」: C级 - 生成40%自购佣金（自购场景）
-                 * status scene = 1 promoter_id = 5 promoter_level = 2 user_id = 4 order_id goods_id commission_base = 100 commission_rate = 40% commission_amount = 40
-                 */
+                // 9.生成佣金记录
+                foreach ($filterCartGoodsList as $cartGoods) {
+                    CommissionService::getInstance()->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                }
 
                 return $orderId;
             });
@@ -338,6 +304,12 @@ class OrderController extends Controller
 
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
+
+                // 9.生成佣金记录
+                foreach ($filterCartGoodsList as $cartGoods) {
+                    CommissionService::getInstance()->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                }
+
                 $orderIds->push($orderId);
             }
 

@@ -2,7 +2,7 @@
 
 namespace App\Utils\Enums;
 
-class CommodityType
+class ProductType
 {
     const SCENIC = 1;
     const HOTEL = 2;

@@ -16,6 +16,7 @@ namespace App\Models;
  * @property int $product_id 产品id
  * @property float $commission_base 佣金基数
  * @property float $commission_rate 佣金系数
+ * @property float $commission_limit 佣金上限
  * @property float $commission_amount 佣金金额
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -26,6 +27,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission query()
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionBase($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereDeletedAt($value)

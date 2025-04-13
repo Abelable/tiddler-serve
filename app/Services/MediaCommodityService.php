@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\MediaCommodity;
-use App\Utils\Enums\CommodityType;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommodityMediaPageInput;
 
 class MediaCommodityService extends BaseService
@@ -32,22 +32,22 @@ class MediaCommodityService extends BaseService
         $list = MediaCommodity::query()->where('media_type', $mediaType)->whereIn('media_id', $mediaIds)->get($columns);
 
         $scenicIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == CommodityType::SCENIC;
+            return $mediaCommodity->commodity_type == ProductType::SCENIC;
         })->pluck('commodity_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, $scenicColumns)->keyBy('id');
 
         $hotelIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == CommodityType::HOTEL;
+            return $mediaCommodity->commodity_type == ProductType::HOTEL;
         })->pluck('commodity_id')->toArray();
         $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, $hotelColumns)->keyBy('id');
 
         $restaurantIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == CommodityType::RESTAURANT;
+            return $mediaCommodity->commodity_type == ProductType::RESTAURANT;
         })->pluck('commodity_id')->toArray();
         $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
 
         $goodsIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == CommodityType::GOODS;
+            return $mediaCommodity->commodity_type == ProductType::GOODS;
         })->pluck('commodity_id')->toArray();
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $goodsColumns)->keyBy('id');
 

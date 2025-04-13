@@ -16,7 +16,7 @@ use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\MediaCommodityService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\CommodityType;
+use App\Utils\Enums\ProductType;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;
@@ -166,7 +166,7 @@ class ShortVideoController extends Controller
             })->map(function (MediaCommodity $commodity) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
                 $info = null;
                 switch ($commodity->commodity_type) {
-                    case CommodityType::SCENIC:
+                    case ProductType::SCENIC:
                         /** @var ScenicSpot $info */
                         $info = $scenicList->get($commodity->commodity_id);
                         if ($info->image_list) {
@@ -174,13 +174,13 @@ class ShortVideoController extends Controller
                             unset($info->image_list);
                         }
                         break;
-                    case CommodityType::HOTEL:
+                    case ProductType::HOTEL:
                         $info = $hotelList->get($commodity->commodity_id);
                         break;
-                    case CommodityType::RESTAURANT:
+                    case ProductType::RESTAURANT:
                         $info = $restaurantList->get($commodity->commodity_id);
                         break;
-                    case CommodityType::GOODS:
+                    case ProductType::GOODS:
                         $info = $goodsList->get($commodity->commodity_id);
                         break;
                 }
