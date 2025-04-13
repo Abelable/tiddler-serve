@@ -313,8 +313,13 @@ class OrderController extends Controller
                 $orderIds->push($orderId);
             }
 
-            // 4.清空购物车
+            // 10.清空购物车
             CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $input->cartGoodsIds);
+
+            // 11.使用优惠券
+            if (!is_null($input->couponId)) {
+                UserCouponService::getInstance()->useCoupon($this->userId(), $input->couponId);
+            }
 
             return $orderIds;
         });
