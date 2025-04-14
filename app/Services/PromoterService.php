@@ -87,7 +87,7 @@ class PromoterService extends BaseService
 
     public function getPromoterByUserId($userId, $columns = ['*'])
     {
-        return Promoter::query()->where('user_id', $userId)->first($columns);
+        return Promoter::query()->where('user_id', $userId)->whereIn('status', [1, 2])->first($columns);
     }
 
     public function getPromoterById($id, $columns = ['*'])

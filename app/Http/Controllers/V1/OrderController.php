@@ -267,10 +267,16 @@ class OrderController extends Controller
             $upperSuperiorId = 0;
             $upperSuperiorLevel = 0;
             if ($superiorId != 0) {
-                $superiorLevel = PromoterService::getInstance()->getPromoterByUserId($superiorId)->level;
-                $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId) ?: 0;
-                if ($upperSuperiorId != 0) {
-                    $upperSuperiorLevel = PromoterService::getInstance()->getPromoterByUserId($upperSuperiorId)->level;
+                $superiorPromoterInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
+                if (!is_null($superiorPromoterInfo)) {
+                    $superiorLevel = $superiorPromoterInfo->level;
+                    $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId) ?: 0;
+                    if ($upperSuperiorId != 0) {
+                        $upperSuperiorPromoterInfo = PromoterService::getInstance()->getPromoterByUserId($upperSuperiorId);
+                        if (!is_null($upperSuperiorPromoterInfo)) {
+                            $upperSuperiorLevel = $upperSuperiorPromoterInfo->level;
+                        }
+                    }
                 }
             }
 

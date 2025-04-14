@@ -110,7 +110,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
 
     public function promoterInfo()
     {
-        return $this->hasOne(Promoter::class, 'user_id');
+        return $this->hasOne(Promoter::class, 'user_id')->whereIn('status', [1, 2]);
     }
 
     public function superiorId() {
