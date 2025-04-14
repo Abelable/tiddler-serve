@@ -238,10 +238,18 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function updateCommissionSum($userId, $commission)
+    public function updateSelfCommissionSum($userId, $commission)
     {
         $promoter = $this->getPromoterByUserId($userId);
-        $promoter->commission_sum = bcadd($promoter->commission_sum, $commission, 2);
+        $promoter->self_commission_sum = bcadd($promoter->self_commission_sum, $commission, 2);
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function updateShareCommissionSum($userId, $commission)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->share_commission_sum = bcadd($promoter->share_commission_sum, $commission, 2);
         $promoter->save();
         return $promoter;
     }

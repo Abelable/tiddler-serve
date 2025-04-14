@@ -14,6 +14,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -59,6 +60,14 @@ class OrderService extends BaseService
     {
         return Order::query()
             ->whereIn('order_sn', $orderSnList)
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->get($columns);
+    }
+
+    public function getUnpaidListByIds(array $ids, $columns = ['*'])
+    {
+        return Order::query()
+            ->whereIn('id', $ids)
             ->where('status', OrderEnums::STATUS_CREATE)
             ->get($columns);
     }
@@ -211,8 +220,7 @@ class OrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSnList = $data['body'] ?
-            json_encode(str_replace('order_sn_list:', '', $data['body'])) : [];
+        $orderSnList = json_decode($data['attach']);
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -228,16 +236,50 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
 
-        return $orderList->map(function (Order $order) use ($payId) {
-            $order->pay_id = $payId;
-            $order->pay_time = now()->toDateTimeString();
-            $order->status = OrderEnums::STATUS_PAY;
-            if ($order->cas() == 0) {
-                $this->throwUpdateFail();
-            }
-            // todo 通知（邮件或钉钉）管理员、
-            // todo 通知（短信、系统消息）商家
-            return $order;
+        return $this->paySuccess($orderList, $payId, $actualPaymentAmount);
+    }
+
+    public function paySuccess($orderList, $payId = null, $actualPaymentAmount = null)
+    {
+        return DB::transaction(function () use ($actualPaymentAmount, $payId, $orderList) {
+            $orderList = $orderList->map(function (Order $order) use ($actualPaymentAmount, $payId) {
+                if (!is_null($payId)) {
+                    $order->pay_id = $payId;
+                }
+                if (!is_null($actualPaymentAmount)) {
+                    $order->total_payment_amount = $actualPaymentAmount;
+                }
+                $order->pay_time = now()->toDateTimeString();
+                if ($order->delivery_mode == 1) {
+                    $order->status = OrderEnums::STATUS_PAY;
+                    // todo 待发货通知
+                } else {
+                    $order->status = OrderEnums::STATUS_PENDING_VERIFICATION;
+                    OrderVerifyService::getInstance()->createVerifyCode($order->id);
+
+                    // 同步微信后台订单发货
+                    $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                    WxMpServe::new()->verify($openid, $order->pay_id);
+                }
+
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+
+                // todo 通知（邮件或钉钉）管理员、
+                // todo 通知（短信、系统消息）商家
+
+                return $order;
+            });
+
+            // 佣金记录状态更新为：已支付待结算
+            $orderIds = $orderList->pluck('id')->toArray();
+            CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds);
+
+            // 更新订单商品状态
+            OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
+
+            return $orderList;
         });
     }
 

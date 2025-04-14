@@ -13,7 +13,8 @@ namespace App\Models;
  * @property int $path 生成路径：1-管理后台添加，2-礼包购买，3-限时活动
  * @property string $gift_goods_ids 礼包商品id-用于售后退款删除推广员身份
  * @property int $promoted_user_number 推广人数
- * @property float $commission_sum 累计商品佣金
+ * @property float $self_commission_sum 累计自购佣金
+ * @property float $share_commission_sum 累计分享佣金
  * @property float $team_commission_sum 累计团队佣金
  * @property string $expiration_time 身份失效时间
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -23,7 +24,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter newQuery()
  * @method static \Illuminate\Database\Query\Builder|Promoter onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter query()
- * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereExpirationTime($value)
@@ -33,6 +33,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePromotedUserNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereScene($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereSelfCommissionSum($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereShareCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereTeamCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereUpdatedAt($value)
