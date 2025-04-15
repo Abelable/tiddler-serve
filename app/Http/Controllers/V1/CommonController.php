@@ -23,6 +23,7 @@ use App\Utils\AliOssServe;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class CommonController extends Controller
@@ -48,6 +49,13 @@ class CommonController extends Controller
 //        return response($imageData)
 //            ->header('Content-Type', 'image/png')
 //            ->header('Content-Disposition', 'inline');
+    }
+
+    public function qrCode()
+    {
+        $code = $this->verifyRequiredId('code');
+        $qrCode = QrCode::format('png')->size(300)->generate($code);
+        return response($qrCode)->header('Content-Type', 'image/png');
     }
 
     private function fileToBase64($file){

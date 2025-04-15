@@ -53,7 +53,7 @@ class CartGoodsService extends BaseService
                 $cartGoods->delete();
             }
 
-            $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+            $giftGoods = GiftGoodsService::getInstance()->getGoodsByGoodsId($cartGoods->goods_id);
 
             $cartGoods = CartGoods::new();
             $cartGoods->scene = $scene;
@@ -64,7 +64,10 @@ class CartGoodsService extends BaseService
             $cartGoods->freight_template_id = $goods->freight_template_id;
             $cartGoods->refund_status = $goods->refund_status;
             $cartGoods->delivery_mode = $goods->delivery_mode;
-            $cartGoods->is_gift = in_array($goodsId, $giftGoodsIds) ? 1 : 0;
+            if (!is_null($cartGoods)) {
+                $cartGoods->is_gift =  1;
+                $cartGoods->effective_duration = $giftGoods->effective_duration;
+            }
             $cartGoods->cover = $goods->cover;
             $cartGoods->name = $goods->name;
             if (count($skuList) != 0 && $selectedSkuIndex != -1 ) {

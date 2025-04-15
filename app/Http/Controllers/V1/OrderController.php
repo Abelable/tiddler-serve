@@ -17,8 +17,10 @@ use App\Services\CouponService;
 use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
+use App\Services\OrderVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
+use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
@@ -292,9 +294,16 @@ class OrderController extends Controller
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
 
-                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    CommissionService::getInstance()->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    // 9.生成佣金记录
+                    CommissionService::getInstance()
+                        ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+
+                    // 10.生成推广员
+                    if ($userLevel == 0 && $cartGoods->is_gift == 1) {
+                        PromoterService::getInstance()
+                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $cartGoods->goods_id);
+                    }
                 }
 
                 return $orderId;
@@ -311,18 +320,25 @@ class OrderController extends Controller
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
 
-                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    CommissionService::getInstance()->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    // 9.生成佣金记录
+                    CommissionService::getInstance()
+                        ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+
+                    // 10.生成推广员
+                    if ($userLevel == 0 && $cartGoods->is_gift == 1) {
+                        PromoterService::getInstance()
+                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $cartGoods->goods_id);
+                    }
                 }
 
                 $orderIds->push($orderId);
             }
 
-            // 10.清空购物车
+            // 11.清空购物车
             CartGoodsService::getInstance()->deleteCartGoodsList($this->userId(), $input->cartGoodsIds);
 
-            // 11.使用优惠券
+            // 12.使用优惠券
             if (!is_null($input->couponId)) {
                 UserCouponService::getInstance()->useCoupon($this->userId(), $input->couponId);
             }
@@ -421,6 +437,40 @@ class OrderController extends Controller
         });
     }
 
+    public function verifyCode()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $verifyCode = OrderVerifyService::getInstance()->getByOrderId($orderId)->code;
+        return $this->success($verifyCode);
+    }
+
+    public function verify()
+    {
+        $code = $this->verifyRequiredString('code');
+
+        $verifyCodeInfo = OrderVerifyService::getInstance()->getByCode($code);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
+        }
+
+        $order = OrderService::getInstance()->getPendingVerifyOrderById($verifyCodeInfo->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
+        }
+
+        $managerIds = ShopManagerService::getInstance()->getManagerList($order->shop_id)->pluck('user_id')->toArray();
+        if (!in_array($this->userId(), $managerIds)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
+        }
+
+        DB::transaction(function () use ($verifyCodeInfo, $order) {
+            OrderService::getInstance()->userConfirm($order->user_id, $order->id);
+            OrderVerifyService::getInstance()->verified($verifyCodeInfo->id, $this->userId());
+        });
+
+        return $this->success();
+    }
+
     public function cancel()
     {
         $id = $this->verifyRequiredId('id');
@@ -431,7 +481,7 @@ class OrderController extends Controller
     public function confirm()
     {
         $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->confirm($this->userId(), $id);
+        OrderService::getInstance()->userConfirm($this->userId(), $id);
         return $this->success();
     }
 

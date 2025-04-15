@@ -10,6 +10,7 @@ namespace App\Models;
  * @property int $goods_id 商品id
  * @property string $goods_cover 商品图片
  * @property string $goods_name 商品名称
+ * @property int $effective_duration 有效时长（月）
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -19,6 +20,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereEffectiveDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsName($value)

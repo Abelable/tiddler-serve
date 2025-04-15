@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Exceptions\BusinessException;
-use App\Services\OrderService;
+use App\Services\CommissionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,23 +12,21 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class OverTimeCancelOrder implements ShouldQueue
+class CommissionConfirmJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $userId;
-    private $orderId;
+    private $commissionId;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($userId, $orderId)
+    public function __construct($commissionId)
     {
-        $this->userId = $userId;
-        $this->orderId = $orderId;
-        $this->delay(now()->addMinute(30));
+        $this->commissionId = $commissionId;
+        $this->delay(now()->addDays(7));
     }
 
     /**
@@ -39,7 +37,7 @@ class OverTimeCancelOrder implements ShouldQueue
     public function handle()
     {
         try {
-            OrderService::getInstance()->SystemCancel($this->userId, $this->orderId);
+            CommissionService::getInstance()->updateToOrderConfirmStatus($this->commissionId);
         } catch (BusinessException $e) {
             Log::error($e->getMessage());
         }

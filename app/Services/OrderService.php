@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\OverTimeCancelOrder;
+use App\Jobs\OverTimeCancelOrderJob;
 use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
@@ -12,6 +12,7 @@ use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
@@ -47,6 +48,16 @@ class OrderService extends BaseService
         return Order::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getOrderListByIds(array $ids, $columns = ['*'])
+    {
+        return Order::query()->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getUserOrderList($userId, $ids, $columns = ['*'])
+    {
+        return Order::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+    }
+
     public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
     {
         return Order::query()
@@ -70,6 +81,19 @@ class OrderService extends BaseService
             ->whereIn('id', $ids)
             ->where('status', OrderEnums::STATUS_CREATE)
             ->get($columns);
+    }
+
+    public function getOverTimeUnpaidList($columns = ['*'])
+    {
+        return Order::query()
+            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('created_at', '<=', now()->subHours(24))
+            ->get($columns);
+    }
+
+    public function getPendingVerifyOrderById($id, $columns = ['*'])
+    {
+        return Order::query()->where('status', OrderEnums::STATUS_PENDING_VERIFICATION)->find($id, $columns);
     }
 
     public function generateOrderSn()
@@ -169,7 +193,7 @@ class OrderService extends BaseService
         $order->save();
 
         // 设置订单支付超时任务
-        // dispatch(new OverTimeCancelOrder($userId, $order->id));
+        dispatch(new OverTimeCancelOrderJob($userId, $order->id));
 
         return $order->id;
     }
@@ -274,7 +298,7 @@ class OrderService extends BaseService
 
             // 佣金记录状态更新为：已支付待结算
             $orderIds = $orderList->pluck('id')->toArray();
-            CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds);
+            CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
 
             // 更新订单商品状态
             OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
@@ -286,45 +310,83 @@ class OrderService extends BaseService
     public function userCancel($userId, $orderId)
     {
         return DB::transaction(function () use ($userId, $orderId) {
-            return $this->cancel($userId, $orderId);
+            $orderList = $this->getUserOrderList($userId, [$orderId]);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->cancel($orderList);
         });
     }
 
-    public function systemCancel($userId, $orderId)
+    public function systemAutoCancel($userId, $orderId)
     {
         return DB::transaction(function () use ($userId, $orderId) {
-            return $this->cancel($userId, $orderId, 'system');
+            $orderList = $this->getUserOrderList($userId, [$orderId]);
+            if (count($orderList) != 0) {
+                $this->cancel($orderList, 'system');
+            }
         });
     }
 
-    public function cancel($userId, $orderId, $role = 'user')
+    public function systemCancel()
     {
-        $order = $this->getOrderById($userId, $orderId);
-        if (is_null($order)) {
-            $this->throwBadArgumentValue();
-        }
-        if ($order->status != OrderEnums::STATUS_CREATE) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
-        }
-        switch ($role) {
-            case 'system':
-                $order->status = OrderEnums::STATUS_AUTO_CANCEL;
-                break;
-            case 'admin':
-                $order->status = OrderEnums::STATUS_ADMIN_CANCEL;
-                break;
-            case 'user':
-                $order->status = OrderEnums::STATUS_CANCEL;
-                break;
-        }
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
+        return DB::transaction(function () {
+            $orderList = $this->getOverTimeUnpaidList();
+            if (count($orderList) != 0) {
+                $this->cancel($orderList, 'system');
+            }
+        });
+    }
 
-        // 返还库存
-        $this->returnStock($order->id);
+    public function adminCancel($orderIds)
+    {
+        return DB::transaction(function () use ($orderIds) {
+            $orderList = $this->getOrderListByIds($orderIds);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->cancel($orderList, 'admin');
+        });
+    }
 
-        return $order;
+    public function cancel($orderList, $role = 'user')
+    {
+        $orderList = $orderList->map(function (Order $order) use ($role) {
+            if ($order->status != OrderEnums::STATUS_CREATE) {
+                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
+            }
+            switch ($role) {
+                case 'system':
+                    $order->status = OrderEnums::STATUS_AUTO_CANCEL;
+                    break;
+                case 'admin':
+                    $order->status = OrderEnums::STATUS_ADMIN_CANCEL;
+                    break;
+                case 'user':
+                    $order->status = OrderEnums::STATUS_CANCEL;
+                    break;
+            }
+            $order->finish_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            // 返还库存
+            $this->returnStock($order->id);
+
+            // 恢复优惠券
+            if ($order->coupon_id != 0) {
+                $this->restoreCoupon($order->user_id, $order->coupon_id);
+            }
+
+            return $order;
+        });
+
+        // 删除佣金记录
+        $orderIds = $orderList->pluck('id')->toArray();
+        CommissionService::getInstance()->deleteUnpaidListByOrderIds($orderIds, ProductType::GOODS);
+
+        return $orderList;
     }
 
     public function returnStock($orderId)
@@ -340,25 +402,81 @@ class OrderService extends BaseService
         }
     }
 
-    public function confirm($userId, $orderId, $isAuto = false)
+    public function restoreCoupon($userId, $couponId)
     {
-        $order = $this->getOrderById($userId, $orderId);
-        if (is_null($order)) {
-            $this->throwBadArgumentValue();
+        $userCoupon = UserCouponService::getInstance()->getUserUsedCouponByCouponId($userId, $couponId);
+        if (!is_null($userCoupon)) {
+            $userCoupon->status = 1;
+            $userCoupon->save();
         }
-        if ($order->status != OrderEnums::STATUS_SHIP) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能被确认收货');
-        }
+        return $userCoupon;
+    }
 
-        $order->status = $isAuto ? OrderEnums::STATUS_AUTO_CONFIRM : OrderEnums::STATUS_CONFIRM;
-        $order->confirm_time = now()->toDateTimeString();
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
+    public function userConfirm($userId, $orderId)
+    {
+        return DB::transaction(function () use ($userId, $orderId) {
+            $orderList = $this->getUserOrderList($userId, [$orderId]);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->confirm($orderList);
+        });
+    }
 
-        // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
+    public function adminConfirm($orderIds)
+    {
+        return DB::transaction(function () use ($orderIds) {
+            $orderList = $this->getOrderListByIds($orderIds);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->confirm($orderList, 'admin');
+        });
+    }
 
-        return $order;
+    public function systemConfirm()
+    {
+        return DB::transaction(function () {
+            $orderList = $this->getTimeoutUnConfirmOrders();
+            if (count($orderList) != 0) {
+                $this->confirm($orderList, 'system');
+            }
+        });
+    }
+
+    public function confirm($orderList, $role = 'user')
+    {
+        $orderList = $orderList->map(function (Order $order) use ($role) {
+            if (!$order->canConfirmHandle()) {
+                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+            }
+            switch ($role) {
+                case 'system':
+                    $order->status = OrderEnums::STATUS_AUTO_CONFIRM;
+                    break;
+                case 'admin':
+                    $order->status = OrderEnums::STATUS_ADMIN_CONFIRM;
+                    break;
+                case 'user':
+                    $order->status = OrderEnums::STATUS_CONFIRM;
+                    break;
+            }
+            $order->confirm_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            return $order;
+        });
+
+        // 佣金记录变更为待提现
+        $orderIds = $orderList->pluck('id')->toArray();
+        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
+
+        // todo 礼包逻辑临时改动，付款成功就成为推广员，售后需人工处理产生的佣金记录
+        // GiftCommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds);
+
+        return $orderList;
     }
 
     public function finish($userId, $orderId)

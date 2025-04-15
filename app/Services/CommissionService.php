@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\CommissionConfirm;
+use App\Jobs\CommissionConfirmJob;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\Commission;
@@ -103,7 +103,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
-                $promotionCommissionUpperLimit
+                $promotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
         }
 
@@ -120,7 +121,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
-                $promotionCommissionUpperLimit
+                $promotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -133,7 +135,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
-                $superiorPromotionCommissionUpperLimit
+                $superiorPromotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
 
             $teamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
@@ -148,7 +151,9 @@ class CommissionService extends BaseService
                 $cartGoods->goods_id,
                 $finalPromotionCommission,
                 $teamCommissionRate,
-                $teamCommissionAmount
+                $teamCommissionAmount,
+                0,
+                $cartGoods->refund_status
             );
         }
 
@@ -168,7 +173,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
-                $commissionLimit
+                $commissionLimit,
+                $cartGoods->refund_status
             );
         }
 
@@ -185,7 +191,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
-                $promotionCommissionUpperLimit
+                $promotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
         }
 
@@ -202,7 +209,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
-                $promotionCommissionUpperLimit
+                $promotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -215,7 +223,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
-                $superiorPromotionCommissionUpperLimit
+                $superiorPromotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
 
             $teamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
@@ -230,7 +239,9 @@ class CommissionService extends BaseService
                 $cartGoods->goods_id,
                 $finalPromotionCommission,
                 $teamCommissionRate,
-                $teamCommissionAmount
+                $teamCommissionAmount,
+                0,
+                $cartGoods->refund_status
             );
         }
 
@@ -247,7 +258,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
-                $promotionCommissionUpperLimit
+                $promotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -260,7 +272,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
-                $superiorPromotionCommissionUpperLimit
+                $superiorPromotionCommissionUpperLimit,
+                $cartGoods->refund_status
             );
 
             $teamCommissionRate = bcdiv($superiorLevel - 1, 10, 2);
@@ -275,7 +288,9 @@ class CommissionService extends BaseService
                 $cartGoods->goods_id,
                 $finalPromotionCommission,
                 $teamCommissionRate,
-                $teamCommissionAmount
+                $teamCommissionAmount,
+                0,
+                $cartGoods->refund_status
             );
         }
 
@@ -295,7 +310,8 @@ class CommissionService extends BaseService
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
-                $commissionLimit
+                $commissionLimit,
+                $cartGoods->refund_status
             );
         }
     }
@@ -311,7 +327,8 @@ class CommissionService extends BaseService
         $commissionBase,
         $commissionRate,
         $commissionAmount,
-        $commissionLimit = 0
+        $commissionLimit = 0,
+        $refundStatus = 0
     )
     {
         $commission = Commission::new();
@@ -322,6 +339,7 @@ class CommissionService extends BaseService
         $commission->order_id = $orderId;
         $commission->product_type = $productType;
         $commission->product_id = $productId;
+        $commission->refund_status = $refundStatus;
         $commission->commission_base = $commissionBase;
         $commission->commission_rate = $commissionRate;
         $commission->commission_amount = $commissionAmount;
@@ -330,9 +348,9 @@ class CommissionService extends BaseService
         return $commission;
     }
 
-    public function updateListToOrderPaidStatus(array $orderIds)
+    public function updateListToOrderPaidStatus(array $orderIds, $productType)
     {
-        $commissionList = $this->getUnpaidListByOrderIds($orderIds);
+        $commissionList = $this->getUnpaidListByOrderIds($orderIds, $productType);
         return $commissionList->map(function (Commission $commission) {
             $commission->status = 1;
             $commission->save();
@@ -352,15 +370,20 @@ class CommissionService extends BaseService
         });
     }
 
-    public function deleteUnpaidListByOrderIds(array $orderIds)
-    {
-        return Commission::query()->where('status', 0)->whereIn('order_id', $orderIds)->delete();
-    }
-
-    public function getUnpaidListByOrderIds(array $orderIds, $columns = ['*'])
+    public function deleteUnpaidListByOrderIds(array $orderIds, $productType)
     {
         return Commission::query()
             ->where('status', 0)
+            ->where('product_type', $productType)
+            ->whereIn('order_id', $orderIds)
+            ->delete();
+    }
+
+    public function getUnpaidListByOrderIds(array $orderIds, $productType, $columns = ['*'])
+    {
+        return Commission::query()
+            ->where('status', 0)
+            ->where('product_type', $productType)
             ->whereIn('order_id', $orderIds)
             ->get($columns);
     }
@@ -378,7 +401,7 @@ class CommissionService extends BaseService
         return $commissionList->map(function (Commission $commission) use ($role) {
             if ($commission->refund_status == 1 && $role == 'user') {
                 // 7天无理由商品：确认收货7天后更新佣金状态
-                dispatch(new CommissionConfirm($commission->id));
+                dispatch(new CommissionConfirmJob($commission->id));
             } else {
                 $commission->status = 2;
                 $commission->save();

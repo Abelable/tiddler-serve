@@ -12,6 +12,23 @@ use Illuminate\Support\Facades\DB;
 
 class PromoterService extends BaseService
 {
+    public function createPromoter($userId, $path, $duration, $giftGoodsId = null)
+    {
+        $expirationTime = Carbon::now()
+            ->addMonths($duration)
+            ->setTimezone('UTC')
+            ->format('Y-m-d\TH:i:s.v\Z');
+
+        $promoter = Promoter::new();
+        $promoter->user_id = $userId;
+        $promoter->path = $path;
+        $promoter->expiration_time = $expirationTime;
+        $promoter->gift_goods_id = $giftGoodsId ?: 0;
+        $promoter->save();
+
+        return $promoter;
+    }
+
     public function adminCreate($userId, $level, $scene)
     {
         $promoter = Promoter::new();
@@ -23,7 +40,7 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function toBePromoter($userId, $path, array $goodsIds)
+    public function toBePromoter($userId, $path, $giftGoodsId)
     {
         $promoter = $this->getExactPromoter($userId, PromoterScene::LEVEL_PROMOTER, PromoterScene::SCENE_PROMOTER);
         if (is_null($promoter)) {
@@ -32,7 +49,7 @@ class PromoterService extends BaseService
             $promoter->level = PromoterScene::LEVEL_PROMOTER;
             $promoter->scene = PromoterScene::SCENE_PROMOTER;
             $promoter->path = $path;
-            $promoter->gift_goods_ids = implode(',', $goodsIds);
+            $promoter->gift_goods_id = $giftGoodsId;
             $promoter->save();
         }
     }

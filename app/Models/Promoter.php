@@ -6,12 +6,12 @@ namespace App\Models;
  * App\Models\Promoter
  *
  * @property int $id
- * @property int $status 状态：1-身份正常，2-身份即将失效（续身份窗口期），3-身份失效
+ * @property int $status 状态：0-订单待确认，1-身份正常，2-身份即将失效（续身份窗口期），3-身份失效
  * @property int $user_id 用户id
  * @property int $level 用户等级：1-推广员，2-组织者C1，3-C2，4-C3，5-委员会
  * @property int $scene 场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300
- * @property int $path 生成路径：1-管理后台添加，2-礼包购买，3-限时活动
- * @property string $gift_goods_ids 礼包商品id-用于售后退款删除推广员身份
+ * @property int $path 生成路径：1-管理后台添加，2-礼包购买
+ * @property int $gift_goods_id 礼包商品id-用于售后退款删除推广员身份
  * @property int $promoted_user_number 推广人数
  * @property float $self_commission_sum 累计自购佣金
  * @property float $share_commission_sum 累计分享佣金
@@ -27,7 +27,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereExpirationTime($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereGiftGoodsIds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereGiftGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePath($value)

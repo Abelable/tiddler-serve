@@ -23,6 +23,7 @@ class CreateCommissionsTable extends Migration
             $table->integer('order_id')->comment('订单id');
             $table->integer('product_type')->comment('产品类型：1-景点，2-酒店，3-餐馆，4-商品');
             $table->integer('product_id')->comment('产品id');
+            $table->integer('refund_status')->default(0)->comment('是否支持7天无理由：0-不支持，1-支持');
             $table->float('commission_base')->comment('佣金基数');
             $table->float('commission_rate')->comment('佣金系数');
             $table->float('commission_limit')->default(0)->comment('佣金上限');
