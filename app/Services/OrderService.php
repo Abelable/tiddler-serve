@@ -91,6 +91,15 @@ class OrderService extends BaseService
             ->get($columns);
     }
 
+    public function getTimeoutUnConfirmOrders($columns = ['*'])
+    {
+        return Order::query()
+            ->where('status', OrderEnums::STATUS_SHIP)
+            ->where('ship_time', '<=', now()->subDays(15))
+            ->where('ship_time', '>', now()->subDays(30))
+            ->get($columns);
+    }
+
     public function getPendingVerifyOrderById($id, $columns = ['*'])
     {
         return Order::query()->where('status', OrderEnums::STATUS_PENDING_VERIFICATION)->find($id, $columns);
@@ -236,7 +245,8 @@ class OrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'order_sn_list:' . json_encode($orderSnList),
+            'body' => '订单编号：' . implode("','", $orderSnList),
+            'attach' => json_encode($orderSnList),
             'total_fee' => bcmul($paymentAmount, 100),
             'openid' => $openid
         ];
@@ -379,6 +389,9 @@ class OrderService extends BaseService
                 $this->restoreCoupon($order->user_id, $order->coupon_id);
             }
 
+            // 删除推官员记录
+            PromoterService::getInstance()->deletePendingPromoterByOrderId($order->id);
+
             return $order;
         });
 
@@ -414,13 +427,11 @@ class OrderService extends BaseService
 
     public function userConfirm($userId, $orderId)
     {
-        return DB::transaction(function () use ($userId, $orderId) {
-            $orderList = $this->getUserOrderList($userId, [$orderId]);
-            if (count($orderList) == 0) {
-                $this->throwBadArgumentValue();
-            }
-            return $this->confirm($orderList);
-        });
+        $orderList = $this->getUserOrderList($userId, [$orderId]);
+        if (count($orderList) == 0) {
+            $this->throwBadArgumentValue();
+        }
+        return $this->confirm($orderList);
     }
 
     public function adminConfirm($orderIds)
@@ -469,12 +480,18 @@ class OrderService extends BaseService
             return $order;
         });
 
-        // 佣金记录变更为待提现
+        // todo 优惠订单确认逻辑，佣金延时确认，推广员身份延时确认，需要整个逻辑梳理，冗余字段太多
         $orderIds = $orderList->pluck('id')->toArray();
+
+        // 佣金记录变更为待提现
         CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
 
-        // todo 礼包逻辑临时改动，付款成功就成为推广员，售后需人工处理产生的佣金记录
-        // GiftCommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds);
+        // 变更推广员为正式身份
+        $giftOrderGoods = OrderGoodsService::getInstance()->getGiftGoodsByOrderIds($orderIds);
+        if (!is_null($giftOrderGoods)) {
+            PromoterService::getInstance()
+                ->confirmPendingPromoterByOrderId($giftOrderGoods->order_id, $giftOrderGoods->effective_duration, $giftOrderGoods->refund_status, $role);
+        }
 
         return $orderList;
     }

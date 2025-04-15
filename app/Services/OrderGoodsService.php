@@ -19,6 +19,7 @@ class OrderGoodsService extends BaseService
             $goods->goods_id = $cartGoods->goods_id;
             $goods->shop_id = $cartGoods->shop_id;
             $goods->is_gift = $cartGoods->is_gift;
+            $goods->effective_duration = $cartGoods->effective_duration;
             $goods->refund_status = $cartGoods->refund_status;
             $goods->cover = $cartGoods->cover;
             $goods->name = $cartGoods->name;
@@ -48,6 +49,14 @@ class OrderGoodsService extends BaseService
     public function getListByOrderIds(array $orderIds, $columns = ['*'])
     {
         return OrderGoods::query()->whereIn('order_id', $orderIds)->get($columns);
+    }
+
+    public function getGiftGoodsByOrderIds(array $orderIds, $columns = ['*'])
+    {
+        return OrderGoods::query()
+            ->whereIn('order_id', $orderIds)
+            ->where('is_gift', 1)
+            ->first($columns);
     }
 
     public function getListByGoodsIds(array $goodsIds, $columns = ['*'])

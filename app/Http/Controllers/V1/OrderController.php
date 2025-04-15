@@ -302,7 +302,7 @@ class OrderController extends Controller
                     // 10.生成推广员
                     if ($userLevel == 0 && $cartGoods->is_gift == 1) {
                         PromoterService::getInstance()
-                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $cartGoods->goods_id);
+                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $orderId, $cartGoods->goods_id);
                     }
                 }
 
@@ -328,7 +328,7 @@ class OrderController extends Controller
                     // 10.生成推广员
                     if ($userLevel == 0 && $cartGoods->is_gift == 1) {
                         PromoterService::getInstance()
-                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $cartGoods->goods_id);
+                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $orderId, $cartGoods->goods_id);
                     }
                 }
 
@@ -446,6 +446,7 @@ class OrderController extends Controller
 
     public function verify()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $code = $this->verifyRequiredString('code');
 
         $verifyCodeInfo = OrderVerifyService::getInstance()->getByCode($code);
@@ -463,9 +464,9 @@ class OrderController extends Controller
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
         }
 
-        DB::transaction(function () use ($verifyCodeInfo, $order) {
+        DB::transaction(function () use ($shopId, $verifyCodeInfo, $order) {
             OrderService::getInstance()->userConfirm($order->user_id, $order->id);
-            OrderVerifyService::getInstance()->verified($verifyCodeInfo->id, $this->userId());
+            OrderVerifyService::getInstance()->verify($verifyCodeInfo->id, $this->userId(), $shopId);
         });
 
         return $this->success();
@@ -481,7 +482,9 @@ class OrderController extends Controller
     public function confirm()
     {
         $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->userConfirm($this->userId(), $id);
+        DB::transaction(function () use ($id) {
+            OrderService::getInstance()->userConfirm($this->userId(), $id);
+        });
         return $this->success();
     }
 

@@ -20,6 +20,7 @@ class CreatePromotersTable extends Migration
             $table->integer('level')->default(1)->comment('用户等级：1-推广员，2-组织者C1，3-C2，4-C3，5-委员会');
             $table->integer('scene')->default(100)->comment('场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300');
             $table->integer('path')->comment('生成路径：1-管理后台添加，2-礼包购买');
+            $table->integer('order_id')->default(0)->comment('订单id');
             $table->integer('gift_goods_id')->default(0)->comment('礼包商品id-用于售后退款删除推广员身份');
             $table->integer('promoted_user_number')->default(0)->comment('推广人数');
             $table->float('self_commission_sum')->default(0)->comment('累计自购佣金');
