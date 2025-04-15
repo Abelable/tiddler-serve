@@ -41,6 +41,7 @@ Route::prefix('user')->group(function () {
 });
 
 Route::get('oss_config', 'CommonController@ossConfig');
+Route::get('qr_code', 'CommonController@qrCode');
 
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
