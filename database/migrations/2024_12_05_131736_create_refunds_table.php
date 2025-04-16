@@ -18,6 +18,7 @@ class CreateRefundsTable extends Migration
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，等待买家寄回，2-买家已寄出，待确认，3-退款成功，4-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->integer('user_id')->comment('用户id');
+            $table->integer('shop_id')->comment('店铺id');
             $table->integer('order_id')->comment('订单id');
             $table->string('order_sn')->comment('订单编号');
             $table->integer('goods_id')->comment('商品id');

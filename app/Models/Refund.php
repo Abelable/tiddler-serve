@@ -9,6 +9,7 @@ namespace App\Models;
  * @property int $status 申请状态：0-待审核，1-审核通过，等待买家寄回，2-买家已寄出，待确认，3-退款成功，4-审核失败
  * @property string $failure_reason 审核失败原因
  * @property int $user_id 用户id
+ * @property int $shop_id 店铺id
  * @property int $order_id 订单id
  * @property string $order_sn 订单编号
  * @property int $goods_id 商品id
@@ -40,6 +41,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereRefundType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShipCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShipSn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereUserId($value)
