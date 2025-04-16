@@ -44,9 +44,14 @@ class OrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getOrderById($userId, $id, $columns = ['*'])
+    public function getUserOrderById($userId, $id, $columns = ['*'])
     {
         return Order::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getOrderById($id, $columns = ['*'])
+    {
+        return Order::query()->find($id, $columns);
     }
 
     public function getOrderListByIds(array $ids, $columns = ['*'])
@@ -424,6 +429,97 @@ class OrderService extends BaseService
         return $userCoupon;
     }
 
+    public function ship($orderId, $shipChannel, $shipCode, $shipSn)
+    {
+        $order = $this->getOrderById($orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canShipHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单未付款，无法发货');
+        }
+
+        if (empty($shipCode)) {
+            $express = ExpressService::getInstance()->getExpressByName($shipChannel);
+            $shipCode = $express->code;
+        }
+
+        DB::transaction(function () use ($order, $shipChannel, $shipCode, $shipSn) {
+            $order->status = OrderEnums::STATUS_SHIP;
+            $order->ship_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            $orderPackage = OrderPackageService::getInstance()->create($order->id, $shipChannel, $shipCode, $shipSn);
+            $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+            foreach ($orderGoodsList as $orderGoods) {
+                OrderPackageGoodsService::getInstance()
+                    ->create($order->id, $orderPackage->id, $orderGoods->goods_id, $orderGoods->cover, $orderGoods->name, $orderGoods->number);
+            }
+
+            // 发货同步小程序后台
+            if ($order->refund_amount != 0) {
+                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                WxMpServe::new()->uploadShippingInfo($openid, $order, [$orderPackage], true);
+            }
+
+            // todo 待发货通知
+        });
+
+        return $order;
+    }
+
+    public function splitShip($orderId, array $packageList, $isAllDelivered = false)
+    {
+        $order = $this->getOrderById($orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canShipHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单未付款，无法发货');
+        }
+
+        DB::transaction(function () use ($order, $packageList, $isAllDelivered) {
+            if ($isAllDelivered) {
+                $order->status = OrderEnums::STATUS_SHIP;
+                $order->ship_time = now()->toDateTimeString();
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+            }
+
+            $orderPackageList = [];
+            foreach ($packageList as $package) {
+                $shipChannel = $package['shipChannel'];
+                $shipCode = $package['shipCode'];
+                $shipSn = $package['shipSn'];
+                if (empty($shipCode)) {
+                    $express = ExpressService::getInstance()->getExpressByName($shipChannel);
+                    $shipCode = $express->code;
+                }
+                $orderPackage = OrderPackageService::getInstance()->create($order->id, $shipChannel, $shipCode, $shipSn);
+                $orderPackageList[] = $orderPackage;
+
+                $goodsList = json_decode($package['goodsList']);
+                foreach ($goodsList as $goods) {
+                    OrderPackageGoodsService::getInstance()
+                        ->create($order->id, $orderPackage->id, $goods->goodsId, $goods->cover, $goods->name, $goods->number);
+                }
+            }
+
+            // 发货同步小程序后台
+            if ($order->refund_amount != 0) {
+                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                WxMpServe::new()->uploadShippingInfo($openid, $order, $orderPackageList, $isAllDelivered);
+            }
+
+            // todo 待发货通知
+        });
+
+        return $order;
+    }
+
     public function userConfirm($userId, $orderId)
     {
         $orderList = $this->getUserOrderList($userId, [$orderId]);
@@ -503,7 +599,7 @@ class OrderService extends BaseService
 
     public function finish($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -519,7 +615,7 @@ class OrderService extends BaseService
 
     public function delete($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -533,7 +629,7 @@ class OrderService extends BaseService
 
     public function refund($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
