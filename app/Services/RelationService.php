@@ -65,7 +65,7 @@ class RelationService extends BaseService
     public function getSuperiorId($userId, $columns = ['*'])
     {
         $relation = Relation::query()->where('user_id', $userId)->first($columns);
-        return $relation->superior_id ?? null;
+        return $relation ? $relation->superior_id : 0;
     }
 
     public function deleteBySuperiorId($superiorId)

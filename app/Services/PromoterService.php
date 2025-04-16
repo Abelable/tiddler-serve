@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\OrderGoods;
 use App\Models\Promoter;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\PromoterScene;
@@ -12,6 +13,13 @@ use Illuminate\Support\Facades\DB;
 
 class PromoterService extends BaseService
 {
+    public function createPromoterByGift($orderGoodsId)
+    {
+        /** @var OrderGoods $orderGoods */
+        $orderGoods = OrderGoodsService::getInstance()->getById($orderGoodsId);
+        return $this->createPromoter($orderGoods->user_id, 2, $orderGoods->effective_duration, $orderGoods->order_id, $orderGoods->goods_id);
+    }
+
     public function createPromoter($userId, $path, $duration, $orderId = null, $giftGoodsId = null)
     {
         $expirationTime = Carbon::now()
@@ -22,53 +30,12 @@ class PromoterService extends BaseService
         $promoter = Promoter::new();
         $promoter->user_id = $userId;
         $promoter->path = $path;
+        $promoter->expiration_time = $expirationTime;
         $promoter->order_id = $orderId ?: 0;
         $promoter->gift_goods_id = $giftGoodsId ?: 0;
-
         $promoter->save();
 
         return $promoter;
-    }
-
-    public function deletePendingPromoterByOrderId($orderId)
-    {
-        Promoter::query()->where('order_id', $orderId)->where('status', 0)->delete();
-    }
-
-    public function confirmPendingPromoterByOrderId($orderId, $duration, $refundStatus, $role)
-    {
-        $promoter = Promoter::query()->where('order_id', $orderId)->where('status', 0);
-        if (!is_null($promoter)) {
-            if ($refundStatus == 1 && $role == 'user') {
-
-            } else {
-                $expirationTime = Carbon::now()
-                    ->addMonths($duration)
-                    ->setTimezone('UTC')
-                    ->format('Y-m-d\TH:i:s.v\Z');
-                $promoter->status = 1;
-                $promoter->expiration_time = $expirationTime;
-                $promoter->save();
-            }
-        }
-    }
-
-    public function confirmPendingPromoter($id, $duration)
-    {
-        $promoter = $this->getPromoterById($id);
-        if (!is_null($promoter)) {
-            if ($refundStatus == 1 && $role == 'user') {
-
-            } else {
-                $expirationTime = Carbon::now()
-                    ->addMonths($duration)
-                    ->setTimezone('UTC')
-                    ->format('Y-m-d\TH:i:s.v\Z');
-                $promoter->status = 1;
-                $promoter->expiration_time = $expirationTime;
-                $promoter->save();
-            }
-        }
     }
 
     public function adminCreate($userId, $level, $scene)
@@ -149,14 +116,15 @@ class PromoterService extends BaseService
         return Promoter::query()->where('user_id', $userId)->whereIn('status', [1, 2])->first($columns);
     }
 
+    public function getPromoterLevel($userId)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        return $promoter ? $promoter->level : 0;
+    }
+
     public function getPromoterById($id, $columns = ['*'])
     {
         return Promoter::query()->find($id, $columns);
-    }
-
-    public function getPendingPromoterById($id, $columns = ['*'])
-    {
-        return Promoter::query()->where('status', 0)->find($id, $columns);
     }
 
     public function getExactPromoter($userId, $level, $scene, $columns = ['*'])

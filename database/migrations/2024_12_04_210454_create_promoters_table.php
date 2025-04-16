@@ -15,7 +15,7 @@ class CreatePromotersTable extends Migration
     {
         Schema::create('promoters', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)->comment('状态：0-订单待确认，1-身份正常，2-身份即将失效（续身份窗口期），3-身份失效');
+            $table->integer('status')->default(1)->comment('状态：1-身份正常，2-身份即将失效（续身份窗口期），3-身份失效');
             $table->integer('user_id')->comment('用户id');
             $table->integer('level')->default(1)->comment('用户等级：1-推广员，2-组织者C1，3-C2，4-C3，5-委员会');
             $table->integer('scene')->default(100)->comment('场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300');

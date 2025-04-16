@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderGoodsService extends BaseService
 {
-    public function createList($cartGoodsList, $orderId, $userId)
+    public function createList($cartGoodsList, $orderId, $userId, $userLevel)
     {
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             $goods = OrderGoods::new();
             $goods->user_id = $userId;
+            $goods->user_level = $userLevel;
             $goods->order_id = $orderId;
             $goods->goods_id = $cartGoods->goods_id;
             $goods->shop_id = $cartGoods->shop_id;
@@ -41,6 +42,11 @@ class OrderGoodsService extends BaseService
         return OrderGoods::query()->where('order_id', $orderId)->get($columns);
     }
 
+    public function getById($id, $columns = ['*'])
+    {
+        return OrderGoods::query()->find($id, $columns);
+    }
+
     public function getOrderGoods($orderId, $goodsId, $columns = ['*'])
     {
         return OrderGoods::query()->where('order_id', $orderId)->where('goods_id', $goodsId)->first($columns);
@@ -51,7 +57,7 @@ class OrderGoodsService extends BaseService
         return OrderGoods::query()->whereIn('order_id', $orderIds)->get($columns);
     }
 
-    public function getGiftGoodsByOrderIds(array $orderIds, $columns = ['*'])
+    public function getGiftOrderGoodsList(array $orderIds, $columns = ['*'])
     {
         return OrderGoods::query()
             ->whereIn('order_id', $orderIds)

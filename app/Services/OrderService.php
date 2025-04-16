@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\OverTimeCancelOrderJob;
+use App\Jobs\PromoterConfirmJob;
 use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
@@ -306,8 +307,9 @@ class OrderService extends BaseService
                 return $order;
             });
 
-            // 佣金记录状态更新为：已支付待结算
             $orderIds = $orderList->pluck('id')->toArray();
+
+            // 佣金记录状态更新为：已支付待结算
             CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
 
             // 更新订单商品状态
@@ -389,9 +391,6 @@ class OrderService extends BaseService
                 $this->restoreCoupon($order->user_id, $order->coupon_id);
             }
 
-            // 删除推官员记录
-            PromoterService::getInstance()->deletePendingPromoterByOrderId($order->id);
-
             return $order;
         });
 
@@ -455,9 +454,14 @@ class OrderService extends BaseService
         });
     }
 
-    public function confirm($orderList, $role = 'user')
+    public function confirm($orderList, $role = 'user', $userId = null)
     {
-        $orderList = $orderList->map(function (Order $order) use ($role) {
+        // 订单确认时，如果存在普通用户购买礼包的逻辑，需要执行生成推广员的逻辑
+        // 如果是用户手动确认，则需根据订单商品是否支持7天无理由，延迟生成推广员身份（佣金逻辑同理）
+        $orderIds = $orderList->pluck('id')->toArray();
+        $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
+
+        $orderList = $orderList->map(function (Order $order) use ($role, $orderGoodsList) {
             if (!$order->canConfirmHandle()) {
                 $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
             }
@@ -477,21 +481,22 @@ class OrderService extends BaseService
                 $this->throwUpdateFail();
             }
 
+            /** @var OrderGoods $orderGoods */
+            $orderGoods = $orderGoodsList->get($order->id);
+            if ($orderGoods->is_gift == 1 && $orderGoods->user_level == 0) {
+                if ($role == 'user') {
+                    // 7天无理由商品：确认收货7天后生成推广员身份
+                    dispatch(new PromoterConfirmJob($orderGoods->id));
+                } else {
+                    PromoterService::getInstance()->createPromoterByGift($orderGoods->id);
+                }
+            }
+
             return $order;
         });
 
-        // todo 优惠订单确认逻辑，佣金延时确认，推广员身份延时确认，需要整个逻辑梳理，冗余字段太多
-        $orderIds = $orderList->pluck('id')->toArray();
-
         // 佣金记录变更为待提现
         CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
-
-        // 变更推广员为正式身份
-        $giftOrderGoods = OrderGoodsService::getInstance()->getGiftGoodsByOrderIds($orderIds);
-        if (!is_null($giftOrderGoods)) {
-            PromoterService::getInstance()
-                ->confirmPendingPromoterByOrderId($giftOrderGoods->order_id, $giftOrderGoods->effective_duration, $giftOrderGoods->refund_status, $role);
-        }
 
         return $orderList;
     }

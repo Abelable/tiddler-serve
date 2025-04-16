@@ -8,6 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $status 状态：0-待付款，1-已付款，2-已退款
  * @property int $user_id 用户id
+ * @property int $user_level 用户等级
  * @property int $order_id 订单id
  * @property int $shop_id 店铺id
  * @property int $goods_id 商品id
@@ -56,6 +57,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUserLevel($value)
  * @method static \Illuminate\Database\Query\Builder|OrderGoods withTrashed()
  * @method static \Illuminate\Database\Query\Builder|OrderGoods withoutTrashed()
  * @mixin \Eloquent

@@ -258,29 +258,16 @@ class OrderController extends Controller
                     })->keyBy('id');
             }
 
+            $userId = $this->userId();
+            $userLevel = $this->user()->promoterInfo->level ?: 0;
+            $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+            $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
+            $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
+            $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
+
             // 6.按店铺进行订单拆分，生成对应订单
             $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
-
-            $userId = $this->userId();
-            $userLevel = $this->user()->promoterInfo->level ?: 0;
-            $superiorId = $this->user()->superiorId() ?: 0;
-            $superiorLevel = 0;
-            $upperSuperiorId = 0;
-            $upperSuperiorLevel = 0;
-            if ($superiorId != 0) {
-                $superiorPromoterInfo = PromoterService::getInstance()->getPromoterByUserId($superiorId);
-                if (!is_null($superiorPromoterInfo)) {
-                    $superiorLevel = $superiorPromoterInfo->level;
-                    $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId) ?: 0;
-                    if ($upperSuperiorId != 0) {
-                        $upperSuperiorPromoterInfo = PromoterService::getInstance()->getPromoterByUserId($upperSuperiorId);
-                        if (!is_null($upperSuperiorPromoterInfo)) {
-                            $upperSuperiorLevel = $upperSuperiorPromoterInfo->level;
-                        }
-                    }
-                }
-            }
 
             $orderIds = $shopList->map(function (Shop $shop) use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
@@ -292,18 +279,12 @@ class OrderController extends Controller
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon, $shop);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
 
+                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    // 9.生成佣金记录
                     CommissionService::getInstance()
                         ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
-
-                    // 10.生成推广员
-                    if ($userLevel == 0 && $cartGoods->is_gift == 1) {
-                        PromoterService::getInstance()
-                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $orderId, $cartGoods->goods_id);
-                    }
                 }
 
                 return $orderId;
@@ -318,18 +299,12 @@ class OrderController extends Controller
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
 
+                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    // 9.生成佣金记录
                     CommissionService::getInstance()
                         ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
-
-                    // 10.生成推广员
-                    if ($userLevel == 0 && $cartGoods->is_gift == 1) {
-                        PromoterService::getInstance()
-                            ->createPromoter($userId, 2, $cartGoods->effective_duration, $orderId, $cartGoods->goods_id);
-                    }
                 }
 
                 $orderIds->push($orderId);

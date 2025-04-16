@@ -17,6 +17,7 @@ class CreateOrderGoodsTable extends Migration
             $table->id();
             $table->integer('status')->default(0)->comment('状态：0-待付款，1-已付款，2-已退款');
             $table->integer('user_id')->comment('用户id');
+            $table->integer('user_level')->comment('用户等级');
             $table->integer('order_id')->comment('订单id');
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->integer('goods_id')->comment('商品id');

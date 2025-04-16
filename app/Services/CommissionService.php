@@ -412,7 +412,7 @@ class CommissionService extends BaseService
 
     public function updateToOrderConfirmStatus($id)
     {
-        $commission = $this->getCommissionById($id);
+        $commission = $this->getPaidCommissionById($id);
         if (is_null($commission)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '佣金记录不存在或已删除');
         }
@@ -462,10 +462,16 @@ class CommissionService extends BaseService
             ->get($columns);
     }
 
+    public function getPaidCommissionById($id, $columns = ['*'])
+    {
+        return Commission::query()->where('status', 1)->find($id, $columns);
+    }
+
     public function getCommissionById($id, $columns = ['*'])
     {
         return Commission::query()->find($id, $columns);
     }
+
     public function getCommissionListByIds(array $ids, $columns = ['*'])
     {
         return Commission::query()->whereIn('id', $ids)->get($columns);
