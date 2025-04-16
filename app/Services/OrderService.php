@@ -19,6 +19,9 @@ use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Yansongda\LaravelPay\Facades\Pay;
+use Yansongda\Pay\Exceptions\GatewayException;
 
 class OrderService extends BaseService
 {
@@ -109,6 +112,15 @@ class OrderService extends BaseService
     public function getPendingVerifyOrderById($id, $columns = ['*'])
     {
         return Order::query()->where('status', OrderEnums::STATUS_PENDING_VERIFICATION)->find($id, $columns);
+    }
+
+    public function getTimeoutUnFinishedOrders($columns = ['*'])
+    {
+        return Order::query()
+            ->whereIn('status', [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM, OrderEnums::STATUS_ADMIN_CONFIRM])
+            ->where('confirm_time', '<=', now()->subDays(15))
+            ->where('confirm_time', '>', now()->subDays(30))
+            ->get($columns);
     }
 
     public function generateOrderSn()
@@ -429,6 +441,20 @@ class OrderService extends BaseService
         return $userCoupon;
     }
 
+    public function importOrders(array $row)
+    {
+        $validator = Validator::make($row, [
+            'order_id' => 'required|integer',
+            'ship_channel' => 'required|string',
+            'ship_code' => 'string',
+            'ship_sn' => 'required|string',
+        ]);
+        if ($validator->fails()) {
+            $this->throwBusinessException(CodeResponse::PARAM_VALUE_INVALID, $validator->errors());
+        }
+        $this->ship($row['order_id'], $row['ship_channel'], $row['ship_code'], $row['ship_sn']);
+    }
+
     public function ship($orderId, $shipChannel, $shipCode, $shipSn)
     {
         $order = $this->getOrderById($orderId);
@@ -597,6 +623,24 @@ class OrderService extends BaseService
         return $orderList;
     }
 
+    public function systemFinish()
+    {
+        $orderList = $this->getTimeoutUnFinishedOrders();
+        if (count($orderList) != 0) {
+            $orderList->map(function (Order $order) {
+                if (!$order->canFinishHandle()) {
+                    $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
+                }
+                $order->status = OrderEnums::STATUS_AUTO_FINISHED;
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+            });
+
+            // todo 商品默认好评
+        }
+    }
+
     public function finish($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
@@ -613,39 +657,158 @@ class OrderService extends BaseService
         return $order;
     }
 
-    public function delete($userId, $orderId)
+    public function userRefund($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if (!$order->canDeleteHandle()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
-        }
-
-        OrderGoodsService::getInstance()->delete($order->id);
-        $order->delete();
+        $this->refund($order);
     }
 
-    public function refund($userId, $orderId)
+    public function adminRefund($orderIds)
+    {
+        $orderList = $this->getOrderListByIds($orderIds);
+        if (count($orderList) == 0) {
+            $this->throwBadArgumentValue();
+        }
+        foreach ($orderList as $order) {
+            $this->refund($order);
+        }
+    }
+
+    public function refund(Order $order)
+    {
+        if (!$order->canRefundHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+        }
+        DB::transaction(function () use ($order) {
+            try {
+                // 微信退款
+                if ($order->refund_amount != 0) {
+                    $refundParams = [
+                        'transaction_id' => $order->pay_id,
+                        'out_refund_no' => time(),
+                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'refund_fee' => bcmul($order->refund_amount, 100),
+                        'refund_desc' => '商品退款',
+                        'type' => 'miniapp'
+                    ];
+
+                    $result = Pay::wechat()->refund($refundParams);
+                    $order->refund_id = $result['refund_id'];
+                    Log::info('order_wx_refund', $result->toArray());
+                }
+
+                $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
+                $order->refund_time = now()->toDateTimeString();
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+
+                // 退还余额
+                if ($order->deduction_balance != 0) {
+                    AccountService::getInstance()->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn);
+                }
+
+                // 删除佣金记录
+                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id]);
+
+                // 更新订单商品状态
+                OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);
+            } catch (GatewayException $exception) {
+                Log::error('wx_refund_fail', [$exception]);
+            }
+        });
+    }
+
+    public function afterSale($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canAftersaleHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单无法申请售后');
+        }
+        $order->status = OrderEnums::STATUS_REFUND;
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+        return $order;
+    }
+
+    public function afterSaleRefund($orderId, $goodsId, $couponId, $refundAmount)
+    {
+        $order = $this->getOrderById($orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
         if (!$order->canRefundHandle()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不支持退款');
         }
 
-        $order->status = OrderEnums::STATUS_REFUND;
+        /** @var OrderGoods $orderGoods */
+        $orderGoods = OrderGoodsService::getInstance()->getOrderGoods($orderId, $goodsId);
+        $totalPrice = bcmul($orderGoods->price, $orderGoods->number, 2);
+        $couponDenomination = 0;
+        if ($couponId != 0) {
+            $coupon = CouponService::getInstance()->getGoodsCoupon($couponId, $goodsId);
+            if (!is_null($coupon)) {
+                $couponDenomination = $coupon->denomination;
+            }
+        }
+        $actualRefundAmount = bcsub($totalPrice, $couponDenomination, 2);
 
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
+        if (bccomp($actualRefundAmount, $refundAmount, 2) != 0) {
+            $errMsg = "退款申请，订单id为{$orderId}商品id为{$goodsId}，退款金额（{$refundAmount}）与实际可退款金额（{$actualRefundAmount}）不一致";
+            Log::error($errMsg);
+            $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
 
-        // todo 通知商家
-        // todo 开启自动退款定时任务
+        try {
+            $refundParams = [
+                'transaction_id' => $order->pay_id,
+                'out_refund_no' => time(),
+                'total_fee' => bcmul($order->payment_amount, 100),
+                'refund_fee' => bcmul($actualRefundAmount, 100),
+                'refund_desc' => '商品退款',
+                'type' => 'miniapp'
+            ];
 
-        return $order;
+            $result = Pay::wechat()->refund($refundParams);
+            Log::info('order_wx_refund', $result->toArray());
+
+            $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
+            $order->refund_id = $result['refund_id'];
+            $order->refund_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            // 退还余额
+            if ($order->deduction_balance != 0) {
+                AccountService::getInstance()->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn);
+            }
+
+            // 删除佣金记录
+            CommissionService::getInstance()->deletePaidCommission($order->id, $goodsId);
+
+            // 更新订单商品状态
+            OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);
+        } catch (GatewayException $exception) {
+            Log::error('wx_refund_fail', [$exception]);
+        }
+    }
+
+    public function delete($orderList)
+    {
+        foreach ($orderList as $order) {
+            if (!$order->canDeleteHandle()) {
+                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
+            }
+            OrderGoodsService::getInstance()->delete($order->id);
+            $order->delete();
+        }
     }
 }
