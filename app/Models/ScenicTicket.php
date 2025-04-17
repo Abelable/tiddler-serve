@@ -17,8 +17,10 @@ namespace App\Models;
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
  * @property float $sales_commission_rate 销售佣金比例
- * @property float $promotion_commission_rate 推广佣金比例
+ * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $sales_volume 门票销量
  * @property string $fee_include_tips 费用包含说明
  * @property string $fee_not_include_tips 费用不含说明
@@ -75,6 +77,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUserId($value)
