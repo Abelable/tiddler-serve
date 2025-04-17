@@ -84,7 +84,7 @@ class ShopController extends Controller
     public function shopInfo()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'category_ids', 'name', 'type', 'avatar', 'cover'];
+        $columns = ['id', 'category_ids', 'name', 'type', 'logo', 'cover'];
         $shop = ShopService::getInstance()->getShopById($id, $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');

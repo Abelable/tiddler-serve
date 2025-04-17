@@ -13,6 +13,11 @@ namespace App\Models;
  * @property string $category_name 门票分类
  * @property string $selected_date_timestamp 选中日期时间戳
  * @property float $price 门票价格
+ * @property float $sales_commission_rate 销售佣金比例
+ * @property float $promotion_commission_rate 推广佣金比例%
+ * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $number 门票数量
  * @property int $effective_time 生效时间，单位小时
  * @property int $validity_time 有效期, 单位天
@@ -36,8 +41,13 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereRefundStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSelectedDateTimestamp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereValidityTime($value)

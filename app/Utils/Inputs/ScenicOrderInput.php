@@ -11,6 +11,7 @@ class ScenicOrderInput extends BaseInput
     public $consignee;
     public $mobile;
     public $idCardNumber;
+    public $useBalance;
 
     public function rules()
     {
@@ -22,6 +23,7 @@ class ScenicOrderInput extends BaseInput
             'consignee' => 'required|string',
             'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
             'idCardNumber' => 'required|string',
+            'useBalance' => 'integer|in:0,1',
         ];
     }
 }

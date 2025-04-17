@@ -33,7 +33,7 @@ class GoodsController extends Controller
         $shopColumns = [
             'id',
             'merchant_id',
-            'avatar',
+            'logo',
             'name',
             'category_ids',
             'created_at',

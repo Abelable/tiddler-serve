@@ -181,7 +181,7 @@ class GoodsController extends Controller
         $goods['isGift'] = !is_null($giftGoods) ? 1 : 0;
 
         if ($goods->shop_id != 0) {
-            $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'avatar', 'name']);
+            $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'logo', 'name']);
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }

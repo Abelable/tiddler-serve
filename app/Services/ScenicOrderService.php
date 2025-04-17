@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ScenicOrder;
+use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderEnums;
 use App\Utils\Inputs\ScenicOrderInput;
@@ -73,12 +74,8 @@ class ScenicOrderService extends BaseService
         return ScenicOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, ScenicOrderInput $input)
+    public function createOrder($userId, ScenicOrderInput $input, ScenicShop $shop, $paymentAmount)
     {
-        list($paymentAmount, $price) = $this->calcPaymentAmount($input->ticketId, $input->categoryId, $input->timeStamp, $input->num);
-        $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
-        $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
-
         $order = ScenicOrder::new();
         $order->order_sn = $this->generateOrderSn();
         $order->status = ScenicOrderEnums::STATUS_CREATE;
@@ -87,34 +84,16 @@ class ScenicOrderService extends BaseService
         $order->mobile = $input->mobile;
         $order->id_card_number = $input->idCardNumber;
         $order->shop_id = $shop->id;
-        $order->shop_avatar = $shop->avatar;
+        $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
         $order->payment_amount = $paymentAmount;
         $order->refund_amount = $order->payment_amount;
         $order->save();
 
-        // 生成订单门票快照
-        $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
-        ScenicOrderTicketService::getInstance()->createOrderTicket($order->id, $category, $input->timeStamp, $price, $input->num, $ticket);
-
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
-        return $order->id;
-    }
-
-    public function calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num)
-    {
-        $priceList = TicketSpecService::getInstance()->getPriceList($ticketId, $categoryId);
-        $priceUnit = array_values(array_filter($priceList, function ($item) use ($timeStamp) {
-                return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
-            }))[0] ?? null;
-        if (is_null($priceUnit)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
-        }
-
-        $paymentAmount = (float)bcmul($priceUnit->price, $num, 2);
-        return [$paymentAmount, $priceUnit->price];
+        return $order;
     }
 
     public function createWxPayOrder($userId, $orderId, $openid)

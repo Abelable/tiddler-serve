@@ -39,4 +39,16 @@ class TicketSpecService extends BaseService
         }
         return json_decode($spec->price_list);
     }
+
+    public function getPriceUnit($ticketId, $categoryId, $timeStamp)
+    {
+        $priceList = $this->getPriceList($ticketId, $categoryId);
+        $priceUnit = array_values(array_filter($priceList, function ($item) use ($timeStamp) {
+            return $timeStamp >= $item->startDate && $timeStamp <= $item->endDate;
+        }))[0] ?? null;
+        if (is_null($priceUnit)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '所选日期暂无门票销售，请更换日期');
+        }
+        return $priceUnit;
+    }
 }

@@ -182,7 +182,7 @@ class CartController extends Controller
             return $cartGoods;
         });
 
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name']);
         $cartList = $shopList->map(function (Shop $shop) use ($cartGoodsList) {
             return [
                 'shopInfo' => $shop,

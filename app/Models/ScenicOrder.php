@@ -15,7 +15,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property string $mobile 出游人手机号
  * @property string $id_card_number 出游人身份证号
  * @property int $shop_id 店铺id
- * @property string $shop_avatar 店铺头像
+ * @property string $shop_logo 店铺logo
  * @property string $shop_name 店铺名称
  * @property float $payment_amount 支付金额
  * @property int $pay_id 支付id
@@ -49,8 +49,8 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereRefundRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereRefundTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereRefundType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereUpdatedAt($value)

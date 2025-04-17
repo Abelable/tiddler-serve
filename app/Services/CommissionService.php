@@ -6,6 +6,7 @@ use App\Jobs\CommissionConfirmJob;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\Commission;
+use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\CommissionScene;
 use App\Utils\Enums\ProductType;
@@ -54,6 +55,44 @@ use Illuminate\Support\Facades\DB;
  */
 class CommissionService extends BaseService
 {
+    public function createScenicCommission(
+        $orderId,
+        ScenicTicket $ticket,
+        $priceUnit,
+        $paymentAmount,
+        $userId,
+        $userLevel,
+        $superiorId,
+        $superiorLevel,
+        $upperSuperiorId,
+        $upperSuperiorLevel
+    )
+    {
+        $salesCommissionRate = bcdiv($priceUnit->salesCommissionRate ?? $ticket->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($ticket->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $ticket->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($ticket->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $ticket->superior_promotion_commission_upper_limit;
+
+        $this->createProductCommission(
+            $paymentAmount,
+            $salesCommissionRate,
+            $promotionCommissionRate,
+            $promotionCommissionUpperLimit,
+            $superiorPromotionCommissionRate,
+            $superiorPromotionCommissionUpperLimit,
+            $userId,
+            $userLevel,
+            $superiorId,
+            $superiorLevel,
+            $upperSuperiorId,
+            $upperSuperiorLevel,
+            $orderId,
+            ProductType::SCENIC,
+            $ticket->id
+        );
+    }
+
     public function createGoodsCommission(
         $orderId,
         CartGoods $cartGoods,
@@ -66,18 +105,58 @@ class CommissionService extends BaseService
         Coupon $coupon = null
     )
     {
-        $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 2);
-        $promotionCommissionRate = bcdiv($cartGoods->promotion_commission_rate, 100, 2);
-        $promotionCommissionUpperLimit = $cartGoods->promotion_commission_upper_limit;
-        $superiorPromotionCommissionRate = bcdiv($cartGoods->superior_promotion_commission_rate, 100, 2);
-        $superiorPromotionCommissionUpperLimit = $cartGoods->superior_promotion_commission_upper_limit;
-
         $couponDenomination = 0;
         if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
             $couponDenomination = $coupon->denomination;
         }
         $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
         $paymentAmount = bcsub($totalPrice, $couponDenomination, 2);
+
+        $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($cartGoods->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $cartGoods->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($cartGoods->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $cartGoods->superior_promotion_commission_upper_limit;
+
+        $this->createProductCommission(
+            $paymentAmount,
+            $salesCommissionRate,
+            $promotionCommissionRate,
+            $promotionCommissionUpperLimit,
+            $superiorPromotionCommissionRate,
+            $superiorPromotionCommissionUpperLimit,
+            $userId,
+            $userLevel,
+            $superiorId,
+            $superiorLevel,
+            $upperSuperiorId,
+            $upperSuperiorLevel,
+            $orderId,
+            ProductType::GOODS,
+            $cartGoods->goods_id,
+            $cartGoods->refund_status
+        );
+    }
+
+    public function createProductCommission(
+        $paymentAmount,
+        $salesCommissionRate,
+        $promotionCommissionRate,
+        $promotionCommissionUpperLimit,
+        $superiorPromotionCommissionRate,
+        $superiorPromotionCommissionUpperLimit,
+        $userId,
+        $userLevel,
+        $superiorId,
+        $superiorLevel,
+        $upperSuperiorId,
+        $upperSuperiorLevel,
+        $orderId,
+        $productType,
+        $productId,
+        $refundStatus = 0
+    )
+    {
         $commissionBase = bcmul($paymentAmount, $salesCommissionRate, 2);
 
         $promotionCommission = bcmul($commissionBase, $promotionCommissionRate, 2);
@@ -90,6 +169,11 @@ class CommissionService extends BaseService
             ? min($superiorPromotionCommission, $superiorPromotionCommissionUpperLimit)
             : $superiorPromotionCommission;
 
+        $teamCommissionRate = bcdiv($superiorLevel - 1, 10, 2);
+        $teamCommissionAmount = bcmul($finalPromotionCommission, $teamCommissionRate, 2);
+        $upperTeamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
+        $upperTeamCommissionAmount = bcmul($finalPromotionCommission, $upperTeamCommissionRate, 2);
+
         // 场景2
         if ($userLevel == 0 && $superiorLevel == 1 && $upperSuperiorLevel <= 1) {
             $this->createCommission(
@@ -98,13 +182,13 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
                 $promotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -116,13 +200,13 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
                 $promotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -130,30 +214,27 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
-
-            $teamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
-            $teamCommissionAmount = bcmul($finalPromotionCommission, $teamCommissionRate, 2);
             $this->createCommission(
                 CommissionScene::DIRECT_TEAM,
                 $upperSuperiorId,
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $finalPromotionCommission,
-                $teamCommissionRate,
-                $teamCommissionAmount,
+                $upperTeamCommissionRate,
+                $upperTeamCommissionAmount,
                 0,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -168,13 +249,13 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
                 $commissionLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -186,13 +267,13 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
                 $promotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -204,13 +285,13 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
                 $promotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -218,30 +299,27 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
-
-            $teamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
-            $teamCommissionAmount = bcmul($finalPromotionCommission, $teamCommissionRate, 2);
             $this->createCommission(
                 CommissionScene::INDIRECT_TEAM,
                 $upperSuperiorId,
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $finalPromotionCommission,
-                $teamCommissionRate,
-                $teamCommissionAmount,
+                $upperTeamCommissionRate,
+                $upperTeamCommissionAmount,
                 0,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -253,13 +331,13 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $promotionCommissionRate,
                 $finalPromotionCommission,
                 $promotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -267,30 +345,27 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
                 $finalSuperiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
-
-            $teamCommissionRate = bcdiv($superiorLevel - 1, 10, 2);
-            $teamCommissionAmount = bcmul($finalPromotionCommission, $teamCommissionRate, 2);
             $this->createCommission(
                 CommissionScene::DIRECT_TEAM,
                 $superiorId,
                 $superiorLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $finalPromotionCommission,
                 $teamCommissionRate,
                 $teamCommissionAmount,
                 0,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
 
@@ -305,13 +380,13 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
-                ProductType::GOODS,
-                $cartGoods->goods_id,
+                $productType,
+                $productId,
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
                 $commissionLimit,
-                $cartGoods->refund_status
+                $refundStatus
             );
         }
     }

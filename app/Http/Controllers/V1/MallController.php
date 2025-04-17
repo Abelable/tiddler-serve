@@ -106,7 +106,7 @@ class MallController extends Controller
                 $commodity['facility_list'] = json_decode($commodity['facility_list']);
             }
             if ($commodity['type'] == 4 && $commodity->shop_id != 0) {
-                $shopInfo = ShopService::getInstance()->getShopById($commodity->shop_id, ['id', 'type', 'avatar', 'name']);
+                $shopInfo = ShopService::getInstance()->getShopById($commodity->shop_id, ['id', 'type', 'logo', 'name']);
                 $commodity['shop_info'] = $shopInfo;
             }
             return $commodity;

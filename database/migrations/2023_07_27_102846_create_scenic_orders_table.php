@@ -22,7 +22,7 @@ class CreateScenicOrdersTable extends Migration
             $table->string('mobile')->comment('出游人手机号');
             $table->string('id_card_number')->comment('出游人身份证号');
             $table->integer('shop_id')->default(0)->comment('店铺id');
-            $table->string('shop_avatar')->default('')->comment('店铺头像');
+            $table->string('shop_logo')->default('')->comment('店铺logo');
             $table->string('shop_name')->default('')->comment('店铺名称');
             $table->float('payment_amount')->comment('支付金额');
             $table->integer('pay_id')->default(0)->comment('支付id');

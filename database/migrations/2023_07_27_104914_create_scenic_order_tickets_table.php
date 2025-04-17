@@ -22,6 +22,11 @@ class CreateScenicOrderTicketsTable extends Migration
             $table->string('category_name')->comment('门票分类');
             $table->string('selected_date_timestamp')->comment('选中日期时间戳');
             $table->float('price')->comment('门票价格');
+            $table->float('sales_commission_rate')->comment('销售佣金比例');
+            $table->float('promotion_commission_rate')->comment('推广佣金比例%');
+            $table->float('promotion_commission_upper_limit')->comment('推广佣金上限');
+            $table->float('superior_promotion_commission_rate')->comment('上级推广佣金比例%');
+            $table->float('superior_promotion_commission_upper_limit')->comment('上级推广佣金上限');
             $table->integer('number')->comment('门票数量');
             $table->integer('effective_time')->comment('生效时间，单位小时');
             $table->integer('validity_time')->comment('有效期, 单位天');

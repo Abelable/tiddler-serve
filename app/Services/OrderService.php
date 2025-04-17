@@ -178,6 +178,7 @@ class OrderService extends BaseService
         $paymentAmount = bcsub($paymentAmount, $couponDenomination, 2);
 
         $orderSn = $this->generateOrderSn();
+
         // 余额抵扣
         $deductionBalance = 0;
         if ($input->useBalance == 1) {

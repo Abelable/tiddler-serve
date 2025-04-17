@@ -4,8 +4,16 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicOrder;
+use App\Services\AccountService;
+use App\Services\CommissionService;
+use App\Services\PromoterService;
+use App\Services\RelationService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
+use App\Services\ScenicShopService;
+use App\Services\ScenicTicketCategoryService;
+use App\Services\ScenicTicketService;
+use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderEnums;
 use App\Utils\Inputs\ScenicOrderInput;
@@ -22,10 +30,28 @@ class ScenicOrderController extends Controller
         $categoryId = $this->verifyRequiredId('categoryId');
         $timeStamp = $this->verifyRequiredInteger('timeStamp');
         $num = $this->verifyRequiredInteger('num');
+        $useBalance = $this->verifyBoolean('useBalance', false);
 
-        list($paymentAmount) = ScenicOrderService::getInstance()->calcPaymentAmount($ticketId, $categoryId, $timeStamp, $num);
+        $priceUnit = TicketSpecService::getInstance()->getPriceUnit($ticketId, $categoryId, $timeStamp);
+        $totalPrice = (float)bcmul($priceUnit->price, $num, 2);
 
-        return $this->success($paymentAmount);
+        // 余额逻辑
+        $deductionBalance = 0;
+        $account = AccountService::getInstance()->getUserAccount($this->userId());
+        $accountBalance = $account->status == 1 ? $account->balance : 0;
+        if ($useBalance) {
+            $deductionBalance = min($totalPrice, $accountBalance);
+            $paymentAmount = bcsub($totalPrice, $deductionBalance, 2);
+        } else {
+            $paymentAmount = $totalPrice;
+        }
+
+        return $this->success([
+            'totalPrice' => $totalPrice,
+            'accountBalance' => $accountBalance,
+            'deductionBalance' => $deductionBalance,
+            'paymentAmount' => $paymentAmount
+        ]);
     }
 
     public function submit()
@@ -40,8 +66,40 @@ class ScenicOrderController extends Controller
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
 
-        $orderId = DB::transaction(function () use ($input) {
-            return ScenicOrderService::getInstance()->createOrder($this->userId(), $input);
+        // 判断余额状态
+        if (!is_null($input->useBalance) && $input->useBalance != 0) {
+            $account = AccountService::getInstance()->getUserAccount($this->userId());
+            if ($account->status == 0 || $account->balance <= 0) {
+                return $this->fail(CodeResponse::NOT_FOUND, '余额异常不可用，请联系客服解决问题');
+            }
+        }
+
+        $userId = $this->userId();
+        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+        $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
+        $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
+        $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
+
+        $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
+        $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
+
+        $priceUnit = TicketSpecService::getInstance()->getPriceUnit($input->ticketId, $input->categoryId, $input->timeStamp);
+        $paymentAmount = (float)bcmul($priceUnit->price, $input->num, 2);
+
+        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
+            $order = ScenicOrderService::getInstance()->createOrder($this->userId(), $input, $shop, $paymentAmount);
+
+            // 生成订单门票快照
+            $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
+            ScenicOrderTicketService::getInstance()
+                ->createOrderTicket($order->id, $category, $input->timeStamp, $priceUnit, $input->num, $ticket);
+
+            // 生成佣金记录
+            CommissionService::getInstance()
+                ->createScenicCommission($order->id, $ticket, $priceUnit, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+
+            return $order->id;
         });
 
         return $this->success($orderId);
@@ -116,7 +174,7 @@ class ScenicOrderController extends Controller
                 'status' => $order->status,
                 'statusDesc' => ScenicOrderEnums::STATUS_TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
-                'shopAvatar' => $order->shop_avatar,
+                'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
                 'ticketInfo' => $ticket,
                 'paymentAmount' => $order->payment_amount,
@@ -167,7 +225,7 @@ class ScenicOrderController extends Controller
             'consignee',
             'mobile',
             'shop_id',
-            'shop_avatar',
+            'shop_logo',
             'shop_name',
             'payment_amount',
             'pay_time',

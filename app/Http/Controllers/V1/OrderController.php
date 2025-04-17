@@ -133,7 +133,7 @@ class OrderController extends Controller
         }
 
         $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'avatar', 'name']);
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name']);
         $goodsLists = $shopList->map(function (Shop $shop) use ($cartGoodsList) {
             return [
                 'shopInfo' => $shop,
@@ -400,7 +400,7 @@ class OrderController extends Controller
                 'status' => $order->status,
                 'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
-                'shopAvatar' => $order->shop_avatar,
+                'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
                 'goodsList' => $goodsList,
                 'paymentAmount' => $order->payment_amount,
@@ -495,7 +495,7 @@ class OrderController extends Controller
             'mobile',
             'address',
             'shop_id',
-            'shop_avatar',
+            'shop_logo',
             'shop_name',
             'goods_price',
             'freight_price',
