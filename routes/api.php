@@ -158,6 +158,8 @@ Route::prefix('order')->group(function () {
     Route::get('shop_list', 'OrderController@shopList');
     Route::get('detail', 'OrderController@detail');
     Route::post('confirm', 'OrderController@confirm');
+    Route::get('verify_code', 'OrderController@verifyCode');
+    Route::post('verify', 'OrderController@verify');
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
     Route::post('delete', 'OrderController@delete');
@@ -240,7 +242,8 @@ Route::prefix('scenic')->group(function () {
         Route::get('list', 'ScenicOrderController@list');
         Route::get('shop_list', 'ScenicOrderController@shopList');
         Route::get('detail', 'ScenicOrderController@detail');
-        Route::post('confirm', 'ScenicOrderController@confirm');
+        Route::get('verify_code', 'ScenicOrderController@verifyCode');
+        Route::post('verify', 'ScenicOrderController@verify');
         Route::post('refund', 'ScenicOrderController@refund');
         Route::post('cancel', 'ScenicOrderController@cancel');
         Route::post('delete', 'ScenicOrderController@delete');

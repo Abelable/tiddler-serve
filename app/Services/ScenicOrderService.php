@@ -12,6 +12,8 @@ use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yansongda\LaravelPay\Facades\Pay;
+use Yansongda\Pay\Exceptions\GatewayException;
 
 class ScenicOrderService extends BaseService
 {
@@ -106,10 +108,32 @@ class ScenicOrderService extends BaseService
         return ScenicOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
+    public function getTimeoutUnFinishedOrders($columns = ['*'])
+    {
+        return ScenicOrder::query()
+            ->whereIn('status', [ScenicOrderEnums::STATUS_CONFIRM, ScenicOrderEnums::STATUS_AUTO_CONFIRM, ScenicOrderEnums::STATUS_ADMIN_CONFIRM])
+            ->where('confirm_time', '<=', now()->subDays(15))
+            ->where('confirm_time', '>', now()->subDays(30))
+            ->get($columns);
+    }
+
     public function createOrder($userId, ScenicOrderInput $input, ScenicShop $shop, $paymentAmount)
     {
+        $orderSn = $this->generateOrderSn();
+
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($userId);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+
+            // 更新余额
+            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn, ProductType::SCENIC);
+        }
+
         $order = ScenicOrder::new();
-        $order->order_sn = $this->generateOrderSn();
+        $order->order_sn = $orderSn;
         $order->status = ScenicOrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
         $order->consignee = $input->consignee;
@@ -118,8 +142,10 @@ class ScenicOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
-        $order->refund_amount = $order->payment_amount;
+        $order->total_payment_amount = $paymentAmount;
+        $order->refund_amount = $paymentAmount;
         $order->save();
 
         // 设置订单支付超时任务
@@ -288,6 +314,24 @@ class ScenicOrderService extends BaseService
         return $orderList;
     }
 
+    public function systemFinish()
+    {
+        $orderList = $this->getTimeoutUnFinishedOrders();
+        if (count($orderList) != 0) {
+            $orderList->map(function (ScenicOrder $order) {
+                if (!$order->canFinishHandle()) {
+                    $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
+                }
+                $order->status = ScenicOrderEnums::STATUS_AUTO_FINISHED;
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+            });
+
+            // todo 景点默认好评
+        }
+    }
+
     public function finish($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
@@ -304,6 +348,71 @@ class ScenicOrderService extends BaseService
         return $order;
     }
 
+    public function userRefund($userId, $orderId)
+    {
+        $order = $this->getUserOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        $this->refund($order);
+    }
+
+    public function adminRefund($orderIds)
+    {
+        $orderList = $this->getOrderListByIds($orderIds);
+        if (count($orderList) == 0) {
+            $this->throwBadArgumentValue();
+        }
+        foreach ($orderList as $order) {
+            $this->refund($order);
+        }
+    }
+
+    public function refund(ScenicOrder $order)
+    {
+        if (!$order->canRefundHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+        }
+        DB::transaction(function () use ($order) {
+            try {
+                // 微信退款
+                if ($order->refund_amount != 0) {
+                    $refundParams = [
+                        'transaction_id' => $order->pay_id,
+                        'out_refund_no' => time(),
+                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'refund_fee' => bcmul($order->refund_amount, 100),
+                        'refund_desc' => '景点门票退款',
+                        'type' => 'miniapp'
+                    ];
+
+                    $result = Pay::wechat()->refund($refundParams);
+                    $order->refund_id = $result['refund_id'];
+                    Log::info('order_wx_refund', $result->toArray());
+                }
+
+                $order->status = ScenicOrderEnums::STATUS_REFUND_CONFIRM;
+                $order->refund_time = now()->toDateTimeString();
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+
+                // 退还余额
+                if ($order->deduction_balance != 0) {
+                    AccountService::getInstance()
+                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::SCENIC);
+                }
+
+                // 删除佣金记录
+                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::SCENIC);
+
+                // todo 通知商家
+            } catch (GatewayException $exception) {
+                Log::error('wx_refund_fail', [$exception]);
+            }
+        });
+    }
+
     public function delete($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
@@ -316,27 +425,5 @@ class ScenicOrderService extends BaseService
 
         ScenicOrderTicketService::getInstance()->delete($order->id);
         $order->delete();
-    }
-
-    public function refund($userId, $orderId)
-    {
-        $order = $this->getUserOrderById($userId, $orderId);
-        if (is_null($order)) {
-            $this->throwBadArgumentValue();
-        }
-        if (!$order->canRefundHandle()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
-        }
-
-        $order->status = ScenicOrderEnums::STATUS_REFUND;
-
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
-
-        // todo 通知商家
-        // todo 开启自动退款定时任务
-
-        return $order;
     }
 }

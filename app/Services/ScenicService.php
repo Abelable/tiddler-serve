@@ -170,4 +170,11 @@ class ScenicService extends BaseService
     {
         return ScenicSpot::query()->get();
     }
+
+    public function addSalesVolumeByIds(Array $ids, $num)
+    {
+        ScenicSpot::query()->whereIn('id', $ids)->each(function ($spot) use ($num) {
+            $spot->increment('sales_volume', $num);
+        });
+    }
 }

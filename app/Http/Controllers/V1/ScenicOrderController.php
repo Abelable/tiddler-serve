@@ -12,6 +12,7 @@ use App\Services\ScenicManagerService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicOrderVerifyService;
+use App\Services\ScenicService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
@@ -107,6 +108,11 @@ class ScenicOrderController extends Controller
             // 生成佣金记录
             CommissionService::getInstance()
                 ->createScenicCommission($order->id, $ticket, $priceUnit, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+
+            // 增加景点、门票销量
+            ScenicService::getInstance()->addSalesVolumeByIds($ticketScenicIds, $input->num);
+            $ticket->sales_volume = $ticket->sales_volume + $input->num;
+            $ticket->save();
 
             return $order->id;
         });
@@ -245,13 +251,6 @@ class ScenicOrderController extends Controller
         return $this->success();
     }
 
-    public function confirm()
-    {
-        $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->confirm($this->userId(), $id);
-        return $this->success();
-    }
-
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
@@ -264,7 +263,7 @@ class ScenicOrderController extends Controller
     public function refund()
     {
         $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->refund($this->userId(), $id);
+        ScenicOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
     }
 
