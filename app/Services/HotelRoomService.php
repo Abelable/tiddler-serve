@@ -74,6 +74,8 @@ class HotelRoomService extends BaseService
         $room->sales_commission_rate = $input->salesCommissionRate ?: 0;
         $room->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
         $room->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
+        $room->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate ?: 0;
+        $room->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit ?: 0;
         $room->price = $input->price;
         $room->price_list = json_encode($input->priceList);
         $room->breakfast_num = $input->breakfastNum;
