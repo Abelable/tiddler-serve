@@ -31,12 +31,12 @@ namespace App\Models;
  */
 class OrderVerifyCode extends BaseModel
 {
-    // 生成随机12位核销码
+    // 生成随机8位核销码
     public static function generateVerifyCode()
     {
         do {
-            $code = rand(100000000000, 999999999999);
-        } while (self::query()->where('verify_code', $code)->exists());
+            $code = rand(10000000, 99999999);
+        } while (self::query()->where('code', $code)->exists());
 
         return $code;
     }

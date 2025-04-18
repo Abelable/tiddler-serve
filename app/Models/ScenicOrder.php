@@ -11,16 +11,16 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property string $order_sn 订单编号
  * @property int $status 订单状态
  * @property int $user_id 用户id
- * @property string $consignee 出游人姓名
- * @property string $mobile 出游人手机号
- * @property string $id_card_number 出游人身份证号
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺logo
  * @property string $shop_name 店铺名称
+ * @property string $consignee 出游人姓名
+ * @property string $mobile 出游人手机号
+ * @property string $id_card_number 出游人身份证号
  * @property float $payment_amount 支付金额
  * @property int $pay_id 支付id
  * @property string $pay_time 支付时间
- * @property string $confirm_time 用户确认收货时间
+ * @property string $confirm_time 用户核销使用时间
  * @property string $finish_time 订单关闭时间
  * @property float $refund_amount 退款金额
  * @property string $refund_type 退款方式

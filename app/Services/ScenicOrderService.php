@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Models\ScenicOrder;
 use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Enums\ScenicOrderEnums;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -35,9 +37,39 @@ class ScenicOrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getOrderById($userId, $id, $columns = ['*'])
+    public function getUserOrderById($userId, $id, $columns = ['*'])
     {
         return ScenicOrder::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getUserOrderList($userId, $ids, $columns = ['*'])
+    {
+        return ScenicOrder::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getOrderListByIds(array $ids, $columns = ['*'])
+    {
+        return ScenicOrder::query()->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getOrderById($id, $columns = ['*'])
+    {
+        return ScenicOrder::query()->find($id, $columns);
+    }
+
+    public function getPaidOrderById($id, $columns = ['*'])
+    {
+        return ScenicOrder::query()->where('status', ScenicOrderEnums::STATUS_PAY)->find($id, $columns);
+    }
+
+    // todo 核销有效期
+    public function getTimeoutUnConfirmOrders($columns = ['*'])
+    {
+        return ScenicOrder::query()
+            ->where('status', ScenicOrderEnums::STATUS_PAY)
+            ->where('pay_time', '<=', now()->subDays(30))
+            ->where('pay_time', '>', now()->subDays(45))
+            ->get($columns);
     }
 
     public function getUnpaidOrder(int $userId, $orderId, $columns = ['*'])
@@ -107,6 +139,7 @@ class ScenicOrderService extends BaseService
         return [
             'out_trade_no' => time(),
             'body' => 'scenic_order_sn:' . $order->order_sn,
+            'attach' => $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -114,7 +147,7 @@ class ScenicOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['body'] ? str_replace('scenic_order_sn:', '', $data['body']) : '';
+        $orderSn = $data['attach'];
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -133,8 +166,17 @@ class ScenicOrderService extends BaseService
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
+
+        // 同步微信后台订单发货
+        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        WxMpServe::new()->verify($openid, $order->pay_id);
+
+        // 佣金记录状态更新为：已支付待结算
+        CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::SCENIC);
+
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
+
         return $order;
     }
 
@@ -154,7 +196,7 @@ class ScenicOrderService extends BaseService
 
     public function cancel($userId, $orderId, $role = 'user')
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -176,30 +218,79 @@ class ScenicOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
+        // 删除佣金记录
+        CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::SCENIC);
+
         return $order;
     }
 
-    public function confirm($userId, $orderId, $isAuto = false)
+    public function userConfirm($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
-        if (is_null($order)) {
+        $orderList = $this->getUserOrderList($userId, [$orderId]);
+        if (count($orderList) == 0) {
             $this->throwBadArgumentValue();
         }
+        return $this->confirm($orderList);
+    }
 
-        $order->status = $isAuto ? ScenicOrderEnums::STATUS_AUTO_CONFIRM : ScenicOrderEnums::STATUS_CONFIRM;
-        $order->confirm_time = now()->toDateTimeString();
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
+    public function adminConfirm($orderIds)
+    {
+        return DB::transaction(function () use ($orderIds) {
+            $orderList = $this->getOrderListByIds($orderIds);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->confirm($orderList, 'admin');
+        });
+    }
+
+    public function systemConfirm()
+    {
+        return DB::transaction(function () {
+            $orderList = $this->getTimeoutUnConfirmOrders();
+            if (count($orderList) != 0) {
+                $this->confirm($orderList, 'system');
+            }
+        });
+    }
+
+    public function confirm($orderList, $role = 'user')
+    {
+        $orderList = $orderList->map(function (ScenicOrder $order) use ($role) {
+            if (!$order->canConfirmHandle()) {
+                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+            }
+            switch ($role) {
+                case 'system':
+                    $order->status = ScenicOrderEnums::STATUS_AUTO_CONFIRM;
+                    break;
+                case 'admin':
+                    $order->status = ScenicOrderEnums::STATUS_ADMIN_CONFIRM;
+                    break;
+                case 'user':
+                    $order->status = ScenicOrderEnums::STATUS_CONFIRM;
+                    break;
+            }
+            $order->confirm_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            return $order;
+        });
+
+        // 佣金记录变更为待提现
+        $orderIds = $orderList->pluck('id')->toArray();
+        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
-        return $order;
+        return $orderList;
     }
 
     public function finish($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -215,7 +306,7 @@ class ScenicOrderService extends BaseService
 
     public function delete($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -229,7 +320,7 @@ class ScenicOrderService extends BaseService
 
     public function refund($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
+        $order = $this->getUserOrderById($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }

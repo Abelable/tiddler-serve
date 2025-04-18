@@ -13,7 +13,9 @@ class ScenicOrderEnums
     const STATUS_REFUND_CONFIRM = 203;
     const STATUS_CONFIRM = 301;
     const STATUS_AUTO_CONFIRM = 302;
+    const STATUS_ADMIN_CONFIRM = 303;
     const STATUS_FINISHED = 401;
+    const STATUS_AUTO_FINISHED = 402;
 
     const STATUS_TEXT_MAP = [
         self::STATUS_CREATE => '待付款',
@@ -25,6 +27,8 @@ class ScenicOrderEnums
         self::STATUS_REFUND_CONFIRM => '已退款',
         self::STATUS_CONFIRM => '已确认',
         self::STATUS_AUTO_CONFIRM => '已确认(系统)',
-        self::STATUS_FINISHED => '已完成'
+        self::STATUS_ADMIN_CONFIRM => '已确认(管理员)',
+        self::STATUS_FINISHED => '已完成',
+        self::STATUS_AUTO_FINISHED => '已完成(系统)',
     ];
 }

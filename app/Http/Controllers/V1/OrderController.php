@@ -415,13 +415,17 @@ class OrderController extends Controller
     public function verifyCode()
     {
         $orderId = $this->verifyRequiredId('orderId');
-        $verifyCode = OrderVerifyService::getInstance()->getByOrderId($orderId)->code;
-        return $this->success($verifyCode);
+
+        $verifyCodeInfo = OrderVerifyService::getInstance()->getByOrderId($orderId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
     }
 
     public function verify()
     {
-        $shopId = $this->verifyRequiredId('shopId');
         $code = $this->verifyRequiredString('code');
 
         $verifyCodeInfo = OrderVerifyService::getInstance()->getByCode($code);
@@ -439,9 +443,9 @@ class OrderController extends Controller
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
         }
 
-        DB::transaction(function () use ($shopId, $verifyCodeInfo, $order) {
+        DB::transaction(function () use ($verifyCodeInfo, $order) {
+            OrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId(), $order->shop_id);
             OrderService::getInstance()->userConfirm($order->user_id, $order->id);
-            OrderVerifyService::getInstance()->verify($verifyCodeInfo->id, $this->userId(), $shopId);
         });
 
         return $this->success();

@@ -264,7 +264,7 @@ class OrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => '订单编号：' . implode("','", $orderSnList),
+            'body' => 'order_sn_list' . implode("','", $orderSnList),
             'attach' => json_encode($orderSnList),
             'total_fee' => bcmul($paymentAmount, 100),
             'openid' => $openid
@@ -619,7 +619,7 @@ class OrderService extends BaseService
         });
 
         // 佣金记录变更为待提现
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
+        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::GOODS, $role);
 
         return $orderList;
     }
@@ -713,7 +713,7 @@ class OrderService extends BaseService
                 }
 
                 // 删除佣金记录
-                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id]);
+                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::GOODS);
 
                 // 更新订单商品状态
                 OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);
@@ -793,7 +793,7 @@ class OrderService extends BaseService
             }
 
             // 删除佣金记录
-            CommissionService::getInstance()->deletePaidCommission($order->id, $goodsId);
+            CommissionService::getInstance()->deletePaidCommission($order->id, ProductType::GOODS, $goodsId);
 
             // 更新订单商品状态
             OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);

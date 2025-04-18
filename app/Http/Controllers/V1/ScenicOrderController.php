@@ -8,11 +8,14 @@ use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
+use App\Services\ScenicManagerService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
+use App\Services\ScenicOrderVerifyService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
+use App\Services\TicketScenicService;
 use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderEnums;
@@ -82,13 +85,19 @@ class ScenicOrderController extends Controller
         $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
 
         $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
+        $ticketScenicIds = TicketScenicService::getInstance()->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
         $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
 
         $priceUnit = TicketSpecService::getInstance()->getPriceUnit($input->ticketId, $input->categoryId, $input->timeStamp);
         $paymentAmount = (float)bcmul($priceUnit->price, $input->num, 2);
 
-        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
+        $orderId = DB::transaction(function () use ($ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
             $order = ScenicOrderService::getInstance()->createOrder($this->userId(), $input, $shop, $paymentAmount);
+
+            // 生成景点对应核销码
+            foreach ($ticketScenicIds as $scenicId) {
+                ScenicOrderVerifyService::getInstance()->createVerifyCode($order->id, $scenicId);
+            }
 
             // 生成订单门票快照
             $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
@@ -192,6 +201,50 @@ class ScenicOrderController extends Controller
         return $this->success();
     }
 
+    public function verifyCode()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $scenicId = $this->verifyRequiredId('scenicId');
+
+        $verifyCodeInfo = ScenicOrderVerifyService::getInstance()->getVerifyCodeInfo($orderId, $scenicId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
+    }
+
+    public function verify()
+    {
+        $code = $this->verifyRequiredString('code');
+
+        $verifyCodeInfo = ScenicOrderVerifyService::getInstance()->getByCode($code);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
+        }
+
+        $order = ScenicOrderService::getInstance()->getPaidOrderById($verifyCodeInfo->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
+        }
+
+        $managerIds = ScenicManagerService::getInstance()
+            ->getManagerList($verifyCodeInfo->scenic_id)->pluck('user_id')->toArray();
+        if (!in_array($this->userId(), $managerIds)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前景点核销员，无法核销');
+        }
+
+        DB::transaction(function () use ($verifyCodeInfo, $order) {
+            ScenicOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
+
+            if (!ScenicOrderVerifyService::getInstance()->hasUnverifiedCodes($verifyCodeInfo->order_id)) {
+                ScenicOrderService::getInstance()->userConfirm($order->user_id, $order->id);
+            }
+        });
+
+        return $this->success();
+    }
+
     public function confirm()
     {
         $id = $this->verifyRequiredId('id');
@@ -233,7 +286,7 @@ class ScenicOrderController extends Controller
             'created_at',
             'updated_at',
         ];
-        $order = ScenicOrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
+        $order = ScenicOrderService::getInstance()->getUserOrderById($this->userId(), $id, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }

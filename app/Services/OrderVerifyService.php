@@ -7,11 +7,12 @@ use App\Models\OrderVerifyLog;
 
 class OrderVerifyService extends BaseService
 {
-    public function createVerifyCode($orderId)
+    public function createVerifyCode($orderId, $expirationTime = '')
     {
         $verify = OrderVerifyCode::new();
         $verify->order_id = $orderId;
         $verify->code = OrderVerifyCode::generateVerifyCode();
+        $verify->expiration_time = $expirationTime;
         $verify->save();
         return $verify;
     }
@@ -31,14 +32,13 @@ class OrderVerifyService extends BaseService
         return OrderVerifyCode::query()->find($id, $columns);
     }
 
-    public function verify($id, $userId, $shopId)
+    public function verify(OrderVerifyCode $verifyCodeInfo, $userId, $shopId)
     {
-        $verifyInfo = $this->getById($id);
-        $verifyInfo->status = 1;
-        $verifyInfo->save();
+        $verifyCodeInfo->status = 1;
+        $verifyCodeInfo->save();
 
         $log = OrderVerifyLog::new();
-        $log->verify_code_id = $verifyInfo->id;
+        $log->verify_code_id = $verifyCodeInfo->id;
         $log->shop_id = $shopId;
         $log->verifier_id = $userId;
         $log->verify_time = now()->toDateTimeString();
