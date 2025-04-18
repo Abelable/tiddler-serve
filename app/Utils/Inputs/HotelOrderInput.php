@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class CreateHotelOrderInput extends BaseInput
+class HotelOrderInput extends BaseInput
 {
     public $roomId;
     public $checkInDate;
@@ -10,6 +10,7 @@ class CreateHotelOrderInput extends BaseInput
     public $num;
     public $consignee;
     public $mobile;
+    public $useBalance;
 
     public function rules()
     {
@@ -20,6 +21,7 @@ class CreateHotelOrderInput extends BaseInput
             'num' => 'required|integer',
             'consignee' => 'required|string',
             'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
+            'useBalance' => 'integer|in:0,1',
         ];
     }
 }

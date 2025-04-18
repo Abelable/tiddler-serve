@@ -14,7 +14,7 @@ class HotelShopService extends BaseService
         $shop->user_id = $userId;
         $shop->provider_id = $providerId;
         $shop->type = $input->shopType;
-        $shop->avatar = $input->shopAvatar;
+        $shop->logo = $input->shopLogo;
         $shop->name = $input->shopName;
         if (!empty($input->shopCover)) {
             $shop->cover = $input->shopCover;

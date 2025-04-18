@@ -6,7 +6,7 @@ use App\Models\Hotel;
 use App\Models\HotelOrderRoom;
 use App\Models\HotelRoom;
 use App\Models\HotelRoomType;
-use App\Utils\Inputs\CreateHotelOrderInput;
+use App\Utils\Inputs\HotelOrderInput;
 
 class HotelOrderRoomService extends BaseService
 {
@@ -15,7 +15,7 @@ class HotelOrderRoomService extends BaseService
         Hotel $hotel,
         HotelRoomType $typeInfo,
         HotelRoom $roomInfo,
-        CreateHotelOrderInput $input,
+        HotelOrderInput $input,
         $price
     )
     {

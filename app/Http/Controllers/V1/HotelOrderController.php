@@ -5,11 +5,14 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\HotelOrder;
 use App\Models\HotelOrderRoom;
+use App\Services\AccountService;
 use App\Services\HotelOrderRoomService;
 use App\Services\HotelOrderService;
+use App\Services\PromoterService;
+use App\Services\RelationService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderEnums;
-use App\Utils\Inputs\CreateHotelOrderInput;
+use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -23,16 +26,34 @@ class HotelOrderController extends Controller
         $checkInDate = $this->verifyRequiredInteger('checkInDate');
         $checkOutDate = $this->verifyRequiredInteger('checkOutDate');
         $num = $this->verifyRequiredInteger('num');
+        $useBalance = $this->verifyBoolean('useBalance', false);
 
-        list($paymentAmount) = HotelOrderService::getInstance()->calcPaymentAmount($roomId, $checkInDate, $checkOutDate, $num);
+        $datePriceList = HotelOrderService::getInstance()->getDatePriceList($roomId, $checkInDate, $checkOutDate);
+        $totalPrice = (float)bcmul($datePriceList->pluck('price')->sum(), $num, 2);
 
-        return $this->success($paymentAmount);
+        // 余额逻辑
+        $deductionBalance = 0;
+        $account = AccountService::getInstance()->getUserAccount($this->userId());
+        $accountBalance = $account->status == 1 ? $account->balance : 0;
+        if ($useBalance) {
+            $deductionBalance = min($totalPrice, $accountBalance);
+            $paymentAmount = bcsub($totalPrice, $deductionBalance, 2);
+        } else {
+            $paymentAmount = $totalPrice;
+        }
+
+        return $this->success([
+            'totalPrice' => $totalPrice,
+            'accountBalance' => $accountBalance,
+            'deductionBalance' => $deductionBalance,
+            'paymentAmount' => $paymentAmount
+        ]);
     }
 
     public function submit()
     {
-        /** @var CreateHotelOrderInput $input */
-        $input = CreateHotelOrderInput::new();
+        /** @var HotelOrderInput $input */
+        $input = HotelOrderInput::new();
 
         // 分布式锁，防止重复请求
         $lockKey = sprintf('create_hotel_order_%s_%s', $this->userId(), md5(serialize($input)));
@@ -40,6 +61,21 @@ class HotelOrderController extends Controller
         if (!$lock->get()) {
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
+
+        // 判断余额状态
+        if (!is_null($input->useBalance) && $input->useBalance != 0) {
+            $account = AccountService::getInstance()->getUserAccount($this->userId());
+            if ($account->status == 0 || $account->balance <= 0) {
+                return $this->fail(CodeResponse::NOT_FOUND, '余额异常不可用，请联系客服解决问题');
+            }
+        }
+
+        $userId = $this->userId();
+        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+        $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
+        $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
+        $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
 
         $orderId = DB::transaction(function () use ($input) {
             return HotelOrderService::getInstance()->createOrder($this->userId(), $input);
@@ -125,7 +161,7 @@ class HotelOrderController extends Controller
                 'status' => $order->status,
                 'statusDesc' => HotelOrderEnums::STATUS_TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
-                'shopAvatar' => $order->shop_avatar,
+                'shopAvatar' => $order->shop_logo,
                 'shopName' => $order->shop_name,
                 'roomInfo' => $room,
                 'paymentAmount' => $order->payment_amount,
@@ -176,7 +212,7 @@ class HotelOrderController extends Controller
             'consignee',
             'mobile',
             'shop_id',
-            'shop_avatar',
+            'shop_logo',
             'shop_name',
             'payment_amount',
             'pay_time',

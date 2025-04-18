@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\HotelOrder;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderEnums;
-use App\Utils\Inputs\CreateHotelOrderInput;
+use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -74,14 +74,12 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, CreateHotelOrderInput $input)
+    public function createOrder($userId, HotelOrderInput $input)
     {
-        list($paymentAmount, $averagePrice) = $this->calcPaymentAmount(
-            $input->roomId,
-            $input->checkInDate,
-            $input->checkOutDate,
-            $input->num
-        );
+        $datePriceList = $this->getDatePriceList($input->roomId, $input->checkInDate, $input->checkOutDate);
+        $paymentAmount = (float)bcmul($datePriceList->pluck('price')->sum(), $input->num, 2);
+        $averagePrice = round($datePriceList->avg('price'), 2);
+
         $room = HotelRoomService::getInstance()->getRoomById($input->roomId);
         $shop = HotelShopService::getInstance()->getShopById($room->shop_id);
 
@@ -92,7 +90,7 @@ class HotelOrderService extends BaseService
         $order->consignee = $input->consignee;
         $order->mobile = $input->mobile;
         $order->shop_id = $shop->id;
-        $order->shop_avatar = $shop->avatar;
+        $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
         $order->payment_amount = $paymentAmount;
         $order->refund_amount = $order->payment_amount;
@@ -116,7 +114,7 @@ class HotelOrderService extends BaseService
         return $order->id;
     }
 
-    public function calcPaymentAmount($roomId, $checkInDate, $checkOutDate, $num)
+    public function getDatePriceList($roomId, $checkInDate, $checkOutDate)
     {
         $room = HotelRoomService::getInstance()->getRoomById($roomId, ['price_list']);
         if (is_null($room)) {
@@ -126,7 +124,7 @@ class HotelOrderService extends BaseService
 
         $dateList = $this->createDateList($checkInDate, $checkOutDate);
 
-        $datePriceList = $dateList->map(function ($date) use ($priceList) {
+        return $dateList->map(function ($date) use ($priceList) {
             $priceUnit = array_filter($priceList, function ($item) use ($date) {
                 return $date >= $item->startDate && $date <= $item->endDate;
             })[0];
@@ -135,11 +133,6 @@ class HotelOrderService extends BaseService
                 'price' => $priceUnit->price
             ];
         });
-
-        $paymentAmount = (float)bcmul($datePriceList->pluck('price')->sum(), $num, 2);
-        $averagePrice = round($datePriceList->avg('price'), 2);
-
-        return [$paymentAmount, $averagePrice, $datePriceList];
     }
 
     private function createDateList($checkInDate, $checkOutDate)

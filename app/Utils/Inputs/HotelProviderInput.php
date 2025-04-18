@@ -19,7 +19,7 @@ class HotelProviderInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
-    public $shopAvatar;
+    public $shopLogo;
     public $shopName;
     public $shopType;
     public $shopCover;
@@ -42,7 +42,7 @@ class HotelProviderInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
-            'shopAvatar' => 'required|string',
+            'shopLogo' => 'required|string',
             'shopName' => 'required|string',
             'shopType' => 'required|integer|in:1,2,3',
             'shopCover' => 'string',
