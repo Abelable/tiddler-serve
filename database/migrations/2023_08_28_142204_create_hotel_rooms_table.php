@@ -25,6 +25,8 @@ class CreateHotelRoomsTable extends Migration
             $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例');
             $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例');
             $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
+            $table->float('superior_promotion_commission_rate')->default(0)->comment('上级推广佣金比例%');
+            $table->float('superior_promotion_commission_upper_limit')->default(0)->comment('上级推广佣金上限');
             $table->integer('breakfast_num')->comment('早餐份数');
             $table->integer('guest_num')->comment('可入住客人数量');
             $table->integer('cancellable')->comment('免费取消：0-不可取消，1-可免费取消');

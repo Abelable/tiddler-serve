@@ -16,6 +16,8 @@ namespace App\Models;
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $promotion_commission_rate 推广佣金比例
  * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $breakfast_num 早餐份数
  * @property int $guest_num 可入住客人数量
  * @property int $cancellable 免费取消：0-不可取消，1-可免费取消
@@ -46,6 +48,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelRoom whereUserId($value)
