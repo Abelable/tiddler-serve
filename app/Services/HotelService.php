@@ -203,4 +203,12 @@ class HotelService extends BaseService
     {
         return Hotel::query()->get();
     }
+
+    public function increaseSalesVolume($hotelId, $num)
+    {
+        $hotel = $this->getHotelById($hotelId);
+        $hotel->sales_volume = $hotel->sales_volume + $num;
+        $hotel->save();
+        return $hotel;
+    }
 }

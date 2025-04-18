@@ -6,6 +6,7 @@ use App\Jobs\CommissionConfirmJob;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\Commission;
+use App\Models\HotelRoom;
 use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\CommissionScene;
@@ -55,6 +56,43 @@ use Illuminate\Support\Facades\DB;
  */
 class CommissionService extends BaseService
 {
+    public function createHotelCommission(
+        $orderId,
+        HotelRoom $room,
+        $paymentAmount,
+        $userId,
+        $userLevel,
+        $superiorId,
+        $superiorLevel,
+        $upperSuperiorId,
+        $upperSuperiorLevel
+    )
+    {
+        $salesCommissionRate = bcdiv($room->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($room->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $room->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($room->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $room->superior_promotion_commission_upper_limit;
+
+        $this->createProductCommission(
+            $paymentAmount,
+            $salesCommissionRate,
+            $promotionCommissionRate,
+            $promotionCommissionUpperLimit,
+            $superiorPromotionCommissionRate,
+            $superiorPromotionCommissionUpperLimit,
+            $userId,
+            $userLevel,
+            $superiorId,
+            $superiorLevel,
+            $upperSuperiorId,
+            $upperSuperiorLevel,
+            $orderId,
+            ProductType::HOTEL,
+            $room->id
+        );
+    }
+
     public function createScenicCommission(
         $orderId,
         ScenicTicket $ticket,

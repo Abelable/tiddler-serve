@@ -3,13 +3,18 @@
 namespace App\Services;
 
 use App\Models\HotelOrder;
+use App\Models\HotelShop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderEnums;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxMpServe;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Yansongda\LaravelPay\Facades\Pay;
+use Yansongda\Pay\Exceptions\GatewayException;
 
 class HotelOrderService extends BaseService
 {
@@ -40,6 +45,21 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getUserOrderList($userId, $ids, $columns = ['*'])
+    {
+        return HotelOrder::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getUserOrderById($userId, $id, $columns = ['*'])
+    {
+        return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getOrderListByIds(array $ids, $columns = ['*'])
+    {
+        return HotelOrder::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function getUnpaidOrder(int $userId, $orderId, $columns = ['*'])
     {
         return HotelOrder::query()
@@ -55,6 +75,30 @@ class HotelOrderService extends BaseService
             ->where('order_sn', $orderSn)
             ->where('status', HotelOrderEnums::STATUS_CREATE)
             ->first($columns);
+    }
+
+    public function getPendingSettleInOrderById($id, $columns = ['*'])
+    {
+        return HotelOrder::query()->whereIn('status', [HotelOrderEnums::STATUS_PAY, HotelOrderEnums::STATUS_SETTLE_IN])->find($id, $columns);
+    }
+
+    // todo 核销有效期
+    public function getTimeoutUnConfirmOrders($columns = ['*'])
+    {
+        return HotelOrder::query()
+            ->where('status', HotelOrderEnums::STATUS_PAY)
+            ->where('pay_time', '<=', now()->subDays(30))
+            ->where('pay_time', '>', now()->subDays(45))
+            ->get($columns);
+    }
+
+    public function getTimeoutUnFinishedOrders($columns = ['*'])
+    {
+        return HotelOrder::query()
+            ->whereIn('status', [HotelOrderEnums::STATUS_CONFIRM, HotelOrderEnums::STATUS_AUTO_CONFIRM, HotelOrderEnums::STATUS_ADMIN_CONFIRM])
+            ->where('confirm_time', '<=', now()->subDays(15))
+            ->where('confirm_time', '>', now()->subDays(30))
+            ->get($columns);
     }
 
     public function generateOrderSn()
@@ -74,17 +118,23 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, HotelOrderInput $input)
+    public function createOrder($userId, HotelOrderInput $input, HotelShop $shop, $paymentAmount)
     {
-        $datePriceList = $this->getDatePriceList($input->roomId, $input->checkInDate, $input->checkOutDate);
-        $paymentAmount = (float)bcmul($datePriceList->pluck('price')->sum(), $input->num, 2);
-        $averagePrice = round($datePriceList->avg('price'), 2);
+        $orderSn = $this->generateOrderSn();
 
-        $room = HotelRoomService::getInstance()->getRoomById($input->roomId);
-        $shop = HotelShopService::getInstance()->getShopById($room->shop_id);
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($userId);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+
+            // 更新余额
+            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn, ProductType::HOTEL);
+        }
 
         $order = HotelOrder::new();
-        $order->order_sn = $this->generateOrderSn();
+        $order->order_sn = $orderSn;
         $order->status = HotelOrderEnums::STATUS_CREATE;
         $order->user_id = $userId;
         $order->consignee = $input->consignee;
@@ -92,26 +142,16 @@ class HotelOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
-        $order->refund_amount = $order->payment_amount;
+        $order->total_payment_amount = $paymentAmount;
+        $order->refund_amount = $paymentAmount;
         $order->save();
-
-        // 生成订单房间快照
-        $type = HotelRoomTypeService::getInstance()->getTypeById($room->type_id, ['*'], false);
-        $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
-        HotelOrderRoomService::getInstance()->createOrderRoom(
-            $order->id,
-            $hotel,
-            $type,
-            $room,
-            $input,
-            $averagePrice
-        );
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
-        return $order->id;
+        return $order;
     }
 
     public function getDatePriceList($roomId, $checkInDate, $checkOutDate)
@@ -159,6 +199,7 @@ class HotelOrderService extends BaseService
         return [
             'out_trade_no' => time(),
             'body' => 'hotel_order_sn:' . $order->order_sn,
+            'attach' => $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -166,7 +207,7 @@ class HotelOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['body'] ? str_replace('hotel_order_sn:', '', $data['body']) : '';
+        $orderSn = $data['attach'];
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -185,8 +226,17 @@ class HotelOrderService extends BaseService
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
+
+        // 同步微信后台订单发货
+        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        WxMpServe::new()->verify($openid, $order->pay_id);
+
+        // 佣金记录状态更新为：已支付待结算
+        CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::HOTEL);
+
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
+
         return $order;
     }
 
@@ -228,25 +278,92 @@ class HotelOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
+        // 删除佣金记录
+        CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::HOTEL);
+
         return $order;
     }
 
-    public function confirm($userId, $orderId, $isAuto = false)
+    public function userConfirm($userId, $orderId)
     {
-        $order = $this->getOrderById($userId, $orderId);
-        if (is_null($order)) {
+        $orderList = $this->getUserOrderList($userId, [$orderId]);
+        if (count($orderList) == 0) {
             $this->throwBadArgumentValue();
         }
+        return $this->confirm($orderList);
+    }
 
-        $order->status = $isAuto ? HotelOrderEnums::STATUS_AUTO_CONFIRM : HotelOrderEnums::STATUS_CONFIRM;
-        $order->confirm_time = now()->toDateTimeString();
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
+    public function adminConfirm($orderIds)
+    {
+        return DB::transaction(function () use ($orderIds) {
+            $orderList = $this->getOrderListByIds($orderIds);
+            if (count($orderList) == 0) {
+                $this->throwBadArgumentValue();
+            }
+            return $this->confirm($orderList, 'admin');
+        });
+    }
+
+    public function systemConfirm()
+    {
+        return DB::transaction(function () {
+            $orderList = $this->getTimeoutUnConfirmOrders();
+            if (count($orderList) != 0) {
+                $this->confirm($orderList, 'system');
+            }
+        });
+    }
+
+    public function confirm($orderList, $role = 'user')
+    {
+        $orderList = $orderList->map(function (HotelOrder $order) use ($role) {
+            if (!$order->canConfirmHandle()) {
+                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+            }
+            switch ($role) {
+                case 'system':
+                    $order->status = HotelOrderEnums::STATUS_AUTO_CONFIRM;
+                    break;
+                case 'admin':
+                    $order->status = HotelOrderEnums::STATUS_ADMIN_CONFIRM;
+                    break;
+                case 'user':
+                    $order->status = HotelOrderEnums::STATUS_CONFIRM;
+                    break;
+            }
+            $order->confirm_time = now()->toDateTimeString();
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
+
+            return $order;
+        });
+
+        // 佣金记录变更为待提现
+        $orderIds = $orderList->pluck('id')->toArray();
+        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL, $role);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
-        return $order;
+        return $orderList;
+    }
+
+    public function systemFinish()
+    {
+        $orderList = $this->getTimeoutUnFinishedOrders();
+        if (count($orderList) != 0) {
+            $orderList->map(function (HotelOrder $order) {
+                if (!$order->canFinishHandle()) {
+                    $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
+                }
+                $order->status = HotelOrderEnums::STATUS_AUTO_FINISHED;
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+            });
+
+            // todo 酒店默认好评
+        }
     }
 
     public function finish($userId, $orderId)
@@ -265,6 +382,71 @@ class HotelOrderService extends BaseService
         return $order;
     }
 
+    public function userRefund($userId, $orderId)
+    {
+        $order = $this->getUserOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        $this->refund($order);
+    }
+
+    public function adminRefund($orderIds)
+    {
+        $orderList = $this->getOrderListByIds($orderIds);
+        if (count($orderList) == 0) {
+            $this->throwBadArgumentValue();
+        }
+        foreach ($orderList as $order) {
+            $this->refund($order);
+        }
+    }
+
+    public function refund(HotelOrder $order)
+    {
+        if (!$order->canRefundHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
+        }
+        DB::transaction(function () use ($order) {
+            try {
+                // 微信退款
+                if ($order->refund_amount != 0) {
+                    $refundParams = [
+                        'transaction_id' => $order->pay_id,
+                        'out_refund_no' => time(),
+                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'refund_fee' => bcmul($order->refund_amount, 100),
+                        'refund_desc' => '酒店房间退款',
+                        'type' => 'miniapp'
+                    ];
+
+                    $result = Pay::wechat()->refund($refundParams);
+                    $order->refund_id = $result['refund_id'];
+                    Log::info('hotel_order_wx_refund', $result->toArray());
+                }
+
+                $order->status = HotelOrderEnums::STATUS_REFUND_CONFIRM;
+                $order->refund_time = now()->toDateTimeString();
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+
+                // 退还余额
+                if ($order->deduction_balance != 0) {
+                    AccountService::getInstance()
+                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::HOTEL);
+                }
+
+                // 删除佣金记录
+                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::HOTEL);
+
+                // todo 通知商家
+            } catch (GatewayException $exception) {
+                Log::error('wx_refund_fail', [$exception]);
+            }
+        });
+    }
+
     public function delete($userId, $orderId)
     {
         $order = $this->getOrderById($userId, $orderId);
@@ -277,27 +459,5 @@ class HotelOrderService extends BaseService
 
         OrderGoodsService::getInstance()->delete($order->id);
         $order->delete();
-    }
-
-    public function refund($userId, $orderId)
-    {
-        $order = $this->getOrderById($userId, $orderId);
-        if (is_null($order)) {
-            $this->throwBadArgumentValue();
-        }
-        if (!$order->canRefundHandle()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不能申请退款');
-        }
-
-        $order->status = HotelOrderEnums::STATUS_REFUND;
-
-        if ($order->cas() == 0) {
-            $this->throwUpdateFail();
-        }
-
-        // todo 通知商家
-        // todo 开启自动退款定时任务
-
-        return $order;
     }
 }

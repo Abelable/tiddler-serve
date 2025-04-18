@@ -307,7 +307,7 @@ class ScenicOrderService extends BaseService
 
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, $role);
+        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
@@ -388,7 +388,7 @@ class ScenicOrderService extends BaseService
 
                     $result = Pay::wechat()->refund($refundParams);
                     $order->refund_id = $result['refund_id'];
-                    Log::info('order_wx_refund', $result->toArray());
+                    Log::info('scenic_order_wx_refund', $result->toArray());
                 }
 
                 $order->status = ScenicOrderEnums::STATUS_REFUND_CONFIRM;
