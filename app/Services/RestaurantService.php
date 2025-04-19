@@ -134,4 +134,12 @@ class RestaurantService extends BaseService
         $restaurant->save();
         return $restaurant;
     }
+
+    public function increaseSalesVolume($restaurantId, $num)
+    {
+        $restaurant = $this->getRestaurantById($restaurantId);
+        $restaurant->sales_volume = $restaurant->sales_volume + $num;
+        $restaurant->save();
+        return $restaurant;
+    }
 }

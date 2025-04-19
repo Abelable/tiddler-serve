@@ -327,7 +327,8 @@ Route::prefix('hotel')->group(function () {
         Route::get('list', 'HotelOrderController@list');
         Route::get('shop_list', 'HotelOrderController@shopList');
         Route::get('detail', 'HotelOrderController@detail');
-        Route::post('confirm', 'HotelOrderController@confirm');
+        Route::get('verify_code', 'HotelOrderController@verifyCode');
+        Route::post('verify', 'HotelOrderController@verify');
         Route::post('refund', 'HotelOrderController@refund');
         Route::post('cancel', 'HotelOrderController@cancel');
         Route::post('delete', 'HotelOrderController@delete');
@@ -417,7 +418,8 @@ Route::prefix('catering')->group(function () {
             Route::get('list', 'SetMealOrderController@list');
             Route::get('provider_list', 'SetMealOrderController@providerList');
             Route::get('detail', 'SetMealOrderController@detail');
-            Route::post('confirm', 'SetMealOrderController@confirm');
+            Route::get('verify_code', 'SetMealOrderController@verifyCode');
+            Route::post('verify', 'SetMealOrderController@verify');
             Route::post('refund', 'SetMealOrderController@refund');
             Route::post('cancel', 'SetMealOrderController@cancel');
             Route::post('delete', 'SetMealOrderController@delete');
@@ -435,7 +437,8 @@ Route::prefix('catering')->group(function () {
             Route::get('list', 'MealTicketOrderController@list');
             Route::get('provider_list', 'MealTicketOrderController@providerList');
             Route::get('detail', 'MealTicketOrderController@detail');
-            Route::post('confirm', 'MealTicketOrderController@confirm');
+            Route::get('verify_code', 'MealTicketOrderController@verifyCode');
+            Route::post('verify', 'MealTicketOrderController@verify');
             Route::post('refund', 'MealTicketOrderController@refund');
             Route::post('cancel', 'MealTicketOrderController@cancel');
             Route::post('delete', 'MealTicketOrderController@delete');

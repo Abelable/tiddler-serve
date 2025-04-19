@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\Commission;
 use App\Models\HotelRoom;
 use App\Models\ScenicTicket;
+use App\Models\SetMeal;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\CommissionScene;
 use App\Utils\Enums\ProductType;
@@ -56,6 +57,43 @@ use Illuminate\Support\Facades\DB;
  */
 class CommissionService extends BaseService
 {
+    public function createSetMealCommission(
+        $orderId,
+        SetMeal $setMeal,
+        $paymentAmount,
+        $userId,
+        $userLevel,
+        $superiorId,
+        $superiorLevel,
+        $upperSuperiorId,
+        $upperSuperiorLevel
+    )
+    {
+        $salesCommissionRate = bcdiv($setMeal->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($setMeal->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $setMeal->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($setMeal->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $setMeal->superior_promotion_commission_upper_limit;
+
+        $this->createProductCommission(
+            $paymentAmount,
+            $salesCommissionRate,
+            $promotionCommissionRate,
+            $promotionCommissionUpperLimit,
+            $superiorPromotionCommissionRate,
+            $superiorPromotionCommissionUpperLimit,
+            $userId,
+            $userLevel,
+            $superiorId,
+            $superiorLevel,
+            $upperSuperiorId,
+            $upperSuperiorLevel,
+            $orderId,
+            ProductType::SET_MEAL,
+            $setMeal->id
+        );
+    }
+
     public function createHotelCommission(
         $orderId,
         HotelRoom $room,

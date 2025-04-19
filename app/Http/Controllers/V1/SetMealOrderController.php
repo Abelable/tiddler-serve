@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\SetMealOrder;
 use App\Models\OrderSetMeal;
 use App\Services\AccountService;
+use App\Services\CommissionService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
+use App\Services\RestaurantManagerService;
+use App\Services\RestaurantService;
 use App\Services\SetMealOrderService;
 use App\Services\OrderSetMealService;
 use App\Services\SetMealService;
+use App\Services\SetMealVerifyService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\SetMealOrderEnums;
 use App\Utils\Inputs\SetMealOrderInput;
@@ -79,11 +83,25 @@ class SetMealOrderController extends Controller
         $setMeal = SetMealService::getInstance()->getSetMealById($input->setMealId);
         $paymentAmount = (float)bcmul($setMeal->price, $input->num, 2);
 
-        $orderId = DB::transaction(function () use ($paymentAmount, $setMeal, $input) {
+        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $setMeal, $input) {
             $order = SetMealOrderService::getInstance()->createOrder($this->user(), $input, $setMeal->provider_id, $paymentAmount);
+
+            // 生成核销码
+            SetMealVerifyService::getInstance()->createVerifyCode($order->id, $input->restaurantId);
 
             // 生成订单代金券快照
             OrderSetMealService::getInstance()->createOrderSetMeal($order->id, $input->num, $setMeal);
+
+            // 生成佣金记录
+            CommissionService::getInstance()
+                ->createSetMealCommission($order->id, $setMeal, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+
+            // 增加餐馆、套餐销量
+            RestaurantService::getInstance()->increaseSalesVolume($input->restaurantId, $input->num);
+            $setMeal->sales_volume = $setMeal->sales_volume + $input->num;
+            $setMeal->save();
+
+            return $order->id;
         });
 
         return $this->success($orderId);
@@ -179,10 +197,44 @@ class SetMealOrderController extends Controller
         return $this->success();
     }
 
-    public function confirm()
+    public function verifyCode()
     {
-        $id = $this->verifyRequiredId('id');
-        SetMealOrderService::getInstance()->confirm($this->userId(), $id);
+        $orderId = $this->verifyRequiredId('orderId');
+        $restaurantId = $this->verifyRequiredId('hotelId');
+
+        $verifyCodeInfo = SetMealVerifyService::getInstance()->getVerifyCodeInfo($orderId, $restaurantId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
+    }
+
+    public function verify()
+    {
+        $code = $this->verifyRequiredString('code');
+
+        $verifyCodeInfo = SetMealVerifyService::getInstance()->getByCode($code);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
+        }
+
+        $order = SetMealOrderService::getInstance()->getPaidOrderById($verifyCodeInfo->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
+        }
+
+        $managerIds = RestaurantManagerService::getInstance()
+            ->getManagerList($verifyCodeInfo->restaurant_id)->pluck('user_id')->toArray();
+        if (!in_array($this->userId(), $managerIds)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前餐馆核销员，无法核销');
+        }
+
+        DB::transaction(function () use ($verifyCodeInfo, $order) {
+            SetMealVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
+            SetMealOrderService::getInstance()->userConfirm($order->user_id, $order->id);
+        });
+
         return $this->success();
     }
 
@@ -198,7 +250,7 @@ class SetMealOrderController extends Controller
     public function refund()
     {
         $id = $this->verifyRequiredId('id');
-        SetMealOrderService::getInstance()->refund($this->userId(), $id);
+        SetMealOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
     }
 
