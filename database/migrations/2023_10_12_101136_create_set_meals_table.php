@@ -23,9 +23,11 @@ class CreateSetMealsTable extends Migration
             $table->string('name')->comment('套餐名称');
             $table->float('price')->comment('套餐价格');
             $table->float('original_price')->comment('套餐原价');
-            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例');
-            $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例');
+            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例%');
+            $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例%');
             $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
+            $table->float('superior_promotion_commission_rate')->default(0)->comment('上级推广佣金比例%');
+            $table->float('superior_promotion_commission_upper_limit')->default(0)->comment('上级推广佣金上限');
             $table->integer('sales_volume')->default(0)->comment('销量');
             $table->longText('package_details')->comment('套餐详情');
             $table->integer('validity_days')->default(0)->comment('有效天数');

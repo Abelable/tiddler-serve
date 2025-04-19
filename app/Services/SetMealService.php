@@ -80,6 +80,8 @@ class SetMealService extends BaseService
         $setMeal->sales_commission_rate = $input->salesCommissionRate ?: 0;
         $setMeal->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
         $setMeal->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
+        $setMeal->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate ?: 0;
+        $setMeal->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit ?: 0;
         $setMeal->package_details = json_encode($input->packageDetails);
         $setMeal->validity_days = $input->validityDays ?: 0;
         $setMeal->validity_start_time = $input->validityStartTime ?: '';

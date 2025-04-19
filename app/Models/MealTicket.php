@@ -12,9 +12,11 @@ namespace App\Models;
  * @property string $failure_reason 审核失败原因
  * @property float $price 代金券价格
  * @property float $original_price 抵扣原价
- * @property float $sales_commission_rate 销售佣金比例
- * @property float $promotion_commission_rate 推广佣金比例
+ * @property float $sales_commission_rate 销售佣金比例%
+ * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $sales_volume 代金券销量
  * @property int $validity_days 有效天数
  * @property string $validity_start_time 范围有效期开始时间
@@ -52,6 +54,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSalesVolume($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUseRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUseTimeList($value)
