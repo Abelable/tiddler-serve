@@ -89,7 +89,7 @@ class SetMealOrderController extends Controller
             // 生成核销码
             SetMealVerifyService::getInstance()->createVerifyCode($order->id, $input->restaurantId);
 
-            // 生成订单代金券快照
+            // 生成订单套餐快照
             OrderSetMealService::getInstance()->createOrderSetMeal($order->id, $input->num, $setMeal);
 
             // 生成佣金记录

@@ -7,6 +7,7 @@ use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\Commission;
 use App\Models\HotelRoom;
+use App\Models\MealTicket;
 use App\Models\ScenicTicket;
 use App\Models\SetMeal;
 use App\Utils\CodeResponse;
@@ -57,9 +58,10 @@ use Illuminate\Support\Facades\DB;
  */
 class CommissionService extends BaseService
 {
-    public function createSetMealCommission(
+    public function createScenicCommission(
         $orderId,
-        SetMeal $setMeal,
+        ScenicTicket $ticket,
+        $priceUnit,
         $paymentAmount,
         $userId,
         $userLevel,
@@ -69,11 +71,11 @@ class CommissionService extends BaseService
         $upperSuperiorLevel
     )
     {
-        $salesCommissionRate = bcdiv($setMeal->sales_commission_rate, 100, 2);
-        $promotionCommissionRate = bcdiv($setMeal->promotion_commission_rate, 100, 2);
-        $promotionCommissionUpperLimit = $setMeal->promotion_commission_upper_limit;
-        $superiorPromotionCommissionRate = bcdiv($setMeal->superior_promotion_commission_rate, 100, 2);
-        $superiorPromotionCommissionUpperLimit = $setMeal->superior_promotion_commission_upper_limit;
+        $salesCommissionRate = bcdiv($priceUnit->salesCommissionRate ?? $ticket->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($ticket->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $ticket->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($ticket->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $ticket->superior_promotion_commission_upper_limit;
 
         $this->createProductCommission(
             $paymentAmount,
@@ -89,8 +91,8 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
-            ProductType::SET_MEAL,
-            $setMeal->id
+            ProductType::SCENIC,
+            $ticket->id
         );
     }
 
@@ -131,10 +133,9 @@ class CommissionService extends BaseService
         );
     }
 
-    public function createScenicCommission(
+    public function createMealTicketCommission(
         $orderId,
-        ScenicTicket $ticket,
-        $priceUnit,
+        MealTicket $ticket,
         $paymentAmount,
         $userId,
         $userLevel,
@@ -144,7 +145,7 @@ class CommissionService extends BaseService
         $upperSuperiorLevel
     )
     {
-        $salesCommissionRate = bcdiv($priceUnit->salesCommissionRate ?? $ticket->sales_commission_rate, 100, 2);
+        $salesCommissionRate = bcdiv($ticket->sales_commission_rate, 100, 2);
         $promotionCommissionRate = bcdiv($ticket->promotion_commission_rate, 100, 2);
         $promotionCommissionUpperLimit = $ticket->promotion_commission_upper_limit;
         $superiorPromotionCommissionRate = bcdiv($ticket->superior_promotion_commission_rate, 100, 2);
@@ -164,8 +165,45 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
-            ProductType::SCENIC,
+            ProductType::SET_MEAL,
             $ticket->id
+        );
+    }
+
+    public function createSetMealCommission(
+        $orderId,
+        SetMeal $setMeal,
+        $paymentAmount,
+        $userId,
+        $userLevel,
+        $superiorId,
+        $superiorLevel,
+        $upperSuperiorId,
+        $upperSuperiorLevel
+    )
+    {
+        $salesCommissionRate = bcdiv($setMeal->sales_commission_rate, 100, 2);
+        $promotionCommissionRate = bcdiv($setMeal->promotion_commission_rate, 100, 2);
+        $promotionCommissionUpperLimit = $setMeal->promotion_commission_upper_limit;
+        $superiorPromotionCommissionRate = bcdiv($setMeal->superior_promotion_commission_rate, 100, 2);
+        $superiorPromotionCommissionUpperLimit = $setMeal->superior_promotion_commission_upper_limit;
+
+        $this->createProductCommission(
+            $paymentAmount,
+            $salesCommissionRate,
+            $promotionCommissionRate,
+            $promotionCommissionUpperLimit,
+            $superiorPromotionCommissionRate,
+            $superiorPromotionCommissionUpperLimit,
+            $userId,
+            $userLevel,
+            $superiorId,
+            $superiorLevel,
+            $upperSuperiorId,
+            $upperSuperiorLevel,
+            $orderId,
+            ProductType::SET_MEAL,
+            $setMeal->id
         );
     }
 

@@ -153,13 +153,6 @@ class SetMealOrderService extends BaseService
         return $order;
     }
 
-    public function calcPaymentAmount($setMealId, $num)
-    {
-        $setMeal = SetMealService::getInstance()->getSetMealById($setMealId);
-        $paymentAmount = (float)bcmul($setMeal->price, $num, 2);
-        return [$paymentAmount, $setMeal];
-    }
-
     public function createWxPayOrder($userId, $orderId, $openid)
     {
         /** @var SetMealOrder $order */

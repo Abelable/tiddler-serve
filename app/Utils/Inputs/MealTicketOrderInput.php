@@ -8,6 +8,7 @@ class MealTicketOrderInput extends BaseInput
     public $restaurantName;
     public $ticketId;
     public $num;
+    public $useBalance;
 
     public function rules()
     {
@@ -16,6 +17,7 @@ class MealTicketOrderInput extends BaseInput
             'restaurantName' => 'required|string',
             'ticketId' => 'required|integer|digits_between:1,20',
             'num' => 'required|integer',
+            'useBalance' => 'integer|in:0,1',
         ];
     }
 }

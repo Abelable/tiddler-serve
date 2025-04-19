@@ -6,9 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\MealTicketOrder;
 use App\Models\OrderMealTicket;
 use App\Services\AccountService;
+use App\Services\CommissionService;
 use App\Services\MealTicketOrderService;
 use App\Services\MealTicketService;
+use App\Services\MealTicketVerifyService;
 use App\Services\OrderMealTicketService;
+use App\Services\PromoterService;
+use App\Services\RelationService;
+use App\Services\RestaurantManagerService;
+use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderEnums;
 use App\Utils\Inputs\MealTicketOrderInput;
@@ -59,8 +65,43 @@ class MealTicketOrderController extends Controller
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
 
-        $orderId = DB::transaction(function () use ($input) {
-            return MealTicketOrderService::getInstance()->createOrder($this->user(), $input);
+        // 判断余额状态
+        if (!is_null($input->useBalance) && $input->useBalance != 0) {
+            $account = AccountService::getInstance()->getUserAccount($this->userId());
+            if ($account->status == 0 || $account->balance <= 0) {
+                return $this->fail(CodeResponse::NOT_FOUND, '余额异常不可用，请联系客服解决问题');
+            }
+        }
+
+        $userId = $this->userId();
+        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+        $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
+        $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
+        $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
+
+        $ticket = MealTicketService::getInstance()->getTicketById($input->ticketId);
+        $paymentAmount = (float)bcmul($ticket->price, $input->num, 2);
+
+        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $ticket, $input) {
+            $order = MealTicketOrderService::getInstance()->createOrder($this->user(), $input, $ticket->provider_id, $paymentAmount);
+
+            // 生成核销码
+            MealTicketVerifyService::getInstance()->createVerifyCode($order->id, $input->restaurantId);
+
+            // 生成订单代金券快照
+            OrderMealTicketService::getInstance()->createOrderTicket($order->id, $input->num, $ticket);
+
+            // 生成佣金记录
+            CommissionService::getInstance()
+                ->createMealTicketCommission($order->id, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+
+            // 增加餐馆、代金券销量
+            RestaurantService::getInstance()->increaseSalesVolume($input->restaurantId, $input->num);
+            $ticket->sales_volume = $ticket->sales_volume + $input->num;
+            $ticket->save();
+
+            return $order->id;
         });
 
         return $this->success($orderId);
@@ -156,10 +197,44 @@ class MealTicketOrderController extends Controller
         return $this->success();
     }
 
-    public function confirm()
+    public function verifyCode()
     {
-        $id = $this->verifyRequiredId('id');
-        MealTicketOrderService::getInstance()->confirm($this->userId(), $id);
+        $orderId = $this->verifyRequiredId('orderId');
+        $restaurantId = $this->verifyRequiredId('hotelId');
+
+        $verifyCodeInfo = MealTicketVerifyService::getInstance()->getVerifyCodeInfo($orderId, $restaurantId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
+    }
+
+    public function verify()
+    {
+        $code = $this->verifyRequiredString('code');
+
+        $verifyCodeInfo = MealTicketVerifyService::getInstance()->getByCode($code);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
+        }
+
+        $order = MealTicketOrderService::getInstance()->getPaidOrderById($verifyCodeInfo->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
+        }
+
+        $managerIds = RestaurantManagerService::getInstance()
+            ->getManagerList($verifyCodeInfo->restaurant_id)->pluck('user_id')->toArray();
+        if (!in_array($this->userId(), $managerIds)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前餐馆核销员，无法核销');
+        }
+
+        DB::transaction(function () use ($verifyCodeInfo, $order) {
+            MealTicketVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
+            MealTicketOrderService::getInstance()->userConfirm($order->user_id, $order->id);
+        });
+
         return $this->success();
     }
 
@@ -175,7 +250,7 @@ class MealTicketOrderController extends Controller
     public function refund()
     {
         $id = $this->verifyRequiredId('id');
-        MealTicketOrderService::getInstance()->refund($this->userId(), $id);
+        MealTicketOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
     }
 

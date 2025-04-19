@@ -8,6 +8,6 @@ class ProductType
     const HOTEL = 2;
     const SET_MEAL = 3;
 
-    const MEAL_TICKET = 3;
+    const MEAL_TICKET = 4;
     const GOODS = 5;
 }
