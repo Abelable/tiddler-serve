@@ -8,6 +8,7 @@ class SetMealOrderInput extends BaseInput
     public $restaurantName;
     public $setMealId;
     public $num;
+    public $useBalance;
 
     public function rules()
     {
@@ -16,6 +17,7 @@ class SetMealOrderInput extends BaseInput
             'restaurantName' => 'required|string',
             'setMealId' => 'required|integer|digits_between:1,20',
             'num' => 'required|integer',
+            'useBalance' => 'integer|in:0,1',
         ];
     }
 }

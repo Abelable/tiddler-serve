@@ -23,7 +23,7 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @property float $total_payment_amount 总支付金额，拆单场景
  * @property int $pay_id 支付id
  * @property string $pay_time 支付时间
- * @property string $confirm_time 用户确认收货时间
+ * @property string $confirm_time 用户核销使用时间
  * @property string $finish_time 订单关闭时间
  * @property float $refund_amount 退款金额
  * @property string $refund_id 微信退款id

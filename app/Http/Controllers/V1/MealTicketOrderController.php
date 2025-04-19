@@ -5,7 +5,9 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\MealTicketOrder;
 use App\Models\OrderMealTicket;
+use App\Services\AccountService;
 use App\Services\MealTicketOrderService;
+use App\Services\MealTicketService;
 use App\Services\OrderMealTicketService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderEnums;
@@ -21,10 +23,28 @@ class MealTicketOrderController extends Controller
     {
         $ticketId = $this->verifyRequiredId('ticketId');
         $num = $this->verifyRequiredInteger('num');
+        $useBalance = $this->verifyBoolean('useBalance', false);
 
-        list($paymentAmount) = MealTicketOrderService::getInstance()->calcPaymentAmount($ticketId, $num);
+        $ticket = MealTicketService::getInstance()->getTicketById($ticketId);
+        $totalPrice = (float)bcmul($ticket->price, $num, 2);
 
-        return $this->success($paymentAmount);
+        // 余额逻辑
+        $deductionBalance = 0;
+        $account = AccountService::getInstance()->getUserAccount($this->userId());
+        $accountBalance = $account->status == 1 ? $account->balance : 0;
+        if ($useBalance) {
+            $deductionBalance = min($totalPrice, $accountBalance);
+            $paymentAmount = bcsub($totalPrice, $deductionBalance, 2);
+        } else {
+            $paymentAmount = $totalPrice;
+        }
+
+        return $this->success([
+            'totalPrice' => $totalPrice,
+            'accountBalance' => $accountBalance,
+            'deductionBalance' => $deductionBalance,
+            'paymentAmount' => $paymentAmount
+        ]);
     }
 
     public function submit()

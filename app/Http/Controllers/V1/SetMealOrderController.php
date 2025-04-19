@@ -5,8 +5,12 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\SetMealOrder;
 use App\Models\OrderSetMeal;
+use App\Services\AccountService;
+use App\Services\PromoterService;
+use App\Services\RelationService;
 use App\Services\SetMealOrderService;
 use App\Services\OrderSetMealService;
+use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\SetMealOrderEnums;
 use App\Utils\Inputs\SetMealOrderInput;
@@ -21,10 +25,28 @@ class SetMealOrderController extends Controller
     {
         $setMealId = $this->verifyRequiredId('setMealId');
         $num = $this->verifyRequiredInteger('num');
+        $useBalance = $this->verifyBoolean('useBalance', false);
 
-        list($paymentAmount) = SetMealOrderService::getInstance()->calcPaymentAmount($setMealId, $num);
+        $setMeal = SetMealService::getInstance()->getSetMealById($setMealId);
+        $totalPrice = (float)bcmul($setMeal->price, $num, 2);
 
-        return $this->success($paymentAmount);
+        // 余额逻辑
+        $deductionBalance = 0;
+        $account = AccountService::getInstance()->getUserAccount($this->userId());
+        $accountBalance = $account->status == 1 ? $account->balance : 0;
+        if ($useBalance) {
+            $deductionBalance = min($totalPrice, $accountBalance);
+            $paymentAmount = bcsub($totalPrice, $deductionBalance, 2);
+        } else {
+            $paymentAmount = $totalPrice;
+        }
+
+        return $this->success([
+            'totalPrice' => $totalPrice,
+            'accountBalance' => $accountBalance,
+            'deductionBalance' => $deductionBalance,
+            'paymentAmount' => $paymentAmount
+        ]);
     }
 
     public function submit()
@@ -39,8 +61,29 @@ class SetMealOrderController extends Controller
             $this->fail(CodeResponse::FAIL, '请勿重复提交订单');
         }
 
-        $orderId = DB::transaction(function () use ($input) {
-            return SetMealOrderService::getInstance()->createOrder($this->user(), $input);
+        // 判断余额状态
+        if (!is_null($input->useBalance) && $input->useBalance != 0) {
+            $account = AccountService::getInstance()->getUserAccount($this->userId());
+            if ($account->status == 0 || $account->balance <= 0) {
+                return $this->fail(CodeResponse::NOT_FOUND, '余额异常不可用，请联系客服解决问题');
+            }
+        }
+
+        $userId = $this->userId();
+        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+        $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
+        $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
+        $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
+
+        $setMeal = SetMealService::getInstance()->getSetMealById($input->setMealId);
+        $paymentAmount = (float)bcmul($setMeal->price, $input->num, 2);
+
+        $orderId = DB::transaction(function () use ($paymentAmount, $setMeal, $input) {
+            $order = SetMealOrderService::getInstance()->createOrder($this->user(), $input, $setMeal->provider_id, $paymentAmount);
+
+            // 生成订单代金券快照
+            OrderSetMealService::getInstance()->createOrderSetMeal($order->id, $input->num, $setMeal);
         });
 
         return $this->success($orderId);

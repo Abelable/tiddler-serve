@@ -6,6 +6,7 @@ use App\Models\SetMeal;
 use App\Models\SetMealOrder;
 use App\Models\User;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Enums\SetMealOrderEnums;
 use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\Inputs\PageInput;
@@ -75,31 +76,40 @@ class SetMealOrderService extends BaseService
         return SetMealOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder(User $user, SetMealOrderInput $input)
+    public function createOrder(User $user, SetMealOrderInput $input, $providerId, $paymentAmount)
     {
-        /** @var SetMeal $setMeal */
-        list($paymentAmount, $setMeal) = $this->calcPaymentAmount($input->setMealId, $input->num);
+        $orderSn = $this->generateOrderSn();
+
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($user->id);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+
+            // 更新余额
+            AccountService::getInstance()->updateBalance($user->id, 2, -$deductionBalance, $orderSn, ProductType::SET_MEAL);
+        }
 
         $order = SetMealOrder::new();
-        $order->order_sn = $this->generateOrderSn();
+        $order->order_sn = $orderSn;
         $order->status = SetMealOrderEnums::STATUS_CREATE;
         $order->user_id = $user->id;
         $order->consignee = $user->nickname;
         $order->mobile = $user->mobile;
-        $order->provider_id = $setMeal->provider_id;
+        $order->provider_id = $providerId;
         $order->restaurant_id = $input->restaurantId;
         $order->restaurant_name = $input->restaurantName;
+        $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
+        $order->total_payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
         $order->save();
-
-        // 生成订单代金券快照
-        OrderSetMealService::getInstance()->createOrderSetMeal($order->id, $input->num, $setMeal);
 
         // 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrder($userId, $order->id));
 
-        return $order->id;
+        return $order;
     }
 
     public function calcPaymentAmount($setMealId, $num)
