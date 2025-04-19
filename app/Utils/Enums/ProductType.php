@@ -6,8 +6,9 @@ class ProductType
 {
     const SCENIC = 1;
     const HOTEL = 2;
-    const SET_MEAL = 3;
+    const RESTAURANT = 3;
+    const GOODS = 4;
+    const SET_MEAL = 5;
 
-    const MEAL_TICKET = 4;
-    const GOODS = 5;
+    const MEAL_TICKET = 6;
 }
