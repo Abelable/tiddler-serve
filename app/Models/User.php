@@ -37,6 +37,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read \App\Models\Promoter|null $promoterInfo
  * @property-read \App\Models\ScenicProvider|null $scenicProvider
  * @property-read \App\Models\ScenicShop|null $scenicShop
+ * @property-read \App\Models\Shop|null $shopInfo
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Shop[] $shopInfoList
  * @property-read int|null $shop_info_list_count
  * @method static \Database\Factories\UserFactory factory(...$parameters)
@@ -130,6 +131,12 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shopInfoList()
     {
         return $this->hasMany(Shop::class, 'user_id')->where('status', 1);
+    }
+
+    // todo 目前一个商家绑定一个店铺，之后一个商家多个店铺再删除
+    public function shopInfo()
+    {
+        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
     }
 
     public function scenicProvider()
