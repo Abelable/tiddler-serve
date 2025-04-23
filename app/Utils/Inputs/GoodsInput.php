@@ -13,7 +13,6 @@ class GoodsInput extends BaseInput
     public $defaultSpecImage;
     public $name;
     public $introduction;
-    public $freightTemplateId;
     public $price;
     public $marketPrice;
     public $salesCommissionRate;
@@ -26,6 +25,7 @@ class GoodsInput extends BaseInput
     public $specList;
     public $skuList;
     public $deliveryMode;
+    public $freightTemplateId;
     public $pickupAddressIds;
     public $refundStatus;
     public $refundAddressIds;
@@ -42,7 +42,6 @@ class GoodsInput extends BaseInput
             'defaultSpecImage' => 'required|string',
             'name' => 'required|string',
             'introduction' => 'string',
-            'freightTemplateId' => 'required|integer|digits_between:1,20',
             'price' => 'required|numeric',
             'marketPrice' => 'numeric',
             'salesCommissionRate' => 'numeric',
@@ -55,6 +54,7 @@ class GoodsInput extends BaseInput
             'specList' => 'required|array',
             'skuList' => 'required|array',
             'deliveryMode' => 'required|integer|in:1,2,3',
+            'freightTemplateId' => 'required|integer|digits_between:1,20',
             'pickupAddressIds' => 'array',
             'refundStatus' => 'required|integer|in:0,1',
             'refundAddressIds' => 'array',
