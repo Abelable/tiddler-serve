@@ -306,8 +306,9 @@ class GoodsController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        if (!in_array($shopId, $this->user()->shopInfoIds())) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法上架商品');
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if (!in_array($shopId, $this->user()->shopInfoIds()) && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法上架商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -328,8 +329,9 @@ class GoodsController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        if (!in_array($shopId, $this->user()->shopInfoIds())) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法下架商品');
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if (!in_array($shopId, $this->user()->shopInfoIds()) && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法下架商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -347,14 +349,15 @@ class GoodsController extends Controller
 
     public function delete()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $shopInfo = $this->user()->shopInfo;
-        if (is_null($shopInfo)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是商家，无法删除商品');
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if (!in_array($shopId, $this->user()->shopInfoIds()) && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法删除商品');
         }
 
-        $goods = GoodsService::getInstance()->getShopGoods($shopInfo->id, $id);
+        $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
