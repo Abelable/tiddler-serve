@@ -13,7 +13,7 @@ class ShopPickupAddressController extends Controller
     public function list()
     {
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'name', 'time_frame', 'longitude', 'latitude', 'address_detail'];
+        $columns = ['id', 'name', 'longitude', 'latitude', 'address_detail'];
         $list = ShopPickupAddressService::getInstance()->getListByShopId($shopId, $columns);
         return $this->success($list);
     }
