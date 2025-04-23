@@ -21,8 +21,11 @@ class ShopPickupAddressController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'name', 'time_frame', 'longitude', 'latitude', 'address_detail'];
+
+        $columns = ['id', 'name', 'open_time_list', 'longitude', 'latitude', 'address_detail'];
         $detail = ShopPickupAddressService::getInstance()->getAddressById($id, $columns);
+        $detail->open_time_list = json_decode($detail->open_time_list);
+
         return $this->success($detail);
     }
 
@@ -56,10 +59,10 @@ class ShopPickupAddressController extends Controller
         return $this->success();
     }
 
-    private function update($address, ShopPickupAddressInput $input)
+    private function update(ShopPickupAddress $address, ShopPickupAddressInput $input)
     {
         $address->name = $input->name;
-        $address->time_frame = $input->timeFrame;
+        $address->open_time_list = json_encode($input->openTimeList);
         $address->longitude = $input->longitude;
         $address->latitude = $input->latitude;
         $address->address_detail = $input->addressDetail;

@@ -7,11 +7,11 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $shop_id 店铺id
- * @property string $name 提货点名称
- * @property string $time_frame 提货时间范围
- * @property string $address_detail 提货点地址
+ * @property string $name 提货门店名称
+ * @property string $address_detail 提货门店地址详情
  * @property string $longitude 提货点经度
  * @property string $latitude 提货点纬度
+ * @property string $open_time_list 提货门店营业时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -26,8 +26,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereLatitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereOpenTimeList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereShopId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereTimeFrame($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|ShopPickupAddress withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShopPickupAddress withoutTrashed()

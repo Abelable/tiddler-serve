@@ -16,11 +16,11 @@ class CreateShopPickupAddressesTable extends Migration
         Schema::create('shop_pickup_addresses', function (Blueprint $table) {
             $table->id();
             $table->integer('shop_id')->comment('店铺id');
-            $table->string('name')->default('')->comment('提货点名称');
-            $table->string('time_frame')->default('')->comment('提货时间范围');
-            $table->string('address_detail')->comment('提货点地址');
+            $table->string('name')->default('')->comment('提货门店名称');
+            $table->string('address_detail')->comment('提货门店地址详情');
             $table->decimal('longitude', 9, 6)->comment('提货点经度');
             $table->decimal('latitude', 8, 6)->comment('提货点纬度');
+            $table->longText('open_time_list')->comment('提货门店营业时间');
             $table->timestamps();
             $table->softDeletes();
         });
