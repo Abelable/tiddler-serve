@@ -103,7 +103,7 @@ Route::prefix('shop')->group(function () {
 
     Route::prefix('goods')->group(function () {
         Route::get('category_options', 'GoodsController@shopCategoryOptions');
-        Route::get('totals', 'GoodsController@goodsListTotals');
+        Route::get('totals', 'GoodsController@shopGoodsListTotals');
         Route::get('list', 'GoodsController@shopGoodsList');
         Route::get('on_sale_list', 'GoodsController@shopOnSaleGoodsList');
         Route::get('info', 'GoodsController@goodsInfo');
