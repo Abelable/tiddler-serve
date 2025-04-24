@@ -74,7 +74,7 @@ class CartGoodsService extends BaseService
                 $cartGoods->selected_sku_index = $selectedSkuIndex;
                 $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
                 $cartGoods->price = $skuList[$selectedSkuIndex]->price;
-                $cartGoods->market_price = $skuList[$selectedSkuIndex]->originalPrice ?? $goods->market_price;
+                $cartGoods->market_price = $skuList[$selectedSkuIndex]->marketPrice ?? $goods->market_price;
                 $cartGoods->sales_commission_rate = $skuList[$selectedSkuIndex]->salesCommissionRate ?? $goods->sales_commission_rate;
             } else {
                 $cartGoods->price = $goods->price;
@@ -134,7 +134,7 @@ class CartGoodsService extends BaseService
             $cartGoods->selected_sku_index = $selectedSkuIndex;
             $cartGoods->selected_sku_name = $skuList[$selectedSkuIndex]->name;
             $cartGoods->price = $skuList[$selectedSkuIndex]->price;
-            $cartGoods->market_price = $skuList[$selectedSkuIndex]->originalPrice ?? $goods->market_price;
+            $cartGoods->market_price = $skuList[$selectedSkuIndex]->marketPrice ?? $goods->market_price;
             $cartGoods->sales_commission_rate = $skuList[$selectedSkuIndex]->salesCommissionRate ?? $goods->sales_commission_rate;
         }
 

@@ -125,8 +125,8 @@ class CartController extends Controller
                     $cartGoods->price = $sku->price;
                     $cartGoods->save();
                 }
-                if (isset($sku->originalPrice) && $cartGoods->market_price != $sku->originalPrice) {
-                    $cartGoods->market_price = $sku->originalPrice;
+                if (isset($sku->marketPrice) && $cartGoods->market_price != $sku->marketPrice) {
+                    $cartGoods->market_price = $sku->marketPrice;
                     $cartGoods->save();
                 }
                 if (isset($sku->salesCommissionRate) && $cartGoods->sales_commission_rate != $sku->salesCommissionRate) {
