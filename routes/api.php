@@ -535,6 +535,11 @@ Route::prefix('commission')->group(function () {
     Route::get('cash', 'CommissionController@cash');
 });
 
+Route::prefix('withdraw')->group(function () {
+    Route::post('submit', 'WithdrawalController@submit');
+    Route::get('record_list', 'WithdrawalController@recordList');
+});
+
 /*
 |--------------------------------------------------------------------------
 | 管理后台接口

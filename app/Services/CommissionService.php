@@ -773,20 +773,6 @@ class CommissionService extends BaseService
             ->sum('commission_amount');
     }
 
-    public function withdrawUserCommission($userId, $scene, $withdrawalId)
-    {
-        $commissionList = $this->getUserCommissionQuery([$userId], [2])
-            ->where('scene', $scene)
-            ->whereMonth('created_at', '!=', Carbon::now()->month)
-            ->get();
-        /** @var Commission $commission */
-        foreach ($commissionList as $commission) {
-            $commission->withdrawal_id = $withdrawalId;
-            $commission->status = 3;
-            $commission->save();
-        }
-    }
-
     public function restoreCommissionByWithdrawalId($withdrawalId)
     {
         $commissionList = Commission::query()->where('withdrawal_id', $withdrawalId)->where('status', 3)->get();
@@ -797,18 +783,46 @@ class CommissionService extends BaseService
         }
     }
 
+    public function withdrawUserCommission($userId, $scene, $withdrawalId)
+    {
+        $commissionList = $this->getWithdrawalCommissionList($userId, $scene);
+        /** @var Commission $commission */
+        foreach ($commissionList as $commission) {
+            $commission->withdrawal_id = $withdrawalId;
+            $commission->status = 3;
+            $commission->save();
+        }
+    }
+
     public function settleCommissionToBalance($userId, $scene, $withdrawalId)
     {
-        $commissionList = $this->getUserCommissionQuery([$userId], [2])
-            ->where('scene', $scene)
-            ->whereMonth('created_at', '!=', Carbon::now()->month)
-            ->get();
+        $commissionList = $this->getWithdrawalCommissionList($userId, $scene);
         /** @var Commission $commission */
         foreach ($commissionList as $commission) {
             $commission->withdrawal_id = $withdrawalId;
             $commission->status = 4;
             $commission->save();
         }
+    }
+
+    /**
+     * @param $userId
+     * @param $scene
+     * @return Commission[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public function getWithdrawalCommissionList($userId, $scene)
+    {
+        $query = $this->getUserCommissionQuery([$userId], [2]);
+        if ($scene == 1) {
+            $query = $query->where('scene', 1);
+        } elseif ($scene == 2) {
+            $query = $query->whereIn('scene', [2, 3]);
+        } elseif ($scene == 3) {
+            $query = $query->whereIn('scene', [4, 5]);
+        }
+        return $query
+            ->whereMonth('created_at', '!=', Carbon::now()->month)
+            ->get();
     }
 
     public function getCommissionSumByWithdrawalId($withdrawalId, $status = 3)

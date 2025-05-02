@@ -15,6 +15,7 @@ class CreateCommissionsTable extends Migration
     {
         Schema::create('commissions', function (Blueprint $table) {
             $table->id();
+            $table->integer('withdrawal_id')->default(0)->comment('提现记录id');
             $table->integer('status')->default(0)->comment('佣金状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算');
             $table->integer('scene')->comment('场景：1-自购 2-直推分享 3-间推分享 4-直推团队 5-间推团队');
             $table->integer('promoter_id')->comment('推广员id');

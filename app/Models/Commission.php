@@ -6,6 +6,7 @@ namespace App\Models;
  * App\Models\Commission
  *
  * @property int $id
+ * @property int $withdrawal_id 提现记录id
  * @property int $status 佣金状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算
  * @property int $scene 场景：1-自购 2-直推分享 3-间推分享 4-直推团队 5-间推团队
  * @property int $promoter_id 推广员id
@@ -43,6 +44,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereWithdrawalId($value)
  * @method static \Illuminate\Database\Query\Builder|Commission withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Commission withoutTrashed()
  * @mixin \Eloquent
