@@ -708,7 +708,11 @@ class CommissionService extends BaseService
         if (!is_null($scene)) {
             if ($scene == 1) {
                 $query = $query->where('scene', 1);
-            } else {
+            } elseif ($scene == 2) {
+                $query = $query->whereIn('scene', [2, 3]);
+            } elseif ($scene == 3) {
+                $query = $query->whereIn('scene', [4, 5]);
+            } elseif ($scene == 4) {
                 $query = $query->whereIn('scene', [2, 3, 4, 5]);
             }
         }
