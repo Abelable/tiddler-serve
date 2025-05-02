@@ -17,6 +17,7 @@ use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -65,6 +66,16 @@ class OrderService extends BaseService
     public function getUserOrderList($userId, $ids, $columns = ['*'])
     {
         return Order::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getTodayOrderingUserCountByUserIds(array $userIds)
+    {
+        return Order::query()
+            ->whereIn('user_id', $userIds)
+            ->whereDate('created_at', Carbon::today())
+            ->whereIn('status', [201, 204, 301, 401, 402, 403, 501, 502])
+            ->distinct('user_id')
+            ->count('user_id');
     }
 
     public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])

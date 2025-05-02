@@ -523,6 +523,10 @@ Route::prefix('media')->group(function () {
     });
 });
 
+Route::prefix('promoter')->group(function () {
+    Route::get('customer_data', 'PromoterController@customerData');
+});
+
 Route::prefix('commission')->group(function () {
     Route::get('achievement', 'CommissionController@achievement');
     Route::get('sum', 'CommissionController@sum');
