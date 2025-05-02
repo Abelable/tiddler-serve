@@ -525,6 +525,9 @@ Route::prefix('media')->group(function () {
 
 Route::prefix('promoter')->group(function () {
     Route::get('customer_data', 'PromoterController@customerData');
+    Route::get('today_new_customer_list', 'PromoterController@todayNewCustomerList');
+    Route::get('today_ordering_customer_list', 'PromoterController@todayOrderingCustomerList');
+    Route::get('customer_list', 'PromoterController@customerList');
 });
 
 Route::prefix('commission')->group(function () {

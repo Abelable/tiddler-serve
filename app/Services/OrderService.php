@@ -86,6 +86,15 @@ class OrderService extends BaseService
             ->count('user_id');
     }
 
+    public function getTodayOrderListByUserIds(array $userIds, $columns = ['*'])
+    {
+        return Order::query()
+            ->whereIn('user_id', $userIds)
+            ->whereDate('created_at', Carbon::today())
+            ->whereIn('status', [201, 204, 301, 401, 402, 403, 501, 502])
+            ->get($columns);
+    }
+
     public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
     {
         return Order::query()

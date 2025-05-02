@@ -58,6 +58,14 @@ class UserService extends BaseService
         return User::query()->whereIn('id', $ids)->get($columns);
     }
 
+    public function getPageByUserIds(array $userIds, SearchPageInput $input, $columns = ['*'])
+    {
+        return User::query()
+            ->whereIn('id', $userIds)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function searchPage(SearchPageInput $input)
     {
         return User::search($input->keywords)
@@ -74,5 +82,15 @@ class UserService extends BaseService
     {
         $list = $this->searchList($keywords);
         return $list->pluck('id')->toArray();
+    }
+
+    public function searchListByUserIds(array $userIds, $keywords, $columns = ['*'])
+    {
+        return User::query()
+            ->whereIn('id', $userIds)
+            ->where(function($query) use ($keywords) {
+                $query->where('nickname', 'like', "%$keywords%")
+                    ->orWhere('mobile', $keywords);
+            })->get($columns);
     }
 }
