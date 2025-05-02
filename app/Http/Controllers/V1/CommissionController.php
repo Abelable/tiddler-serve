@@ -11,11 +11,6 @@ use Illuminate\Support\Carbon;
 
 class CommissionController extends Controller
 {
-    /**
-     * 推广员升C1：3个月累计超3w
-     * C1升C2：3个月累计超20w
-     * C2生C3：3个月累计超60w
-     */
     public function achievement()
     {
         $promoterInfo = $this->user()->promoterInfo;
@@ -30,6 +25,9 @@ class CommissionController extends Controller
             $totalGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 6);
         }
 
+        // 推广员升C1：3个月累计超3w
+        // C1升C2：3个月累计超20w
+        // C2生C3：3个月累计超60w
         $level = $promoterInfo->level;
         $targets = [1 => 30000, 2 => 200000, 3 => 600000];
         $target = $targets[$level] ?? 0;
@@ -61,7 +59,20 @@ class CommissionController extends Controller
         $timeType = $this->verifyRequiredInteger('timeType');
         $scene = $this->verifyInteger('scene');
 
-        $query = CommissionService::getInstance()->getUserCommissionQueryByTimeType([$this->userId()], $timeType, $scene);
+        $query = CommissionService::getInstance()->getUserCommissionQueryByTimeType([$this->userId()], $timeType);
+        if (!is_null($scene)) {
+            switch ($scene) {
+                case 1:
+                    $query = $query->where('scene', 1);
+                    break;
+                case 2:
+                    $query = $query->whereIn('scene', [2, 3]);
+                    break;
+                case 3:
+                    $query = $query->whereIn('scene', [4, 5]);
+                    break;
+            }
+        }
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('commission_base');

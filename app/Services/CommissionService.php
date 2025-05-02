@@ -699,16 +699,7 @@ class CommissionService extends BaseService
 
     public function getUserCommissionQuery(array $userIds, array $statusList)
     {
-        return Commission::query()
-            ->where(function($query) use ($userIds) {
-                $query->where(function($query) use ($userIds) {
-                    $query->where('scene', 1)
-                        ->whereIn('user_id', $userIds);
-                })->orWhere(function($query) use ($userIds) {
-                    $query->where('scene', 2)
-                        ->whereIn('superior_id', $userIds);
-                });
-            })->whereIn('status', $statusList);
+        return Commission::query()->whereIn('promoter_id', $userIds)->whereIn('status', $statusList);
     }
 
     public function getUserCommissionListByTimeType($userId, $timeType, array $statusList, $scene = null, $columns = ['*'])
