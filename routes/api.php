@@ -529,6 +529,7 @@ Route::prefix('promoter')->group(function () {
 
 Route::prefix('commission')->group(function () {
     Route::get('achievement', 'CommissionController@achievement');
+    Route::post('order_list', 'CommissionController@commissionOrderList');
     Route::get('sum', 'CommissionController@sum');
     Route::get('time_data', 'CommissionController@timeData');
     Route::get('cash', 'CommissionController@cash');

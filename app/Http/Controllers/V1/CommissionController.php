@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Commission;
+use App\Models\Order;
+use App\Models\OrderGoods;
 use App\Services\CommissionService;
+use App\Services\OrderGoodsService;
+use App\Services\OrderService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
 class CommissionController extends Controller
@@ -19,11 +25,30 @@ class CommissionController extends Controller
             return $this->fail(CodeResponse::FAIL, '非推广员无法查看数据');
         }
 
+        $monthDifference = 2;
         if ($promoterInfo->level_change_time) {
-            $totalGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 7, $promoterInfo->level_change_time);
-        } else {
-            $totalGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 6);
+            $currentMonth = date('n');
+            $levelChangeMonth = (int)date('n', strtotime($promoterInfo->level_change_time));
+            $monthDifference = $currentMonth - $levelChangeMonth;
+            if ($monthDifference < 0) {
+                $monthDifference += 12;
+            }
         }
+
+        if ($monthDifference == 0) {
+            $beforeLastMonthGMV = 0;
+            $lastMonthGMV = 0;
+        } elseif ($monthDifference == 1) {
+            $beforeLastMonthGMV = 0;
+            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
+        } else {
+            $beforeLastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 5);
+            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
+        }
+        $curMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 3);
+
+        $totalGMV = bcadd($beforeLastMonthGMV, $lastMonthGMV, 2);
+        $totalGMV = bcadd($totalGMV, $curMonthGMV, 2);
 
         // 推广员升C1：3个月累计超3w
         // C1升C2：3个月累计超20w
@@ -34,9 +59,66 @@ class CommissionController extends Controller
         $percent = ($totalGMV >= $target) ? 100 : round(($totalGMV / $target) * 100, 2);
 
         return $this->success([
+            'monthDifference' => $monthDifference,
+            'beforeLastMonthGMV' => $beforeLastMonthGMV,
+            'lastMonthGMV' => $lastMonthGMV,
+            'curMonthGMV' => $curMonthGMV,
             'totalGMV' => $totalGMV,
             'percent' => $percent
         ]);
+    }
+
+    public function commissionOrderList()
+    {
+        $scene = $this->verifyInteger('scene');
+        $timeType = $this->verifyRequiredInteger('timeType');
+        $statusList = $this->verifyArray('statusList');
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $commissionList = CommissionService::getInstance()
+            ->getUserCommissionListByTimeType($this->userId(), $timeType, $statusList,$scene ?: null);
+        $groupCommissionList = $commissionList->groupBy('order_id');
+        $keyCommissionList = $commissionList->mapWithKeys(function ($commission) {
+            return [ $commission->order_id . '_' . $commission->goods_id => $commission ];
+        });
+        $orderIds = $commissionList->pluck('order_id')->toArray();
+
+        $goodsIds = $commissionList->pluck('goods_id')->toArray();
+        $goodsColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
+        $groupGoodsList = OrderGoodsService::getInstance()->getListByGoodsIds($goodsIds, $goodsColumns)->groupBy('order_id');
+
+        $page = OrderService::getInstance()->getOrderPageByIds($orderIds, $input);
+        $list = collect($page->items())->map(function (Order $order) use ($groupGoodsList, $keyCommissionList, $groupCommissionList) {
+            $orderCommissionList = $groupCommissionList->get($order->id);
+            $commissionBaseSum = $orderCommissionList->sum('commission_base');
+            $commissionAmountSum = $orderCommissionList->sum('commission_amount');
+            /** @var Commission $firstCommission */
+            $firstCommission = $orderCommissionList->first();
+
+            $orderGoodsList = $groupGoodsList->get($order->id);
+            $orderGoodsList->map(function (OrderGoods $goods) use ($order, $keyCommissionList) {
+                $commissionKey = $order->id . '_' . $goods->goods_id;
+                /** @var Commission $commission */
+                $commission = $keyCommissionList->get($commissionKey);
+                $goods['commission'] = $commission->commission_amount;
+                unset($goods->order_id);
+                return $goods;
+            });
+
+            return [
+                'id' => $order->id,
+                'orderSn' => $order->order_sn,
+                'status' => $firstCommission->status,
+                'createdAt' => $order->created_at,
+                'commissionBase' => $commissionBaseSum,
+                'commissionAmount' => bcadd($commissionAmountSum, 0, 2) ,
+                'scene' => $firstCommission->scene,
+                'goodsList' => $orderGoodsList
+            ];
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function sum()
