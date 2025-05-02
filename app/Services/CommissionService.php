@@ -713,38 +713,13 @@ class CommissionService extends BaseService
 
     public function getUserCommissionListByTimeType($userId, $timeType, array $statusList, $scene = null, $columns = ['*'])
     {
-        $query = $this->getUserCommissionQueryByTimeType([$userId], $timeType, $scene);
+        $query = $this->getUserCommissionQueryByTimeType([$userId], $timeType);
         return $query->whereIn('status', $statusList)->get($columns);
     }
 
-    /**
-     * @param array $userIds
-     * @param $timeType
-     * @param $scene
-     * @return Commission|\Illuminate\Database\Eloquent\Builder
-     */
-    public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $scene = null)
+    public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)
     {
-        $query = Commission::query();
-
-        if (!is_null($scene)) {
-            if ($scene == 1) {
-                $query = $query->whereIn('user_id', $userIds);
-            } else {
-                $query = $query->whereIn('superior_id', $userIds);
-            }
-            $query = $query->where('scene', $scene);
-        } else {
-            $query = $query->where(function($query) use ($userIds) {
-                $query->where(function($query) use ($userIds) {
-                    $query->where('scene', 1)
-                        ->whereIn('user_id', $userIds);
-                })->orWhere(function($query) use ($userIds) {
-                    $query->where('scene', 2)
-                        ->whereIn('superior_id', $userIds);
-                });
-            });
-        }
+        $query = Commission::query()->whereIn('promoter_id', $userIds);
 
         switch ($timeType) {
             case 1:
@@ -761,6 +736,12 @@ class CommissionService extends BaseService
                 break;
             case 5:
                 $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()->subMonths(2)->endOfMonth()]);
+                break;
+            case 6:
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()]);
+                break;
+            case 7:
+                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()]);
                 break;
         }
         return $query;
@@ -782,9 +763,12 @@ class CommissionService extends BaseService
             ->get($columns);
     }
 
-    public function getUserGMVByTimeType($userId, $timeType)
+    public function getUserGMVByTimeType($userId, $timeType, $startTime = null)
     {
-        return $this->getUserCommissionQueryByTimeType([$userId], $timeType)->whereIn('status', [2, 3, 4])->sum('commission_base');
+        return $this
+            ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
+            ->whereIn('status', [2, 3, 4])
+            ->sum('commission_amount');
     }
 
     public function withdrawUserCommission($userId, $scene, $withdrawalId)

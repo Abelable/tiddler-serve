@@ -27,6 +27,7 @@ class CreatePromotersTable extends Migration
             $table->float('share_commission_sum')->default(0)->comment('累计分享佣金');
             $table->float('team_commission_sum')->default(0)->comment('累计团队佣金');
             $table->string('expiration_time')->default('')->comment('身份失效时间');
+            $table->string('level_change_time')->default('')->comment('身份变更时间');
             $table->timestamps();
             $table->softDeletes();
         });

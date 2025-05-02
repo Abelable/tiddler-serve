@@ -18,6 +18,7 @@ namespace App\Models;
  * @property float $share_commission_sum 累计分享佣金
  * @property float $team_commission_sum 累计团队佣金
  * @property string $expiration_time 身份失效时间
+ * @property string $level_change_time 身份变更时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -31,6 +32,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereGiftGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereLevel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereLevelChangeTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePromotedUserNumber($value)

@@ -523,6 +523,13 @@ Route::prefix('media')->group(function () {
     });
 });
 
+Route::prefix('commission')->group(function () {
+    Route::get('achievement', 'CommissionController@achievement');
+    Route::get('sum', 'CommissionController@sum');
+    Route::get('time_data', 'CommissionController@timeData');
+    Route::get('cash', 'CommissionController@cash');
+});
+
 /*
 |--------------------------------------------------------------------------
 | 管理后台接口
