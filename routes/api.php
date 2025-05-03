@@ -543,6 +543,17 @@ Route::prefix('withdraw')->group(function () {
     Route::get('record_list', 'WithdrawalController@recordList');
 });
 
+Route::prefix('account')->group(function () {
+    Route::get('info', 'AccountController@accountInfo');
+    Route::get('transaction_record_list', 'AccountController@transactionRecordList');
+});
+
+Route::prefix('bank_card')->group(function () {
+    Route::get('detail', 'BankCardController@detail');
+    Route::post('add', 'BankCardController@add');
+    Route::post('edit', 'BankCardController@edit');
+});
+
 /*
 |--------------------------------------------------------------------------
 | 管理后台接口
