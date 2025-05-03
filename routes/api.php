@@ -446,6 +446,11 @@ Route::prefix('catering')->group(function () {
     });
 });
 
+Route::prefix('coupon')->group(function () {
+    Route::post('receive', 'CouponController@receiveCoupon');
+    Route::get('user_list', 'CouponController@userCouponList');
+});
+
 Route::prefix('mall')->group(function () {
     Route::get('banner_list', 'MallController@bannerList');
     Route::get('commodity_list', 'MallController@list');
