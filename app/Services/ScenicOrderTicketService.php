@@ -52,4 +52,13 @@ class ScenicOrderTicketService extends BaseService
     {
         return ScenicOrderTicket::query()->where('order_id', $orderId)->delete();
     }
+
+    public function searchList($userId, $keyword, $columns = ['*'])
+    {
+        // todo 景点订单搜索
+        return ScenicOrderTicket::query()
+            ->where('user_id', $userId)
+            ->where('name', 'like', "%{$keyword}%")
+            ->get($columns);
+    }
 }

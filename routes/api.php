@@ -155,6 +155,7 @@ Route::prefix('order')->group(function () {
     Route::post('submit', 'OrderController@submit');
     Route::post('pay_params', 'OrderController@payParams');
     Route::get('list', 'OrderController@list');
+    Route::get('search', 'OrderController@search');
     Route::get('shop_list', 'OrderController@shopList');
     Route::get('detail', 'OrderController@detail');
     Route::post('confirm', 'OrderController@confirm');

@@ -136,9 +136,23 @@ class ScenicOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = ScenicOrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
-        $list = $this->orderList($page);
+        $orderList = collect($page->items());
+        $list = $this->handleOrderList($orderList);
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    // todo 景点订单搜索
+    public function search()
+    {
+        $keywords = $this->verifyRequiredString('keywords');
+
+        $orderGoodsList = ScenicOrderTicketService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderList = ScenicOrderService::getInstance()->getOrderListByIds($orderIds);
+        $list = $this->handleOrderList($orderList);
+
+        return $this->success($list);
     }
 
     public function shopList()
@@ -150,7 +164,8 @@ class ScenicOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = ScenicOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $list = $this->orderList($page);
+        $orderList = collect($page->items());
+        $list = $this->handleOrderList($orderList);
 
         return $this->success($this->paginate($page, $list));
     }
@@ -177,9 +192,8 @@ class ScenicOrderController extends Controller
         return $statusList;
     }
 
-    private function orderList($page)
+    private function handleOrderList($orderList)
     {
-        $orderList = collect($page->items());
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = ScenicOrderTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
         return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
