@@ -164,6 +164,12 @@ Route::prefix('order')->group(function () {
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
     Route::post('delete', 'OrderController@delete');
+
+    Route::prefix('keyword')->group(function () {
+        Route::get('list', 'OrderKeywordController@list');
+        Route::post('add', 'OrderKeywordController@add');
+        Route::post('clear', 'OrderKeywordController@clear');
+    });
 });
 
 Route::prefix('scenic')->group(function () {
