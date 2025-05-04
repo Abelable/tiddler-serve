@@ -146,9 +146,6 @@ class GoodsController extends Controller
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
-        $goods['categoryIds'] = $goods->categories->pluck('category_id')->toArray();
-        unset($goods->categories);
-
         if ($this->isLogin()) {
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
             if (is_null($addressId)) {

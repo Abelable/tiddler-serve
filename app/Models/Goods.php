@@ -39,8 +39,6 @@ use Laravel\Scout\Searchable;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsCategory[] $categories
- * @property-read int|null $categories_count
  * @property-read \App\Models\FreightTemplate|null $freightTemplateInfo
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsPickupAddress[] $pickupAddressList
  * @property-read int|null $pickup_address_list_count
@@ -98,11 +96,6 @@ class Goods extends BaseModel
     public function toSearchableArray()
     {
         return $this->only('id', 'name');
-    }
-
-    public function categories()
-    {
-        return $this->hasMany(GoodsCategory::class, 'goods_id');
     }
 
     public function freightTemplateInfo()
