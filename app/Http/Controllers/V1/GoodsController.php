@@ -186,7 +186,7 @@ class GoodsController extends Controller
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
-            $shopInfo['goods_list'] = GoodsService::getInstance()->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price']);
+            $shopInfo['goods_list'] = GoodsService::getInstance()->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price', 'sales_volume']);
             $goods['shop_info'] = $shopInfo;
         }
         unset($goods->shop_id);
