@@ -13,6 +13,7 @@ use App\Services\GoodsCategoryService;
 use App\Services\GoodsPickupAddressService;
 use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
+use App\Services\OrderGoodsService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
@@ -145,6 +146,9 @@ class GoodsController extends Controller
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
+        $goods['categoryIds'] = $goods->categories->pluck('category_id')->toArray();
+        unset($goods->categories);
+
         if ($this->isLogin()) {
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
             if (is_null($addressId)) {
@@ -194,6 +198,9 @@ class GoodsController extends Controller
             $goods['freightTemplateInfo'] = $goods->freightTemplateInfo;
             unset($goods->freight_template_id);
         }
+
+        // 购买用户列表
+        $goods['customerList'] = OrderGoodsService::getInstance()->getLatestCustomerList($goods->id);
 
         return $this->success($goods);
     }
