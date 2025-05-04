@@ -179,12 +179,10 @@ class GoodsService extends BaseService
             $query = $query->whereNotIn('id', $input->goodsIds);
         }
         if (count($input->shopCategoryIds) != 0) {
-            $query->whereHas('categories', function ($q) use ($input) {
-                $q->whereIn('shop_category_id', $input->shopCategoryIds);
-            });
+            $query = $query->whereIn('shop_category_id', $input->shopCategoryIds);
         }
         return $query
-            ->orderBy('sale_commission_rate', 'desc')
+            ->orderBy('sales_commission_rate', 'desc')
             ->orderBy('avg_score', 'desc')
             ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
