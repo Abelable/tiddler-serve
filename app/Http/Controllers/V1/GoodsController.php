@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\Coupon;
 use App\Models\Goods;
 use App\Services\AddressService;
+use App\Services\CartGoodsService;
 use App\Services\CouponService;
 use App\Services\GiftGoodsService;
 use App\Services\GoodsCategoryService;
@@ -43,6 +44,31 @@ class GoodsController extends Controller
         $page = GoodsService::getInstance()->getAllList($input);
         $list = $this->supplementGoodsList($page);
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function getPurchasedList()
+    {
+        $goodsId = $this->verifyRequiredId('goodsId');
+        $scene = $this->verifyRequiredInteger('scene');
+
+        $columns = ['selected_sku_name', 'selected_sku_index', 'number'];
+        $orderGoodsList = OrderGoodsService::getInstance()->getRecentlyUserListByGoodsIds($this->userId(), [$goodsId], $columns);
+        $cartGoodsList = CartGoodsService::getInstance()->getListByGoodsId($this->userId(), $goodsId, $columns);
+        $purchasedList = collect($orderGoodsList);
+        if ($scene == 1) {
+            $purchasedList = $purchasedList->merge(collect($cartGoodsList));
+        }
+        $list = $purchasedList->groupBy(function ($item) {
+            return $item['selected_sku_name'] . '|' . $item['selected_sku_index'];
+        })->map(function ($groupedItems) {
+            return [
+                'skuName' => $groupedItems->first()['selected_sku_name'],
+                'skuIndex' => $groupedItems->first()['selected_sku_index'],
+                'number' => $groupedItems->sum('number'),
+            ];
+        })->values()->toArray();
+
+        return $this->success($list);
     }
 
     public function recommendList()
