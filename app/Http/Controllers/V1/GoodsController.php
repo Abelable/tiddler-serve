@@ -275,6 +275,8 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
+        $goods->refundAddressIds = $goods->refundAddressIds();
+        $goods->pickupAddressIds = $goods->pickupAddressIds();
         $goods->image_list = json_decode($goods->image_list);
         $goods->detail_image_list = json_decode($goods->detail_image_list);
         $goods->spec_list = json_decode($goods->spec_list);
