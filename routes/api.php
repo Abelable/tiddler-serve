@@ -123,6 +123,7 @@ Route::prefix('goods')->group(function () {
     Route::get('search', 'GoodsController@search');
     Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
     Route::get('detail', 'GoodsController@detail');
+    Route::get('pickup_address_list', 'GoodsController@getPickupAddressList');
 
     Route::prefix('evaluation')->group(function () {
         Route::get('summary', 'GoodsEvaluationController@summary');

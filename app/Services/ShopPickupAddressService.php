@@ -15,4 +15,9 @@ class ShopPickupAddressService extends BaseService
     {
         return ShopPickupAddress::query()->find($id, $columns);
     }
+
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return ShopPickupAddress::query()->whereIn('id', $ids)->get($columns);
+    }
 }

@@ -16,6 +16,7 @@ use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\ShopManagerService;
+use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class GoodsController extends Controller
 {
-    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'shopOnSaleGoodsList'];
+    protected $except = ['categoryOptions', 'list', 'search', 'detail', 'shopOnSaleGoodsList', 'getPickupAddressList'];
 
     public function categoryOptions()
     {
@@ -280,6 +281,18 @@ class GoodsController extends Controller
         $goods->sku_list = json_decode($goods->sku_list);
 
         return $this->success($goods);
+    }
+
+    public function getPickupAddressList()
+    {
+        $cartGoodsId = $this->verifyRequiredId('cartGoodsId');
+        $goodsId = CartGoodsService::getInstance()->getCartGoodsById($cartGoodsId)->goods_id;
+        $pickupAddressIds = GoodsPickupAddressService::getInstance()->getListByGoodsId($goodsId)->pluck('pickup_address_id')->toArray();
+
+        $columns = ['id', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
+        $pickupAddressList = ShopPickupAddressService::getInstance()->getListByIds($pickupAddressIds, $columns);
+
+        return $this->success($pickupAddressList);
     }
 
     public function add()
