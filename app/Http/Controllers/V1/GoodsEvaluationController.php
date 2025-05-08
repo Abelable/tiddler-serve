@@ -20,17 +20,25 @@ class GoodsEvaluationController extends Controller
     {
         $goodsId = $this->verifyRequiredId('goodsId');
 
-        $evaluationList = GoodsEvaluationService::getInstance()->evaluationList($goodsId, 5);
+        $evaluationList = GoodsEvaluationService::getInstance()->evaluationList($goodsId, 2);
         $userIds = $evaluationList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname']);
+        $list = $evaluationList->map(function (GoodsEvaluation $evaluation) use ($userList) {
+            $userInfo = $userList->get($evaluation->user_id);
+            $evaluation['userInfo'] = $userInfo;
+            $evaluation->image_list = json_decode($evaluation->image_list);
+            unset($evaluation->user_id);
+            unset($evaluation->goods_id);
+            return $evaluation;
+        });
 
         $total = GoodsEvaluationService::getInstance()->getTotalNum($goodsId);
         $avgScore = GoodsEvaluationService::getInstance()->getAverageScore($goodsId);
 
         return $this->success([
-            'userList' => $userList,
             'total' => $total,
             'avgScore' => $avgScore ?: 0,
+            'list' => $list
         ]);
     }
 
