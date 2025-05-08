@@ -22,7 +22,7 @@ class GoodsEvaluationController extends Controller
 
         $evaluationList = GoodsEvaluationService::getInstance()->evaluationList($goodsId, 2);
         $userIds = $evaluationList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname']);
+        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $list = $evaluationList->map(function (GoodsEvaluation $evaluation) use ($userList) {
             $userInfo = $userList->get($evaluation->user_id);
             $evaluation['userInfo'] = $userInfo;
