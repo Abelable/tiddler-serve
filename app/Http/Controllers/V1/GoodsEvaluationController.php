@@ -66,6 +66,14 @@ class GoodsEvaluationController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
+    public function detail()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $evaluation = GoodsEvaluationService::getInstance()->getEvaluationByOrderId($orderId);
+        $evaluation->image_list = json_decode($evaluation->image_list);
+        return $this->success($evaluation);
+    }
+
     public function add()
     {
         /** @var GoodsEvaluationInput $input */

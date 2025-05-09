@@ -22,6 +22,11 @@ class GoodsEvaluationService extends BaseService
         return GoodsEvaluation::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getEvaluationByOrderId($orderId, $columns = ['*'])
+    {
+        return GoodsEvaluation::query()->where('order_id', $orderId)->first($columns);
+    }
+
     public function createEvaluation($userId, GoodsEvaluationInput $input)
     {
         foreach ($input->goodsIds as $goodsId) {

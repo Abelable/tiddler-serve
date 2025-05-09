@@ -128,6 +128,7 @@ Route::prefix('goods')->group(function () {
     Route::prefix('evaluation')->group(function () {
         Route::get('summary', 'GoodsEvaluationController@summary');
         Route::get('list', 'GoodsEvaluationController@list');
+        Route::get('detail', 'GoodsEvaluationController@detail');
         Route::post('add', 'GoodsEvaluationController@add');
         Route::post('delete', 'GoodsEvaluationController@delete');
     });
