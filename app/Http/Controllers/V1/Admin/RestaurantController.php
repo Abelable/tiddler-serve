@@ -22,7 +22,7 @@ class RestaurantController extends Controller
             'cover',
             'name',
             'category_id',
-            'rate',
+            'score',
             'created_at',
             'updated_at'
         ];
