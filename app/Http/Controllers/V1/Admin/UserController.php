@@ -13,8 +13,9 @@ class UserController extends Controller
 
     public function list()
     {
+        /** @var UserListInput $input */
         $input = UserListInput::new();
-        $list = UserService::getInstance()->getUserList($input);
+        $list = UserService::getInstance()->getUserPage($input);
         return $this->successPaginate($list);
     }
 
@@ -37,5 +38,11 @@ class UserController extends Controller
         }
         $user->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $options = UserService::getInstance()->getUserList(['id', 'avatar', 'nickname']);
+        return $this->success($options);
     }
 }

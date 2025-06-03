@@ -603,6 +603,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('list', 'UserController@list');
         Route::get('detail', 'UserController@detail');
         Route::post('delete', 'UserController@delete');
+        Route::get('options', 'UserController@options');
     });
 
     Route::prefix('auth_info')->group(function () {
