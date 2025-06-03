@@ -623,6 +623,24 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'MallBannerController@delete');
     });
 
+    Route::prefix('media')->group(function () {
+        Route::prefix('short_video')->group(function () {
+            Route::post('list', 'ShortVideoController@list');
+            Route::get('detail', 'ShortVideoController@detail');
+            Route::post('add', 'ShortVideoController@add');
+            Route::post('edit', 'ShortVideoController@edit');
+            Route::post('delete', 'ShortVideoController@delete');
+        });
+
+        Route::prefix('tourism_note')->group(function () {
+            Route::post('list', 'TourismNoteController@list');
+            Route::get('detail', 'TourismNoteController@detail');
+            Route::post('add', 'TourismNoteController@add');
+            Route::post('edit', 'TourismNoteController@edit');
+            Route::post('delete', 'TourismNoteController@delete');
+        });
+    });
+
     Route::prefix('merchant')->group(function () {
         Route::post('list', 'MerchantController@list');
         Route::get('detail', 'MerchantController@detail');

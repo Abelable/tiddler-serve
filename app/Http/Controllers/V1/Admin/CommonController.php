@@ -9,6 +9,8 @@ class CommonController extends Controller
 {
     protected $guard = 'Admin';
 
+    protected $only = [];
+
     public function ossConfig()
     {
         $config = AliOssServe::new()->getOssConfig();

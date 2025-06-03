@@ -4,12 +4,24 @@ namespace App\Services\Media\ShortVideo;
 
 use App\Models\ShortVideo;
 use App\Services\BaseService;
+use App\Utils\Inputs\Admin\ShortVideoPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
+    public function adminPage(ShortVideoPageInput $input, $columns = ['*'])
+    {
+        $query = ShortVideo::query();
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function pageList(PageInput $input, $authorIds = null, $curVideoId = 0, $columns = ['*'])
     {
         $query = ShortVideo::query()->where('is_private', 0);
