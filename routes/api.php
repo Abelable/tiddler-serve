@@ -702,7 +702,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GoodsController@delete');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
-        Route::get('self_options', 'GoodsController@selfGoodsOptions');
+        Route::get('options', 'GoodsController@options');
+        Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
     });
 
     Route::prefix('gift_goods')->group(function () {

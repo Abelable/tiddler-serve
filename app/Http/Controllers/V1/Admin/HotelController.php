@@ -70,7 +70,7 @@ class HotelController extends Controller
 
     public function options()
     {
-        $options = HotelService::getInstance()->getHotelOptions(['id', 'name']);
+        $options = HotelService::getInstance()->getHotelOptions(['id', 'name', 'cover']);
         return $this->success($options);
     }
 }

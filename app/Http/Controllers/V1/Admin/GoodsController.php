@@ -7,7 +7,7 @@ use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\GoodsListInput;
+use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
 
 class GoodsController extends Controller
@@ -16,9 +16,9 @@ class GoodsController extends Controller
 
     public function list()
     {
-        /** @var GoodsListInput $input */
-        $input = GoodsListInput::new();
-        $list = GoodsService::getInstance()->getAdminGoodsList($input);
+        /** @var GoodsPageInput $input */
+        $input = GoodsPageInput::new();
+        $list = GoodsService::getInstance()->getAdminGoodsPage($input);
         return $this->successPaginate($list);
     }
 
@@ -147,7 +147,13 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function selfGoodsOptions()
+    public function options()
+    {
+        $options = GoodsService::getInstance()->getGoodsList(['id', 'name', 'cover']);
+        return $this->success($options);
+    }
+
+    public function selfSupportGoodsOptions()
     {
         $options = GoodsService::getInstance()->getSelfGoodsList(['id', 'name', 'cover']);
         return $this->success($options);

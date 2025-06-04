@@ -93,8 +93,15 @@ class ScenicController extends Controller
 
     public function options()
     {
-        $scenicOptions = ScenicService::getInstance()->getScenicOptions(['id', 'name']);
-        return $this->success($scenicOptions);
+        $scenicOptions = ScenicService::getInstance()->getScenicOptions(['id', 'name', 'image_list']);
+        $options = $scenicOptions->map(function (ScenicSpot $scenicSpot) {
+            return [
+                'id' => $scenicSpot->id,
+                'name' => $scenicSpot->name,
+                'cover' => json_decode($scenicSpot->image_list)[0],
+            ];
+        });
+        return $this->success($options);
     }
 
     public function add()

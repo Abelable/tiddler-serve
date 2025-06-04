@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Goods;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\GoodsListInput;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
@@ -112,6 +111,11 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getGoodsList($columns = ['*'])
+    {
+        return Goods::query()->get($columns);
+    }
+
     public function getSelfGoodsList($columns = ['*'])
     {
         return Goods::query()->where('shop_id', 0)->get($columns);
@@ -151,7 +155,7 @@ class GoodsService extends BaseService
         return Goods::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getAdminGoodsList(GoodsListInput $input, $columns=['*'])
+    public function getAdminGoodsPage(GoodsPageInput $input, $columns=['*'])
     {
         $query = Goods::query();
         if (!empty($input->name)) {

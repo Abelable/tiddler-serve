@@ -125,7 +125,7 @@ class RestaurantController extends Controller
 
     public function options()
     {
-        $restaurantOptions = RestaurantService::getInstance()->getOptions(['id', 'name']);
+        $restaurantOptions = RestaurantService::getInstance()->getOptions(['id', 'name', 'cover']);
         return $this->success($restaurantOptions);
     }
 

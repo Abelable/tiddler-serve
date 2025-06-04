@@ -6,12 +6,14 @@ use App\Utils\Inputs\PageInput;
 
 class ShortVideoPageInput extends PageInput
 {
-    public $name;
+    public $title;
+    public $userId;
 
     public function rules()
     {
         return array_merge([
-            'name' => 'string',
+            'title' => 'string',
+            'userId' => 'integer|digits_between:1,20',
         ], parent::rules());
     }
 }
