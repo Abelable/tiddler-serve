@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\UserListInput;
+use App\Utils\Inputs\Admin\UserPageInput;
 
 class UserController extends Controller
 {
@@ -13,8 +13,8 @@ class UserController extends Controller
 
     public function list()
     {
-        /** @var UserListInput $input */
-        $input = UserListInput::new();
+        /** @var UserPageInput $input */
+        $input = UserPageInput::new();
         $list = UserService::getInstance()->getUserPage($input);
         return $this->successPaginate($list);
     }

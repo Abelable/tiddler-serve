@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Utils\Inputs\Admin\UserListInput;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\WxMpRegisterInput;
