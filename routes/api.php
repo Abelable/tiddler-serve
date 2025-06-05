@@ -630,6 +630,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('detail', 'ShortVideoController@detail');
             Route::post('add', 'ShortVideoController@add');
             Route::post('edit', 'ShortVideoController@edit');
+            Route::post('edit_views', 'ShortVideoController@editViews');
             Route::post('delete', 'ShortVideoController@delete');
         });
 
@@ -638,6 +639,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('detail', 'TourismNoteController@detail');
             Route::post('add', 'TourismNoteController@add');
             Route::post('edit', 'TourismNoteController@edit');
+            Route::post('edit_views', 'TourismNoteController@editViews');
             Route::post('delete', 'TourismNoteController@delete');
         });
     });

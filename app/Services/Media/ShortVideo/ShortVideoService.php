@@ -4,14 +4,14 @@ namespace App\Services\Media\ShortVideo;
 
 use App\Models\ShortVideo;
 use App\Services\BaseService;
-use App\Utils\Inputs\Admin\ShortVideoPageInput;
+use App\Utils\Inputs\Admin\MediaPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\ShortVideoInput;
 
 class ShortVideoService extends BaseService
 {
-    public function adminPage(ShortVideoPageInput $input, $columns = ['*'])
+    public function adminPage(MediaPageInput $input, $columns = ['*'])
     {
         $query = ShortVideo::query();
         if (!empty($input->name)) {
