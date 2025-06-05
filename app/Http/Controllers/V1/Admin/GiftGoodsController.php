@@ -40,6 +40,7 @@ class GiftGoodsController extends Controller
             $giftGoods->goods_id = $goods->id;
             $giftGoods->goods_cover = $goods->cover;
             $giftGoods->goods_name = $goods->name;
+            $giftGoods->effective_duration = $input->effectiveDuration;
             $giftGoods->save();
         }
 

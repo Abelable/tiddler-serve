@@ -10,7 +10,7 @@ class GoodsPageInput extends PageInput
     public $shopCategoryId;
     public $categoryId;
     public $shopId;
-    public $sort;
+    public $sort = 'created_at';
 
     public function rules()
     {
