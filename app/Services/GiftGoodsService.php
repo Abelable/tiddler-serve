@@ -11,10 +11,12 @@ class GiftGoodsService extends BaseService
     public function getGoodsPage(GiftGoodsPageInput $input, $columns = ['*'])
     {
         $query = GiftGoods::query();
-        if (!empty($input->type)) {
-            $query = $query->where('type', $input->type);
+        if (!empty($input->typeId)) {
+            $query = $query->where('type_id', $input->typeId);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getGoodsList($columns = ['*'])
@@ -22,14 +24,12 @@ class GiftGoodsService extends BaseService
         return GiftGoods::query()->get($columns);
     }
 
-    public function getGoodsListByType(array $typeList, $columns = ['*'])
-    {
-        return GiftGoods::query()->whereIn('type', $typeList)->get($columns);
-    }
-
     public function getFilterGoodsList(GiftGoodsListInput $input, $columns = ['*'])
     {
-        return GiftGoods::query()->where('type', $input->type)->whereIn('goods_id', $input->goodsIds)->get($columns);
+        return GiftGoods::query()
+            ->where('type_id', $input->typeId)
+            ->whereIn('goods_id', $input->goodsIds)
+            ->get($columns);
     }
 
     public function getGoodsByGoodsId($goodsId, $columns = ['*'])

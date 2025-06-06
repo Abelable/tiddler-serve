@@ -36,7 +36,7 @@ class GiftGoodsController extends Controller
 
         foreach ($goodsList as $goods) {
             $giftGoods = GiftGoods::new();
-            $giftGoods->type = $input->type;
+            $giftGoods->type_id = $input->typeId;
             $giftGoods->goods_id = $goods->id;
             $giftGoods->goods_cover = $goods->cover;
             $giftGoods->goods_name = $goods->name;

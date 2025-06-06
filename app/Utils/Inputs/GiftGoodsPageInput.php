@@ -4,12 +4,12 @@ namespace App\Utils\Inputs;
 
 class GiftGoodsPageInput extends PageInput
 {
-    public $type;
+    public $typeId;
 
     public function rules()
     {
         return array_merge(parent::rules(), [
-            'type' => 'integer|in:1,2',
+            'typeId' => 'integer',
         ]);
     }
 }
