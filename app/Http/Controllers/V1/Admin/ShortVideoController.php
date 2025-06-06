@@ -65,6 +65,30 @@ class ShortVideoController extends Controller
         if (is_null($shortVideo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前短视频不存在');
         }
+
+        $relatedProductList = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::VIDEO, [$id]);
+        $scenicIds = $hotelIds = $restaurantIds = $goodsIds = [];
+        foreach ($relatedProductList as $mediaCommodity) {
+            switch ($mediaCommodity->commodity_type) {
+                case ProductType::SCENIC:
+                    $scenicIds[] = $mediaCommodity->commodity_id;
+                    break;
+                case ProductType::HOTEL:
+                    $hotelIds[] = $mediaCommodity->commodity_id;
+                    break;
+                case ProductType::RESTAURANT:
+                    $restaurantIds[] = $mediaCommodity->commodity_id;
+                    break;
+                case ProductType::GOODS:
+                    $goodsIds[] = $mediaCommodity->commodity_id;
+                    break;
+            }
+        }
+        $shortVideo['scenicIds'] = $scenicIds;
+        $shortVideo['hotelIds'] = $hotelIds;
+        $shortVideo['restaurantIds'] = $restaurantIds;
+        $shortVideo['goodsIds'] = $goodsIds;
+
         return $this->success($shortVideo);
     }
 
