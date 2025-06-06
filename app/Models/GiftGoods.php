@@ -6,7 +6,7 @@ namespace App\Models;
  * App\Models\GiftGoods
  *
  * @property int $id
- * @property int $type 类型：1-爱心助农，2-文创周边...
+ * @property int $type_id 类型id
  * @property int $goods_id 商品id
  * @property string $goods_cover 商品图片
  * @property string $goods_name 商品名称
@@ -25,7 +25,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|GiftGoods withTrashed()
  * @method static \Illuminate\Database\Query\Builder|GiftGoods withoutTrashed()

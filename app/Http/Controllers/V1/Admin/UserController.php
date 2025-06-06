@@ -29,6 +29,29 @@ class UserController extends Controller
         return $this->success($user);
     }
 
+    public function edit()
+    {
+        $id = $this->verifyRequiredId('id');
+        $avatar = $this->verifyString('avatar');
+        $nickname = $this->verifyString('nickname');
+
+        $user = UserService::getInstance()->getUserById($id);
+        if (is_null($user)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前用户不存在');
+        }
+
+        if (!is_null($avatar)) {
+            $user->avatar = $avatar;
+        }
+        if (!is_null($nickname)) {
+            $user->nickname = $nickname;
+        }
+
+        $user->save();
+
+        return $this->success();
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');

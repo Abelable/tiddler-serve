@@ -15,7 +15,7 @@ class CreateGiftGoodsTable extends Migration
     {
         Schema::create('gift_goods', function (Blueprint $table) {
             $table->id();
-            $table->integer('type')->comment('类型：1-爱心助农，2-文创周边...');
+            $table->integer('type_id')->comment('类型id');
             $table->integer('goods_id')->comment('商品id');
             $table->string('goods_cover')->comment('商品图片');
             $table->string('goods_name')->comment('商品名称');
