@@ -33,7 +33,7 @@ class ShortVideoService extends BaseService
             $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
                 return $mediaCommodity->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
-            $query = $query->whereIn('media_id', $videoIds);
+            $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->hotelId)) {
@@ -42,7 +42,7 @@ class ShortVideoService extends BaseService
             $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
                 return $mediaCommodity->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
-            $query = $query->whereIn('media_id', $videoIds);
+            $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->restaurantId)) {
@@ -51,7 +51,7 @@ class ShortVideoService extends BaseService
             $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
                 return $mediaCommodity->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
-            $query = $query->whereIn('media_id', $videoIds);
+            $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->goodsId)) {
@@ -60,7 +60,7 @@ class ShortVideoService extends BaseService
             $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
                 return $mediaCommodity->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
-            $query = $query->whereIn('media_id', $videoIds);
+            $query = $query->whereIn('id', $videoIds);
         }
 
         return $query
