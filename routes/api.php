@@ -708,7 +708,18 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
     });
 
-    Route::prefix('gift_goods')->group(function () {
+    Route::prefix('gift')->group(function () {
+        Route::prefix('type')->group(function () {
+            Route::post('list', 'GiftTypeController@list');
+            Route::get('detail', 'GiftTypeController@detail');
+            Route::post('add', 'GiftTypeController@add');
+            Route::post('edit', 'GiftTypeController@edit');
+            Route::post('edit_sort', 'GiftTypeController@editSort');
+            Route::post('edit_status', 'GiftTypeController@editStatus');
+            Route::post('delete', 'GiftTypeController@delete');
+            Route::get('options', 'GiftTypeController@options');
+        });
+
         Route::post('list', 'GiftGoodsController@list');
         Route::post('add', 'GiftGoodsController@add');
         Route::post('delete', 'GiftGoodsController@delete');
