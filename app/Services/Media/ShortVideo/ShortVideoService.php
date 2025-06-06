@@ -2,8 +2,12 @@
 
 namespace App\Services\Media\ShortVideo;
 
+use App\Models\MediaCommodity;
 use App\Models\ShortVideo;
 use App\Services\BaseService;
+use App\Services\MediaCommodityService;
+use App\Utils\Enums\MediaType;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\Admin\MediaPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
@@ -14,6 +18,43 @@ class ShortVideoService extends BaseService
     public function adminPage(MediaPageInput $input, $columns = ['*'])
     {
         $query = ShortVideo::query();
+
+        if (!empty($input->scenicId)) {
+            $relatedProductList = MediaCommodityService::getInstance()
+                ->getListByProductIds(ProductType::SCENIC, [$input->scenicId]);
+            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
+                return $mediaCommodity->media_type == MediaType::VIDEO;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('media_id', $videoIds);
+        }
+
+        if (!empty($input->hotelId)) {
+            $relatedProductList = MediaCommodityService::getInstance()
+                ->getListByProductIds(ProductType::HOTEL, [$input->hotelId]);
+            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
+                return $mediaCommodity->media_type == MediaType::VIDEO;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('media_id', $videoIds);
+        }
+
+        if (!empty($input->restaurantId)) {
+            $relatedProductList = MediaCommodityService::getInstance()
+                ->getListByProductIds(ProductType::RESTAURANT, [$input->restaurantId]);
+            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
+                return $mediaCommodity->media_type == MediaType::VIDEO;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('media_id', $videoIds);
+        }
+
+        if (!empty($input->goodsId)) {
+            $relatedProductList = MediaCommodityService::getInstance()
+                ->getListByProductIds(ProductType::GOODS, [$input->goodsId]);
+            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
+                return $mediaCommodity->media_type == MediaType::VIDEO;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('media_id', $videoIds);
+        }
+
         if (!empty($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }

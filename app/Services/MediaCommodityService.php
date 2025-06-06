@@ -19,6 +19,14 @@ class MediaCommodityService extends BaseService
         return $mediaCommodity;
     }
 
+    public function getListByProductIds($productType, array $productIds, $columns = ['*'])
+    {
+        return MediaCommodity::query()
+            ->where('commodity_type', $productType)
+            ->whereIn('commodity_id', $productIds)
+            ->get($columns);
+    }
+
     public function getListByMediaIds($mediaType, array $mediaIds, $columns = ['*'])
     {
         return MediaCommodity::query()

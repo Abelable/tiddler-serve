@@ -19,6 +19,7 @@ class ShortVideoController extends Controller
     {
         /** @var MediaPageInput $input */
         $input = MediaPageInput::new();
+
         $page = ShortVideoService::getInstance()->adminPage($input);
         $shortVideoList = collect($page->items());
         $shortVideoIds = $shortVideoList->pluck('id')->toArray();
