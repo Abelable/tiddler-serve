@@ -134,7 +134,10 @@ Route::prefix('goods')->group(function () {
     });
 });
 
-Route::get('gift_goods_list', 'GiftGoodsController@list');
+Route::prefix('gift')->group(function () {
+    Route::get('type_options', 'GiftGoodsController@typeOptions');
+    Route::get('list', 'GiftGoodsController@list');
+});
 
 Route::prefix('cart')->group(function () {
     Route::get('goods_number', 'CartController@goodsNumber');

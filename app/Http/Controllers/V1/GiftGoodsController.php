@@ -5,12 +5,19 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\GiftGoods;
 use App\Services\GiftGoodsService;
+use App\Services\GiftTypeService;
 use App\Services\GoodsService;
 use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsController extends Controller
 {
     protected $only = [];
+
+    public function typeOptions()
+    {
+        $options = GiftTypeService::getInstance()->getTypeOptions(['id', 'name']);
+        return $this->success($options);
+    }
 
     public function list()
     {
