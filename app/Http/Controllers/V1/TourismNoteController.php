@@ -106,7 +106,7 @@ class TourismNoteController extends Controller
             $hotelList,
             $restaurantList,
             $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        ] = MediaCommodityService::getInstance()->getFilterListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
 
         return $noteList->map(function (TourismNote $note) use (
             $isUserList,

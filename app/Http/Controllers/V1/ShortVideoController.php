@@ -102,13 +102,14 @@ class ShortVideoController extends Controller
         $collectedUserIdsGroup = ShortVideoCollectionService::getInstance()->collectedUserIdsGroup($videoIds);
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-        [
-            $mediaCommodityList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList
-        ] = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::VIDEO, $videoIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+
+        $relatedProductInfo = MediaCommodityService::getInstance()
+            ->getFilterListByMediaIds(MediaType::VIDEO, $videoIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        $mediaCommodityList = $relatedProductInfo['mediaList'];
+        $scenicList = $relatedProductInfo['scenicList'];
+        $hotelList = $relatedProductInfo['hotelList'];
+        $restaurantList = $relatedProductInfo['restaurantList'];
+        $goodsList = $relatedProductInfo['goodsList'];
 
         return $videoList->map(function (ShortVideo $video) use (
             $isUserList,
