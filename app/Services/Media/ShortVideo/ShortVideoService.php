@@ -19,6 +19,14 @@ class ShortVideoService extends BaseService
     {
         $query = ShortVideo::query();
 
+        if (!empty($input->name)) {
+            $query = $query->where('name', 'like', "%$input->name%");
+        }
+
+        if (!empty($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
+        }
+
         if (!empty($input->scenicId)) {
             $relatedProductList = MediaCommodityService::getInstance()
                 ->getListByProductIds(ProductType::SCENIC, [$input->scenicId]);
@@ -55,9 +63,6 @@ class ShortVideoService extends BaseService
             $query = $query->whereIn('media_id', $videoIds);
         }
 
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
-        }
         return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
