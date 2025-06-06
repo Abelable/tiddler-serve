@@ -19,8 +19,8 @@ class ShortVideoService extends BaseService
     {
         $query = ShortVideo::query();
 
-        if (!empty($input->name)) {
-            $query = $query->where('name', 'like', "%$input->name%");
+        if (!empty($input->title)) {
+            $query = $query->where('title', 'like', "%$input->title%");
         }
 
         if (!empty($input->userId)) {
