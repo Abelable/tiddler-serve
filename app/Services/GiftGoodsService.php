@@ -14,6 +14,9 @@ class GiftGoodsService extends BaseService
         if (!empty($input->typeId)) {
             $query = $query->where('type_id', $input->typeId);
         }
+        if (!empty($input->goodsId)) {
+            $query = $query->where('goods_id', $input->goodsId);
+        }
         return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
