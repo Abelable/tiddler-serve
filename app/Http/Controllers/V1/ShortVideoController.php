@@ -8,7 +8,6 @@ use App\Models\ScenicSpot;
 use App\Models\ShortVideo;
 use App\Models\ShortVideoComment;
 use App\Services\FanService;
-use App\Services\KeywordService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
@@ -215,12 +214,39 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($input) {
             $video = ShortVideoService::getInstance()->createVideo($this->userId(), $input);
-            foreach ($input->commodityList as $commodity) {
+            foreach ($input->scenicIds as $scenicId) {
                 MediaCommodityService::getInstance()->createMediaCommodity(
                     MediaType::VIDEO,
                     $video->id,
-                    $commodity['type'],
-                    $commodity['id'],
+                    ProductType::SCENIC,
+                    $scenicId,
+                );
+            }
+
+            foreach ($input->hotelIds as $hotelId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::HOTEL,
+                    $hotelId,
+                );
+            }
+
+            foreach ($input->restaurantIds as $restaurantId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::RESTAURANT,
+                    $restaurantId,
+                );
+            }
+
+            foreach ($input->goodsIds as $goodsId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::GOODS,
+                    $goodsId,
                 );
             }
         });
@@ -275,9 +301,10 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($video) {
             $video->delete();
-            ShortVideoCollectionService::getInstance()->deleteList($video->id);
-            ShortVideoLikeService::getInstance()->deleteList($video->id);
             MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
+            ShortVideoCollectionService::getInstance()->deleteList($video->id);
+            ShortVideoCommentService::getInstance()->deleteList($video->id);
+            ShortVideoLikeService::getInstance()->deleteList($video->id);
         });
 
         return $this->success();

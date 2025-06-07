@@ -19,14 +19,6 @@ class MediaCommodityService extends BaseService
         return $mediaCommodity;
     }
 
-    public function deleteMediaProduct($mediaType, $mediaId)
-    {
-        MediaCommodity::query()
-            ->where('media_type', $mediaType)
-            ->whereIn('media_id', $mediaId)
-            ->delete();
-    }
-
     public function getListByProductIds($productType, array $productIds, $columns = ['*'])
     {
         return MediaCommodity::query()
@@ -93,6 +85,14 @@ class MediaCommodityService extends BaseService
         return MediaCommodity::query()
             ->where('media_type', $mediaType)
             ->where('media_id', $mediaId)
+            ->delete();
+    }
+
+    public function deleteMediaProduct($mediaType, $mediaId)
+    {
+        MediaCommodity::query()
+            ->where('media_type', $mediaType)
+            ->whereIn('media_id', $mediaId)
             ->delete();
     }
 

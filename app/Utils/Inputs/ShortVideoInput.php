@@ -7,7 +7,6 @@ class ShortVideoInput extends BaseInput
     public $title;
     public $cover;
     public $videoUrl;
-    public $commodityList;
     public $scenicIds;
     public $hotelIds;
     public $restaurantIds;
@@ -23,7 +22,6 @@ class ShortVideoInput extends BaseInput
             'title' => 'required|string',
             'cover' => 'required|string',
             'videoUrl' => 'required|string',
-            '$commodityList' => 'array',
             'scenicIds' => 'array',
             'hotelIds' => 'array',
             'restaurantIds' => 'array',

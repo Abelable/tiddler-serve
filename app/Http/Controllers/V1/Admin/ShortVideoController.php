@@ -162,7 +162,7 @@ class ShortVideoController extends Controller
         DB::transaction(function () use ($userId, $input, $video) {
             ShortVideoService::getInstance()->updateVideo($video, $userId, $input);
 
-            MediaCommodityService::getInstance()->deleteMediaProduct(MediaType::VIDEO, $video->id);
+            MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
 
             foreach ($input->scenicIds as $scenicId) {
                 MediaCommodityService::getInstance()->createMediaCommodity(
@@ -230,7 +230,7 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($shortVideo) {
             $shortVideo->delete();
-            MediaCommodityService::getInstance()->deleteMediaProduct(MediaType::VIDEO, $shortVideo->id);
+            MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $shortVideo->id);
             ShortVideoCollectionService::getInstance()->deleteList($shortVideo->id);
             ShortVideoCommentService::getInstance()->deleteList($shortVideo->id);
             ShortVideoLikeService::getInstance()->deleteList($shortVideo->id);
