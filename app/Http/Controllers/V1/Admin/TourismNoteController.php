@@ -4,20 +4,20 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MediaProduct;
-use App\Models\ShortVideo;
-use App\Services\Media\ShortVideo\ShortVideoCollectionService;
-use App\Services\Media\ShortVideo\ShortVideoCommentService;
-use App\Services\Media\ShortVideo\ShortVideoLikeService;
-use App\Services\Media\ShortVideo\ShortVideoService;
+use App\Models\TourismNote;
+use App\Services\Media\Note\TourismNoteCollectionService;
+use App\Services\Media\Note\TourismNoteCommentService;
+use App\Services\Media\Note\TourismNoteLikeService;
+use App\Services\Media\Note\TourismNoteService;
 use App\Services\MediaProductService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\Admin\MediaPageInput;
-use App\Utils\Inputs\ShortVideoInput;
+use App\Utils\Inputs\TourismNoteInput;
 use Illuminate\Support\Facades\DB;
 
-class ShortVideoController extends Controller
+class TourismNoteController extends Controller
 {
     protected $guard = 'Admin';
 
@@ -26,17 +26,17 @@ class ShortVideoController extends Controller
         /** @var MediaPageInput $input */
         $input = MediaPageInput::new();
 
-        $page = ShortVideoService::getInstance()->adminPage($input);
-        $shortVideoList = collect($page->items());
-        $shortVideoIds = $shortVideoList->pluck('id')->toArray();
+        $page = TourismNoteService::getInstance()->adminPage($input);
+        $tourismNoteList = collect($page->items());
+        $tourismNoteIds = $tourismNoteList->pluck('id')->toArray();
 
         $relatedProductList = MediaProductService::getInstance()
-            ->getListByMediaIds(MediaType::VIDEO, $shortVideoIds)->groupBy('media_id');
+            ->getListByMediaIds(MediaType::NOTE, $tourismNoteIds)->groupBy('media_id');
 
-        $list = $shortVideoList->map(function (ShortVideo $shortVideo) use ($relatedProductList) {
+        $list = $tourismNoteList->map(function (TourismNote $tourismNote) use ($relatedProductList) {
             $scenicIds = $hotelIds = $restaurantIds = $goodsIds = [];
 
-            $productList = $relatedProductList->get($shortVideo->id);
+            $productList = $relatedProductList->get($tourismNote->id);
             if (!empty($productList)) {
                 /** @var MediaProduct $mediaProduct */
                 foreach ($productList as $mediaProduct) {
@@ -57,12 +57,12 @@ class ShortVideoController extends Controller
                 }
             }
 
-            $shortVideo['scenicIds'] = $scenicIds;
-            $shortVideo['hotelIds'] = $hotelIds;
-            $shortVideo['restaurantIds'] = $restaurantIds;
-            $shortVideo['goodsIds'] = $goodsIds;
+            $tourismNote['scenicIds'] = $scenicIds;
+            $tourismNote['hotelIds'] = $hotelIds;
+            $tourismNote['restaurantIds'] = $restaurantIds;
+            $tourismNote['goodsIds'] = $goodsIds;
 
-            return $shortVideo;
+            return $tourismNote;
         });
 
         return $this->success($this->paginate($page, $list));
@@ -71,12 +71,12 @@ class ShortVideoController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $shortVideo = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($shortVideo)) {
+        $tourismNote = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($tourismNote)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        $relatedProductList = MediaProductService::getInstance()->getListByMediaIds(MediaType::VIDEO, [$id]);
+        $relatedProductList = MediaProductService::getInstance()->getListByMediaIds(MediaType::NOTE, [$id]);
         $scenicIds = $hotelIds = $restaurantIds = $goodsIds = [];
         foreach ($relatedProductList as $mediaProduct) {
             switch ($mediaProduct->product_type) {
@@ -94,27 +94,27 @@ class ShortVideoController extends Controller
                     break;
             }
         }
-        $shortVideo['scenicIds'] = $scenicIds;
-        $shortVideo['hotelIds'] = $hotelIds;
-        $shortVideo['restaurantIds'] = $restaurantIds;
-        $shortVideo['goodsIds'] = $goodsIds;
+        $tourismNote['scenicIds'] = $scenicIds;
+        $tourismNote['hotelIds'] = $hotelIds;
+        $tourismNote['restaurantIds'] = $restaurantIds;
+        $tourismNote['goodsIds'] = $goodsIds;
 
-        return $this->success($shortVideo);
+        return $this->success($tourismNote);
     }
 
     public function add()
     {
         $userId = $this->verifyRequiredId('userId');
-        /** @var ShortVideoInput $input */
-        $input = ShortVideoInput::new();
+        /** @var TourismNoteInput $input */
+        $input = TourismNoteInput::new();
 
         DB::transaction(function () use ($userId, $input) {
-            $video = ShortVideoService::getInstance()->createVideo($userId, $input);
+            $note = TourismNoteService::getInstance()->createNote($userId, $input);
 
             foreach ($input->scenicIds as $scenicId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::SCENIC,
                     $scenicId,
                 );
@@ -122,8 +122,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->hotelIds as $hotelId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::HOTEL,
                     $hotelId,
                 );
@@ -131,8 +131,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->restaurantIds as $restaurantId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::RESTAURANT,
                     $restaurantId,
                 );
@@ -140,8 +140,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->goodsIds as $goodsId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::GOODS,
                     $goodsId,
                 );
@@ -155,23 +155,23 @@ class ShortVideoController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $userId = $this->verifyRequiredId('userId');
-        /** @var ShortVideoInput $input */
-        $input = ShortVideoInput::new();
+        /** @var TourismNoteInput $input */
+        $input = TourismNoteInput::new();
 
-        $video = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($video)) {
+        $note = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($note)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        DB::transaction(function () use ($userId, $input, $video) {
-            ShortVideoService::getInstance()->updateVideo($video, $userId, $input);
+        DB::transaction(function () use ($userId, $input, $note) {
+            TourismNoteService::getInstance()->updateNote($note, $userId, $input);
 
-            MediaProductService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
+            MediaProductService::getInstance()->deleteList(MediaType::NOTE, $note->id);
 
             foreach ($input->scenicIds as $scenicId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::SCENIC,
                     $scenicId,
                 );
@@ -179,8 +179,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->hotelIds as $hotelId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::HOTEL,
                     $hotelId,
                 );
@@ -188,8 +188,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->restaurantIds as $restaurantId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::RESTAURANT,
                     $restaurantId,
                 );
@@ -197,8 +197,8 @@ class ShortVideoController extends Controller
 
             foreach ($input->goodsIds as $goodsId) {
                 MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
+                    MediaType::NOTE,
+                    $note->id,
                     ProductType::GOODS,
                     $goodsId,
                 );
@@ -213,13 +213,13 @@ class ShortVideoController extends Controller
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
 
-        $shortVideo = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($shortVideo)) {
+        $tourismNote = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($tourismNote)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        $shortVideo->views = $views;
-        $shortVideo->save();
+        $tourismNote->views = $views;
+        $tourismNote->save();
 
         return $this->success();
     }
@@ -227,17 +227,17 @@ class ShortVideoController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        $shortVideo = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($shortVideo)) {
+        $tourismNote = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($tourismNote)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        DB::transaction(function () use ($shortVideo) {
-            $shortVideo->delete();
-            MediaProductService::getInstance()->deleteList(MediaType::VIDEO, $shortVideo->id);
-            ShortVideoCollectionService::getInstance()->deleteList($shortVideo->id);
-            ShortVideoCommentService::getInstance()->deleteList($shortVideo->id);
-            ShortVideoLikeService::getInstance()->deleteList($shortVideo->id);
+        DB::transaction(function () use ($tourismNote) {
+            $tourismNote->delete();
+            MediaProductService::getInstance()->deleteList(MediaType::NOTE, $tourismNote->id);
+            TourismNoteCollectionService::getInstance()->deleteList($tourismNote->id);
+            TourismNoteCommentService::getInstance()->deleteList($tourismNote->id);
+            TourismNoteLikeService::getInstance()->deleteList($tourismNote->id);
         });
 
         return $this->success();

@@ -2,15 +2,72 @@
 
 namespace App\Services\Media\Note;
 
+use App\Models\MediaProduct;
 use App\Models\TourismNote;
 use App\Services\BaseService;
+use App\Services\MediaProductService;
+use App\Utils\Enums\MediaType;
+use App\Utils\Enums\ProductType;
+use App\Utils\Inputs\Admin\MediaPageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\TourismNoteInput;
 use App\Utils\Inputs\TourismNotePageInput;
-use function PHPUnit\Framework\isEmpty;
 
 class TourismNoteService extends BaseService
 {
+    public function adminPage(MediaPageInput $input, $columns = ['*'])
+    {
+        $query = TourismNote::query();
+
+        if (!empty($input->title)) {
+            $query = $query->where('title', 'like', "%$input->title%");
+        }
+
+        if (!empty($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
+        }
+
+        if (!empty($input->scenicId)) {
+            $relatedProductList = MediaProductService::getInstance()
+                ->getListByProductIds(ProductType::SCENIC, [$input->scenicId]);
+            $noteIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::NOTE;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('id', $noteIds);
+        }
+
+        if (!empty($input->hotelId)) {
+            $relatedProductList = MediaProductService::getInstance()
+                ->getListByProductIds(ProductType::HOTEL, [$input->hotelId]);
+            $noteIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::NOTE;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('id', $noteIds);
+        }
+
+        if (!empty($input->restaurantId)) {
+            $relatedProductList = MediaProductService::getInstance()
+                ->getListByProductIds(ProductType::RESTAURANT, [$input->restaurantId]);
+            $noteIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::NOTE;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('id', $noteIds);
+        }
+
+        if (!empty($input->goodsId)) {
+            $relatedProductList = MediaProductService::getInstance()
+                ->getListByProductIds(ProductType::GOODS, [$input->goodsId]);
+            $noteIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::NOTE;
+            })->pluck('media_id')->toArray();
+            $query = $query->whereIn('id', $noteIds);
+        }
+
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function pageList(TourismNotePageInput $input, $columns = ['*'])
     {
         $query = TourismNote::query()->where('is_private', 0);
@@ -49,7 +106,7 @@ class TourismNoteService extends BaseService
     public function userPageList($userId, TourismNotePageInput $input, $columns = ['*'])
     {
         $query = TourismNote::query()->where('user_id', $userId);
-        if (!isEmpty($input->id)) {
+        if (!empty($input->id)) {
             $query = $query->orderByRaw("CASE WHEN id = " . $input->id . " THEN 0 ELSE 1 END");
         }
         if ($input->withComments) {
