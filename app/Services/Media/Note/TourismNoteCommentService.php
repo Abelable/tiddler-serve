@@ -58,4 +58,9 @@ class TourismNoteCommentService extends BaseService
         $replies->delete();
         return $count;
     }
+
+    public function deleteList($noteId)
+    {
+        return TourismNoteComment::query()->where('note_id', $noteId)->delete();
+    }
 }
