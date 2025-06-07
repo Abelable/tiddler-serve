@@ -712,6 +712,17 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GiftGoodsController@delete');
     });
 
+    Route::prefix('promoter')->group(function () {
+        Route::post('list', 'PromoterController@list');
+        Route::get('detail', 'PromoterController@detail');
+        Route::post('add', 'PromoterController@add');
+        Route::post('change_level', 'PromoterController@changeLevel');
+        Route::post('delete', 'PromoterController@delete');
+        Route::get('options', 'PromoterController@options');
+        Route::post('top_list', 'PromoterController@topPromoterList');
+        Route::post('update_list', 'PromoterController@updateList');
+    });
+
     Route::prefix('scenic')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'ScenicCategoryController@list');
