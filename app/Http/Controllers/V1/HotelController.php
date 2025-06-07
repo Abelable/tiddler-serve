@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
-use App\Services\KeywordService;
 use App\Services\ProviderHotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CommonPageInput;

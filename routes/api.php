@@ -466,7 +466,7 @@ Route::prefix('coupon')->group(function () {
 
 Route::prefix('mall')->group(function () {
     Route::get('banner_list', 'MallController@bannerList');
-    Route::get('commodity_list', 'MallController@list');
+    Route::get('product_list', 'MallController@list');
 });
 
 Route::prefix('media')->group(function () {
@@ -475,7 +475,7 @@ Route::prefix('media')->group(function () {
     Route::get('search', 'MediaController@search');
     Route::get('collect_list', 'MediaController@collectList');
     Route::get('like_list', 'MediaController@likeList');
-    Route::get('commodity_relative_list', 'MediaController@commodityMediaList');
+    Route::get('product_relative_list', 'MediaController@productMediaList');
 
     Route::prefix('live')->group(function () {
         Route::post('create', 'LivePushController@createRoom');

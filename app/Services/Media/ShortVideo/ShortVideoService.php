@@ -2,10 +2,10 @@
 
 namespace App\Services\Media\ShortVideo;
 
-use App\Models\MediaCommodity;
+use App\Models\MediaProduct;
 use App\Models\ShortVideo;
 use App\Services\BaseService;
-use App\Services\MediaCommodityService;
+use App\Services\MediaProductService;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\Admin\MediaPageInput;
@@ -28,37 +28,37 @@ class ShortVideoService extends BaseService
         }
 
         if (!empty($input->scenicId)) {
-            $relatedProductList = MediaCommodityService::getInstance()
+            $relatedProductList = MediaProductService::getInstance()
                 ->getListByProductIds(ProductType::SCENIC, [$input->scenicId]);
-            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
-                return $mediaCommodity->media_type == MediaType::VIDEO;
+            $videoIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
             $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->hotelId)) {
-            $relatedProductList = MediaCommodityService::getInstance()
+            $relatedProductList = MediaProductService::getInstance()
                 ->getListByProductIds(ProductType::HOTEL, [$input->hotelId]);
-            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
-                return $mediaCommodity->media_type == MediaType::VIDEO;
+            $videoIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
             $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->restaurantId)) {
-            $relatedProductList = MediaCommodityService::getInstance()
+            $relatedProductList = MediaProductService::getInstance()
                 ->getListByProductIds(ProductType::RESTAURANT, [$input->restaurantId]);
-            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
-                return $mediaCommodity->media_type == MediaType::VIDEO;
+            $videoIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
             $query = $query->whereIn('id', $videoIds);
         }
 
         if (!empty($input->goodsId)) {
-            $relatedProductList = MediaCommodityService::getInstance()
+            $relatedProductList = MediaProductService::getInstance()
                 ->getListByProductIds(ProductType::GOODS, [$input->goodsId]);
-            $videoIds = $relatedProductList->filter(function (MediaCommodity $mediaCommodity) {
-                return $mediaCommodity->media_type == MediaType::VIDEO;
+            $videoIds = $relatedProductList->filter(function (MediaProduct $mediaProduct) {
+                return $mediaProduct->media_type == MediaType::VIDEO;
             })->pluck('media_id')->toArray();
             $query = $query->whereIn('id', $videoIds);
         }

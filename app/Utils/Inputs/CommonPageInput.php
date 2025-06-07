@@ -4,14 +4,14 @@ namespace App\Utils\Inputs;
 
 class CommonPageInput extends PageInput
 {
-    public $commodityIds;
+    public $productIds;
     public $keywords;
     public $categoryId;
 
     public function rules()
     {
         return array_merge(parent::rules(), [
-            'commodityIds' => 'array',
+            'productIds' => 'array',
             'keywords' => 'string',
             'categoryId' => 'integer|digits_between:1,20',
         ]);

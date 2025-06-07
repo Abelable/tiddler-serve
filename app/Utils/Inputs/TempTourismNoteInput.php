@@ -5,15 +5,15 @@ namespace App\Utils\Inputs;
 class TempTourismNoteInput extends TourismNoteInput
 {
     public $userId;
-    public $commodityId;
-    public $commodityType;
+    public $productId;
+    public $productType;
 
     public function rules()
     {
         return [
             'userId' => 'required|string',
-            'commodityId' => 'required|string',
-            'commodityType' => 'required|string'
+            'productId' => 'required|string',
+            'productType' => 'required|string'
         ];
     }
 }

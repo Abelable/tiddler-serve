@@ -28,8 +28,8 @@ class RestaurantService extends BaseService
     public function getRestaurantPage(CommonPageInput $input, $columns=['*'])
     {
         $query = Restaurant::query();
-        if (!empty($input->commodityIds)) {
-            $query = $query->orderByRaw(DB::raw("FIELD(id, " . implode(',', $input->commodityIds) . ") DESC"));
+        if (!empty($input->productIds)) {
+            $query = $query->orderByRaw(DB::raw("FIELD(id, " . implode(',', $input->productIds) . ") DESC"));
         }
         if (!empty($input->keywords)) {
             $query = $query->where('name', 'like', "%$input->keywords%");

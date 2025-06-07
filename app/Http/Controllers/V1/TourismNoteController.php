@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\MediaCommodity;
+use App\Models\MediaProduct;
 use App\Models\ScenicSpot;
 use App\Models\TourismNote;
 use App\Models\TourismNoteComment;
 use App\Services\FanService;
-use App\Services\KeywordService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
-use App\Services\MediaCommodityService;
+use App\Services\MediaProductService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
@@ -101,19 +100,19 @@ class TourismNoteController extends Controller
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
         [
-            $mediaCommodityList,
+            $mediaProductList,
             $scenicList,
             $hotelList,
             $restaurantList,
             $goodsList
-        ] = MediaCommodityService::getInstance()->getFilterListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        ] = MediaProductService::getInstance()->getFilterListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
 
         return $noteList->map(function (TourismNote $note) use (
             $isUserList,
             $isCollectList,
             $isLikeList,
             $isLogin,
-            $mediaCommodityList,
+            $mediaProductList,
             $scenicList,
             $hotelList,
             $restaurantList,
@@ -159,30 +158,30 @@ class TourismNoteController extends Controller
                 }
             }
 
-            $commodityList = $mediaCommodityList->filter(function (MediaCommodity $commodity) use ($note) {
-                return $commodity->media_id == $note->id;
-            })->map(function (MediaCommodity $commodity) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
+            $productList = $mediaProductList->filter(function (MediaProduct $product) use ($note) {
+                return $product->media_id == $note->id;
+            })->map(function (MediaProduct $product) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
                 $info = null;
-                switch ($commodity->commodity_type) {
+                switch ($product->product_type) {
                     case ProductType::SCENIC:
                         /** @var ScenicSpot $info */
-                        $info = $scenicList->get($commodity->commodity_id);
+                        $info = $scenicList->get($product->product_id);
                         if ($info->image_list) {
                             $info['cover'] = json_decode($info->image_list)[0];
                             unset($info->image_list);
                         }
                         break;
                     case ProductType::HOTEL:
-                        $info = $hotelList->get($commodity->commodity_id);
+                        $info = $hotelList->get($product->product_id);
                         break;
                     case ProductType::RESTAURANT:
-                        $info = $restaurantList->get($commodity->commodity_id);
+                        $info = $restaurantList->get($product->product_id);
                         break;
                     case ProductType::GOODS:
-                        $info = $goodsList->get($commodity->commodity_id);
+                        $info = $goodsList->get($product->product_id);
                         break;
                 }
-                $info['type'] = $commodity->commodity_type;
+                $info['type'] = $product->product_type;
                 return $info;
             })->values()->toArray();
 
@@ -197,7 +196,7 @@ class TourismNoteController extends Controller
                 'shareTimes' => $note->share_times,
                 'address' => $note->address,
                 'authorInfo' => $authorList->get($note->user_id),
-                'commodityList' => $commodityList,
+                'productList' => $productList,
                 'isFollow' => $isFollow,
                 'isLike' => $isLike,
                 'isCollected' => $isCollected,
@@ -219,12 +218,12 @@ class TourismNoteController extends Controller
 
         DB::transaction(function () use ($input) {
             $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
-            foreach ($input->commodityList as $commodity) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+            foreach ($input->productList as $product) {
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::NOTE,
                     $note->id,
-                    $commodity['type'],
-                    $commodity['id'],
+                    $product['type'],
+                    $product['id'],
                 );
             }
         });
@@ -241,11 +240,11 @@ class TourismNoteController extends Controller
         if (is_null($note)) {
             DB::transaction(function () use ($input) {
                 $note = TourismNoteService::getInstance()->newNote($input->userId, $input);
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::NOTE,
                     $note->id,
-                    $input->commodityType,
-                    $input->commodityId,
+                    $input->productType,
+                    $input->productId,
                 );
             });
         }
@@ -281,7 +280,7 @@ class TourismNoteController extends Controller
             $note->delete();
             TourismNoteCollectionService::getInstance()->deleteList($note->id);
             TourismNoteLikeService::getInstance()->deleteList($note->id);
-            MediaCommodityService::getInstance()->deleteList(MediaType::NOTE, $note->id);
+            MediaProductService::getInstance()->deleteList(MediaType::NOTE, $note->id);
         });
 
         return $this->success();

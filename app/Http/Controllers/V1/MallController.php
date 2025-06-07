@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Services\MallBannerService;
 use App\Services\MallService;
 use App\Services\ShopService;
-use App\Utils\Inputs\BannerPageInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -95,21 +94,21 @@ class MallController extends Controller
         ];
 
         $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
-        $list = collect($page->items())->map(function ($commodity) {
-            if ($commodity['type'] == 1) {
-                $commodity['cover'] = json_decode($commodity['image_list'])[0];
+        $list = collect($page->items())->map(function ($product) {
+            if ($product['type'] == 1) {
+                $product['cover'] = json_decode($product['image_list'])[0];
             }
-            if ($commodity['type'] == 1 || $commodity['type'] == 2) {
-                $commodity['feature_tag_list'] = json_decode($commodity['feature_tag_list']);
+            if ($product['type'] == 1 || $product['type'] == 2) {
+                $product['feature_tag_list'] = json_decode($product['feature_tag_list']);
             }
-            if ($commodity['type'] == 3) {
-                $commodity['facility_list'] = json_decode($commodity['facility_list']);
+            if ($product['type'] == 3) {
+                $product['facility_list'] = json_decode($product['facility_list']);
             }
-            if ($commodity['type'] == 4 && $commodity->shop_id != 0) {
-                $shopInfo = ShopService::getInstance()->getShopById($commodity->shop_id, ['id', 'type', 'logo', 'name']);
-                $commodity['shop_info'] = $shopInfo;
+            if ($product['type'] == 4 && $product->shop_id != 0) {
+                $shopInfo = ShopService::getInstance()->getShopById($product->shop_id, ['id', 'type', 'logo', 'name']);
+                $product['shop_info'] = $shopInfo;
             }
-            return $commodity;
+            return $product;
         });
 
         return $this->success($this->paginate($page, $list));

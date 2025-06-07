@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\MediaCommodity;
+use App\Models\MediaProduct;
 use App\Models\ShortVideo;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\GoodsService;
-use App\Services\KeywordService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -16,10 +15,10 @@ use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
-use App\Services\MediaCommodityService;
+use App\Services\MediaProductService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaType;
-use App\Utils\Inputs\CommodityMediaPageInput;
+use App\Utils\Inputs\ProductMediaPageInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -292,28 +291,28 @@ class MediaController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function commodityMediaList()
+    public function productMediaList()
     {
-        /** @var CommodityMediaPageInput $input */
-        $input = CommodityMediaPageInput::new();
+        /** @var ProductMediaPageInput $input */
+        $input = ProductMediaPageInput::new();
 
-        $page = MediaCommodityService::getInstance()->getMediaPage($input);
+        $page = MediaProductService::getInstance()->getMediaPage($input);
         $mediaList = collect($page->items());
 
-        $videoIds = $mediaList->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->media_type == MediaType::VIDEO;
+        $videoIds = $mediaList->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->media_type == MediaType::VIDEO;
         })->pluck('media_id')->toArray();
         $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
 
-        $noteIds = $mediaList->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->media_type == MediaType::NOTE;
+        $noteIds = $mediaList->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->media_type == MediaType::NOTE;
         })->pluck('media_id')->toArray();
         $noteList = TourismNoteService::getInstance()->getListByIds($noteIds)->keyBy('id');
 
-        $list = $mediaList->map(function (MediaCommodity $mediaCommodity) use ($noteList, $videoList) {
-            if ($mediaCommodity->media_type == MediaType::VIDEO) {
+        $list = $mediaList->map(function (MediaProduct $mediaProduct) use ($noteList, $videoList) {
+            if ($mediaProduct->media_type == MediaType::VIDEO) {
                 /** @var ShortVideo $video */
-                $video = $videoList->get($mediaCommodity->media_id);
+                $video = $videoList->get($mediaProduct->media_id);
                 return [
                     'type' => MediaType::VIDEO,
                     'id' => $video->id,
@@ -326,7 +325,7 @@ class MediaController extends Controller
                 ];
             } else {
                 /** @var TourismNote $note */
-                $note = $noteList->get($mediaCommodity->media_id);
+                $note = $noteList->get($mediaProduct->media_id);
                 return [
                     'type' => MediaType::NOTE,
                     'id' => $note->id,

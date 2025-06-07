@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\MediaProduct;
 use App\Models\ShortVideo;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
-use App\Services\MediaCommodityService;
+use App\Services\MediaProductService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;
@@ -29,26 +30,27 @@ class ShortVideoController extends Controller
         $shortVideoList = collect($page->items());
         $shortVideoIds = $shortVideoList->pluck('id')->toArray();
 
-        $relatedProductList = MediaCommodityService::getInstance()
+        $relatedProductList = MediaProductService::getInstance()
             ->getListByMediaIds(MediaType::VIDEO, $shortVideoIds)->groupBy('media_id');
 
         $list = $shortVideoList->map(function (ShortVideo $shortVideo) use ($relatedProductList) {
             $productList = $relatedProductList->get($shortVideo->id);
 
             $scenicIds = $hotelIds = $restaurantIds = $goodsIds = [];
-            foreach ($productList as $mediaCommodity) {
-                switch ($mediaCommodity->commodity_type) {
+            /** @var MediaProduct $mediaProduct */
+            foreach ($productList as $mediaProduct) {
+                switch ($mediaProduct->product_type) {
                     case ProductType::SCENIC:
-                        $scenicIds[] = $mediaCommodity->commodity_id;
+                        $scenicIds[] = $mediaProduct->product_id;
                         break;
                     case ProductType::HOTEL:
-                        $hotelIds[] = $mediaCommodity->commodity_id;
+                        $hotelIds[] = $mediaProduct->product_id;
                         break;
                     case ProductType::RESTAURANT:
-                        $restaurantIds[] = $mediaCommodity->commodity_id;
+                        $restaurantIds[] = $mediaProduct->product_id;
                         break;
                     case ProductType::GOODS:
-                        $goodsIds[] = $mediaCommodity->commodity_id;
+                        $goodsIds[] = $mediaProduct->product_id;
                         break;
                 }
             }
@@ -72,21 +74,21 @@ class ShortVideoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        $relatedProductList = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::VIDEO, [$id]);
+        $relatedProductList = MediaProductService::getInstance()->getListByMediaIds(MediaType::VIDEO, [$id]);
         $scenicIds = $hotelIds = $restaurantIds = $goodsIds = [];
-        foreach ($relatedProductList as $mediaCommodity) {
-            switch ($mediaCommodity->commodity_type) {
+        foreach ($relatedProductList as $mediaProduct) {
+            switch ($mediaProduct->product_type) {
                 case ProductType::SCENIC:
-                    $scenicIds[] = $mediaCommodity->commodity_id;
+                    $scenicIds[] = $mediaProduct->product_id;
                     break;
                 case ProductType::HOTEL:
-                    $hotelIds[] = $mediaCommodity->commodity_id;
+                    $hotelIds[] = $mediaProduct->product_id;
                     break;
                 case ProductType::RESTAURANT:
-                    $restaurantIds[] = $mediaCommodity->commodity_id;
+                    $restaurantIds[] = $mediaProduct->product_id;
                     break;
                 case ProductType::GOODS:
-                    $goodsIds[] = $mediaCommodity->commodity_id;
+                    $goodsIds[] = $mediaProduct->product_id;
                     break;
             }
         }
@@ -108,7 +110,7 @@ class ShortVideoController extends Controller
             $video = ShortVideoService::getInstance()->createVideo($userId, $input);
 
             foreach ($input->scenicIds as $scenicId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::SCENIC,
@@ -117,7 +119,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->hotelIds as $hotelId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::HOTEL,
@@ -126,7 +128,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->restaurantIds as $restaurantId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::RESTAURANT,
@@ -135,7 +137,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->goodsIds as $goodsId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::GOODS,
@@ -162,10 +164,10 @@ class ShortVideoController extends Controller
         DB::transaction(function () use ($userId, $input, $video) {
             ShortVideoService::getInstance()->updateVideo($video, $userId, $input);
 
-            MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
+            MediaProductService::getInstance()->deleteList(MediaType::VIDEO, $video->id);
 
             foreach ($input->scenicIds as $scenicId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::SCENIC,
@@ -174,7 +176,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->hotelIds as $hotelId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::HOTEL,
@@ -183,7 +185,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->restaurantIds as $restaurantId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::RESTAURANT,
@@ -192,7 +194,7 @@ class ShortVideoController extends Controller
             }
 
             foreach ($input->goodsIds as $goodsId) {
-                MediaCommodityService::getInstance()->createMediaCommodity(
+                MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,
                     ProductType::GOODS,
@@ -230,7 +232,7 @@ class ShortVideoController extends Controller
 
         DB::transaction(function () use ($shortVideo) {
             $shortVideo->delete();
-            MediaCommodityService::getInstance()->deleteList(MediaType::VIDEO, $shortVideo->id);
+            MediaProductService::getInstance()->deleteList(MediaType::VIDEO, $shortVideo->id);
             ShortVideoCollectionService::getInstance()->deleteList($shortVideo->id);
             ShortVideoCommentService::getInstance()->deleteList($shortVideo->id);
             ShortVideoLikeService::getInstance()->deleteList($shortVideo->id);

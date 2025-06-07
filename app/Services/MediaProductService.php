@@ -2,34 +2,34 @@
 
 namespace App\Services;
 
-use App\Models\MediaCommodity;
+use App\Models\MediaProduct;
 use App\Utils\Enums\ProductType;
-use App\Utils\Inputs\CommodityMediaPageInput;
+use App\Utils\Inputs\ProductMediaPageInput;
 
-class MediaCommodityService extends BaseService
+class MediaProductService extends BaseService
 {
-    public function createMediaCommodity($mediaType, $mediaId, $commodityType, $commodityId)
+    public function createMediaProduct($mediaType, $mediaId, $productType, $productId)
     {
-        $mediaCommodity = MediaCommodity::new();
-        $mediaCommodity->media_type = $mediaType;
-        $mediaCommodity->media_id = $mediaId;
-        $mediaCommodity->commodity_type = $commodityType;
-        $mediaCommodity->commodity_id = $commodityId;
-        $mediaCommodity->save();
-        return $mediaCommodity;
+        $mediaProduct = MediaProduct::new();
+        $mediaProduct->media_type = $mediaType;
+        $mediaProduct->media_id = $mediaId;
+        $mediaProduct->product_type = $productType;
+        $mediaProduct->product_id = $productId;
+        $mediaProduct->save();
+        return $mediaProduct;
     }
 
     public function getListByProductIds($productType, array $productIds, $columns = ['*'])
     {
-        return MediaCommodity::query()
-            ->where('commodity_type', $productType)
-            ->whereIn('commodity_id', $productIds)
+        return MediaProduct::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds)
             ->get($columns);
     }
 
     public function getListByMediaIds($mediaType, array $mediaIds, $columns = ['*'])
     {
-        return MediaCommodity::query()
+        return MediaProduct::query()
             ->where('media_type', $mediaType)
             ->whereIn('media_id', $mediaIds)
             ->get($columns);
@@ -47,24 +47,24 @@ class MediaCommodityService extends BaseService
     {
         $list = $this->getListByMediaIds($mediaType, $mediaIds, $columns);
 
-        $scenicIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == ProductType::SCENIC;
-        })->pluck('commodity_id')->toArray();
+        $scenicIds = $list->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->product_type == ProductType::SCENIC;
+        })->pluck('product_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, $scenicColumns)->keyBy('id');
 
-        $hotelIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == ProductType::HOTEL;
-        })->pluck('commodity_id')->toArray();
+        $hotelIds = $list->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->product_type == ProductType::HOTEL;
+        })->pluck('product_id')->toArray();
         $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds, $hotelColumns)->keyBy('id');
 
-        $restaurantIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == ProductType::RESTAURANT;
-        })->pluck('commodity_id')->toArray();
+        $restaurantIds = $list->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->product_type == ProductType::RESTAURANT;
+        })->pluck('product_id')->toArray();
         $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
 
-        $goodsIds = $list->filter(function (MediaCommodity $mediaCommodity) {
-            return $mediaCommodity->commodity_type == ProductType::GOODS;
-        })->pluck('commodity_id')->toArray();
+        $goodsIds = $list->filter(function (MediaProduct $mediaProduct) {
+            return $mediaProduct->product_type == ProductType::GOODS;
+        })->pluck('product_id')->toArray();
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $goodsColumns)->keyBy('id');
 
         return [
@@ -82,7 +82,7 @@ class MediaCommodityService extends BaseService
 
     public function deleteList($mediaType, $mediaId)
     {
-        return MediaCommodity::query()
+        return MediaProduct::query()
             ->where('media_type', $mediaType)
             ->where('media_id', $mediaId)
             ->delete();
@@ -90,17 +90,22 @@ class MediaCommodityService extends BaseService
 
     public function deleteMediaProduct($mediaType, $mediaId)
     {
-        MediaCommodity::query()
+        MediaProduct::query()
             ->where('media_type', $mediaType)
             ->whereIn('media_id', $mediaId)
             ->delete();
     }
 
-    public function getMediaPage(CommodityMediaPageInput $input, $columns=['*'])
+    public function getMediaPage(ProductMediaPageInput $input, $columns=['*'])
     {
-        return MediaCommodity::query()
-            ->where('commodity_type', $input->commodityType)
-            ->where('commodity_id', $input->commodityId)
+        return MediaProduct::query()
+            ->where('product_type', $input->productType)
+            ->where('product_id', $input->productId)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getList()
+    {
+        return MediaProduct::query()->get();
     }
 }
