@@ -99,13 +99,14 @@ class TourismNoteController extends Controller
         $collectedUserIdsGroup = TourismNoteCollectionService::getInstance()->collectedUserIdsGroup($noteIds);
         $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
         $fanIdsGroup = FanService::getInstance()->fanIdsGroup($authorIds);
-        [
-            $mediaProductList,
-            $scenicList,
-            $hotelList,
-            $restaurantList,
-            $goodsList
-        ] = MediaProductService::getInstance()->getFilterListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+
+        $relatedProductInfo = MediaProductService::getInstance()
+            ->getFilterListByMediaIds(MediaType::NOTE, $noteIds, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        $mediaProductList = $relatedProductInfo['mediaList'];
+        $scenicList = $relatedProductInfo['scenicList'];
+        $hotelList = $relatedProductInfo['hotelList'];
+        $restaurantList = $relatedProductInfo['restaurantList'];
+        $goodsList = $relatedProductInfo['goodsList'];
 
         return $noteList->map(function (TourismNote $note) use (
             $isUserList,
@@ -254,27 +255,6 @@ class TourismNoteController extends Controller
                 );
             }
         });
-
-        return $this->success();
-    }
-
-    public function createTempNote()
-    {
-        /** @var TempTourismNoteInput $input */
-        $input = TempTourismNoteInput::new();
-
-        $note = TourismNoteService::getInstance()->getNoteByTitle($input->title);
-        if (is_null($note)) {
-            DB::transaction(function () use ($input) {
-                $note = TourismNoteService::getInstance()->createNote($input->userId, $input);
-                MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::NOTE,
-                    $note->id,
-                    $input->productType,
-                    $input->productId,
-                );
-            });
-        }
 
         return $this->success();
     }
@@ -498,6 +478,27 @@ class TourismNoteController extends Controller
                 $note->save();
             }
         }
+        return $this->success();
+    }
+
+    public function createTempNote()
+    {
+        /** @var TempTourismNoteInput $input */
+        $input = TempTourismNoteInput::new();
+
+        $note = TourismNoteService::getInstance()->getNoteByTitle($input->title);
+        if (is_null($note)) {
+            DB::transaction(function () use ($input) {
+                $note = TourismNoteService::getInstance()->createNote($input->userId, $input);
+                MediaProductService::getInstance()->createMediaProduct(
+                    MediaType::NOTE,
+                    $note->id,
+                    $input->productType,
+                    $input->productId,
+                );
+            });
+        }
+
         return $this->success();
     }
 }

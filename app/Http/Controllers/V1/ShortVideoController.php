@@ -254,27 +254,6 @@ class ShortVideoController extends Controller
         return $this->success();
     }
 
-    public function createTempVideo()
-    {
-        /** @var TempShortVideoInput $input */
-        $input = TempShortVideoInput::new();
-
-        $video = ShortVideoService::getInstance()->getVideoByTitle($input->title);
-        if (is_null($video)) {
-            DB::transaction(function () use ($input) {
-                $video = ShortVideoService::getInstance()->createVideo($input->userId, $input);
-                MediaProductService::getInstance()->createMediaProduct(
-                    MediaType::VIDEO,
-                    $video->id,
-                    $input->productType,
-                    $input->productId,
-                );
-            });
-        }
-
-        return $this->success();
-    }
-
     public function togglePrivate()
     {
         $id = $this->verifyRequiredId('id');
@@ -494,6 +473,27 @@ class ShortVideoController extends Controller
                 $video->save();
             }
         }
+        return $this->success();
+    }
+
+    public function createTempVideo()
+    {
+        /** @var TempShortVideoInput $input */
+        $input = TempShortVideoInput::new();
+
+        $video = ShortVideoService::getInstance()->getVideoByTitle($input->title);
+        if (is_null($video)) {
+            DB::transaction(function () use ($input) {
+                $video = ShortVideoService::getInstance()->createVideo($input->userId, $input);
+                MediaProductService::getInstance()->createMediaProduct(
+                    MediaType::VIDEO,
+                    $video->id,
+                    $input->productType,
+                    $input->productId,
+                );
+            });
+        }
+
         return $this->success();
     }
 }
