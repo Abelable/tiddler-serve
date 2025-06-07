@@ -4,12 +4,17 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShortVideo;
+use App\Services\Media\ShortVideo\ShortVideoCollectionService;
+use App\Services\Media\ShortVideo\ShortVideoCommentService;
+use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\MediaCommodityService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\Admin\MediaPageInput;
+use App\Utils\Inputs\ShortVideoInput;
+use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
@@ -64,7 +69,7 @@ class ShortVideoController extends Controller
         $id = $this->verifyRequiredId('id');
         $shortVideo = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($shortVideo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
         $relatedProductList = MediaCommodityService::getInstance()->getListByMediaIds(MediaType::VIDEO, [$id]);
@@ -95,18 +100,49 @@ class ShortVideoController extends Controller
 
     public function add()
     {
-        $code = $this->verifyRequiredString('code');
-        $name = $this->verifyRequiredString('name');
+        $userId = $this->verifyRequiredId('userId');
+        /** @var ShortVideoInput $input */
+        $input = ShortVideoInput::new();
 
-        $shortVideo = ShortVideoService::getInstance()->getVideo($code);
-        if (!is_null($shortVideo)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '当前短视频已存在');
-        }
+        DB::transaction(function () use ($userId, $input) {
+            $video = ShortVideoService::getInstance()->createVideo($userId, $input);
 
-        $shortVideo = ShortVideo::new();
-        $shortVideo->code = $code;
-        $shortVideo->name = $name;
-        $shortVideo->save();
+            foreach ($input->scenicIds as $scenicId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::SCENIC,
+                    $scenicId,
+                );
+            }
+
+            foreach ($input->hotelIds as $hotelId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::HOTEL,
+                    $hotelId,
+                );
+            }
+
+            foreach ($input->restaurantIds as $restaurantId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::RESTAURANT,
+                    $restaurantId,
+                );
+            }
+
+            foreach ($input->goodsIds as $goodsId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::GOODS,
+                    $goodsId,
+                );
+            }
+        });
 
         return $this->success();
     }
@@ -114,15 +150,56 @@ class ShortVideoController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        $name = $this->verifyRequiredString('name');
+        $userId = $this->verifyRequiredId('userId');
+        /** @var ShortVideoInput $input */
+        $input = ShortVideoInput::new();
 
-        $shortVideo = ShortVideoService::getInstance()->getVideo($id);
-        if (is_null($shortVideo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前短视频不存在');
+        $video = ShortVideoService::getInstance()->getVideo($id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
-        $shortVideo->name = $name;
-        $shortVideo->save();
+        DB::transaction(function () use ($userId, $input, $video) {
+            ShortVideoService::getInstance()->updateVideo($video, $userId, $input);
+
+            MediaCommodityService::getInstance()->deleteMediaProduct(MediaType::VIDEO, $video->id);
+
+            foreach ($input->scenicIds as $scenicId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::SCENIC,
+                    $scenicId,
+                );
+            }
+
+            foreach ($input->hotelIds as $hotelId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::HOTEL,
+                    $hotelId,
+                );
+            }
+
+            foreach ($input->restaurantIds as $restaurantId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::RESTAURANT,
+                    $restaurantId,
+                );
+            }
+
+            foreach ($input->goodsIds as $goodsId) {
+                MediaCommodityService::getInstance()->createMediaCommodity(
+                    MediaType::VIDEO,
+                    $video->id,
+                    ProductType::GOODS,
+                    $goodsId,
+                );
+            }
+        });
 
         return $this->success();
     }
@@ -134,7 +211,7 @@ class ShortVideoController extends Controller
 
         $shortVideo = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($shortVideo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
 
         $shortVideo->views = $views;
@@ -148,9 +225,17 @@ class ShortVideoController extends Controller
         $id = $this->verifyRequiredId('id');
         $shortVideo = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($shortVideo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前视频游记不存在');
         }
-        $shortVideo->delete();
+
+        DB::transaction(function () use ($shortVideo) {
+            $shortVideo->delete();
+            MediaCommodityService::getInstance()->deleteMediaProduct(MediaType::VIDEO, $shortVideo->id);
+            ShortVideoCollectionService::getInstance()->deleteList($shortVideo->id);
+            ShortVideoCommentService::getInstance()->deleteList($shortVideo->id);
+            ShortVideoLikeService::getInstance()->deleteList($shortVideo->id);
+        });
+
         return $this->success();
     }
 }

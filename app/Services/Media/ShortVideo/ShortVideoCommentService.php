@@ -65,4 +65,9 @@ class ShortVideoCommentService extends BaseService
         $replies->delete();
         return $count;
     }
+
+    public function deleteList($videoId)
+    {
+        return ShortVideoComment::query()->where('video_id', $videoId)->delete();
+    }
 }

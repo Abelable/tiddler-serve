@@ -214,7 +214,7 @@ class ShortVideoController extends Controller
         $input = ShortVideoInput::new();
 
         DB::transaction(function () use ($input) {
-            $video = ShortVideoService::getInstance()->newVideo($this->userId(), $input);
+            $video = ShortVideoService::getInstance()->createVideo($this->userId(), $input);
             foreach ($input->commodityList as $commodity) {
                 MediaCommodityService::getInstance()->createMediaCommodity(
                     MediaType::VIDEO,
@@ -236,7 +236,7 @@ class ShortVideoController extends Controller
         $video = ShortVideoService::getInstance()->getVideoByTitle($input->title);
         if (is_null($video)) {
             DB::transaction(function () use ($input) {
-                $video = ShortVideoService::getInstance()->newVideo($input->userId, $input);
+                $video = ShortVideoService::getInstance()->createVideo($input->userId, $input);
                 MediaCommodityService::getInstance()->createMediaCommodity(
                     MediaType::VIDEO,
                     $video->id,

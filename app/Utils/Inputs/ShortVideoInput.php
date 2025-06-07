@@ -8,6 +8,10 @@ class ShortVideoInput extends BaseInput
     public $cover;
     public $videoUrl;
     public $commodityList;
+    public $scenicIds;
+    public $hotelIds;
+    public $restaurantIds;
+    public $goodsIds;
     public $longitude;
     public $latitude;
     public $address;
@@ -20,6 +24,10 @@ class ShortVideoInput extends BaseInput
             'cover' => 'required|string',
             'videoUrl' => 'required|string',
             '$commodityList' => 'array',
+            'scenicIds' => 'array',
+            'hotelIds' => 'array',
+            'restaurantIds' => 'array',
+            'goodsIds' => 'array',
             'longitude' => 'numeric',
             'latitude' => 'numeric',
             'address' => 'string',

@@ -114,9 +114,14 @@ class ShortVideoService extends BaseService
         return ShortVideo::query()->whereIn('id', $ids)->with('authorInfo')->get($columns);
     }
 
-    public function newVideo($userId, ShortVideoInput $input)
+    public function createVideo($userId, ShortVideoInput $input)
     {
         $video = ShortVideo::new();
+        return $this->updateVideo($video, $userId, $input);
+    }
+
+    public function updateVideo(ShortVideo $video, $userId, ShortVideoInput $input)
+    {
         $video->user_id = $userId;
         $video->title = $input->title;
         $video->cover = $input->cover;
@@ -130,6 +135,7 @@ class ShortVideoService extends BaseService
             $video->is_private = $input->isPrivate;
         }
         $video->save();
+
         return $video;
     }
 
