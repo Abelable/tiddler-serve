@@ -62,6 +62,8 @@ class TourismNoteController extends Controller
             $tourismNote['restaurantIds'] = $restaurantIds;
             $tourismNote['goodsIds'] = $goodsIds;
 
+            $tourismNote['imageList'] = json_decode($tourismNote['image_list'], true);
+
             return $tourismNote;
         });
 
@@ -98,6 +100,8 @@ class TourismNoteController extends Controller
         $tourismNote['hotelIds'] = $hotelIds;
         $tourismNote['restaurantIds'] = $restaurantIds;
         $tourismNote['goodsIds'] = $goodsIds;
+
+        $tourismNote['imageList'] = json_decode($tourismNote['image_list'], true);
 
         return $this->success($tourismNote);
     }

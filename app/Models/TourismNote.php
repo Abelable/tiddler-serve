@@ -21,6 +21,7 @@ use Laravel\Scout\Searchable;
  * @property int $comments_number 评论数
  * @property int $collection_times 收藏次数
  * @property int $share_times 分享次数
+ * @property int $views 观看次数
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -48,6 +49,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|TourismNote whereViews($value)
  * @method static \Illuminate\Database\Query\Builder|TourismNote withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TourismNote withoutTrashed()
  * @mixin \Eloquent

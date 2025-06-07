@@ -28,6 +28,7 @@ class CreateTourismNotesTable extends Migration
             $table->integer('comments_number')->default(0)->comment('评论数');
             $table->integer('collection_times')->default(0)->comment('收藏次数');
             $table->integer('share_times')->default(0)->comment('分享次数');
+            $table->integer('views')->default(0)->comment('观看次数');
             $table->timestamps();
             $table->softDeletes();
         });
