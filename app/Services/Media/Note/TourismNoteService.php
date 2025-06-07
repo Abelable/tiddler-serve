@@ -130,9 +130,14 @@ class TourismNoteService extends BaseService
             ->get($columns);
     }
 
-    public function newNote($userId, TourismNoteInput $input)
+    public function createNote($userId, TourismNoteInput $input)
     {
         $note = TourismNote::new();
+        return $this->updateNote($note, $userId, $input);
+    }
+
+    public function updateNote(TourismNote $note, $userId, TourismNoteInput $input)
+    {
         $note->user_id = $userId;
         $note->image_list = json_encode($input->imageList);
         $note->title = $input->title;

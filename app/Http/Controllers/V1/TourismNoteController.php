@@ -217,13 +217,40 @@ class TourismNoteController extends Controller
         $input = TourismNoteInput::new();
 
         DB::transaction(function () use ($input) {
-            $note = TourismNoteService::getInstance()->newNote($this->userId(), $input);
-            foreach ($input->productList as $product) {
+            $note = TourismNoteService::getInstance()->createNote($this->userId(), $input);
+            foreach ($input->scenicIds as $scenicId) {
                 MediaProductService::getInstance()->createMediaProduct(
                     MediaType::NOTE,
                     $note->id,
-                    $product['type'],
-                    $product['id'],
+                    ProductType::SCENIC,
+                    $scenicId,
+                );
+            }
+
+            foreach ($input->hotelIds as $hotelId) {
+                MediaProductService::getInstance()->createMediaProduct(
+                    MediaType::NOTE,
+                    $note->id,
+                    ProductType::HOTEL,
+                    $hotelId,
+                );
+            }
+
+            foreach ($input->restaurantIds as $restaurantId) {
+                MediaProductService::getInstance()->createMediaProduct(
+                    MediaType::NOTE,
+                    $note->id,
+                    ProductType::RESTAURANT,
+                    $restaurantId,
+                );
+            }
+
+            foreach ($input->goodsIds as $goodsId) {
+                MediaProductService::getInstance()->createMediaProduct(
+                    MediaType::NOTE,
+                    $note->id,
+                    ProductType::GOODS,
+                    $goodsId,
                 );
             }
         });
@@ -239,7 +266,7 @@ class TourismNoteController extends Controller
         $note = TourismNoteService::getInstance()->getNoteByTitle($input->title);
         if (is_null($note)) {
             DB::transaction(function () use ($input) {
-                $note = TourismNoteService::getInstance()->newNote($input->userId, $input);
+                $note = TourismNoteService::getInstance()->createNote($input->userId, $input);
                 MediaProductService::getInstance()->createMediaProduct(
                     MediaType::NOTE,
                     $note->id,
