@@ -48,6 +48,11 @@ class UserService extends BaseService
         return User::query()->get($columns);
     }
 
+    public function getNormalList($promoterIds, $columns = ['*'])
+    {
+        return User::query()->whereNotIn('id', $promoterIds)->get($columns);
+    }
+
     public function getUserById($id, $columns = ['*'])
     {
         return User::query()->find($id, $columns);

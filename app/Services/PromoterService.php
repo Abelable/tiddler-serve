@@ -7,6 +7,7 @@ use App\Models\Promoter;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\PromoterScene;
 use App\Utils\Inputs\Admin\UserPageInput;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\SearchPageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;

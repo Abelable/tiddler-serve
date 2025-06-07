@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\PromoterService;
+use App\Services\RelationService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\UserPageInput;
@@ -67,5 +69,40 @@ class UserController extends Controller
     {
         $options = UserService::getInstance()->getUserList(['id', 'avatar', 'nickname']);
         return $this->success($options);
+    }
+
+    public function normalOptions()
+    {
+        $promoterIds = PromoterService::getInstance()->getOptions()->pluck('user_id')->toArray();
+        $normalUserList = UserService::getInstance()->getNormalList($promoterIds, ['id', 'avatar', 'nickname']);
+        return $this->success($normalUserList);
+    }
+
+    public function bindSuperior()
+    {
+        $userId = $this->verifyRequiredId('userId');
+        $superiorId = $this->verifyRequiredId('superiorId');
+
+        $relation = RelationService::getInstance()->getRelationByFanId($userId);
+        if (!is_null($relation)) {
+            $relation->superior_id = $superiorId;
+            $relation->save();
+        } else {
+            RelationService::getInstance()->banding($superiorId, $userId);
+        }
+
+        return $this->success();
+    }
+
+    public function deleteSuperior()
+    {
+        $userId = $this->verifyRequiredId('userId');
+
+        $relation = RelationService::getInstance()->getRelationByFanId($userId);
+        if (is_null($relation)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前上级不存在');
+        }
+        $relation->delete();
+        return $this->success();
     }
 }
