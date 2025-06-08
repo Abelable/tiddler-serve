@@ -77,4 +77,10 @@ class ShopController extends Controller
 
         return $this->success($this->paginate($page, $list));
     }
+
+    public function options()
+    {
+        $options = ShopService::getInstance()->getOptions(['id', 'name']);
+        return $this->success($options);
+    }
 }

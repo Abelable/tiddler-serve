@@ -94,4 +94,9 @@ class ShopService extends BaseService
         $shop->save();
         return $shop;
     }
+
+    public function getOptions($columns = ['*'])
+    {
+        return Shop::query()->where('status', 1)->get($columns);
+    }
 }

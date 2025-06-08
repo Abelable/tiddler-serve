@@ -654,6 +654,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('list', 'ShopController@list');
         Route::get('detail', 'ShopController@detail');
         Route::post('deposit_payment_logs', 'ShopController@depositPaymentLogs');
+        Route::get('options', 'ShopController@options');
     });
 
     Route::prefix('express')->group(function () {
