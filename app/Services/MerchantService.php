@@ -67,4 +67,9 @@ class MerchantService extends BaseService
     {
         return Merchant::query()->whereIn('id', $ids)->get($columns);
     }
+
+    public function getMerchantOptions($columns = ['*'])
+    {
+        return Merchant::query()->where('status', 1)->get($columns);
+    }
 }
