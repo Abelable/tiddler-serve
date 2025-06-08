@@ -187,7 +187,7 @@ class MealTicketOrderService extends BaseService
         }
 
         $order->pay_id = $payId;
-        $order->pay_time = now()->toDateTimeString();
+        $order->pay_time = now()->format('Y-m-d\TH:i:s');
         $order->status = MealTicketOrderEnums::STATUS_PAY;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -297,7 +297,7 @@ class MealTicketOrderService extends BaseService
                     $order->status = MealTicketOrderEnums::STATUS_CONFIRM;
                     break;
             }
-            $order->confirm_time = now()->toDateTimeString();
+            $order->confirm_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -392,7 +392,7 @@ class MealTicketOrderService extends BaseService
                 }
 
                 $order->status = MealTicketOrderEnums::STATUS_REFUND_CONFIRM;
-                $order->refund_time = now()->toDateTimeString();
+                $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }

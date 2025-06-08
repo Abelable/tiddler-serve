@@ -55,7 +55,7 @@ class HotelOrderVerifyService extends BaseService
         $log->order_id = $verifyCodeInfo->order_id;
         $log->hotel_id = $verifyCodeInfo->hotel_id;
         $log->verifier_id = $userId;
-        $log->verify_time = now()->toDateTimeString();
+        $log->verify_time = now()->format('Y-m-d\TH:i:s');
         $log->save();
     }
 }

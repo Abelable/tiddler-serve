@@ -41,7 +41,7 @@ class OrderVerifyService extends BaseService
         $log->verify_code_id = $verifyCodeInfo->id;
         $log->shop_id = $shopId;
         $log->verifier_id = $userId;
-        $log->verify_time = now()->toDateTimeString();
+        $log->verify_time = now()->format('Y-m-d\TH:i:s');
         $log->save();
     }
 }

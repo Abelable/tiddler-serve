@@ -330,7 +330,7 @@ class OrderService extends BaseService
                 if (!is_null($actualPaymentAmount)) {
                     $order->total_payment_amount = $actualPaymentAmount;
                 }
-                $order->pay_time = now()->toDateTimeString();
+                $order->pay_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->delivery_mode == 1) {
                     $order->status = OrderEnums::STATUS_PAY;
                     // todo 待发货通知
@@ -424,7 +424,7 @@ class OrderService extends BaseService
                     $order->status = OrderEnums::STATUS_CANCEL;
                     break;
             }
-            $order->finish_time = now()->toDateTimeString();
+            $order->finish_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -501,7 +501,7 @@ class OrderService extends BaseService
 
         DB::transaction(function () use ($order, $shipChannel, $shipCode, $shipSn) {
             $order->status = OrderEnums::STATUS_SHIP;
-            $order->ship_time = now()->toDateTimeString();
+            $order->ship_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -538,7 +538,7 @@ class OrderService extends BaseService
         DB::transaction(function () use ($order, $packageList, $isAllDelivered) {
             if ($isAllDelivered) {
                 $order->status = OrderEnums::STATUS_SHIP;
-                $order->ship_time = now()->toDateTimeString();
+                $order->ship_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -627,7 +627,7 @@ class OrderService extends BaseService
                     $order->status = OrderEnums::STATUS_CONFIRM;
                     break;
             }
-            $order->confirm_time = now()->toDateTimeString();
+            $order->confirm_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -730,7 +730,7 @@ class OrderService extends BaseService
                 }
 
                 $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
-                $order->refund_time = now()->toDateTimeString();
+                $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -811,7 +811,7 @@ class OrderService extends BaseService
 
             $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
             $order->refund_id = $result['refund_id'];
-            $order->refund_time = now()->toDateTimeString();
+            $order->refund_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
