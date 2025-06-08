@@ -21,7 +21,7 @@ class LiveRoomService extends BaseService
         return $query
             ->whereIn('status', $statusList)
             ->orderByRaw("CASE WHEN status = 1 THEN 0 WHEN status = 3 THEN 1 WHEN status = 2 THEN 2 ELSE 3 END")
-            ->orderBy('viewers_number', 'desc')
+            ->orderBy('views', 'desc')
             ->orderBy('praise_number', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -32,7 +32,7 @@ class LiveRoomService extends BaseService
         // todo whereIn无效
         return LiveRoom::search($input->keywords)
             ->whereIn('status', $statusList)
-            ->orderBy('viewers_number', 'desc')
+            ->orderBy('views', 'desc')
             ->orderBy('praise_number', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);

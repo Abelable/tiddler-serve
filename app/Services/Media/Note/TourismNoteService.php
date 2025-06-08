@@ -136,6 +136,14 @@ class TourismNoteService extends BaseService
         return $this->updateNote($note, $userId, $input);
     }
 
+    public function createTempNote($userId, TourismNoteInput $input)
+    {
+        $note = TourismNote::new();
+        $note->like_number = mt_rand(0, 100);
+        $note->views = mt_rand(0, 1000);
+        return $this->updateNote($note, $userId, $input);
+    }
+
     public function updateNote(TourismNote $note, $userId, TourismNoteInput $input)
     {
         $note->user_id = $userId;

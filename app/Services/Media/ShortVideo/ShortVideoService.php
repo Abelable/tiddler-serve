@@ -120,6 +120,14 @@ class ShortVideoService extends BaseService
         return $this->updateVideo($video, $userId, $input);
     }
 
+    public function createTempVideo($userId, ShortVideoInput $input)
+    {
+        $video = ShortVideo::new();
+        $video->like_number = mt_rand(0, 100);
+        $video->views = mt_rand(0, 1000);
+        return $this->updateVideo($video, $userId, $input);
+    }
+
     public function updateVideo(ShortVideo $video, $userId, ShortVideoInput $input)
     {
         $video->user_id = $userId;

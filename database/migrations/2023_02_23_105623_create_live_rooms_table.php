@@ -25,7 +25,7 @@ class CreateLiveRoomsTable extends Migration
             $table->string('play_url')->default('')->comment('拉流地址');
             $table->string('playback_url')->default('')->comment('回放地址');
             $table->string('group_id')->default('')->comment('群聊群组id');
-            $table->integer('viewers_number')->default(0)->comment('观看人数');
+            $table->integer('views')->default(0)->comment('观看人数');
             $table->integer('praise_number')->default(0)->comment('点赞数');
             $table->string('notice_time')->default('')->comment('预告时间');
             $table->string('start_time')->default('')->comment('开播时间');

@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\DB;
 
 class ShortVideoController extends Controller
 {
-    protected $except = ['list', 'search', 'createTempVideo', 'addLikes'];
+    protected $except = ['list', 'search', 'createTempVideo'];
 
     public function list()
     {
@@ -463,19 +463,6 @@ class ShortVideoController extends Controller
         return $this->success($commentsNumber);
     }
 
-    public function addLikes()
-    {
-        $list = ShortVideoService::getInstance()->getList();
-        /** @var ShortVideo $video */
-        foreach ($list as $video) {
-            if ($video->like_number == 0) {
-                $video->like_number = mt_rand(100, 180);
-                $video->save();
-            }
-        }
-        return $this->success();
-    }
-
     public function createTempVideo()
     {
         /** @var TempShortVideoInput $input */
@@ -484,7 +471,7 @@ class ShortVideoController extends Controller
         $video = ShortVideoService::getInstance()->getVideoByTitle($input->title);
         if (is_null($video)) {
             DB::transaction(function () use ($input) {
-                $video = ShortVideoService::getInstance()->createVideo($input->userId, $input);
+                $video = ShortVideoService::getInstance()->createTempVideo($input->userId, $input);
                 MediaProductService::getInstance()->createMediaProduct(
                     MediaType::VIDEO,
                     $video->id,

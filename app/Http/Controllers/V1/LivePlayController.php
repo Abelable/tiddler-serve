@@ -7,7 +7,6 @@ use App\Models\LiveGoods;
 use App\Models\LiveRoom;
 use App\Services\FanService;
 use App\Services\GoodsService;
-use App\Services\KeywordService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;
@@ -69,7 +68,7 @@ class LivePlayController extends Controller
         }
 
         // 增加直播间人数
-        $room->viewers_number = $room->viewers_number + 1;
+        $room->views = $room->views + 1;
 
         // 将缓存中的实时点赞数，保存到数据库中
         $praiseNumber = LiveRoomService::getInstance()->getPraiseNumber($id);
@@ -97,7 +96,7 @@ class LivePlayController extends Controller
         // 实时数据：点赞数、观看人数、历史聊天消息列表、商品列表
         // 用户状态：是否关注直播间、用户粉丝等级（待开发）
         return $this->success([
-            'viewersNumber' => $room->viewers_number,
+            'views' => $room->views,
             'praiseNumber' => $room->praise_number,
             'hotGoods' => $room->hotGoods(),
             'historyChatMsgList' => $historyChatMsgList,

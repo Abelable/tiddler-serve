@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
 {
-    protected $except = ['list', 'search', 'createTempNote', 'addLikes'];
+    protected $except = ['list', 'search', 'createTempNote'];
 
     public function list()
     {
@@ -468,19 +468,6 @@ class TourismNoteController extends Controller
         return $this->success($commentsNumber);
     }
 
-    public function addLikes()
-    {
-        $list = TourismNoteService::getInstance()->getList();
-        /** @var TourismNote $note */
-        foreach ($list as $note) {
-            if ($note->like_number == 0) {
-                $note->like_number = mt_rand(100, 180);
-                $note->save();
-            }
-        }
-        return $this->success();
-    }
-
     public function createTempNote()
     {
         /** @var TempTourismNoteInput $input */
@@ -489,7 +476,7 @@ class TourismNoteController extends Controller
         $note = TourismNoteService::getInstance()->getNoteByTitle($input->title);
         if (is_null($note)) {
             DB::transaction(function () use ($input) {
-                $note = TourismNoteService::getInstance()->createNote($input->userId, $input);
+                $note = TourismNoteService::getInstance()->createTempNote($input->userId, $input);
                 MediaProductService::getInstance()->createMediaProduct(
                     MediaType::NOTE,
                     $note->id,
