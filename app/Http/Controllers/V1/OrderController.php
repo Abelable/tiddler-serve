@@ -283,8 +283,10 @@ class OrderController extends Controller
 
                 // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    CommissionService::getInstance()
-                        ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    if (!$cartGoods->is_gift) {
+                        CommissionService::getInstance()
+                            ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    }
                 }
 
                 return $orderId;
@@ -303,8 +305,10 @@ class OrderController extends Controller
 
                 // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    CommissionService::getInstance()
-                        ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    if (!$cartGoods->is_gift) {
+                        CommissionService::getInstance()
+                            ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                    }
                 }
 
                 $orderIds->push($orderId);

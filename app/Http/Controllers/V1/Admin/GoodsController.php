@@ -30,38 +30,40 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $shopColumns = [
-            'id',
-            'merchant_id',
-            'logo',
-            'name',
-            'category_ids',
-            'created_at',
-            'updated_at'
-        ];
-        $shop = ShopService::getInstance()->getShopById($goods->shop_id, $shopColumns);
-        if (is_null($shop)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
-        }
-        $shop->category_ids = json_decode($shop->category_ids);
+        if ($goods->shop_id != 0) {
+            $shopColumns = [
+                'id',
+                'merchant_id',
+                'logo',
+                'name',
+                'category_ids',
+                'created_at',
+                'updated_at'
+            ];
+            $shop = ShopService::getInstance()->getShopById($goods->shop_id, $shopColumns);
+            if (is_null($shop)) {
+                return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
+            }
+            $shop->category_ids = json_decode($shop->category_ids);
 
-        $merchantColumns = [
-            'id',
-            'type',
-            'name',
-            'mobile',
-            'created_at',
-            'updated_at'
-        ];
-        $merchant = MerchantService::getInstance()->getMerchantById($shop->merchant_id, $merchantColumns);
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
-        }
+            $merchantColumns = [
+                'id',
+                'type',
+                'name',
+                'mobile',
+                'created_at',
+                'updated_at'
+            ];
+            $merchant = MerchantService::getInstance()->getMerchantById($shop->merchant_id, $merchantColumns);
+            if (is_null($merchant)) {
+                return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
+            }
 
-        unset($shop->merchant_id);
-        unset($goods->shop_id);
-        $goods['shop_info'] = $shop;
-        $goods['merchant_info'] = $merchant;
+            unset($shop->merchant_id);
+            unset($goods->shop_id);
+            $goods['shop_info'] = $shop;
+            $goods['merchant_info'] = $merchant;
+        }
 
         return $this->success($goods);
     }

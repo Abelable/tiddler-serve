@@ -248,8 +248,8 @@ class OrderService extends BaseService
         $order->refund_amount = $paymentAmount;
         $order->save();
 
-        // 设置订单支付超时任务
-        dispatch(new OverTimeCancelOrderJob($userId, $order->id));
+        // todo 设置订单支付超时任务
+        // dispatch(new OverTimeCancelOrderJob($userId, $order->id));
 
         return $order->id;
     }
