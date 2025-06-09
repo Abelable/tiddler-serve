@@ -471,6 +471,7 @@ Route::prefix('banner')->group(function () {
 
 Route::prefix('mall')->group(function () {
     Route::get('product_list', 'MallController@list');
+    Route::get('init_product_views', 'MallController@initViews');
 });
 
 Route::prefix('media')->group(function () {

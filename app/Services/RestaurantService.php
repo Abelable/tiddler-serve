@@ -95,6 +95,11 @@ class RestaurantService extends BaseService
         return Restaurant::query()->orderBy('id', 'asc')->get($columns);
     }
 
+    public function getList($columns = ['*'])
+    {
+        return Restaurant::query()->get($columns);
+    }
+
     public function getUserOptions(array $ids, $columns = ['*'])
     {
         return Restaurant::query()->whereNotIn('id', $ids)->orderBy('id', 'asc')->get($columns);

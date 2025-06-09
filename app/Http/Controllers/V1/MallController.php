@@ -3,8 +3,16 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Goods;
+use App\Models\Hotel;
+use App\Models\Restaurant;
+use App\Models\ScenicSpot;
 use App\Services\GiftGoodsService;
+use App\Services\GoodsService;
+use App\Services\HotelService;
 use App\Services\MallService;
+use App\Services\RestaurantService;
+use App\Services\ScenicService;
 use App\Services\ShopService;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
@@ -116,5 +124,34 @@ class MallController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function initViews()
+    {
+        $scenicList = ScenicService::getInstance()->getList();
+        $scenicList->map(function (ScenicSpot $scenicSpot) {
+            $scenicSpot->views = mt_rand(0, 1000);
+            $scenicSpot->save();
+        });
+
+        $hotelList = HotelService::getInstance()->getList();
+        $hotelList->map(function (Hotel $hotel) {
+            $hotel->views = mt_rand(0, 1000);
+            $hotel->save();
+        });
+
+        $restaurantList = RestaurantService::getInstance()->getList();
+        $restaurantList->map(function (Restaurant $restaurant) {
+            $restaurant->views = mt_rand(0, 1000);
+            $restaurant->save();
+        });
+
+        $goodsList = GoodsService::getInstance()->getGoodsList();
+        $goodsList->map(function (Goods $goods) {
+            $goods->views = mt_rand(0, 1000);
+            $goods->save();
+        });
+
+        return $this->success();
     }
 }
