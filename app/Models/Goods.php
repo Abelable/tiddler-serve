@@ -34,8 +34,9 @@ use Laravel\Scout\Searchable;
  * @property string $sku_list 商品sku
  * @property int $delivery_mode 提货方式：1-快递，2-自提，3-快递/自提
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
- * @property int $sales_volume 商品销量
- * @property float $avg_score 综合评分
+ * @property int $sales_volume 销量
+ * @property float $score 评分
+ * @property int $views 点击率
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -48,7 +49,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods query()
- * @method static \Illuminate\Database\Eloquent\Builder|Goods whereAvgScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
@@ -70,6 +70,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSkuList($value)
@@ -80,6 +81,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereVideo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereViews($value)
  * @method static \Illuminate\Database\Query\Builder|Goods withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Goods withoutTrashed()
  * @mixin \Eloquent

@@ -20,7 +20,6 @@ class CreateHotelsTable extends Migration
             $table->string('english_name')->comment('酒店英文名称');
             $table->integer('grade')->comment('酒店等级：1-经济，2-舒适，3-高档，4-豪华');
             $table->float('price')->comment('酒店最低价格');
-            $table->integer('sales_volume')->default(0)->comment('酒店房间销量');
             $table->string('video')->default('')->comment('视频');
             $table->string('cover')->comment('封面图片');
             $table->longText('appearance_image_list')->comment('外观图片列表');
@@ -31,7 +30,6 @@ class CreateHotelsTable extends Migration
             $table->decimal('longitude', 9, 6)->comment('经度');
             $table->decimal('latitude', 8, 6)->comment('纬度');
             $table->string('address')->comment('具体地址');
-            $table->float('score')->default(0)->comment('酒店评分');
             $table->string('feature_tag_list')->default('')->comment('酒店特点');
             $table->string('opening_year')->comment('开业年份');
             $table->string('last_decoration_year')->default('')->comment('最近一次装修年份');
@@ -52,6 +50,9 @@ class CreateHotelsTable extends Migration
             $table->longText('remind_list')->comment('酒店政策-重要提醒');
             $table->longText('check_in_tip_list')->comment('酒店政策-入住必读');
             $table->longText('preorder_tip_list')->comment('酒店政策-预定须知');
+            $table->integer('sales_volume')->default(0)->comment('销量');
+            $table->float('score')->default(0)->comment('评分');
+            $table->integer('views')->default(0)->comment('点击率');
             $table->timestamps();
             $table->softDeletes();
         });

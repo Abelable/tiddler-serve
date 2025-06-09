@@ -13,7 +13,6 @@ use Laravel\Scout\Searchable;
  * @property string $english_name 酒店英文名称
  * @property int $grade 酒店等级：1-经济，2-舒适，3-高档，4-豪华
  * @property float $price 酒店最低价格
- * @property int $sales_volume 酒店房间销量
  * @property string $video 视频
  * @property string $cover 封面图片
  * @property string $appearance_image_list 外观图片列表
@@ -24,7 +23,6 @@ use Laravel\Scout\Searchable;
  * @property string $longitude 经度
  * @property string $latitude 纬度
  * @property string $address 具体地址
- * @property float $score 酒店评分
  * @property string $feature_tag_list 酒店特点
  * @property string $opening_year 开业年份
  * @property string $last_decoration_year 最近一次装修年份
@@ -45,6 +43,9 @@ use Laravel\Scout\Searchable;
  * @property string $remind_list 酒店政策-重要提醒
  * @property string $check_in_tip_list 酒店政策-入住必读
  * @property string $preorder_tip_list 酒店政策-预定须知
+ * @property int $sales_volume 销量
+ * @property float $score 评分
+ * @property int $views 点击率
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -93,6 +94,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereTrafficService($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereVideo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Hotel whereViews($value)
  * @method static \Illuminate\Database\Query\Builder|Hotel withTrashed()
  * @method static \Illuminate\Database\Query\Builder|Hotel withoutTrashed()
  * @mixin \Eloquent
