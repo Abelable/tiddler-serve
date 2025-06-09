@@ -14,6 +14,7 @@ class RoleController extends Controller
 
     public function list()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $list = RoleService::getInstance()->getRoleList($input);
         return $this->successPaginate($list);
@@ -33,6 +34,7 @@ class RoleController extends Controller
     {
         $name = $this->verifyRequiredString('name');
         $desc = $this->verifyString('desc');
+        $permission = $this->verifyRequiredString('permission');
 
         $role = RoleService::getInstance()->getRoleByName($name);
         if (!is_null($role)) {
@@ -42,6 +44,7 @@ class RoleController extends Controller
         $role = AdminRole::new();
         $role->name = $name;
         $role->desc = $desc;
+        $role->permission = $permission;
         $role->save();
 
         return $this->success();
@@ -52,11 +55,7 @@ class RoleController extends Controller
         $id = $this->verifyRequiredId('id');
         $name = $this->verifyRequiredString('name');
         $desc = $this->verifyString('desc');
-
-        $role = RoleService::getInstance()->getRoleByName($name);
-        if (!is_null($role)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '管理员角色已存在');
-        }
+        $permission = $this->verifyRequiredString('permission');
 
         $role = RoleService::getInstance()->getRoleById($id);
         if (is_null($role)) {
@@ -65,6 +64,7 @@ class RoleController extends Controller
 
         $role->name = $name;
         $role->desc = $desc;
+        $role->permission = $permission;
         $role->save();
 
         return $this->success();
