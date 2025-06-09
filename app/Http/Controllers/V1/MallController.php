@@ -107,10 +107,13 @@ class MallController extends Controller
             if ($product['type'] == 3) {
                 $product['facility_list'] = json_decode($product['facility_list']);
             }
-            if ($product['type'] == 4 && $product->shop_id != 0) {
-                $shopInfo = ShopService::getInstance()->getShopById($product->shop_id, ['id', 'type', 'logo', 'name']);
-                $product['shop_info'] = $shopInfo;
-                $product['isGift'] = in_array($product->id, $giftGoodsIds) ? 1 : 0;
+            if ($product['type'] == 4) {
+                if ($product->shop_id != 0) {
+                    $shopInfo = ShopService::getInstance()->getShopById($product->shop_id, ['id', 'type', 'logo', 'name']);
+                    $product['shop_info'] = $shopInfo;
+                }
+
+                $product['is_gift'] = in_array($product->id, $giftGoodsIds) ? 1 : 0;
             }
             return $product;
         });
