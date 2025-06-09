@@ -27,12 +27,13 @@ class MallController extends Controller
             'image_list',
             'price',
             DB::raw('NULL as market_price'),
-            'sales_volume',
             'longitude',
             'latitude',
             'address',
             'feature_tag_list',
             DB::raw('NULL as facility_list'),
+            'sales_volume',
+            'views',
             'created_at',
         ];
         $hotelColumns = [
@@ -44,12 +45,13 @@ class MallController extends Controller
             DB::raw('NULL as image_list'),
             'price',
             DB::raw('NULL as market_price'),
-            'sales_volume',
             'longitude',
             'latitude',
             'address',
             'feature_tag_list',
             DB::raw('NULL as facility_list'),
+            'sales_volume',
+            'views',
             'created_at',
         ];
         $restaurantColumns = [
@@ -61,12 +63,13 @@ class MallController extends Controller
             DB::raw('NULL as image_list'),
             'price',
             DB::raw('NULL as market_price'),
-            'sales_volume',
             'longitude',
             'latitude',
             'address',
             DB::raw('NULL as feature_tag_list'),
             'facility_list',
+            'sales_volume',
+            'views',
             'created_at',
         ];
         $goodsColumns = [
@@ -78,12 +81,13 @@ class MallController extends Controller
             'image_list',
             'price',
             'market_price',
-            'sales_volume',
             DB::raw('NULL as longitude'),
             DB::raw('NULL as latitude'),
             DB::raw('NULL as address'),
             DB::raw('NULL as feature_tag_list'),
             DB::raw('NULL as facility_list'),
+            'sales_volume',
+            'views',
             'created_at',
         ];
 

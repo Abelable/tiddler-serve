@@ -30,7 +30,7 @@ class GoodsService extends BaseService
         } else {
             $query = $query
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('avg_score', 'desc')
+                ->orderBy('score', 'desc')
                 ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
         }
@@ -48,7 +48,7 @@ class GoodsService extends BaseService
         } else {
             $query = $query
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('avg_score', 'desc')
+                ->orderBy('score', 'desc')
                 ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
         }
@@ -68,7 +68,7 @@ class GoodsService extends BaseService
         }
         return $query
                 ->orderBy('sales_commission_rate', 'desc')
-                ->orderBy('avg_score', 'desc')
+                ->orderBy('score', 'desc')
                 ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
@@ -82,7 +82,7 @@ class GoodsService extends BaseService
             ->where('shop_id', $shopId)
             ->where('id', '!=', $goodsId)
             ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('avg_score', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->take($limit)
@@ -95,7 +95,7 @@ class GoodsService extends BaseService
             ->where('status', 1)
             ->where('shop_id', $shopId)
             ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('avg_score', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->orderBy($input->sort, $input->order)
@@ -187,7 +187,7 @@ class GoodsService extends BaseService
         }
         return $query
             ->orderBy('sales_commission_rate', 'desc')
-            ->orderBy('avg_score', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->orderBy($input->sort, $input->order)
