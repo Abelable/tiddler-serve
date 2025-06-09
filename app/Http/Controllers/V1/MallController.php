@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\GiftGoodsService;
 use App\Services\MallBannerService;
 use App\Services\MallService;
 use App\Services\ShopService;
@@ -93,8 +94,10 @@ class MallController extends Controller
             'created_at',
         ];
 
+        $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+
         $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
-        $list = collect($page->items())->map(function ($product) {
+        $list = collect($page->items())->map(function ($product) use ($giftGoodsIds) {
             if ($product['type'] == 1) {
                 $product['cover'] = json_decode($product['image_list'])[0];
             }
@@ -107,6 +110,7 @@ class MallController extends Controller
             if ($product['type'] == 4 && $product->shop_id != 0) {
                 $shopInfo = ShopService::getInstance()->getShopById($product->shop_id, ['id', 'type', 'logo', 'name']);
                 $product['shop_info'] = $shopInfo;
+                $product['isGift'] = in_array($product->id, $giftGoodsIds) ? 1 : 0;
             }
             return $product;
         });
