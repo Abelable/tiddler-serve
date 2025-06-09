@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\GiftGoodsService;
-use App\Services\MallBannerService;
 use App\Services\MallService;
 use App\Services\ShopService;
 use App\Utils\Inputs\PageInput;
@@ -12,13 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class MallController extends Controller
 {
-    protected $except = ['bannerList', 'list'];
-
-    public function bannerList()
-    {
-        $list = MallBannerService::getInstance()->getBannerList();
-        return $this->success($list);
-    }
+    protected $only = [];
 
     public function list()
     {
