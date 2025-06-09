@@ -581,7 +581,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('login', 'AuthController@login');
         Route::get('logout', 'AuthController@logout');
-        Route::get('me', 'AuthController@info');
+        Route::get('base_info', 'AuthController@baseInfo');
         Route::get('token_refresh', 'AuthController@refreshToken');
     });
 
