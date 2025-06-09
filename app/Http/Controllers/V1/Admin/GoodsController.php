@@ -70,6 +70,9 @@ class GoodsController extends Controller
         $goods->sku_list = json_decode($goods->sku_list);
         $goods->spec_list = json_decode($goods->spec_list);
 
+        $goods['pickupAddressIds'] = $goods->pickupAddressIds();
+        $goods['refundAddressIds'] = $goods->refundAddressIds();
+
         return $this->success($goods);
     }
 
