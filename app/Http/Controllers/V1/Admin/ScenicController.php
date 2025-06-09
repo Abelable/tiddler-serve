@@ -17,16 +17,7 @@ class ScenicController extends Controller
     {
         /** @var ScenicPageInput $input */
         $input = ScenicPageInput::new();
-        $columns = [
-            'id',
-            'name',
-            'level',
-            'category_id',
-            'score',
-            'created_at',
-            'updated_at'
-        ];
-        $list = ScenicService::getInstance()->getAdminScenicPage($input, $columns);
+        $list = ScenicService::getInstance()->getAdminScenicPage($input);
         return $this->successPaginate($list);
     }
 
@@ -34,6 +25,9 @@ class ScenicController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $scenic = ScenicService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
+        }
         return $this->success($scenic);
     }
 
@@ -58,6 +52,22 @@ class ScenicController extends Controller
         }
 
         ScenicService::getInstance()->updateScenic($scenic, $input);
+
+        return $this->success();
+    }
+
+    public function editViews()
+    {
+        $id = $this->verifyRequiredId('id');
+        $views = $this->verifyRequiredInteger('views');
+
+        $scenic = ScenicService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点不存在');
+        }
+
+        $scenic->views = $views;
+        $scenic->save();
 
         return $this->success();
     }

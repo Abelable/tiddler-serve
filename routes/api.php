@@ -692,12 +692,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
         Route::post('list', 'GoodsController@list');
         Route::get('detail', 'GoodsController@detail');
+        Route::post('add', 'GoodsController@add');
+        Route::post('edit', 'GoodsController@edit');
+        Route::post('edit_views', 'GoodsController@editViews');
         Route::post('up', 'GoodsController@up');
         Route::post('down', 'GoodsController@down');
         Route::post('reject', 'GoodsController@reject');
         Route::post('delete', 'GoodsController@delete');
-        Route::post('add', 'GoodsController@add');
-        Route::post('edit', 'GoodsController@edit');
         Route::get('options', 'GoodsController@options');
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
     });
@@ -744,6 +745,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'ScenicController@detail');
         Route::post('add', 'ScenicController@add');
         Route::post('edit', 'ScenicController@edit');
+        Route::post('edit_views', 'ScenicController@editViews');
         Route::post('delete', 'ScenicController@delete');
         Route::get('options', 'ScenicController@options');
 
@@ -798,6 +800,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'HotelController@detail');
         Route::post('add', 'HotelController@add');
         Route::post('edit', 'HotelController@edit');
+        Route::post('edit_views', 'HotelController@editViews');
         Route::post('delete', 'HotelController@delete');
         Route::get('options', 'HotelController@options');
 
@@ -877,6 +880,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('detail', 'RestaurantController@detail');
             Route::post('add', 'RestaurantController@add');
             Route::post('edit', 'RestaurantController@edit');
+            Route::post('edit_views', 'RestaurantController@editViews');
             Route::post('delete', 'RestaurantController@delete');
             Route::get('options', 'RestaurantController@options');
         });

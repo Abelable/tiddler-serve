@@ -73,6 +73,46 @@ class GoodsController extends Controller
         return $this->success($goods);
     }
 
+    public function add()
+    {
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
+        GoodsService::getInstance()->createGoods(0, $input);
+        return $this->success();
+    }
+
+    public function edit()
+    {
+        $id = $this->verifyRequiredId('id');
+        /** @var GoodsInput $input */
+        $input = GoodsInput::new();
+
+        $goods = GoodsService::getInstance()->getGoodsById($id);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        GoodsService::getInstance()->updateGoods($goods, $input);
+
+        return $this->success();
+    }
+
+    public function editViews()
+    {
+        $id = $this->verifyRequiredId('id');
+        $views = $this->verifyRequiredInteger('views');
+
+        $goods = GoodsService::getInstance()->getGoodsById($id);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $goods->views = $views;
+        $goods->save();
+
+        return $this->success();
+    }
+
     public function up()
     {
         $id = $this->verifyRequiredId('id');
@@ -103,19 +143,6 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function delete()
-    {
-        $id = $this->verifyRequiredId('id');
-
-        $goods = GoodsService::getInstance()->getGoodsById($id);
-        if (is_null($goods)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-        $goods->delete();
-
-        return $this->success();
-    }
-
     public function down()
     {
         $id = $this->verifyRequiredId('id');
@@ -130,26 +157,15 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function add()
-    {
-        /** @var GoodsInput $input */
-        $input = GoodsInput::new();
-        GoodsService::getInstance()->createGoods(0, $input);
-        return $this->success();
-    }
-
-    public function edit()
+    public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        /** @var GoodsInput $input */
-        $input = GoodsInput::new();
 
         $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-
-        GoodsService::getInstance()->updateGoods($goods, $input);
+        $goods->delete();
 
         return $this->success();
     }
