@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\GoodsPickupAddressService;
+use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
+use Illuminate\Support\Facades\DB;
 
 class GoodsController extends Controller
 {
@@ -80,7 +83,18 @@ class GoodsController extends Controller
     {
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
-        GoodsService::getInstance()->createGoods(0, $input);
+
+        DB::transaction(function () use ($input) {
+            $goods = GoodsService::getInstance()->createGoods(0, $input);
+
+            if (!empty($input->pickupAddressIds)) {
+                GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds);
+            }
+            if (!empty($input->refundAddressIds)) {
+                GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds);
+            }
+        });
+
         return $this->success();
     }
 
