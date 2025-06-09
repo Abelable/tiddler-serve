@@ -130,26 +130,34 @@ class MallController extends Controller
     {
         $scenicList = ScenicService::getInstance()->getList();
         $scenicList->map(function (ScenicSpot $scenicSpot) {
-            $scenicSpot->views = mt_rand(0, 1000);
-            $scenicSpot->save();
+            if ($scenicSpot->views == 0) {
+                $scenicSpot->views = mt_rand(0, 1000);
+                $scenicSpot->save();
+            }
         });
 
         $hotelList = HotelService::getInstance()->getList();
         $hotelList->map(function (Hotel $hotel) {
-            $hotel->views = mt_rand(0, 1000);
-            $hotel->save();
+            if ($hotel->views == 0) {
+                $hotel->views = mt_rand(0, 1000);
+                $hotel->save();
+            }
         });
 
         $restaurantList = RestaurantService::getInstance()->getList();
         $restaurantList->map(function (Restaurant $restaurant) {
-            $restaurant->views = mt_rand(0, 1000);
-            $restaurant->save();
+            if ($restaurant->views == 0) {
+                $restaurant->views = mt_rand(0, 1000);
+                $restaurant->save();
+            }
         });
 
         $goodsList = GoodsService::getInstance()->getGoodsList();
         $goodsList->map(function (Goods $goods) {
-            $goods->views = mt_rand(0, 1000);
-            $goods->save();
+            if ($goods->views == 0) {
+                $goods->views = mt_rand(0, 1000);
+                $goods->save();
+            }
         });
 
         return $this->success();
