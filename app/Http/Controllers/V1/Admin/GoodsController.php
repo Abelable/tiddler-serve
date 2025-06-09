@@ -109,7 +109,11 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        GoodsService::getInstance()->updateGoods($goods, $input);
+        DB::transaction(function () use ($goods, $input) {
+            GoodsService::getInstance()->updateGoods($goods, $input);
+            GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds);
+            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds);
+        });
 
         return $this->success();
     }
