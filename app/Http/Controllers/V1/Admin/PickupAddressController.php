@@ -24,10 +24,13 @@ class PickupAddressController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $address = ShopPickupAddressService::getInstance()->getAddressById($id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
         }
+        $address->open_time_list = json_decode($address->open_time_list, true);
+
         return $this->success($address);
     }
 

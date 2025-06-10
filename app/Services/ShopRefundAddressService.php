@@ -39,7 +39,7 @@ class ShopRefundAddressService extends BaseService
         $address->consignee_name = $input->consigneeName;
         $address->mobile = $input->mobile;
         $address->address_detail = $input->addressDetail;
-        $address->supplement = $input->supplement;
+        $address->supplement = $input->supplement ?: '';
         $address->save();
 
         return $address;

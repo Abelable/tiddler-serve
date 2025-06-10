@@ -72,7 +72,7 @@ class RefundAddressController extends Controller
 
     public function options()
     {
-        $options = ShopRefundAddressService::getInstance()->getSelfOptions(['id', 'name']);
+        $options = ShopRefundAddressService::getInstance()->getSelfOptions(['id', 'address_detail']);
         return $this->success($options);
     }
 }
