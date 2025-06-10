@@ -1,41 +1,42 @@
 <?php
 
-namespace App\Http\Controllers\V1;
+namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShopRefundAddress;
 use App\Services\ShopRefundAddressService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ShopRefundAddressInput;
+use App\Utils\Inputs\PageInput;
 
-class ShopRefundAddressController extends Controller
+class RefundAddressController extends Controller
 {
+    protected $guard = 'Admin';
+
     public function list()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'consignee_name', 'mobile', 'address_detail'];
-        $list = ShopRefundAddressService::getInstance()->getListByShopId($shopId, $columns);
-        return $this->success($list);
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = ShopRefundAddressService::getInstance()->getSelfList($input);
+        return $this->successPaginate($page);
     }
 
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $columns = ['id', 'consignee_name', 'mobile', 'address_detail', 'supplement'];
-        $detail = ShopRefundAddressService::getInstance()->getAddressById($id, $columns);
-        return $this->success($detail);
+        $address = ShopRefundAddressService::getInstance()->getAddressById($id);
+        if (is_null($address)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
+        }
+        return $this->success($address);
     }
 
     public function add()
     {
         /** @var ShopRefundAddressInput $input */
         $input = ShopRefundAddressInput::new();
-        $shopId = $this->verifyRequiredId('shopId');
-
-        $address = ShopRefundAddress::new();
-        $address->shop_id = $shopId;
-
-        ShopRefundAddressService::getInstance()->update($address, $input);
+        $freightTemplate = ShopRefundAddress::new();
+        ShopRefundAddressService::getInstance()->update($freightTemplate, $input);
 
         return $this->success();
     }
@@ -59,11 +60,19 @@ class ShopRefundAddressController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
+
         $address = ShopRefundAddressService::getInstance()->getAddressById($id);
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前退货地址不存在');
         }
+
         $address->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $options = ShopRefundAddressService::getInstance()->getSelfOptions(['id', 'name']);
+        return $this->success($options);
     }
 }

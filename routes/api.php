@@ -680,6 +680,24 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'FreightTemplateController@options');
     });
 
+    Route::prefix('refund_address')->group(function () {
+        Route::post('list', 'RefundAddressController@list');
+        Route::get('detail', 'RefundAddressController@detail');
+        Route::post('add', 'RefundAddressController@add');
+        Route::post('edit', 'RefundAddressController@edit');
+        Route::post('delete', 'RefundAddressController@delete');
+        Route::get('options', 'RefundAddressController@options');
+    });
+
+    Route::prefix('pickup_address')->group(function () {
+        Route::post('list', 'PickupAddressController@list');
+        Route::get('detail', 'PickupAddressController@detail');
+        Route::post('add', 'PickupAddressController@add');
+        Route::post('edit', 'PickupAddressController@edit');
+        Route::post('delete', 'PickupAddressController@delete');
+        Route::get('options', 'PickupAddressController@options');
+    });
+
     Route::prefix('goods')->group(function () {
         Route::prefix('category')->group(function () {
             Route::post('list', 'GoodsCategoryController@list');
