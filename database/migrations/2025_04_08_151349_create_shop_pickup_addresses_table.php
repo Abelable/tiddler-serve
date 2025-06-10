@@ -15,7 +15,7 @@ class CreateShopPickupAddressesTable extends Migration
     {
         Schema::create('shop_pickup_addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('shop_id')->comment('店铺id');
+            $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->string('name')->default('')->comment('提货门店名称');
             $table->string('address_detail')->comment('提货门店地址详情');
             $table->decimal('longitude', 9, 6)->comment('提货点经度');
