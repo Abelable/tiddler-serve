@@ -29,6 +29,7 @@ use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
@@ -437,6 +438,7 @@ class OrderController extends Controller
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
                 'goodsList' => $goodsList,
+                'payTime' => $order->pay_time,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
@@ -444,6 +446,13 @@ class OrderController extends Controller
                 'orderSn' => $order->order_sn
             ];
         });
+    }
+
+    public function qrCode()
+    {
+        $code = $this->verifyRequiredId('code');
+        $qrCode = QrCode::format('png')->size(400)->generate($code);
+        return response($qrCode)->header('Content-Type', 'image/png');
     }
 
     public function verifyCode()

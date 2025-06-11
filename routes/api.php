@@ -167,6 +167,7 @@ Route::prefix('order')->group(function () {
     Route::get('detail', 'OrderController@detail');
     Route::post('confirm', 'OrderController@confirm');
     Route::get('verify_code', 'OrderController@verifyCode');
+    Route::get('qr_code', 'OrderController@qrCode');
     Route::post('verify', 'OrderController@verify');
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
