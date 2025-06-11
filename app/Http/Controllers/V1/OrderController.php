@@ -34,6 +34,8 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
 {
+    protected $except = ['qrCode'];
+
     public function preOrderInfo()
     {
         $cartGoodsIds = $this->verifyArrayNotEmpty('cartGoodsIds');
