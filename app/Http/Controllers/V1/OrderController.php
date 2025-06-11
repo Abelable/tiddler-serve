@@ -522,9 +522,11 @@ class OrderController extends Controller
             'goods_price',
             'freight_price',
             'payment_amount',
+            'refund_amount',
             'pay_time',
             'ship_time',
             'confirm_time',
+            'refund_time',
             'created_at',
             'updated_at',
         ];
