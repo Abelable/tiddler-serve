@@ -510,6 +510,7 @@ class OrderController extends Controller
         $columns = [
             'id',
             'order_sn',
+            'user_id',
             'status',
             'remarks',
             'consignee',
