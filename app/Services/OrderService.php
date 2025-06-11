@@ -292,8 +292,8 @@ class OrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'order_sn_list' . implode("','", $orderSnList),
-            'attach' => json_encode($orderSnList),
+            'body' => 'order_sn_list:' . implode("','", $orderSnList),
+            'attach' => 'order_sn_list:' . json_encode($orderSnList),
             'total_fee' => bcmul($paymentAmount, 100),
             'openid' => $openid
         ];
@@ -301,7 +301,7 @@ class OrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSnList = json_decode($data['attach']);
+        $orderSnList = json_decode(str_replace('order_sn_list:', '', $data['attach']));
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
