@@ -342,14 +342,14 @@ class OrderController extends Controller
         return $this->success($payParams);
     }
 
-    public function orderListTotals()
+    public function total()
     {
         return $this->success([
-            OrderService::getInstance()->getListTotal($this->userId(), $this->statusList(1)),
-            OrderService::getInstance()->getListTotal($this->userId(), $this->statusList(2)),
-            OrderService::getInstance()->getListTotal($this->userId(), $this->statusList(3)),
-            OrderService::getInstance()->getListTotal($this->userId(), $this->statusList(4)),
-            OrderService::getInstance()->getListTotal($this->userId(), [OrderEnums::STATUS_REFUND]),
+            OrderService::getInstance()->getTotal($this->userId(), $this->statusList(1)),
+            OrderService::getInstance()->getTotal($this->userId(), $this->statusList(2)),
+            OrderService::getInstance()->getTotal($this->userId(), $this->statusList(3)),
+            OrderService::getInstance()->getTotal($this->userId(), $this->statusList(4)),
+            OrderService::getInstance()->getTotal($this->userId(), [OrderEnums::STATUS_REFUND]),
         ]);
     }
 

@@ -26,7 +26,7 @@ use Yansongda\Pay\Exceptions\GatewayException;
 
 class OrderService extends BaseService
 {
-    public function getListTotal($userId, $statusList)
+    public function getTotal($userId, $statusList)
     {
         return Order::query()->where('user_id', $userId)->whereIn('status', $statusList)->count();
     }
