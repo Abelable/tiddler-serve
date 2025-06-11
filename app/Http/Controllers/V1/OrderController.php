@@ -389,13 +389,19 @@ class OrderController extends Controller
                 $statusList = [OrderEnums::STATUS_CREATE];
                 break;
             case 2:
-                $statusList = [OrderEnums::STATUS_PAY];
+                $statusList = [OrderEnums::STATUS_PAY, OrderEnums::STATUS_EXPORTED];
                 break;
             case 3:
-                $statusList = [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [OrderEnums::STATUS_SHIP, OrderEnums::STATUS_PENDING_VERIFICATION];
                 break;
             case 4:
+                $statusList = [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM, OrderEnums::STATUS_ADMIN_CONFIRM];
+                break;
+            case 5:
                 $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
+                break;
+            case 6:
+                $statusList = [OrderEnums::STATUS_FINISHED];
                 break;
             default:
                 $statusList = [];
