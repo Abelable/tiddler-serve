@@ -28,7 +28,8 @@ class TourismNoteCommentService extends BaseService
         $comment->note_id = $input->mediaId;
         $comment->content = $input->content;
         if (!empty($input->commentId)) {
-            $comment->comment_id = $input->commentId;
+            // todo 通知用户评论被回复
+            $comment->parent_id = $input->commentId;
         }
         $comment->save();
         return $comment;

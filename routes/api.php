@@ -532,6 +532,7 @@ Route::prefix('media')->group(function () {
         Route::get('user_list', 'TourismNoteController@userNoteList');
         Route::get('collect_list', 'TourismNoteController@collectNoteList');
         Route::get('like_list', 'TourismNoteController@likeNoteList');
+        Route::get('detail', 'TourismNoteController@detail');
         Route::post('create', 'TourismNoteController@createNote');
         Route::post('toggle_private', 'TourismNoteController@togglePrivate');
         Route::post('delete', 'TourismNoteController@deleteNote');

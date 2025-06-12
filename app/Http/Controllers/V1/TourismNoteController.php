@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\DB;
 
 class TourismNoteController extends Controller
 {
-    protected $except = ['list', 'search', 'createTempNote'];
+    protected $except = ['list', 'detail', 'search', 'createTempNote'];
 
     public function list()
     {
@@ -210,6 +210,58 @@ class TourismNoteController extends Controller
                 'createdAt' => $note->created_at,
             ];
         });
+    }
+
+    public function detail()
+    {
+        $scenicColumns = ['id', 'name', 'image_list', 'level', 'score', 'price', 'sales_volume'];
+        $hotelColumns = ['id', 'category_id', 'name', 'english_name', 'cover', 'grade', 'price', 'sales_volume'];
+        $restaurantColumns = ['id', 'category_id', 'name', 'cover', 'price', 'score', 'sales_volume'];
+        $goodsColumns = ['id', 'name', 'cover', 'price', 'market_price', 'stock', 'sales_volume', 'sales_volume'];
+        $id = $this->verifyRequiredId('id');
+
+        $note = TourismNoteService::getInstance()->getNote($id);
+        if (is_null($note)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
+        }
+
+        $relatedProductInfo = MediaProductService::getInstance()
+            ->getFilterListByMediaIds(MediaType::NOTE, [$id], $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        $mediaProductList = $relatedProductInfo['mediaList'];
+        $scenicList = $relatedProductInfo['scenicList'];
+        $hotelList = $relatedProductInfo['hotelList'];
+        $restaurantList = $relatedProductInfo['restaurantList'];
+        $goodsList = $relatedProductInfo['goodsList'];
+        $productList = $mediaProductList->map(function (MediaProduct $product) use ($goodsList, $restaurantList, $hotelList, $scenicList) {
+            $info = null;
+            switch ($product->product_type) {
+                case ProductType::SCENIC:
+                    /** @var ScenicSpot $info */
+                    $info = $scenicList->get($product->product_id);
+                    if ($info->image_list) {
+                        $info['cover'] = json_decode($info->image_list)[0];
+                        unset($info->image_list);
+                    }
+                    break;
+                case ProductType::HOTEL:
+                    $info = $hotelList->get($product->product_id);
+                    break;
+                case ProductType::RESTAURANT:
+                    $info = $restaurantList->get($product->product_id);
+                    break;
+                case ProductType::GOODS:
+                    $info = $goodsList->get($product->product_id);
+                    break;
+            }
+            $info['type'] = $product->product_type;
+            return $info;
+        })->values()->toArray();
+
+        $note['productList'] = $productList;
+        $note->image_list = json_decode($note->image_list);
+        $note['authorInfo'] = $note->authorInfo;
+
+        return $this->success($note);
     }
 
     public function createNote()
