@@ -22,7 +22,7 @@ class ShopDepositPaymentLogService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $shopId = $data['body'] ? str_replace('shop_id:', '', $data['body']) : '';
+        $shopId = $data['attach'] ? str_replace('shop_id:', '', $data['attach']) : '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 

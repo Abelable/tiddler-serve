@@ -75,7 +75,8 @@ class ShopService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'shop_id:' . $shopId,
+            'body' => '店铺保证金',
+            'attach' => 'shop_id:' . $shopId,
             'total_fee' => bcmul($shop->deposit, 100),
             'openid' => $openid
         ];
