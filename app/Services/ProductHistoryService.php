@@ -13,7 +13,7 @@ class ProductHistoryService extends BaseService
         return ProductHistory::query()
             ->where('user_id', $userId)
             ->where('product_type', $type)
-            ->orderBy('updated_at', $input->order)
+            ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 

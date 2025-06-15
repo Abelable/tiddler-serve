@@ -12,7 +12,7 @@ class MediaHistoryService extends BaseService
     {
         return MediaHistory::query()
             ->where('user_id', $userId)
-            ->orderBy('updated_at', $input->order)
+            ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
