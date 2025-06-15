@@ -547,6 +547,11 @@ Route::prefix('media')->group(function () {
     });
 });
 
+Route::prefix('history')->group(function () {
+    Route::get('media', 'HistoryController@mediaHistory');
+    Route::get('product', 'HistoryController@productHistory');
+});
+
 Route::prefix('promoter')->group(function () {
     Route::get('customer_data', 'PromoterController@customerData');
     Route::get('today_new_customer_list', 'PromoterController@todayNewCustomerList');
