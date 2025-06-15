@@ -5,13 +5,16 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
 use App\Services\KeywordService;
+use App\Services\ProductHistoryService;
 use App\Services\ProviderScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\ScenicInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicController extends Controller
 {
@@ -87,7 +90,20 @@ class ScenicController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $scenic = ScenicService::getInstance()->getScenicById($id);
+        if (is_null($scenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
+        }
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($scenic) {
+                ScenicService::getInstance()->updateViews($scenic);
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::SCENIC, $scenic->id);
+            });
+        }
+
         return $this->success($scenic);
     }
 

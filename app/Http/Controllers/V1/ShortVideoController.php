@@ -12,6 +12,7 @@ use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
+use App\Services\MediaHistoryService;
 use App\Services\MediaProductService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -260,7 +261,7 @@ class ShortVideoController extends Controller
 
         $video = ShortVideoService::getInstance()->getUserVideo($this->userId(), $id);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         $video->is_private = $video->is_private ? 0 : 1;
@@ -275,7 +276,7 @@ class ShortVideoController extends Controller
 
         $video = ShortVideoService::getInstance()->getUserVideo($this->userId(), $id);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         DB::transaction(function () use ($video) {
@@ -298,7 +299,7 @@ class ShortVideoController extends Controller
         /** @var ShortVideo $video */
         $video = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         $shareTimes = $video->share_times + 1;
@@ -318,7 +319,7 @@ class ShortVideoController extends Controller
         /** @var ShortVideo $video */
         $video = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         $likeNumber = DB::transaction(function () use ($video, $id) {
@@ -346,7 +347,7 @@ class ShortVideoController extends Controller
         /** @var ShortVideo $video */
         $video = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         $collection = ShortVideoCollectionService::getInstance()->getCollection($this->userId(), $id);
@@ -375,7 +376,7 @@ class ShortVideoController extends Controller
         /** @var ShortVideo $video */
         $video = ShortVideoService::getInstance()->getVideo($input->mediaId);
         if (is_null($video)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '短视频不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
 
         /** @var ShortVideoComment $comment */
@@ -461,6 +462,22 @@ class ShortVideoController extends Controller
         });
 
         return $this->success($commentsNumber);
+    }
+
+    public function createHistory()
+    {
+        $id = $this->verifyRequiredId('id');
+        $video = ShortVideoService::getInstance()->getVideo($this->userId(), $id);
+        if (is_null($video)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
+        }
+
+        DB::transaction(function () use ($video) {
+            ShortVideoService::getInstance()->updateViews($video);
+            MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::VIDEO, $video->id);
+        });
+
+        return $this->success();
     }
 
     public function createTempVideo()

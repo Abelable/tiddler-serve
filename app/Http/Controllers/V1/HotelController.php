@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Services\HotelCategoryService;
 use App\Services\HotelService;
+use App\Services\ProductHistoryService;
 use App\Services\ProviderHotelService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
+use Illuminate\Support\Facades\DB;
 
 class HotelController extends Controller
 {
@@ -86,7 +89,20 @@ class HotelController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $hotel = HotelService::getInstance()->getHotelById($id);
+        if (is_null($hotel)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '酒店不存在');
+        }
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($hotel) {
+                HotelService::getInstance()->updateViews($hotel);
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::HOTEL, $hotel->id);
+            });
+        }
+
         return $this->success($hotel);
     }
 

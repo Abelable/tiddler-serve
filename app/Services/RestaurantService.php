@@ -147,4 +147,10 @@ class RestaurantService extends BaseService
         $restaurant->save();
         return $restaurant;
     }
+
+    public function updateViews(Restaurant $restaurant)
+    {
+        $restaurant->views = $restaurant->views + 1;
+        $restaurant->save();
+    }
 }

@@ -523,6 +523,7 @@ Route::prefix('media')->group(function () {
         Route::get('comment_list', 'ShortVideoController@getCommentList');
         Route::get('reply_comment_list', 'ShortVideoController@getReplyCommentList');
         Route::post('delete_comment', 'ShortVideoController@deleteComment');
+        Route::post('create_history', 'ShortVideoController@createHistory');
         Route::post('create_temp_video', 'ShortVideoController@createTempVideo');
     });
 

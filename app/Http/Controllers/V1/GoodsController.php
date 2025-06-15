@@ -14,12 +14,15 @@ use App\Services\GoodsCategoryService;
 use App\Services\GoodsPickupAddressService;
 use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
+use App\Services\HotelService;
 use App\Services\OrderGoodsService;
+use App\Services\ProductHistoryService;
 use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\PageInput;
@@ -174,6 +177,12 @@ class GoodsController extends Controller
         $goods->sku_list = json_decode($goods->sku_list);
 
         if ($this->isLogin()) {
+            DB::transaction(function () use ($goods) {
+                GoodsService::getInstance()->updateViews($goods);
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::GOODS, $goods->id);
+            });
+
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
             if (is_null($addressId)) {
                 /** @var Address $address */

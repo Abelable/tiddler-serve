@@ -7,15 +7,17 @@ use App\Models\MealTicket;
 use App\Models\Restaurant;
 use App\Models\RestaurantCategory;
 use App\Models\SetMeal;
-use App\Services\KeywordService;
 use App\Services\MealTicketService;
+use App\Services\ProductHistoryService;
 use App\Services\ProviderRestaurantService;
 use App\Services\RestaurantCategoryService;
 use App\Services\RestaurantService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\RestaurantInput;
+use Illuminate\Support\Facades\DB;
 
 class RestaurantController extends Controller
 {
@@ -119,6 +121,14 @@ class RestaurantController extends Controller
             return $setMeal;
         });
         $restaurant['setMealList'] = $setMealList;
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($restaurant) {
+                RestaurantService::getInstance()->updateViews($restaurant);
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::RESTAURANT, $restaurant->id);
+            });
+        }
 
         return $this->success($restaurant);
     }

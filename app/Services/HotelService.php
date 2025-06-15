@@ -217,4 +217,10 @@ class HotelService extends BaseService
         $hotel->save();
         return $hotel;
     }
+
+    public function updateViews(Hotel $hotel)
+    {
+        $hotel->views = $hotel->views + 1;
+        $hotel->save();
+    }
 }
