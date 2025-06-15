@@ -97,7 +97,7 @@ class HotelController extends Controller
 
         if ($this->isLogin()) {
             DB::transaction(function () use ($hotel) {
-                HotelService::getInstance()->updateViews($hotel);
+                $hotel->increment('views');
                 ProductHistoryService::getInstance()
                     ->createHistory($this->userId(), ProductType::HOTEL, $hotel->id);
             });
