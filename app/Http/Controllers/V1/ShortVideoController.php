@@ -468,7 +468,7 @@ class ShortVideoController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $video = ShortVideoService::getInstance()->getVideo($this->userId(), $id);
+        $video = ShortVideoService::getInstance()->getVideo($id);
         if (is_null($video)) {
             return $this->fail(CodeResponse::NOT_FOUND, '视频游记不存在');
         }
