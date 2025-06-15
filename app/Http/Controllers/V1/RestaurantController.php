@@ -101,6 +101,17 @@ class RestaurantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
+        if (is_null($restaurant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '美食不存在');
+        }
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($restaurant) {
+                $restaurant->increment('views');
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::RESTAURANT, $restaurant->id);
+            });
+        }
 
         $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
         $restaurant['categoryName'] = $category->name;
@@ -121,14 +132,6 @@ class RestaurantController extends Controller
             return $setMeal;
         });
         $restaurant['setMealList'] = $setMealList;
-
-        if ($this->isLogin()) {
-            DB::transaction(function () use ($restaurant) {
-                RestaurantService::getInstance()->updateViews($restaurant);
-                ProductHistoryService::getInstance()
-                    ->createHistory($this->userId(), ProductType::RESTAURANT, $restaurant->id);
-            });
-        }
 
         return $this->success($restaurant);
     }

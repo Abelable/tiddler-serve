@@ -288,10 +288,4 @@ class GoodsService extends BaseService
     {
         return Goods::query()->whereIn('id', $ids)->get($columns);
     }
-
-    public function updateViews(Goods $goods)
-    {
-        $goods->views = $goods->views + 1;
-        $goods->save();
-    }
 }

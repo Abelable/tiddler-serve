@@ -171,18 +171,20 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($goods) {
+                $goods->increment('views');
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::GOODS, $goods->id);
+            });
+        }
+
         $goods->image_list = json_decode($goods->image_list);
         $goods->detail_image_list = json_decode($goods->detail_image_list);
         $goods->spec_list = json_decode($goods->spec_list);
         $goods->sku_list = json_decode($goods->sku_list);
 
         if ($this->isLogin()) {
-            DB::transaction(function () use ($goods) {
-                GoodsService::getInstance()->updateViews($goods);
-                ProductHistoryService::getInstance()
-                    ->createHistory($this->userId(), ProductType::GOODS, $goods->id);
-            });
-
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
             if (is_null($addressId)) {
                 /** @var Address $address */
