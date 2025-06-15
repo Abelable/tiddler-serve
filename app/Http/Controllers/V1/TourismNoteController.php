@@ -228,7 +228,7 @@ class TourismNoteController extends Controller
 
         if ($this->isLogin()) {
             DB::transaction(function () use ($note) {
-                TourismNoteService::getInstance()->updateViews($note);
+                $note->increment('views');
                 MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::NOTE, $note->id);
             });
         }

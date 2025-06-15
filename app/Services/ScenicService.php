@@ -183,10 +183,4 @@ class ScenicService extends BaseService
             $spot->increment('sales_volume', $num);
         });
     }
-
-    public function updateViews(ScenicSpot $scenic)
-    {
-        $scenic->views = $scenic->views + 1;
-        $scenic->save();
-    }
 }

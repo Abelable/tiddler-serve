@@ -166,10 +166,4 @@ class ShortVideoService extends BaseService
     {
         return ShortVideo::query()->get();
     }
-
-    public function updateViews(ShortVideo $video)
-    {
-        $video->views = $video->views + 1;
-        $video->save();
-    }
 }

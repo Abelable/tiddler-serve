@@ -98,7 +98,7 @@ class ScenicController extends Controller
 
         if ($this->isLogin()) {
             DB::transaction(function () use ($scenic) {
-                ScenicService::getInstance()->updateViews($scenic);
+                $scenic->increment('views');
                 ProductHistoryService::getInstance()
                     ->createHistory($this->userId(), ProductType::SCENIC, $scenic->id);
             });

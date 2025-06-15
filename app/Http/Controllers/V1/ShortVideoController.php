@@ -474,7 +474,7 @@ class ShortVideoController extends Controller
         }
 
         DB::transaction(function () use ($video) {
-            ShortVideoService::getInstance()->updateViews($video);
+            $video->increment('views');
             MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::VIDEO, $video->id);
         });
 
