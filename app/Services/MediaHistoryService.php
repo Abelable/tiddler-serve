@@ -18,16 +18,18 @@ class MediaHistoryService extends BaseService
 
     public function createHistory($userId, $mediaType, $mediaId)
     {
-        return MediaHistory::query()->updateOrCreate(
-            [
-                'user_id' => $userId,
-                'media_type' => $mediaType,
-                'media_id' => $mediaId,
-            ],
-            [
-                'updated_at' => now()
-            ]
-        );
+        $history = $this->getHistory($userId, $mediaType, $mediaId);
+        if (!is_null($history)) {
+            $history->delete();
+        }
+
+        $history = MediaHistory::new();
+        $history->user_id = $userId;
+        $history->media_type = $mediaType;
+        $history->media_id = $mediaId;
+        $history->save();
+
+        return $history;
     }
 
     public function getHistory($userId, $mediaType, $mediaId, $columns = ['*'])

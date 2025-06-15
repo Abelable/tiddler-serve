@@ -226,6 +226,13 @@ class TourismNoteController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($note) {
+                TourismNoteService::getInstance()->updateViews($note);
+                MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::NOTE, $note->id);
+            });
+        }
+
         $relatedProductInfo = MediaProductService::getInstance()
             ->getFilterListByMediaIds(MediaType::NOTE, [$id], $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
         $mediaProductList = $relatedProductInfo['mediaList'];
@@ -266,11 +273,6 @@ class TourismNoteController extends Controller
         $isLike = false;
         $isCollected = false;
         if ($this->isLogin()) {
-            DB::transaction(function () use ($note) {
-                TourismNoteService::getInstance()->updateViews($note);
-                MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::NOTE, $note->id);
-            });
-
             $fan = FanService::getInstance()->fan($note->user_id, $this->userId());
             if (!is_null($fan) || $note->user_id == $this->userId()) {
                 $isFollow = true;
