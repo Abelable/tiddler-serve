@@ -14,7 +14,6 @@ use App\Services\GoodsCategoryService;
 use App\Services\GoodsPickupAddressService;
 use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
-use App\Services\HotelService;
 use App\Services\OrderGoodsService;
 use App\Services\ProductHistoryService;
 use App\Services\ShopManagerService;
@@ -165,18 +164,11 @@ class GoodsController extends Controller
             'sku_list',
             'refund_status',
             'delivery_mode',
+            'views'
         ];
         $goods = GoodsService::getInstance()->getGoodsById($id, $columns);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
-        }
-
-        if ($this->isLogin()) {
-            DB::transaction(function () use ($goods) {
-                $goods->increment('views');
-                ProductHistoryService::getInstance()
-                    ->createHistory($this->userId(), ProductType::GOODS, $goods->id);
-            });
         }
 
         $goods->image_list = json_decode($goods->image_list);
@@ -236,6 +228,14 @@ class GoodsController extends Controller
 
         // 购买用户列表
         $goods['customerList'] = OrderGoodsService::getInstance()->getLatestCustomerList($goods->id);
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($goods) {
+                $goods->increment('views');
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::GOODS, $goods->id);
+            });
+        }
 
         return $this->success($goods);
     }
