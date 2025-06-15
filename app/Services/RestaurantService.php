@@ -85,7 +85,7 @@ class RestaurantService extends BaseService
         return $restaurant;
     }
 
-    public function getRestaurantListByIds(array $ids, $columns = ['*'])
+    public function getListByIds(array $ids, $columns = ['*'])
     {
         return Restaurant::query()->whereIn('id', $ids)->get($columns);
     }

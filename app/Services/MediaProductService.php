@@ -60,7 +60,7 @@ class MediaProductService extends BaseService
         $restaurantIds = $list->filter(function (MediaProduct $mediaProduct) {
             return $mediaProduct->product_type == ProductType::RESTAURANT;
         })->pluck('product_id')->toArray();
-        $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
+        $restaurantList = RestaurantService::getInstance()->getListByIds($restaurantIds, $restaurantColumns)->keyBy('id');
 
         $goodsIds = $list->filter(function (MediaProduct $mediaProduct) {
             return $mediaProduct->product_type == ProductType::GOODS;

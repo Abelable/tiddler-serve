@@ -205,6 +205,11 @@ class HotelService extends BaseService
         return Hotel::query()->get();
     }
 
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return Hotel::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function increaseSalesVolume($hotelId, $num)
     {
         $hotel = $this->getHotelById($hotelId);

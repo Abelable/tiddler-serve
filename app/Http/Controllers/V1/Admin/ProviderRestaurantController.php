@@ -26,7 +26,7 @@ class ProviderRestaurantController extends Controller
         $providerList = CateringProviderService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name', 'business_license_photo'])->keyBy('id');
 
         $restaurantIds = $providerRestaurantList->pluck('restaurant_id')->toArray();
-        $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, ['id', 'name', 'cover'])->keyBy('id');
+        $restaurantList = RestaurantService::getInstance()->getListByIds($restaurantIds, ['id', 'name', 'cover'])->keyBy('id');
 
         $list = $providerRestaurantList->map(function (ProviderRestaurant $providerRestaurant) use ($restaurantList, $providerList) {
             /** @var CateringProvider $provider */

@@ -181,4 +181,10 @@ class TourismNoteService extends BaseService
     {
         return TourismNote::query()->get();
     }
+
+    public function updateViews(TourismNote $note)
+    {
+        $note->views = $note->views + 1;
+        $note->save();
+    }
 }

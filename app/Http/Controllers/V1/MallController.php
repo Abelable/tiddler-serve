@@ -14,6 +14,7 @@ use App\Services\MallService;
 use App\Services\RestaurantService;
 use App\Services\ScenicService;
 use App\Services\ShopService;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -103,16 +104,16 @@ class MallController extends Controller
 
         $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
         $list = collect($page->items())->map(function ($product) use ($giftGoodsIds) {
-            if ($product['type'] == 1) {
+            if ($product['type'] == ProductType::SCENIC) {
                 $product['cover'] = json_decode($product['image_list'])[0];
             }
-            if ($product['type'] == 1 || $product['type'] == 2) {
+            if ($product['type'] == ProductType::SCENIC || $product['type'] == ProductType::HOTEL) {
                 $product['feature_tag_list'] = json_decode($product['feature_tag_list']);
             }
-            if ($product['type'] == 3) {
+            if ($product['type'] == ProductType::RESTAURANT) {
                 $product['facility_list'] = json_decode($product['facility_list']);
             }
-            if ($product['type'] == 4) {
+            if ($product['type'] == ProductType::GOODS) {
                 if ($product->shop_id != 0) {
                     $shopInfo = ShopService::getInstance()->getShopById($product->shop_id, ['id', 'type', 'logo', 'name']);
                     $product['shop_info'] = $shopInfo;

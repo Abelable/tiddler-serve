@@ -12,6 +12,7 @@ use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
+use App\Services\MediaHistoryService;
 use App\Services\MediaProductService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -225,11 +226,6 @@ class TourismNoteController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '游记不存在');
         }
 
-        $note->views = $note->views + 1;
-        $note->save();
-
-        // todo 观看历史
-
         $relatedProductInfo = MediaProductService::getInstance()
             ->getFilterListByMediaIds(MediaType::NOTE, [$id], $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
         $mediaProductList = $relatedProductInfo['mediaList'];
@@ -270,6 +266,11 @@ class TourismNoteController extends Controller
         $isLike = false;
         $isCollected = false;
         if ($this->isLogin()) {
+            DB::transaction(function () use ($note) {
+                TourismNoteService::getInstance()->updateViews($note);
+                MediaHistoryService::getInstance()->createHistory($this->userId(), MediaType::NOTE, $note->id);
+            });
+
             $fan = FanService::getInstance()->fan($note->user_id, $this->userId());
             if (!is_null($fan) || $note->user_id == $this->userId()) {
                 $isFollow = true;

@@ -283,4 +283,9 @@ class GoodsService extends BaseService
 
         return $goods;
     }
+
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return Goods::query()->whereIn('id', $ids)->get($columns);
+    }
 }

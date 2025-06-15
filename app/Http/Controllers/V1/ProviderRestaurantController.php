@@ -29,7 +29,7 @@ class ProviderRestaurantController extends Controller
         $page = ProviderRestaurantService::getInstance()->getUserList($this->userId(), $input);
         $providerRestaurantList = collect($page->items());
         $restaurantIds = $providerRestaurantList->pluck('restaurant_id')->toArray();
-        $restaurantList = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, ['id', 'name', 'cover', 'address'])->keyBy('id');
+        $restaurantList = RestaurantService::getInstance()->getListByIds($restaurantIds, ['id', 'name', 'cover', 'address'])->keyBy('id');
         $list = $providerRestaurantList->map(function (ProviderRestaurant $providerRestaurant) use ($restaurantList) {
             /** @var Restaurant $restaurant */
             $restaurant = $restaurantList->get($providerRestaurant->restaurant_id);
@@ -69,7 +69,7 @@ class ProviderRestaurantController extends Controller
     public function options()
     {
         $restaurantIds = ProviderRestaurantService::getInstance()->getOptions($this->userId())->pluck('restaurant_id')->toArray();
-        $options = RestaurantService::getInstance()->getRestaurantListByIds($restaurantIds, ['id', 'name']);
+        $options = RestaurantService::getInstance()->getListByIds($restaurantIds, ['id', 'name']);
         return $this->success($options);
     }
 }
