@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\MediaProduct;
 use App\Models\ShortVideo;
+use App\Models\TopMedia;
 use App\Models\TourismNote;
 use App\Services\FanService;
 use App\Services\GoodsService;
@@ -16,6 +17,7 @@ use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
 use App\Services\MediaProductService;
+use App\Services\TopMediaService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\ProductMediaPageInput;
@@ -24,7 +26,34 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['list', 'search'];
+    protected $except = ['topList', 'list', 'search'];
+
+    public function topList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $page = TopMediaService::getInstance()->getTopMediaPage($input);
+
+        $topMediaList = collect($page->items());
+
+        $shortVideoIds = $topMediaList->where('media_type', MediaType::VIDEO)->pluck('media_id')->toArray();
+        $shortVideoList = ShortVideoService::getInstance()->getListByIds($shortVideoIds)->keyBy('id');
+
+        $tourismNoteIds = $topMediaList->where('media_type', MediaType::NOTE)->pluck('media_id')->toArray();
+        $tourismNoteList = TourismNoteService::getInstance()->getListByIds($tourismNoteIds)->keyBy('id');
+
+        $list = $topMediaList->map(function (TopMedia $topMedia) use ($tourismNoteList, $shortVideoList) {
+            $media = $topMedia->media_type == MediaType::VIDEO
+                ? $shortVideoList->get($topMedia->media_id)
+                : $tourismNoteList->get($topMedia->media_id);
+
+            $media['cover'] = $topMedia->cover;
+            return $media;
+        });
+
+        return $this->success($this->paginate($page, $list));
+    }
 
     public function list()
     {

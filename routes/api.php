@@ -477,6 +477,7 @@ Route::prefix('mall')->group(function () {
 });
 
 Route::prefix('media')->group(function () {
+    Route::get('top_list', 'MediaController@topList');
     Route::get('list', 'MediaController@list');
     Route::get('follow_list', 'MediaController@followList');
     Route::get('search', 'MediaController@search');
