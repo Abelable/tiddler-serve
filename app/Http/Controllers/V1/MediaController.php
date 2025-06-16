@@ -37,18 +37,30 @@ class MediaController extends Controller
 
         $topMediaList = collect($page->items());
 
-        $shortVideoIds = $topMediaList->where('media_type', MediaType::VIDEO)->pluck('media_id')->toArray();
-        $shortVideoList = ShortVideoService::getInstance()->getListByIds($shortVideoIds)->keyBy('id');
+        $videoIds = $topMediaList->where('media_type', MediaType::VIDEO)->pluck('media_id')->toArray();
+        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds)->keyBy('id');
 
-        $tourismNoteIds = $topMediaList->where('media_type', MediaType::NOTE)->pluck('media_id')->toArray();
-        $tourismNoteList = TourismNoteService::getInstance()->getListByIds($tourismNoteIds)->keyBy('id');
+        $noteIds = $topMediaList->where('media_type', MediaType::NOTE)->pluck('media_id')->toArray();
+        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds)->keyBy('id');
 
-        $list = $topMediaList->map(function (TopMedia $topMedia) use ($tourismNoteList, $shortVideoList) {
+        $videoAuthorIds = $videoList->pluck('user_id');
+        $noteAuthorIds = $noteList->pluck('user_id');
+        $authorIds = $videoAuthorIds->merge($noteAuthorIds)->unique()->values()->toArray();
+        $authorList = UserService::getInstance()->getListByIds($authorIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+
+        $list = $topMediaList->map(function (TopMedia $topMedia) use ($authorList, $noteList, $videoList) {
             $media = $topMedia->media_type == MediaType::VIDEO
-                ? $shortVideoList->get($topMedia->media_id)
-                : $tourismNoteList->get($topMedia->media_id);
+                ? $videoList->get($topMedia->media_id)
+                : $noteList->get($topMedia->media_id);
+
+            $media['type'] = $topMedia->media_type == MediaType::VIDEO ? MediaType::VIDEO : MediaType::NOTE;
+
+            $authorInfo = $authorList->get($media['user_id']);
+            $media['authorInfo'] = $authorInfo;
+            unset($media['user_id']);
 
             $media['cover'] = $topMedia->cover;
+
             return $media;
         });
 
