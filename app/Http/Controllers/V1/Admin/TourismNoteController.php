@@ -228,6 +228,19 @@ class TourismNoteController extends Controller
         return $this->success();
     }
 
+    public function options()
+    {
+        $list = TourismNoteService::getInstance()->getList(['id', 'image_list', 'title']);
+        $options = $list->map(function (TourismNote $note) {
+            $note['cover'] = json_decode($note->image_list, true)[0];
+            unset($note->image_list);
+
+            return $note;
+        });
+
+        return $this->success($options);
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');

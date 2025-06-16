@@ -177,8 +177,8 @@ class TourismNoteService extends BaseService
         return TourismNote::query()->where('title', $title)->first($columns);
     }
 
-    public function getList()
+    public function getList($columns = ['*'])
     {
-        return TourismNote::query()->get();
+        return TourismNote::query()->get($columns);
     }
 }

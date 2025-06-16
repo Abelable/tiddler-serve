@@ -936,6 +936,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('add', 'ShortVideoController@add');
             Route::post('edit', 'ShortVideoController@edit');
             Route::post('edit_views', 'ShortVideoController@editViews');
+            Route::get('options', 'ShortVideoController@options');
             Route::post('delete', 'ShortVideoController@delete');
         });
 
@@ -945,7 +946,16 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('add', 'TourismNoteController@add');
             Route::post('edit', 'TourismNoteController@edit');
             Route::post('edit_views', 'TourismNoteController@editViews');
+            Route::get('options', 'TourismNoteController@options');
             Route::post('delete', 'TourismNoteController@delete');
+        });
+
+        Route::prefix('top')->group(function () {
+            Route::post('list', 'TopMediaController@list');
+            Route::get('detail', 'TopMediaController@detail');
+            Route::post('add', 'TopMediaController@add');
+            Route::post('update_cover', 'TopMediaController@updateCover');
+            Route::post('delete', 'TopMediaController@delete');
         });
     });
 });

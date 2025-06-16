@@ -162,8 +162,8 @@ class ShortVideoService extends BaseService
         return ShortVideo::query()->where('title', $title)->first($columns);
     }
 
-    public function getList()
+    public function getList($columns = ['*'])
     {
-        return ShortVideo::query()->get();
+        return ShortVideo::query()->get($columns);
     }
 }

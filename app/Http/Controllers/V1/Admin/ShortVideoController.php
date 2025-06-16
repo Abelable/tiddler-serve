@@ -224,6 +224,12 @@ class ShortVideoController extends Controller
         return $this->success();
     }
 
+    public function options()
+    {
+        $options = ShortVideoService::getInstance()->getList(['id', 'cover', 'title']);
+        return $this->success($options);
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
