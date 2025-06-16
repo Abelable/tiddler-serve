@@ -10,9 +10,14 @@ class TopMediaService extends BaseService
     public function createTopMedia($mediaType, $mediaId, $cover, $title)
     {
         $media = TopMedia::new();
+        return $this->updateTopMedia($media, $mediaType, $mediaId, $cover, $title);
+    }
+
+    public function updateTopMedia(TopMedia $media, $mediaType, $mediaId, $cover, $title)
+    {
         $media->media_type = $mediaType;
         $media->media_id = $mediaId;
-        $media->cover = $cover;
+        $media->cover = $cover ?: '';
         $media->title = $title;
         $media->save();
         return $media;

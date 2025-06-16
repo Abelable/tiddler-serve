@@ -31,28 +31,30 @@ class TopMediaController extends Controller
 
     public function add()
     {
-        $type = $this->verifyRequiredInteger('mediaType');
-        $id = $this->verifyRequiredInteger('mediaId');
-        $cover = $this->verifyRequiredString('cover');
+        $mediaType = $this->verifyRequiredInteger('mediaType');
+        $mediaId = $this->verifyRequiredInteger('mediaId');
+        $cover = $this->verifyString('cover');
         $title = $this->verifyRequiredString('title');
 
-        TopMediaService::getInstance()->createTopMedia($type, $id, $cover, $title);
+        TopMediaService::getInstance()->createTopMedia($mediaType, $mediaId, $cover, $title);
 
         return $this->success();
     }
 
-    public function editCover()
+    public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        $cover = $this->verifyRequiredString('cover');
+        $mediaType = $this->verifyRequiredInteger('mediaType');
+        $mediaId = $this->verifyRequiredInteger('mediaId');
+        $cover = $this->verifyString('cover');
+        $title = $this->verifyRequiredString('title');
 
         $topMedia = TopMediaService::getInstance()->getTopMediaById($id);
         if (is_null($topMedia)) {
             return $this->fail(CodeResponse::NOT_FOUND, '最佳游记不存在');
         }
 
-        $topMedia->cover = $cover;
-        $topMedia->save();
+        TopMediaService::getInstance()->updateTopMedia($topMedia, $mediaType, $mediaId, $cover, $title);
 
         return $this->success();
     }

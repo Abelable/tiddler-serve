@@ -17,7 +17,7 @@ class CreateTopMediaTable extends Migration
             $table->id();
             $table->integer('media_type')->comment('媒体类型');
             $table->integer('media_id')->comment('媒体id');
-            $table->string('cover')->comment('封面');
+            $table->string('cover')->default('')->comment('封面');
             $table->string('title')->comment('标题');
             $table->timestamps();
             $table->softDeletes();

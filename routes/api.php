@@ -954,7 +954,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('list', 'TopMediaController@list');
             Route::get('detail', 'TopMediaController@detail');
             Route::post('add', 'TopMediaController@add');
-            Route::post('edit_cover', 'TopMediaController@editCover');
+            Route::post('edit', 'TopMediaController@edit');
             Route::post('delete', 'TopMediaController@delete');
         });
     });
