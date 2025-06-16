@@ -41,7 +41,7 @@ class TopMediaController extends Controller
         return $this->success();
     }
 
-    public function updateCover()
+    public function editCover()
     {
         $id = $this->verifyRequiredId('id');
         $cover = $this->verifyRequiredString('cover');
