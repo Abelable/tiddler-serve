@@ -50,9 +50,9 @@ class ShopController extends Controller
 
     public function merchantStatusInfo()
     {
-        $merchant = $this->user()->merchant;
         // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = ShopService::getInstance()->getShopByMerchantId($merchant->id);
+        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
+        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
 
         return $this->success($merchant ? [
             'id' => $merchant->id,

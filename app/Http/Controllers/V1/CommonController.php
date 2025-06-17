@@ -10,6 +10,7 @@ use App\Services\HotelProviderOrderService;
 use App\Services\HotelProviderService;
 use App\Services\HotelShopService;
 use App\Services\MealTicketOrderService;
+use App\Services\MerchantService;
 use App\Services\ShopDepositPaymentLogService;
 use App\Services\OrderService;
 use App\Services\RestaurantService;
@@ -77,6 +78,7 @@ class CommonController extends Controller
             DB::transaction(function () use ($data) {
                 $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
                 ShopService::getInstance()->paySuccess($log->shop_id);
+                MerchantService::getInstance()->paySuccess($log->merchant_id);
             });
         }
 

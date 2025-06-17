@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Merchant;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantPageInput;
 use App\Utils\Inputs\MerchantInput;
 
@@ -71,5 +72,19 @@ class MerchantService extends BaseService
     public function getMerchantOptions($columns = ['*'])
     {
         return Merchant::query()->where('status', 1)->get($columns);
+    }
+
+    public function paySuccess(int $merchantId)
+    {
+        $merchant = $this->getMerchantById($merchantId);
+        if (is_null($merchant)) {
+            $this->throwBadArgumentValue();
+        }
+        if ($merchant->status != 1) {
+            $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
+        }
+        $merchant->status = 2;
+        $merchant->save();
+        return $merchant;
     }
 }

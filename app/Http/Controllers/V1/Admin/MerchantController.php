@@ -56,7 +56,7 @@ class MerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
 
-        $merchant->status = 2;
+        $merchant->status = 3;
         $merchant->failure_reason = $reason;
         $merchant->save();
 
