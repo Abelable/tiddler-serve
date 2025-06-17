@@ -73,7 +73,7 @@ class CommonController extends Controller
     {
         $data = Pay::wechat()->verify()->toArray();
 
-        if (strpos($data['attach'], 'shop_id')) {
+        if (strpos($data['attach'], 'shop_id') !== false) {
             Log::info('shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
@@ -89,7 +89,7 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'scenic_provider_order_sn')) {
+        if (strpos($data['attach'], 'scenic_provider_order_sn') !== false) {
             Log::info('scenic_provider_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $order = ScenicProviderOrderService::getInstance()->wxPaySuccess($data);
@@ -98,14 +98,14 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'scenic_order_sn')) {
+        if (strpos($data['attach'], 'scenic_order_sn') !== false) {
             Log::info('scenic_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 ScenicOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
-        if (strpos($data['attach'], 'hotel_provider_order_sn')) {
+        if (strpos($data['attach'], 'hotel_provider_order_sn') !== false) {
             Log::info('hotel_provider_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $order = HotelProviderOrderService::getInstance()->wxPaySuccess($data);
@@ -114,14 +114,14 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'hotel_order_sn')) {
+        if (strpos($data['attach'], 'hotel_order_sn') !== false) {
             Log::info('hotel_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 HotelOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
-        if (strpos($data['attach'], 'catering_provider_order_sn')) {
+        if (strpos($data['attach'], 'catering_provider_order_sn') !== false) {
             Log::info('catering_provider_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $order = CateringProviderOrderService::getInstance()->wxPaySuccess($data);
@@ -130,14 +130,14 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'meal_ticket_order_sn')) {
+        if (strpos($data['attach'], 'meal_ticket_order_sn') !== false) {
             Log::info('meal_ticket_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 MealTicketOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
-        if (strpos($data['attach'], 'set_meal_order_sn')) {
+        if (strpos($data['attach'], 'set_meal_order_sn') !== false) {
             Log::info('set_meal_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 SetMealOrderService::getInstance()->wxPaySuccess($data);
