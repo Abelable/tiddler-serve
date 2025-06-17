@@ -13,6 +13,11 @@ class MerchantService extends BaseService
     {
         $merchant = Merchant::new();
         $merchant->user_id = $userId;
+        return $this->updateMerchant($merchant, $input);
+    }
+
+    public function updateMerchant(Merchant $merchant, MerchantInput $input)
+    {
         $merchant->type = $input->type;
         if ($input->type == 2) {
             $merchant->company_name = $input->companyName;

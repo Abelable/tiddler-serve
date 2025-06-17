@@ -69,6 +69,7 @@ Route::prefix('shop')->group(function () {
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'ShopController@addMerchant');
         Route::get('status', 'ShopController@merchantStatusInfo');
+        Route::get('info', 'ShopController@merchantInfo');
         Route::post('pay_deposit', 'ShopController@payDeposit');
         Route::post('delete', 'ShopController@deleteMerchant');
     });

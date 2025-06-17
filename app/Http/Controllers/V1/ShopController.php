@@ -35,15 +35,21 @@ class ShopController extends Controller
 
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请');
+            if ($merchant->status == 3) {
+                $merchant->status = 0;
+                $merchant->failure_reason = '';
+                MerchantService::getInstance()->updateMerchant($merchant, $input);
+            } else {
+                return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
+            }
+        } else {
+            DB::transaction(function () use ($input) {
+                $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
+                $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
+                ShopDepositPaymentLogService::getInstance()
+                    ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
+            });
         }
-
-        DB::transaction(function () use ($input) {
-            $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
-            $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
-            ShopDepositPaymentLogService::getInstance()
-                ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
-        });
 
         return $this->success();
     }
@@ -61,6 +67,23 @@ class ShopController extends Controller
             'deposit' => $shop->deposit,
             'shopId' => $shop->id
         ] : null);
+    }
+
+    public function merchantInfo()
+    {
+        $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '暂无商家信息');
+        }
+
+        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
+        $merchant['shopCover'] = $shop->cover;
+        $merchant['shopLogo'] = $shop->logo;
+        $merchant['shopName'] = $shop->name;
+        $merchant['shopCategoryIds'] = array_map('intval', json_decode($shop->category_ids));
+        $merchant['deposit'] = $shop->deposit;
+
+        return $this->success($merchant);
     }
 
     public function payDeposit()
