@@ -15,10 +15,10 @@ class ShopDepositService extends BaseService
         return $deposit;
     }
 
-    public function createShopDeposit($userId)
+    public function createShopDeposit($shopId)
     {
         $deposit = ShopDeposit::new();
-        $deposit->shop_id = $userId;
+        $deposit->shop_id = $shopId;
         $deposit->save();
         return $deposit;
     }
@@ -26,7 +26,7 @@ class ShopDepositService extends BaseService
     public function updateDeposit($shopId, $type, $amount, $referenceId = '')
     {
         $deposit = $this->getShopDeposit($shopId);
-        $oldBalance = $deposit->balance;
+        $oldBalance = $deposit->balance ?? 0;
         $newBalance = bcadd($oldBalance, $amount, 2);
         $deposit->balance = $newBalance;
         $deposit->save();
