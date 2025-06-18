@@ -76,7 +76,7 @@ Route::prefix('shop')->group(function () {
 
     Route::get('info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
-    Route::get('update_info', 'ShopController@updateShopInfo');
+    Route::post('update_info', 'ShopController@updateShopInfo');
     Route::get('express_options', 'ShopController@expressOptions');
 
     Route::prefix('freight_template')->group(function () {

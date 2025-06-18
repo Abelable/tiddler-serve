@@ -24,9 +24,9 @@ class ShopInput extends BaseInput
             'brief' => 'string',
             'owner_name' => 'string',
             'mobile' => 'regex:/^1[345789][0-9]{9}$/',
-            'addressDetail' => 'required|string',
-            'longitude' => 'required|numeric',
-            'latitude' => 'required|numeric',
+            'addressDetail' => 'string',
+            'longitude' => 'numeric',
+            'latitude' => 'numeric',
             'openTimeList' => 'array',
         ];
     }

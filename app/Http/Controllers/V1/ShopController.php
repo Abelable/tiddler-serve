@@ -125,6 +125,8 @@ class ShopController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
         }
         $shop->category_ids = json_decode($shop->category_ids);
+        $shop->open_time_list = json_decode($shop->open_time_list);
+
         return $this->success($shop);
     }
 
