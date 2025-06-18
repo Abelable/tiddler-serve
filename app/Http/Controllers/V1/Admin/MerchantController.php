@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Merchant;
+use App\Models\ShopDepositPaymentLog;
 use App\Services\MerchantService;
+use App\Services\ShopDepositPaymentLogService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantPageInput;
 
@@ -15,8 +18,14 @@ class MerchantController extends Controller
     {
         /** @var MerchantPageInput $input */
         $input = MerchantPageInput::new();
+
         $page = MerchantService::getInstance()->getMerchantList($input);
-        return $this->successPaginate($page);
+        $list = collect($page->items())->map(function (Merchant $merchant) {
+            $merchant['depositInfo'] = $merchant->depositInfo;
+            return $merchant;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -26,6 +35,9 @@ class MerchantController extends Controller
         if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
+
+        $merchant['depositInfo'] = $merchant->depositInfo;
+
         return $this->success($merchant);
     }
 

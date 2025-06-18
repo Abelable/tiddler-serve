@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $user_id 用户id
- * @property int $status 申请状态：0-待审核，1-审核通过，待支付保证金，2-已支付保证金，3-审核失败
+ * @property int $status 申请状态：0-待审核，1-审核通过，2-审核失败
  * @property string $failure_reason 审核失败原因
  * @property int $type 商家类型：1-个人，2-企业
  * @property string $company_name 企业名称
@@ -28,6 +28,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\ShopDepositPaymentLog|null $depositInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Merchant newQuery()
  * @method static \Illuminate\Database\Query\Builder|Merchant onlyTrashed()
@@ -61,4 +62,10 @@ namespace App\Models;
  */
 class Merchant extends BaseModel
 {
+    public function depositInfo()
+    {
+        return $this
+            ->hasOne(ShopDepositPaymentLog::class, 'merchant_id')
+            ->where('status', 1);
+    }
 }
