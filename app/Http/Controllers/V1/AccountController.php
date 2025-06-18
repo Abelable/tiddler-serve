@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\AccountChangeLogService;
 use App\Services\AccountService;
-use App\Services\TransactionService;
 use App\Utils\Inputs\PageInput;
 
 class AccountController extends Controller
@@ -19,13 +19,14 @@ class AccountController extends Controller
         ]);
     }
 
-    public function transactionRecordList()
+    public function changeLogList()
     {
         $accountId = $this->verifyRequiredInteger('accountId');
         /** @var PageInput $input */
         $input = PageInput::new();
-        $columns = ['id', 'type', 'amount', 'reference_id', 'created_at'];
-        $page = TransactionService::getInstance()->getPage($accountId, $input, $columns);
+
+        $page = AccountChangeLogService::getInstance()->getLogPage($accountId, $input);
+
         return $this->successPaginate($page);
     }
 }

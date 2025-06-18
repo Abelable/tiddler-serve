@@ -19,6 +19,7 @@ use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicProviderService;
 use App\Services\ScenicShopService;
 use App\Services\SetMealOrderService;
+use App\Services\ShopDepositService;
 use App\Services\ShopService;
 use App\Utils\AliOssServe;
 use App\Utils\WxMpServe;
@@ -77,6 +78,7 @@ class CommonController extends Controller
             Log::info('shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
                 ShopService::getInstance()->paySuccess($log->shop_id);
                 MerchantService::getInstance()->paySuccess($log->merchant_id);
             });

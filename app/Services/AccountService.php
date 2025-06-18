@@ -30,7 +30,8 @@ class AccountService extends BaseService
         $newBalance = bcadd($oldBalance, $amount, 2);
         $account->balance = $newBalance;
         $account->save();
-        TransactionService::getInstance()->createTransaction($account->id, $type, $amount, $referenceId, $productType);
-        AccountChangeLogService::getInstance()->createLog($account->id, $oldBalance, $newBalance, $type, $amount);
+
+        AccountChangeLogService::getInstance()
+            ->createLog($account->id, $oldBalance, $newBalance, $type, $amount, $referenceId, $productType);
     }
 }

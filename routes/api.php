@@ -562,6 +562,11 @@ Route::prefix('promoter')->group(function () {
     Route::get('customer_list', 'PromoterController@customerList');
 });
 
+Route::prefix('shop_deposit')->group(function () {
+    Route::get('info', 'ShopDepositController@accountInfo');
+    Route::get('change_log_list', 'ShopDepositController@changeLogList');
+});
+
 Route::prefix('commission')->group(function () {
     Route::get('achievement', 'CommissionController@achievement');
     Route::post('order_list', 'CommissionController@commissionOrderList');
@@ -577,7 +582,7 @@ Route::prefix('withdraw')->group(function () {
 
 Route::prefix('account')->group(function () {
     Route::get('info', 'AccountController@accountInfo');
-    Route::get('transaction_record_list', 'AccountController@transactionRecordList');
+    Route::get('change_log_list', 'AccountController@changeLogList');
 });
 
 Route::prefix('bank_card')->group(function () {
