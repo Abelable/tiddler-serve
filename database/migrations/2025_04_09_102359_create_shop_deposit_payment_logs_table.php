@@ -20,7 +20,7 @@ class CreateShopDepositPaymentLogsTable extends Migration
             $table->integer('merchant_id')->comment('商家id');
             $table->integer('shop_id')->comment('店铺id');
             $table->float('payment_amount')->comment('支付金额');
-            $table->integer('pay_id')->default(0)->comment('微信支付id');
+            $table->string('pay_id')->default('')->comment('微信支付id');
             $table->string('pay_time')->default('')->comment('支付时间');
             $table->timestamps();
             $table->softDeletes();

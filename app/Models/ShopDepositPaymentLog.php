@@ -11,7 +11,7 @@ namespace App\Models;
  * @property int $merchant_id 商家id
  * @property int $shop_id 店铺id
  * @property float $payment_amount 支付金额
- * @property int $pay_id 微信支付id
+ * @property string $pay_id 微信支付id
  * @property string $pay_time 支付时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
