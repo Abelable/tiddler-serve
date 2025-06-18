@@ -6,6 +6,7 @@ use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\MerchantInput;
+use App\Utils\Inputs\ShopInput;
 
 class ShopService extends BaseService
 {
@@ -14,12 +15,28 @@ class ShopService extends BaseService
         $shop = Shop::new();
         $shop->user_id = $userId;
         $shop->merchant_id = $merchantId;
-        $shop->deposit = $input->deposit;
         $shop->type = $input->type;
+        $shop->deposit = $input->deposit;
         $shop->category_ids = json_encode($input->shopCategoryIds);
         $shop->logo = $input->shopLogo;
         $shop->name = $input->shopName;
-        $shop->cover = $input->shopCover;
+        $shop->bg = $input->shopBg;
+        $shop->save();
+        return $shop;
+    }
+
+    public function updateShopInfo(Shop $shop, ShopInput $input)
+    {
+        $shop->bg = $input->bg ?? '';
+        $shop->logo = $input->logo;
+        $shop->name = $input->name;
+        $shop->brief = $input->brief ?? '';
+        $shop->owner_name = $input->owner_name ?? '';
+        $shop->mobile = $input->mobile ?? '';
+        $shop->address_detail = $input->addressDetail ?? '';
+        $shop->longitude = $input->longitude ?? 0;
+        $shop->latitude = $input->latitude ?? 0;
+        $shop->open_time_list = $input->openTimeList ? json_decode($input->openTimeList, true) : '[]';
         $shop->save();
         return $shop;
     }

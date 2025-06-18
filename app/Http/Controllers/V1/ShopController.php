@@ -11,6 +11,7 @@ use App\Services\ShopCategoryService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantInput;
+use App\Utils\Inputs\ShopInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
@@ -119,12 +120,26 @@ class ShopController extends Controller
     public function myShopInfo()
     {
         // todo 目前一个用户对应一个商家，一个商家对应一个店铺，可以暂时用用户id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $columns = ['id', 'category_ids', 'name', 'type', 'logo', 'cover'];
-        $shop = ShopService::getInstance()->getShopByUserId($this->userId(), $columns);
+        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
         if (is_null($shop)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
         }
         $shop->category_ids = json_decode($shop->category_ids);
+        return $this->success($shop);
+    }
+
+    public function updateShopInfo()
+    {
+        /** @var ShopInput $input */
+        $input = ShopInput::new();
+
+        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
+        }
+
+        ShopService::getInstance()->updateShopInfo($shop, $input);
+
         return $this->success($shop);
     }
 

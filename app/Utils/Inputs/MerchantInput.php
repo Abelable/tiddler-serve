@@ -24,7 +24,7 @@ class MerchantInput extends BaseInput
     public $shopLogo;
     public $shopName;
     public $shopCategoryIds;
-    public $shopCover;
+    public $shopBg;
 
     public function rules()
     {
@@ -49,7 +49,7 @@ class MerchantInput extends BaseInput
             'shopLogo' => 'required|string',
             'shopName' => 'required|string',
             'shopCategoryIds' => 'required|array|min:1',
-            'shopCover' => 'string',
+            'shopBg' => 'string',
         ];
     }
 }
