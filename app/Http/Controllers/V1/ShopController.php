@@ -142,7 +142,7 @@ class ShopController extends Controller
 
         ShopService::getInstance()->updateShopInfo($shop, $input);
 
-        return $this->success($shop);
+        return $this->success();
     }
 
     public function expressOptions()
