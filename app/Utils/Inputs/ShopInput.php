@@ -8,7 +8,7 @@ class ShopInput extends BaseInput
     public $logo;
     public $name;
     public $brief;
-    public $owner_name;
+    public $ownerName;
     public $mobile;
     public $addressDetail;
     public $longitude;
@@ -22,7 +22,7 @@ class ShopInput extends BaseInput
             'logo' => 'string',
             'name' => 'string',
             'brief' => 'string',
-            'owner_name' => 'string',
+            'ownerName' => 'string',
             'mobile' => 'regex:/^1[345789][0-9]{9}$/',
             'addressDetail' => 'string',
             'longitude' => 'numeric',

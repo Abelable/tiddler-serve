@@ -31,7 +31,7 @@ class ShopService extends BaseService
         $shop->logo = $input->logo;
         $shop->name = $input->name;
         $shop->brief = $input->brief ?? '';
-        $shop->owner_name = $input->owner_name ?? '';
+        $shop->owner_name = $input->ownerName ?? '';
         $shop->mobile = $input->mobile ?? '';
         $shop->address_detail = $input->addressDetail ?? '';
         $shop->longitude = $input->longitude ?? 0;
