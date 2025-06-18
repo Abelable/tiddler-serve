@@ -5,19 +5,27 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\ShopDepositChangeLogService;
 use App\Services\ShopDepositService;
+use App\Services\ShopService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 
 class ShopDepositController extends Controller
 {
-    public function accountInfo()
+    public function depositInfo()
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $deposits = ShopDepositService::getInstance()->getShopDeposit($shopId);
+        $deposit = ShopDepositService::getInstance()->getShopDeposit($shopId);
+        if (is_null($deposit)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '保证金数据不存在');
+        }
+
+        $shopInfo = ShopService::getInstance()->getShopById($shopId);
+        $dueAmount = bcsub($shopInfo->deposit, $deposit->balance, 2);
 
         return $this->success([
-            'id' => $deposits->id,
-            'balance' => $deposits->balance ?: 0,
+            'balance' => $deposit->balance,
+            'dueAmount' => $dueAmount
         ]);
     }
 

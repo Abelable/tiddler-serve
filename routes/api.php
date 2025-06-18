@@ -74,6 +74,11 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'ShopController@deleteMerchant');
     });
 
+    Route::prefix('deposit')->group(function () {
+        Route::get('info', 'ShopDepositController@depositInfo');
+        Route::get('log_list', 'ShopDepositController@changeLogList');
+    });
+
     Route::get('info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
     Route::post('update_info', 'ShopController@updateShopInfo');

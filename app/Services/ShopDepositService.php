@@ -32,6 +32,6 @@ class ShopDepositService extends BaseService
         $deposit->save();
 
         ShopDepositChangeLogService::getInstance()
-            ->createLog($deposit->id, $oldBalance, $newBalance, $type, $amount, $referenceId);
+            ->createLog($shopId, $oldBalance, $newBalance, $type, $amount, $referenceId);
     }
 }
