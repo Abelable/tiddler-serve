@@ -735,9 +735,9 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
         Route::post('edit_views', 'GoodsController@editViews');
-        Route::post('up', 'GoodsController@up');
-        Route::post('down', 'GoodsController@down');
+        Route::post('approve', 'GoodsController@approve');
         Route::post('reject', 'GoodsController@reject');
+        Route::post('down', 'GoodsController@down');
         Route::post('delete', 'GoodsController@delete');
         Route::get('options', 'GoodsController@options');
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');

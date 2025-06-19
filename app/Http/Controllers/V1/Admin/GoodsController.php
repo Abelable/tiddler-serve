@@ -9,6 +9,7 @@ use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Admin\GoodsApproveInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
 use Illuminate\Support\Facades\DB;
@@ -134,15 +135,21 @@ class GoodsController extends Controller
         return $this->success();
     }
 
-    public function up()
+    public function approve()
     {
-        $id = $this->verifyRequiredId('id');
+        /** @var GoodsApproveInput $input */
+        $input = GoodsApproveInput::new();
 
-        $goods = GoodsService::getInstance()->getGoodsById($id);
+        $goods = GoodsService::getInstance()->getGoodsById($input->id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
+
         $goods->status = 1;
+        $goods->promotion_commission_rate = $input->promotionCommissionRate;
+        $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
         $goods->save();
 
         return $this->success();
