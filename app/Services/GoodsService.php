@@ -173,7 +173,10 @@ class GoodsService extends BaseService
         if (!empty($input->shopId)) {
             $query = $query->where('shop_id', $input->shopId);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderByRaw("FIELD(status, 0) DESC")
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getRecommendGoodsList(RecommendGoodsPageInput $input, $columns=['*'])
