@@ -129,10 +129,18 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        if ($input->promotionCommissionRate) {
+            $goods->promotion_commission_rate = $input->promotionCommissionRate;
+        }
+        if ($input->promotionCommissionUpperLimit) {
+            $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        }
+        if ($input->superiorPromotionCommissionRate) {
+            $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        }
+        if ($input->superiorPromotionCommissionUpperLimit) {
+            $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        }
         $goods->save();
 
         return $this->success();
