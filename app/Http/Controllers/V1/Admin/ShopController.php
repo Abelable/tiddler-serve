@@ -80,7 +80,7 @@ class ShopController extends Controller
 
     public function options()
     {
-        $options = ShopService::getInstance()->getOptions(['id', 'name']);
+        $options = ShopService::getInstance()->getOptions(['id', 'logo', 'name']);
         return $this->success($options);
     }
 }

@@ -26,6 +26,7 @@ class GoodsCategoryService extends BaseService
         $category->min_superior_promotion_commission_rate = $input->minSuperiorPromotionCommissionRate;
         $category->max_superior_promotion_commission_rate = $input->maxSuperiorPromotionCommissionRate;
         $category->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        $category->save();
 
         return $category;
     }
