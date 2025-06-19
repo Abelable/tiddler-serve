@@ -13,6 +13,9 @@ namespace App\Models;
  * @property float $min_promotion_commission_rate 最小推广佣金比例
  * @property float $max_promotion_commission_rate 最大推广佣金比例
  * @property float $promotion_commission_upper_limit 推广佣金上限（元）
+ * @property float $min_superior_promotion_commission_rate 最小上级推广佣金比例
+ * @property float $max_superior_promotion_commission_rate 最大上级推广佣金比例
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限（元）
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -25,11 +28,14 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMaxPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMaxSalesCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMaxSuperiorPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMinPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMinSalesCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereMinSuperiorPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereShopCategoryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GoodsCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|GoodsCategory withTrashed()
  * @method static \Illuminate\Database\Query\Builder|GoodsCategory withoutTrashed()

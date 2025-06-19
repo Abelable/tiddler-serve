@@ -82,6 +82,7 @@ class CartGoodsService extends BaseService
                 $cartGoods->sales_commission_rate = $goods->sales_commission_rate;
             }
 
+            // todo 临时写死推广佣金比例及上线
             $cartGoods->promotion_commission_rate = $goods->promotion_commission_rate ?? 20;
             $cartGoods->promotion_commission_upper_limit = $goods->promotion_commission_upper_limit ?? 20;
             $cartGoods->superior_promotion_commission_rate = $goods->superior_promotion_commission_rate ?? 10;

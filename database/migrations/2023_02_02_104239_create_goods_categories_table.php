@@ -22,6 +22,9 @@ class CreateGoodsCategoriesTable extends Migration
             $table->float('min_promotion_commission_rate')->default(0)->comment('最小推广佣金比例');
             $table->float('max_promotion_commission_rate')->default(0)->comment('最大推广佣金比例');
             $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限（元）');
+            $table->float('min_superior_promotion_commission_rate')->default(0)->comment('最小上级推广佣金比例');
+            $table->float('max_superior_promotion_commission_rate')->default(0)->comment('最大上级推广佣金比例');
+            $table->float('superior_promotion_commission_upper_limit')->default(0)->comment('上级推广佣金上限（元）');
             $table->timestamps();
             $table->softDeletes();
         });

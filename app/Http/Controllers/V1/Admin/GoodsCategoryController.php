@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\GoodsCategory;
 use App\Services\GoodsCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsCategoryInput;
 use App\Utils\Inputs\Admin\GoodsCategoryPageInput;
-use App\Utils\Inputs\PageInput;
 
 class GoodsCategoryController extends Controller
 {
@@ -44,15 +42,7 @@ class GoodsCategoryController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '当前商品分类已存在');
         }
 
-        $category = GoodsCategory::new();
-        $category->shop_category_id = $input->shopCategoryId;
-        $category->name = $input->name;
-        $category->min_sales_commission_rate = $input->minSalesCommissionRate;
-        $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
-        $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
-        $category->max_promotion_commission_rate = $input->maxPromotionCommissionRate;
-        $category->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $category->save();
+        GoodsCategoryService::getInstance()->createGoodsCategory($input);
 
         return $this->success();
     }
@@ -68,14 +58,7 @@ class GoodsCategoryController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品分类不存在');
         }
 
-        $category->shop_category_id = $input->shopCategoryId;
-        $category->name = $input->name;
-        $category->min_sales_commission_rate = $input->minSalesCommissionRate;
-        $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
-        $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
-        $category->max_promotion_commission_rate = $input->maxPromotionCommissionRate;
-        $category->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $category->save();
+        GoodsCategoryService::getInstance()->updateGoodsCategory($category, $input);
 
         return $this->success();
     }
@@ -94,8 +77,7 @@ class GoodsCategoryController extends Controller
     public function options()
     {
         $shopCategoryId = $this->verifyId('shopCategoryId');
-        $columns = ['id', 'name', 'shop_category_id', 'min_promotion_commission_rate', 'max_promotion_commission_rate'];
-        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryId, $columns);
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryId);
         return $this->success($options);
     }
 }

@@ -13,6 +13,9 @@ class GoodsCategoryInput extends BaseInput
     public $minPromotionCommissionRate;
     public $maxPromotionCommissionRate;
     public $promotionCommissionUpperLimit;
+    public $minSuperiorPromotionCommissionRate;
+    public $maxSuperiorPromotionCommissionRate;
+    public $superiorPromotionCommissionUpperLimit;
 
     public function rules()
     {
@@ -24,6 +27,9 @@ class GoodsCategoryInput extends BaseInput
             'minPromotionCommissionRate' => 'numeric',
             'maxPromotionCommissionRate' => 'numeric',
             'promotionCommissionUpperLimit' => 'numeric',
+            'minSuperiorPromotionCommissionRate' => 'numeric',
+            'maxSuperiorPromotionCommissionRate' => 'numeric',
+            'superiorPromotionCommissionUpperLimit' => 'numeric',
         ];
     }
 }

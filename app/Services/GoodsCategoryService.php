@@ -3,10 +3,33 @@
 namespace App\Services;
 
 use App\Models\GoodsCategory;
+use App\Utils\Inputs\Admin\GoodsCategoryInput;
 use App\Utils\Inputs\Admin\GoodsCategoryPageInput;
 
 class GoodsCategoryService extends BaseService
 {
+    public function createGoodsCategory(GoodsCategoryInput $input)
+    {
+        $category = GoodsCategory::new();
+        return $this->updateGoodsCategory($category, $input);
+    }
+
+    public function updateGoodsCategory(GoodsCategory $category, GoodsCategoryInput $input)
+    {
+        $category->shop_category_id = $input->shopCategoryId;
+        $category->name = $input->name;
+        $category->min_sales_commission_rate = $input->minSalesCommissionRate;
+        $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
+        $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
+        $category->max_promotion_commission_rate = $input->maxPromotionCommissionRate;
+        $category->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        $category->min_superior_promotion_commission_rate = $input->minSuperiorPromotionCommissionRate;
+        $category->max_superior_promotion_commission_rate = $input->maxSuperiorPromotionCommissionRate;
+        $category->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+
+        return $category;
+    }
+
     public function getCategoryList(GoodsCategoryPageInput $input, $columns = ['*'])
     {
         $query = GoodsCategory::query();
