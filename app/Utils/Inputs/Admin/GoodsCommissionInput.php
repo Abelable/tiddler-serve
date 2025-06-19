@@ -4,7 +4,7 @@ namespace App\Utils\Inputs\Admin;
 
 use App\Utils\Inputs\BaseInput;
 
-class GoodsApproveInput extends BaseInput
+class GoodsCommissionInput extends BaseInput
 {
     public $id;
     public $promotionCommissionRate;

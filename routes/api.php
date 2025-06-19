@@ -734,6 +734,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'GoodsController@detail');
         Route::post('add', 'GoodsController@add');
         Route::post('edit', 'GoodsController@edit');
+        Route::post('edit_commission', 'GoodsController@editCommission');
         Route::post('edit_views', 'GoodsController@editViews');
         Route::post('approve', 'GoodsController@approve');
         Route::post('reject', 'GoodsController@reject');
