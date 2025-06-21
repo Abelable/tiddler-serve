@@ -79,6 +79,12 @@ Route::prefix('shop')->group(function () {
         Route::get('log_list', 'ShopDepositController@changeLogList');
     });
 
+    Route::prefix('income')->group(function () {
+        Route::get('order_list', 'ShopIncomeController@incomeOrderList');
+        Route::get('sum', 'ShopIncomeController@sum');
+        Route::get('time_data', 'ShopIncomeController@timeData');
+    });
+
     Route::get('info', 'ShopController@shopInfo');
     Route::get('my_shop_info', 'ShopController@myShopInfo');
     Route::post('update_info', 'ShopController@updateShopInfo');
