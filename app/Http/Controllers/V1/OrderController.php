@@ -20,6 +20,7 @@ use App\Services\OrderService;
 use App\Services\OrderVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
+use App\Services\ShopIncomeService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
@@ -284,12 +285,15 @@ class OrderController extends Controller
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
 
-                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
+                    // 9.生成佣金记录
                     if (!$cartGoods->is_gift) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
+
+                    // 10.生成店铺收益
+                    ShopIncomeService::getInstance()->createIncome($shop->id, $orderId, $cartGoods, $coupon);
                 }
 
                 return $orderId;
@@ -306,8 +310,8 @@ class OrderController extends Controller
                 // 8.生成订单商品快照
                 OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
 
-                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
+                    // 9.生成佣金记录
                     if (!$cartGoods->is_gift) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);

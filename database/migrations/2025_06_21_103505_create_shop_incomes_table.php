@@ -17,11 +17,11 @@ class CreateShopIncomesTable extends Migration
             $table->id();
             $table->integer('withdrawal_id')->default(0)->comment('提现记录id');
             $table->integer('status')->default(0)->comment('收益状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算');
-            $table->integer('user_id')->comment('用户id');
+            $table->integer('shop_id')->comment('店铺id');
             $table->integer('order_id')->comment('订单id');
             $table->integer('goods_id')->comment('商品id');
             $table->integer('refund_status')->default(0)->comment('是否支持7天无理由：0-不支持，1-支持');
-            $table->float('income_base')->comment('收入基数');
+            $table->float('payment_amount')->comment('支付金额');
             $table->float('sales_commission_rate')->comment('销售佣金比例');
             $table->float('income_amount')->comment('收入金额');
             $table->timestamps();
