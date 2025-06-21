@@ -18,12 +18,12 @@ class CreateWithdrawalsTable extends Migration
             $table->integer('status')->default(0)->comment('状态：0-待审核；1-提现成功; 2-提现失败;');
             $table->string('failure_reason')->default('')->comment('提现失败原因');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('scene')->comment('佣金类型：1-商品自购佣金；2-商品分享佣金；3-礼包佣金');
+            $table->integer('scene')->comment('提现类型：1-商品自购佣金；2-商品分享佣金；3-礼包佣金；4-景点收益；5-酒店收益；6-餐饮收益；7-商品收益');
             $table->float('withdraw_amount')->comment('提现金额');
             $table->float('tax_fee')->default(0)->comment('税费');
             $table->float('handling_fee')->comment('手续费');
             $table->float('actual_amount')->comment('实际到账金额');
-            $table->integer('path')->comment('提现方式：1-微信；2-银行卡');
+            $table->integer('path')->comment('提现方式：1-微信；2-银行卡；3-余额');
             $table->string('remark')->default('')->comment('备注');
             $table->timestamps();
             $table->softDeletes();
