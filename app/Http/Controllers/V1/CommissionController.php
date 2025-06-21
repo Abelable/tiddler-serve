@@ -157,7 +157,7 @@ class CommissionController extends Controller
         }
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
-        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('commission_base');
+        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
         $pendingAmount = (clone $query)->where('status', 1)->sum('commission_amount');
         $settledAmount = (clone $query)->whereIn('status', [2, 3, 4])->sum('commission_amount');
 
@@ -178,7 +178,7 @@ class CommissionController extends Controller
 
         $query = CommissionService::getInstance()->getUserCommissionQueryByTimeType($promoterIds, $timeType);
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
-        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('commission_base');
+        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
 
         $pendingAmount = 0;
         $settledAmount = 0;

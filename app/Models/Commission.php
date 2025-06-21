@@ -16,6 +16,7 @@ namespace App\Models;
  * @property int $product_type 产品类型：1-景点，2-酒店，3-餐馆，4-商品
  * @property int $product_id 产品id
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property float $payment_amount 支付金额
  * @property float $commission_base 佣金基数
  * @property float $commission_rate 佣金系数
  * @property float $commission_limit 佣金上限
@@ -35,6 +36,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePaymentAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePromoterId($value)

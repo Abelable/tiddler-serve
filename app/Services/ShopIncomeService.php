@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\ShopIncome;
+use Illuminate\Support\Carbon;
 
 class ShopIncomeService extends BaseService
 {
@@ -32,5 +33,50 @@ class ShopIncomeService extends BaseService
         $income->save();
 
         return $income;
+    }
+
+    public function getShopIncomeListByTimeType($shopId, $timeType, array $statusList, $columns = ['*'])
+    {
+        return $this->getShopIncomeQueryByTimeType($shopId, $timeType)->whereIn('status', $statusList)->get($columns);
+    }
+
+    public function getShopIncomeQueryByTimeType($shopId, $timeType, $startTime = null)
+    {
+        $query = ShopIncome::query()->where('shop_id', $shopId);
+
+        switch ($timeType) {
+            case 1:
+                $query = $query->whereDate('created_at', Carbon::today());
+                break;
+            case 2:
+                $query = $query->whereDate('created_at', Carbon::yesterday());
+                break;
+            case 3:
+                $query = $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()]);
+                break;
+            case 4:
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
+                break;
+            case 5:
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()->subMonths(2)->endOfMonth()]);
+                break;
+            case 6:
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()]);
+                break;
+            case 7:
+                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()]);
+                break;
+        }
+        return $query;
+    }
+
+    public function getShopIncomeSum($shopId, $statusList)
+    {
+        return $this->getShopIncomeQuery($shopId, $statusList)->sum('income_amount');
+    }
+
+    public function getShopIncomeQuery($shopId, array $statusList)
+    {
+        return ShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
 }
