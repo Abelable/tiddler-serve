@@ -102,13 +102,21 @@ class GoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopGoodsList($shopId, StatusPageInput $input, $columns=['*'])
+    public function getShopGoodsPage($shopId, StatusPageInput $input, $columns=['*'])
     {
         return Goods::query()
             ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getShopGoodsList($shopId, $statusList, $columns=['*'])
+    {
+        return Goods::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->get($columns);
     }
 
     public function getGoodsList($columns = ['*'])

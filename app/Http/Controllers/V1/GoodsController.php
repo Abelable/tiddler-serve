@@ -264,8 +264,8 @@ class GoodsController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
         $columns = ['id', 'cover', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
-        $list = GoodsService::getInstance()->getShopGoodsList($shopId, $input, $columns);
-        return $this->successPaginate($list);
+        $page = GoodsService::getInstance()->getShopGoodsPage($shopId, $input, $columns);
+        return $this->successPaginate($page);
     }
 
     public function shopOnSaleGoodsList()

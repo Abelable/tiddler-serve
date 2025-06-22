@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ProductHistory;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Carbon;
 
 class ProductHistoryService extends BaseService
 {
@@ -40,5 +41,23 @@ class ProductHistoryService extends BaseService
             ->where('product_type', $productType)
             ->where('product_id', $productId)
             ->first($columns);
+    }
+
+    public function getHistoryDateCount($productType, $productIds, $dateDesc = 'today')
+    {
+        switch ($dateDesc) {
+            case 'today':
+                $date = Carbon::today();
+                break;
+            case 'yesterday':
+                $date = Carbon::yesterday();
+                break;
+        }
+
+        return ProductHistory::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds)
+            ->whereDate('created_at', $date)
+            ->count();
     }
 }
