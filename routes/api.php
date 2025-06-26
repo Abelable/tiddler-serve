@@ -83,7 +83,7 @@ Route::prefix('shop')->group(function () {
         Route::get('data_overview', 'ShopIncomeController@dataOverview');
         Route::get('sum', 'ShopIncomeController@sum');
         Route::get('time_data', 'ShopIncomeController@timeData');
-        Route::get('order_list', 'ShopIncomeController@incomeOrderList');
+        Route::post('order_list', 'ShopIncomeController@incomeOrderList');
     });
 
     Route::get('info', 'ShopController@shopInfo');
