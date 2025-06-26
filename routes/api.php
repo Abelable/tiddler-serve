@@ -586,11 +586,11 @@ Route::prefix('commission')->group(function () {
     Route::get('sum', 'CommissionController@sum');
     Route::get('time_data', 'CommissionController@timeData');
     Route::get('cash', 'CommissionController@cash');
-});
 
-Route::prefix('withdraw')->group(function () {
-    Route::post('submit', 'WithdrawalController@submit');
-    Route::get('record_list', 'WithdrawalController@recordList');
+    Route::prefix('withdraw')->group(function () {
+        Route::post('submit', 'CommissionWithdrawalController@submit');
+        Route::get('record_list', 'CommissionWithdrawalController@recordList');
+    });
 });
 
 Route::prefix('account')->group(function () {

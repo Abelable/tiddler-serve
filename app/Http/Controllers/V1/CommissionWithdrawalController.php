@@ -5,20 +5,20 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
 use App\Services\CommissionService;
-use App\Services\WithdrawalService;
+use App\Services\CommissionWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\WithdrawalInput;
+use App\Utils\Inputs\CommissionWithdrawalInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class WithdrawalController extends Controller
+class CommissionWithdrawalController extends Controller
 {
     public function submit()
     {
-        /** @var WithdrawalInput $input */
-        $input = WithdrawalInput::new();
+        /** @var CommissionWithdrawalInput $input */
+        $input = CommissionWithdrawalInput::new();
 
         if (is_null($this->user()->authInfo)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '需完成实名认证才可提现');
@@ -58,7 +58,7 @@ class WithdrawalController extends Controller
         }
 
         DB::transaction(function () use ($withdrawAmount, $input) {
-            $withdrawal = WithdrawalService::getInstance()->addWithdrawal($this->userId(), $withdrawAmount, $input);
+            $withdrawal = CommissionWithdrawalService::getInstance()->addWithdrawal($this->userId(), $withdrawAmount, $input);
 
             if ($input->path == 3) { // 提现至余额
                 CommissionService::getInstance()->settleCommissionToBalance($this->userId(), $input->scene, $withdrawal->id);
@@ -78,7 +78,7 @@ class WithdrawalController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        $page = WithdrawalService::getInstance()->getUserRecordList($this->userId(), $input);
+        $page = CommissionWithdrawalService::getInstance()->getUserRecordList($this->userId(), $input);
         return $this->successPaginate($page);
     }
 }

@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\Withdrawal;
+use App\Models\CommissionWithdrawal;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\WithdrawalPageInput;
-use App\Utils\Inputs\WithdrawalInput;
+use App\Utils\Inputs\CommissionWithdrawalInput;
 use Illuminate\Support\Facades\DB;
 
-class WithdrawalService extends BaseService
+class CommissionWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, $withdrawAmount, WithdrawalInput $input)
+    public function addWithdrawal($userId, $withdrawAmount, CommissionWithdrawalInput $input)
     {
-        $withdrawal = Withdrawal::new();
+        $withdrawal = CommissionWithdrawal::new();
 
         if ($input->path == 3) { // 提现至余额
             $taxFee = 0;
@@ -41,7 +41,7 @@ class WithdrawalService extends BaseService
 
     public function getUserRecordList($userId, PageInput $input, $columns = ['*'])
     {
-        return Withdrawal::query()
+        return CommissionWithdrawal::query()
             ->where('user_id', $userId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -49,7 +49,7 @@ class WithdrawalService extends BaseService
 
     public function getList(WithdrawalPageInput $input, $columns = ['*'])
     {
-        $query = Withdrawal::query();
+        $query = CommissionWithdrawal::query();
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
@@ -70,12 +70,12 @@ class WithdrawalService extends BaseService
 
     public function getRecordById($id, $columns = ['*'])
     {
-        return Withdrawal::query()->find($id, $columns);
+        return CommissionWithdrawal::query()->find($id, $columns);
     }
 
     public function getUserApplication($userId, $scene, $columns = ['*'])
     {
-        return Withdrawal::query()
+        return CommissionWithdrawal::query()
             ->where('user_id', $userId)
             ->where('scene', $scene)
             ->where('status', 0)
@@ -84,12 +84,12 @@ class WithdrawalService extends BaseService
 
     public function getCountByStatus($status)
     {
-        return Withdrawal::query()->where('status', $status)->count();
+        return CommissionWithdrawal::query()->where('status', $status)->count();
     }
 
     public function getWithdrawSumListByUserIds(array $userIds)
     {
-        return Withdrawal::query()
+        return CommissionWithdrawal::query()
             ->where('status', 1)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('SUM(withdraw_amount) as sum'))

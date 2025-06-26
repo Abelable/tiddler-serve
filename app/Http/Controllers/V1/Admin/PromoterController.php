@@ -9,7 +9,7 @@ use App\Services\CommissionService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
-use App\Services\WithdrawalService;
+use App\Services\CommissionWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\PageInput;
@@ -29,7 +29,7 @@ class PromoterController extends Controller
             $userList = collect($page->items());
             $userIds = $userList->pluck('id')->toArray();
             $promoterList = PromoterService::getInstance()->getPromoterListByUserIds($userIds)->keyBy('user_id');
-            $withdrawSumList = WithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
+            $withdrawSumList = CommissionWithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
             $list = $userList->map(function (User $user) use ($withdrawSumList, $promoterList) {
                 $promoter = $promoterList->get($user->id);
                 if (!is_null($promoter)) {
@@ -51,7 +51,7 @@ class PromoterController extends Controller
 
             $userIds = $promoterList->pluck('user_id')->toArray();
             $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname', 'mobile'])->keyBy('id');
-            $withdrawSumList = WithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
+            $withdrawSumList = CommissionWithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
 
             $list = $promoterList->map(function (Promoter $promoter) use ($withdrawSumList, $userList) {
                 /** @var User $user */
@@ -151,7 +151,7 @@ class PromoterController extends Controller
         $userIds = $promoterList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname', 'mobile'])->keyBy('id');
 
-        $withdrawSumList = WithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
+        $withdrawSumList = CommissionWithdrawalService::getInstance()->getWithdrawSumListByUserIds($userIds)->keyBy('user_id');
 
         $list = $promoterList->map(function (Promoter $promoter, $index) use ($withdrawSumList, $page, $userList) {
             $user = $userList->get($promoter->user_id);

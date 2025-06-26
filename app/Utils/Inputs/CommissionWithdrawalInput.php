@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class WithdrawalInput extends BaseInput
+class CommissionWithdrawalInput extends BaseInput
 {
     public $scene;
     public $withdrawAmount;

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateWithdrawalsTable extends Migration
+class CreateCommissionWithdrawalsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateWithdrawalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('withdrawals', function (Blueprint $table) {
+        Schema::create('commission_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(0)->comment('状态：0-待审核；1-提现成功; 2-提现失败;');
             $table->string('failure_reason')->default('')->comment('提现失败原因');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('scene')->comment('提现类型：1-商品自购佣金；2-商品分享佣金；3-礼包佣金；4-景点收益；5-酒店收益；6-餐饮收益；7-商品收益');
+            $table->integer('scene')->comment('提现场景：1-自购佣金；2-分享佣金；3-团队佣金；');
             $table->float('withdraw_amount')->comment('提现金额');
             $table->float('tax_fee')->default(0)->comment('税费');
             $table->float('handling_fee')->comment('手续费');
@@ -37,6 +37,6 @@ class CreateWithdrawalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('withdrawals');
+        Schema::dropIfExists('commission_withdrawals');
     }
 }
