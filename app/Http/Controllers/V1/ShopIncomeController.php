@@ -58,10 +58,13 @@ class ShopIncomeController extends Controller
             ->whereMonth('created_at', '!=', Carbon::now()->month)
             ->sum('income_amount');
         $pendingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
-        $settledAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [2, 3, 4]);
+        $withdrawingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
+        $settledAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
+
         return $this->success([
             'cashAmount' => $cashAmount,
             'pendingAmount' => $pendingAmount,
+            'withdrawingAmount' => $withdrawingAmount,
             'settledAmount' => $settledAmount
         ]);
     }
