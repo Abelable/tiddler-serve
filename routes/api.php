@@ -84,6 +84,11 @@ Route::prefix('shop')->group(function () {
         Route::get('sum', 'ShopIncomeController@sum');
         Route::get('time_data', 'ShopIncomeController@timeData');
         Route::post('order_list', 'ShopIncomeController@incomeOrderList');
+
+        Route::prefix('withdraw')->group(function () {
+            Route::post('submit', 'CommissionWithdrawalController@submit');
+            Route::get('record_list', 'CommissionWithdrawalController@recordList');
+        });
     });
 
     Route::get('info', 'ShopController@shopInfo');
