@@ -10,7 +10,7 @@ namespace App\Models;
  * @property float $old_balance 变更前余额
  * @property float $new_balance 变更后余额
  * @property float $change_amount 变更金额
- * @property int $change_type 变更类型：1-佣金提现，2-消费抵扣，3-订单退款
+ * @property int $change_type 变更类型：1-佣金提现，2-收益提现, 3-消费抵扣，4-订单退款
  * @property string $reference_id 外部参考ID，如订单号
  * @property int $product_type 产品类型
  * @property \Illuminate\Support\Carbon|null $created_at

@@ -19,7 +19,7 @@ class CreateAccountChangeLogsTable extends Migration
             $table->float('old_balance')->comment('变更前余额');
             $table->float('new_balance')->comment('变更后余额');
             $table->float('change_amount')->comment('变更金额');
-            $table->integer('change_type')->comment('变更类型：1-佣金提现，2-消费抵扣，3-订单退款');
+            $table->integer('change_type')->comment('变更类型：1-佣金提现，2-收益提现, 3-消费抵扣，4-订单退款');
             $table->string('reference_id')->default('')->comment('外部参考ID，如订单号');
             $table->integer('product_type')->default(0)->comment('产品类型');
             $table->timestamps();

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ScenicOrder;
 use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Enums\ScenicOrderEnums;
 use App\Utils\Inputs\ScenicOrderInput;
@@ -129,7 +130,8 @@ class ScenicOrderService extends BaseService
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
             // 更新余额
-            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn, ProductType::SCENIC);
+            AccountService::getInstance()
+                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::SCENIC);
         }
 
         $order = ScenicOrder::new();
@@ -400,7 +402,7 @@ class ScenicOrderService extends BaseService
                 // 退还余额
                 if ($order->deduction_balance != 0) {
                     AccountService::getInstance()
-                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::SCENIC);
+                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::SCENIC);
                 }
 
                 // 删除佣金记录

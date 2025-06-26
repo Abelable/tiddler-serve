@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\OrderEnums;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CreateOrderInput;
@@ -237,7 +238,8 @@ class OrderService extends BaseService
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
             // 更新余额
-            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn, ProductType::GOODS);
+            AccountService::getInstance()
+                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::GOODS);
         }
 
         $order = Order::new();
@@ -760,7 +762,7 @@ class OrderService extends BaseService
                 // 退还余额
                 if ($order->deduction_balance != 0) {
                     AccountService::getInstance()
-                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
+                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
                 }
 
                 // 删除佣金记录
@@ -841,7 +843,7 @@ class OrderService extends BaseService
             // 退还余额
             if ($order->deduction_balance != 0) {
                 AccountService::getInstance()
-                    ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
+                    ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
             }
 
             // 删除佣金记录

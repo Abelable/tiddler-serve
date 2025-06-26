@@ -790,9 +790,9 @@ class CommissionService extends BaseService
         }
     }
 
-    public function withdrawUserCommission($userId, $scene, $withdrawalId)
+    public function applyWithdrawal($userId, $scene, $withdrawalId)
     {
-        $commissionList = $this->getWithdrawalCommissionList($userId, $scene);
+        $commissionList = $this->getWithdrawingList($userId, $scene);
         /** @var Commission $commission */
         foreach ($commissionList as $commission) {
             $commission->withdrawal_id = $withdrawalId;
@@ -801,9 +801,9 @@ class CommissionService extends BaseService
         }
     }
 
-    public function settleCommissionToBalance($userId, $scene, $withdrawalId)
+    public function finishWithdrawal($userId, $scene, $withdrawalId)
     {
-        $commissionList = $this->getWithdrawalCommissionList($userId, $scene);
+        $commissionList = $this->getWithdrawingList($userId, $scene);
         /** @var Commission $commission */
         foreach ($commissionList as $commission) {
             $commission->withdrawal_id = $withdrawalId;
@@ -817,7 +817,7 @@ class CommissionService extends BaseService
      * @param $scene
      * @return Commission[]|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function getWithdrawalCommissionList($userId, $scene)
+    public function getWithdrawingList($userId, $scene)
     {
         $query = $this->getUserCommissionQuery([$userId], [2]);
         if ($scene == 1) {

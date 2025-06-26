@@ -75,6 +75,36 @@ class ShopIncomeService extends BaseService
         return $this->getShopIncomeQuery($shopId, $statusList)->sum('income_amount');
     }
 
+    public function applyWithdrawal($shopId, $withdrawalId)
+    {
+        $incomeList = $this->getWithdrawingList($shopId);
+        /** @var ShopIncome $income */
+        foreach ($incomeList as $income) {
+            $income->withdrawal_id = $withdrawalId;
+            $income->status = 3;
+            $income->save();
+        }
+    }
+
+    public function finishWithdrawal($shopId, $withdrawalId)
+    {
+        $incomeList = $this->getWithdrawingList($shopId);
+        /** @var ShopIncome $income */
+        foreach ($incomeList as $income) {
+            $income->withdrawal_id = $withdrawalId;
+            $income->status = 4;
+            $income->save();
+        }
+    }
+
+    public function getWithdrawingList($shopId)
+    {
+        return $this
+            ->getShopIncomeQuery($shopId, [2])
+            ->whereMonth('created_at', '!=', Carbon::now()->month)
+            ->get();
+    }
+
     public function getShopIncomeQuery($shopId, array $statusList)
     {
         return ShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);

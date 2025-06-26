@@ -7,6 +7,7 @@ use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\CommissionWithdrawalService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\CommissionWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -61,10 +62,11 @@ class CommissionWithdrawalController extends Controller
             $withdrawal = CommissionWithdrawalService::getInstance()->addWithdrawal($this->userId(), $withdrawAmount, $input);
 
             if ($input->path == 3) { // 提现至余额
-                CommissionService::getInstance()->settleCommissionToBalance($this->userId(), $input->scene, $withdrawal->id);
-                AccountService::getInstance()->updateBalance($this->userId(), 1, $withdrawAmount);
+                CommissionService::getInstance()->finishWithdrawal($this->userId(), $input->scene, $withdrawal->id);
+                AccountService::getInstance()
+                    ->updateBalance($this->userId(), AccountChangeType::COMMISSION_WITHDRAWAL, $withdrawAmount);
             } else {
-                CommissionService::getInstance()->withdrawUserCommission($this->userId(), $input->scene, $withdrawal->id);
+                CommissionService::getInstance()->applyWithdrawal($this->userId(), $input->scene, $withdrawal->id);
 
                 // todo 管理后台提现通知
                 // AdminTodoService::getInstance()->createTodo(NotificationEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);

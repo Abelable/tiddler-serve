@@ -6,6 +6,7 @@ use App\Models\MealTicket;
 use App\Models\MealTicketOrder;
 use App\Models\User;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\MealTicketOrderEnums;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\MealTicketOrderInput;
@@ -130,7 +131,8 @@ class MealTicketOrderService extends BaseService
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
             // 更新余额
-            AccountService::getInstance()->updateBalance($user->id, 2, -$deductionBalance, $orderSn, ProductType::MEAL_TICKET);
+            AccountService::getInstance()
+                ->updateBalance($user->id, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::MEAL_TICKET);
         }
 
         $order = MealTicketOrder::new();
@@ -400,7 +402,7 @@ class MealTicketOrderService extends BaseService
                 // 退还余额
                 if ($order->deduction_balance != 0) {
                     AccountService::getInstance()
-                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::MEAL_TICKET);
+                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::MEAL_TICKET);
                 }
 
                 // 删除佣金记录

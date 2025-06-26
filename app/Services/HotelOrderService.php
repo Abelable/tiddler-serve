@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\HotelOrder;
 use App\Models\HotelShop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\HotelOrderEnums;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\HotelOrderInput;
@@ -130,7 +131,8 @@ class HotelOrderService extends BaseService
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
             // 更新余额
-            AccountService::getInstance()->updateBalance($userId, 2, -$deductionBalance, $orderSn, ProductType::HOTEL);
+            AccountService::getInstance()
+                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::HOTEL);
         }
 
         $order = HotelOrder::new();
@@ -434,7 +436,7 @@ class HotelOrderService extends BaseService
                 // 退还余额
                 if ($order->deduction_balance != 0) {
                     AccountService::getInstance()
-                        ->updateBalance($order->user_id, 3, $order->deduction_balance, $order->order_sn, ProductType::HOTEL);
+                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::HOTEL);
                 }
 
                 // 删除佣金记录
