@@ -133,12 +133,6 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasMany(Shop::class, 'user_id')->where('status', 1);
     }
 
-    // todo 目前一个商家绑定一个店铺，之后一个商家多个店铺再删除
-    public function shopInfo()
-    {
-        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
-    }
-
     public function scenicProvider()
     {
         return $this->hasOne(ScenicProvider::class, 'user_id')->where('status', 2);
