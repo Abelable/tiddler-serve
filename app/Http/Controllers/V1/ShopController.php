@@ -118,19 +118,6 @@ class ShopController extends Controller
         return $this->success($shop);
     }
 
-    public function myShopInfo()
-    {
-        // todo 目前一个用户对应一个商家，一个商家对应一个店铺，可以暂时用用户id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
-        if (is_null($shop)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
-        }
-        $shop->category_ids = json_decode($shop->category_ids);
-        $shop->open_time_list = json_decode($shop->open_time_list);
-
-        return $this->success($shop);
-    }
-
     public function updateShopInfo()
     {
         /** @var ShopInput $input */
