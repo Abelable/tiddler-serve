@@ -21,7 +21,8 @@ class ShopController extends Controller
 
     public function categoryOptions()
     {
-        $options = ShopCategoryService::getInstance()->getCategoryOptions(['id', 'name', 'deposit', 'adapted_merchant_types']);
+        $options = ShopCategoryService::getInstance()
+            ->getCategoryOptions(['id', 'name', 'deposit', 'adapted_merchant_types']);
         $options = $options->map(function (ShopCategory $category) {
             $category->adapted_merchant_types = json_decode($category->adapted_merchant_types);
             return $category;

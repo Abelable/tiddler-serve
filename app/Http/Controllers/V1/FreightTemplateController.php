@@ -12,7 +12,7 @@ class FreightTemplateController extends Controller
 {
     public function list()
     {
-        $shopId = $this->user()->shopInfo->id;
+        $shopId = $this->verifyRequiredId('shopId');
         $list = FreightTemplateService::getInstance()->getListByShopId($shopId, ['id', 'name']);
         return $this->success($list);
     }
@@ -29,9 +29,9 @@ class FreightTemplateController extends Controller
     {
         /** @var FreightTemplateInput $input */
         $input = FreightTemplateInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
         $freightTemplate = FreightTemplate::new();
-        $shopId = $this->user()->shopInfo->id;
         $freightTemplate->shop_id = $shopId;
 
         FreightTemplateService::getInstance()->update($freightTemplate, $input);

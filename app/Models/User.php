@@ -123,7 +123,7 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
     }
 
-    public function shopInfoIds()
+    public function shopIds()
     {
         return $this->shopInfoList()->pluck('id')->toArray();
     }

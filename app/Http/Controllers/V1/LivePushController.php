@@ -178,7 +178,8 @@ class LivePushController extends Controller
         } else {
             $goodsIds = LiveGoodsService::getInstance()->goodsIds($room->id);
             $columns = ['id', 'cover', 'name', 'price', 'market_price', 'stock'];
-            $goodsList = GoodsService::getInstance()->getLiveUnlistedGoodsList($this->user()->shopInfo->id, $goodsIds, $columns);
+            $goodsList = GoodsService::getInstance()
+                ->getLiveUnlistedGoodsList($this->user()->shopIds()[0], $goodsIds, $columns);
         }
 
         return $this->success($goodsList);
