@@ -387,6 +387,9 @@ class OrderService extends BaseService
             // 佣金记录状态更新为：已支付待结算
             CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
 
+            // 收益记录状态更新为：已支付待结算
+            ShopIncomeService::getInstance()->updateListToPaidStatus($orderIds);
+
             // 更新订单商品状态
             OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
 
@@ -469,9 +472,14 @@ class OrderService extends BaseService
             return $order;
         });
 
-        // 删除佣金记录
+
         $orderIds = $orderList->pluck('id')->toArray();
+
+        // 删除佣金记录
         CommissionService::getInstance()->deleteUnpaidListByOrderIds($orderIds, ProductType::GOODS);
+
+        // 删除收益记录
+        ShopIncomeService::getInstance()->deleteListByOrderIds($orderIds, 0);
 
         return $orderList;
     }
@@ -678,6 +686,9 @@ class OrderService extends BaseService
         // 佣金记录变更为待提现
         CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::GOODS, $role);
 
+        // 收益记录变更为待提现
+        ShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);
+
         return $orderList;
     }
 
@@ -775,7 +786,7 @@ class OrderService extends BaseService
 
                 // 删除店铺收益
                 if ($order->shop_id != 0) {
-                    ShopIncomeService::getInstance()->deletePaidListByOrderId($order->id);
+                    ShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
                 }
 
                 // 更新订单商品状态
@@ -858,6 +869,9 @@ class OrderService extends BaseService
 
             // 删除佣金记录
             CommissionService::getInstance()->deletePaidCommission($order->id, ProductType::GOODS, $goodsId);
+
+            // 删除收益记录
+            ShopIncomeService::getInstance()->deleteIncome($order->id, $goodsId, 1);
 
             // 更新订单商品状态
             OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);

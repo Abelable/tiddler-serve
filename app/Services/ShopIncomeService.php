@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Jobs\ShopIncomeConfirmJob;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\ShopIncome;
+use App\Utils\CodeResponse;
 use Illuminate\Support\Carbon;
 
 class ShopIncomeService extends BaseService
@@ -110,11 +112,64 @@ class ShopIncomeService extends BaseService
         return ShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
 
-    public function deletePaidListByOrderId($orderId)
+    public function updateListToPaidStatus(array $orderIds)
     {
-        ShopIncome::query()
-            ->where('status', 1)
+        return ShopIncome::query()
+            ->whereIn('order_id', $orderIds)
+            ->where('status', 0)
+            ->update(['status' => 1]);
+    }
+
+    public function updateListToConfirmStatus($orderIds, $role = 'user')
+    {
+        $incomeList = $this->getPaidListByOrderIds($orderIds);
+        return $incomeList->map(function (ShopIncome $income) use ($role) {
+            if ($income->refund_status == 1 && $role == 'user') {
+                // 7天无理由商品：确认收货7天后更新收益状态
+                dispatch(new ShopIncomeConfirmJob($income->id));
+            } else {
+                $income->status = 2;
+                $income->save();
+            }
+            return $income;
+        });
+    }
+
+    public function updateIncomeToConfirmStatus($id)
+    {
+        $income = $this->getPaidIncomeById($id);
+        if (is_null($income)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '收益记录不存在或已删除');
+        }
+        $income->status = 2;
+        $income->save();
+        return $income;
+    }
+
+    public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
+    {
+        return ShopIncome::query()->whereIn('order_id', $orderIds)->where('status', 1)->get($columns);
+    }
+
+    public function getPaidIncomeById($id, $columns = ['*'])
+    {
+        return ShopIncome::query()->where('status', 1)->find($id, $columns);
+    }
+
+    public function deleteListByOrderIds(array $orderId, $status)
+    {
+        return ShopIncome::query()
             ->where('order_id', $orderId)
+            ->where('status', $status)
+            ->delete();
+    }
+
+    public function deleteIncome($orderId, $goodsId, $status)
+    {
+        return ShopIncome::query()
+            ->where('order_id', $orderId)
+            ->where('goods_id', $goodsId)
+            ->where('status', $status)
             ->delete();
     }
 }

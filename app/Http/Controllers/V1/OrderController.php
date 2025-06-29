@@ -421,11 +421,10 @@ class OrderController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
 
         return $this->success([
-            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(1)),
-            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(2)),
-            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(3)),
-            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(4)),
-            OrderService::getInstance()->getTotal($shopId, [OrderEnums::STATUS_REFUND]),
+            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(1)),
+            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(2)),
+            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(3)),
+            OrderService::getInstance()->getShopTotal($shopId, [OrderEnums::STATUS_REFUND]),
         ]);
     }
 
