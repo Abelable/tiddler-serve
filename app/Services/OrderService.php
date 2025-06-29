@@ -92,7 +92,7 @@ class OrderService extends BaseService
         return Order::query()
             ->whereIn('user_id', $userIds)
             ->whereDate('created_at', Carbon::today())
-            ->whereIn('status', [201, 202, 301, 401, 402, 403, 501, 502])
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
             ->distinct('user_id')
             ->count('user_id');
     }
@@ -102,7 +102,7 @@ class OrderService extends BaseService
         return Order::query()
             ->whereIn('user_id', $userIds)
             ->whereDate('created_at', Carbon::today())
-            ->whereIn('status', [201, 202, 301, 401, 402, 403, 501, 502])
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
             ->get($columns);
     }
 
@@ -120,7 +120,7 @@ class OrderService extends BaseService
         return Order::query()
             ->where('shop_id', $shopId)
             ->whereDate('created_at', $date)
-            ->whereIn('status', [201, 202, 301, 401, 402, 403, 501, 502]);
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502]);
     }
 
     public function getUnpaidList(int $userId, array $orderIds, $columns = ['*'])
