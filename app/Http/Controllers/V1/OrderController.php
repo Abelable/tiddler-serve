@@ -388,21 +388,6 @@ class OrderController extends Controller
         return $this->success($list);
     }
 
-    public function shopList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $status = $this->verifyRequiredInteger('status');
-        $shopId = $this->verifyId('shopId');
-
-        $statusList = $this->statusList($status);
-        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $orderList = collect($page->items());
-        $list = $this->handleOrderList($orderList);
-
-        return $this->success($this->paginate($page, $list));
-    }
-
     private function statusList($status) {
         switch ($status) {
             case 1:
@@ -422,6 +407,46 @@ class OrderController extends Controller
                 break;
             case 6:
                 $statusList = [OrderEnums::STATUS_FINISHED];
+                break;
+            default:
+                $statusList = [];
+                break;
+        }
+
+        return $statusList;
+    }
+
+    public function shopList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $status = $this->verifyRequiredInteger('status');
+        $shopId = $this->verifyId('shopId');
+
+        $statusList = $this->shopStatusList($status);
+        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
+        $orderList = collect($page->items());
+        $list = $this->handleOrderList($orderList);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
+    private function shopStatusList($status) {
+        switch ($status) {
+            case 1:
+                $statusList = [OrderEnums::STATUS_PAY, OrderEnums::STATUS_EXPORTED];
+                break;
+            case 2:
+                $statusList = [OrderEnums::STATUS_SHIP];
+                break;
+            case 3:
+                $statusList = [OrderEnums::STATUS_PENDING_VERIFICATION];
+                break;
+            case 4:
+                $statusList = [OrderEnums::STATUS_FINISHED];
+                break;
+            case 5:
+                $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
                 break;
             default:
                 $statusList = [];
