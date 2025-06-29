@@ -16,12 +16,14 @@ use App\Services\CommissionService;
 use App\Services\CouponService;
 use App\Services\FreightTemplateService;
 use App\Services\OrderGoodsService;
+use App\Services\OrderPackageService;
 use App\Services\OrderService;
 use App\Services\OrderVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ShopIncomeService;
 use App\Services\ShopManagerService;
+use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
@@ -449,7 +451,8 @@ class OrderController extends Controller
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
                 'address' => $order->address,
-                'orderSn' => $order->order_sn
+                'orderSn' => $order->order_sn,
+                'createdAt' => $order->created_at,
             ];
         });
     }
@@ -544,21 +547,26 @@ class OrderController extends Controller
             'order_sn',
             'user_id',
             'status',
-            'remarks',
+            'delivery_mode',
             'consignee',
             'mobile',
             'address',
+            'pickup_address_id',
+            'pickup_time',
+            'pickup_mobile',
             'shop_id',
             'shop_logo',
             'shop_name',
             'goods_price',
             'freight_price',
+            'deduction_balance',
             'payment_amount',
             'refund_amount',
             'pay_time',
             'ship_time',
             'confirm_time',
             'refund_time',
+            'remarks',
             'created_at',
             'updated_at',
         ];
@@ -568,6 +576,22 @@ class OrderController extends Controller
         }
         $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
         $order['goods_list'] = $goodsList;
+
+        $packageList = OrderPackageService::getInstance()->getListByOrderId($order->id);
+        $order['package_list'] = $packageList ?: [];
+
+        if ($order->delivery_mode == 2) {
+            $pickupAddress = ShopPickupAddressService::getInstance()
+                ->getAddressById($order->pickup_address_id, ['id', 'name', 'address_detail', 'latitude', 'longitude']);
+            $order['pickup_address'] = $pickupAddress;
+            unset($order['pickup_address_id']);
+
+            if ($order->status !== OrderEnums::STATUS_CREATE) {
+                $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
+                $order['verify_code'] = $verifyInfo->code ?: null;
+            }
+        }
+
         return $this->success($order);
     }
 }
