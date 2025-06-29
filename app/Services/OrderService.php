@@ -773,6 +773,11 @@ class OrderService extends BaseService
                 // 删除佣金记录
                 CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::GOODS);
 
+                // 删除店铺收益
+                if ($order->shop_id != 0) {
+                    ShopIncomeService::getInstance()->deletePaidListByOrderId($order->id);
+                }
+
                 // 更新订单商品状态
                 OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);
             } catch (GatewayException $exception) {

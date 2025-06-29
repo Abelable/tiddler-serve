@@ -641,13 +641,13 @@ class CommissionService extends BaseService
         $commissionList->map(function (Commission $commission) {
             // 更新推广员佣金总数
             if ($commission->scene == 1) {
-                PromoterService::getInstance()->updateSelfCommissionSum($commission->promoter_id, $commission->commission_amount);
+                PromoterService::getInstance()->updateSelfCommissionSum($commission->promoter_id, -$commission->commission_amount);
             }
             if ($commission->scene == 2 || $commission->scene == 3) {
-                PromoterService::getInstance()->updateShareCommissionSum($commission->promoter_id, $commission->commission_amount);
+                PromoterService::getInstance()->updateShareCommissionSum($commission->promoter_id, -$commission->commission_amount);
             }
             if ($commission->scene == 4 || $commission->scene == 5) {
-                PromoterService::getInstance()->updateTeamCommissionSum($commission->promoter_id, $commission->commission_amount);
+                PromoterService::getInstance()->updateTeamCommissionSum($commission->promoter_id, -$commission->commission_amount);
             }
 
             $commission->delete();

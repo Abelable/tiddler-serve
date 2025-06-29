@@ -109,4 +109,12 @@ class ShopIncomeService extends BaseService
     {
         return ShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
+
+    public function deletePaidListByOrderId($orderId)
+    {
+        ShopIncome::query()
+            ->where('status', 1)
+            ->where('order_id', $orderId)
+            ->delete();
+    }
 }
