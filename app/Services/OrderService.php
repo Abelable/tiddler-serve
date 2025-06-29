@@ -32,6 +32,11 @@ class OrderService extends BaseService
         return Order::query()->where('user_id', $userId)->whereIn('status', $statusList)->count();
     }
 
+    public function getShopTotal($shopId, $statusList)
+    {
+        return Order::query()->where('shop_id', $shopId)->whereIn('status', $statusList)->count();
+    }
+
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
         $query = Order::query()->where('user_id', $userId);

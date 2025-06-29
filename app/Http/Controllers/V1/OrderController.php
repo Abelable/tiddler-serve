@@ -416,6 +416,19 @@ class OrderController extends Controller
         return $statusList;
     }
 
+    public function shopTotal()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+
+        return $this->success([
+            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(1)),
+            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(2)),
+            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(3)),
+            OrderService::getInstance()->getTotal($shopId, $this->shopStatusList(4)),
+            OrderService::getInstance()->getTotal($shopId, [OrderEnums::STATUS_REFUND]),
+        ]);
+    }
+
     public function shopList()
     {
         /** @var PageInput $input */
@@ -473,6 +486,7 @@ class OrderController extends Controller
                 'goodsList' => $goodsList,
                 'payTime' => $order->pay_time,
                 'paymentAmount' => $order->payment_amount,
+                'deliveryMode' => $order->delivery_mode,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
                 'address' => $order->address,

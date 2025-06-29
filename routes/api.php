@@ -181,6 +181,7 @@ Route::prefix('order')->group(function () {
     Route::get('total', 'OrderController@total');
     Route::get('list', 'OrderController@list');
     Route::get('search', 'OrderController@search');
+    Route::get('shop_total', 'OrderController@shopTotal');
     Route::get('shop_list', 'OrderController@shopList');
     Route::get('detail', 'OrderController@detail');
     Route::post('confirm', 'OrderController@confirm');
