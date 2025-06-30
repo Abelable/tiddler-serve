@@ -34,8 +34,12 @@ class ExpressService extends BaseService
         return Express::query()->where('name', $name)->first($columns);
     }
 
-    public function getExpressOptions($columns = ['*'])
+    public function getExpressOptions($name = '', $columns = ['*'])
     {
-        return Express::query()->get($columns);
+        $query = Express::query();
+        if (!empty($name)) {
+            $query = $query->where('name', 'like', '%' . $name . '%');
+        }
+        return $query->get($columns);
     }
 }

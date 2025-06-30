@@ -135,7 +135,8 @@ class ShopController extends Controller
 
     public function expressOptions()
     {
-        $options = ExpressService::getInstance()->getExpressOptions(['id', 'code', 'name']);
+        $name = $this->verifyString('name');
+        $options = ExpressService::getInstance()->getExpressOptions($name, ['id', 'code', 'name']);
         return $this->success($options);
     }
 }
