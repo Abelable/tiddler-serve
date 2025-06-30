@@ -135,6 +135,7 @@ Route::prefix('shop')->group(function () {
     Route::prefix('order')->group(function () {
         Route::get('total', 'ShopOrderController@total');
         Route::get('list', 'ShopOrderController@list');
+        Route::get('detail', 'ShopOrderController@detail');
         Route::post('verify', 'ShopOrderController@verify');
         Route::post('delivery', 'ShopOrderController@delivery');
     });
