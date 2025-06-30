@@ -552,7 +552,7 @@ class OrderService extends BaseService
             $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
             foreach ($orderGoodsList as $orderGoods) {
                 OrderPackageGoodsService::getInstance()
-                    ->create($order->id, $orderPackage->id, $orderGoods->goods_id, $orderGoods->cover, $orderGoods->name, $orderGoods->number);
+                    ->create($order->id, $orderPackage->id, $orderGoods->goods_id, $orderGoods->cover, $orderGoods->name, $orderGoods->selected_sku_name, $orderGoods->number);
             }
 
             // 发货同步小程序后台
@@ -593,7 +593,7 @@ class OrderService extends BaseService
                 $goodsList = json_decode($package['goodsList']);
                 foreach ($goodsList as $goods) {
                     OrderPackageGoodsService::getInstance()
-                        ->create($order->id, $orderPackage->id, $goods->goodsId, $goods->cover, $goods->name, $goods->number);
+                        ->create($order->id, $orderPackage->id, $goods->goodsId, $goods->cover, $goods->name, $goods->selectedSkuName, $goods->number);
                 }
             }
 
