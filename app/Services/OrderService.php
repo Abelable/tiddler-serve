@@ -59,12 +59,17 @@ class OrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getUserOrderById($userId, $id, $columns = ['*'])
+    public function getUserOrder($userId, $id, $columns = ['*'])
     {
         return Order::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function getOrderById($id, $columns = ['*'])
+    public function getShopOrder($shopId, $id, $columns = ['*'])
+    {
+        return Order::query()->where('shop_id', $shopId)->find($id, $columns);
+    }
+
+    public function getOrder($id, $columns = ['*'])
     {
         return Order::query()->find($id, $columns);
     }
@@ -523,7 +528,7 @@ class OrderService extends BaseService
 
     public function ship($orderId, $shipChannel, $shipCode, $shipSn)
     {
-        $order = $this->getOrderById($orderId);
+        $order = $this->getOrder($orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -562,16 +567,8 @@ class OrderService extends BaseService
         return $order;
     }
 
-    public function splitShip($orderId, array $packageList, $isAllDelivered = false)
+    public function splitShip(Order $order, array $packageList, $isAllDelivered = false)
     {
-        $order = $this->getOrderById($orderId);
-        if (is_null($order)) {
-            $this->throwBadArgumentValue();
-        }
-        if (!$order->canShipHandle()) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单未付款，无法发货');
-        }
-
         DB::transaction(function () use ($order, $packageList, $isAllDelivered) {
             if ($isAllDelivered) {
                 $order->status = OrderEnums::STATUS_SHIP;
@@ -712,7 +709,7 @@ class OrderService extends BaseService
 
     public function finish($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -728,7 +725,7 @@ class OrderService extends BaseService
 
     public function userRefund($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -799,7 +796,7 @@ class OrderService extends BaseService
 
     public function afterSale($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -815,7 +812,7 @@ class OrderService extends BaseService
 
     public function afterSaleRefund($orderId, $goodsId, $couponId, $refundAmount)
     {
-        $order = $this->getOrderById($orderId);
+        $order = $this->getOrder($orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }

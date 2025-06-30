@@ -64,6 +64,8 @@ Route::prefix('keyword')->group(function () {
 });
 
 Route::prefix('shop')->group(function () {
+    Route::get('info', 'ShopController@shopInfo');
+    Route::post('update_info', 'ShopController@updateShopInfo');
     Route::get('category_options', 'ShopController@categoryOptions');
 
     Route::prefix('merchant')->group(function () {
@@ -91,8 +93,6 @@ Route::prefix('shop')->group(function () {
         });
     });
 
-    Route::get('info', 'ShopController@shopInfo');
-    Route::post('update_info', 'ShopController@updateShopInfo');
     Route::get('express_options', 'ShopController@expressOptions');
 
     Route::prefix('freight_template')->group(function () {
@@ -130,6 +130,13 @@ Route::prefix('shop')->group(function () {
         Route::post('up', 'GoodsController@up');
         Route::post('down', 'GoodsController@down');
         Route::post('delete', 'GoodsController@delete');
+    });
+
+    Route::prefix('order')->group(function () {
+        Route::get('total', 'ShopOrderController@total');
+        Route::get('list', 'ShopOrderController@list');
+        Route::post('verify', 'ShopOrderController@verify');
+        Route::post('delivery', 'ShopOrderController@delivery');
     });
 });
 
@@ -181,13 +188,10 @@ Route::prefix('order')->group(function () {
     Route::get('total', 'OrderController@total');
     Route::get('list', 'OrderController@list');
     Route::get('search', 'OrderController@search');
-    Route::get('shop_total', 'OrderController@shopTotal');
-    Route::get('shop_list', 'OrderController@shopList');
     Route::get('detail', 'OrderController@detail');
     Route::post('confirm', 'OrderController@confirm');
     Route::get('verify_code', 'OrderController@verifyCode');
     Route::get('qr_code', 'OrderController@qrCode');
-    Route::post('verify', 'OrderController@verify');
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
     Route::post('delete', 'OrderController@delete');

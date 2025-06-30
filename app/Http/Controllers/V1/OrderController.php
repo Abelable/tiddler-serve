@@ -22,7 +22,6 @@ use App\Services\OrderVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ShopIncomeService;
-use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
@@ -416,58 +415,6 @@ class OrderController extends Controller
         return $statusList;
     }
 
-    public function shopTotal()
-    {
-        $shopId = $this->verifyRequiredId('shopId');
-
-        return $this->success([
-            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(1)),
-            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(2)),
-            OrderService::getInstance()->getShopTotal($shopId, $this->shopStatusList(3)),
-            OrderService::getInstance()->getShopTotal($shopId, [OrderEnums::STATUS_REFUND]),
-        ]);
-    }
-
-    public function shopList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $status = $this->verifyRequiredInteger('status');
-        $shopId = $this->verifyId('shopId');
-
-        $statusList = $this->shopStatusList($status);
-        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $orderList = collect($page->items());
-        $list = $this->handleOrderList($orderList);
-
-        return $this->success($this->paginate($page, $list));
-    }
-
-    private function shopStatusList($status) {
-        switch ($status) {
-            case 1:
-                $statusList = [OrderEnums::STATUS_PAY, OrderEnums::STATUS_EXPORTED];
-                break;
-            case 2:
-                $statusList = [OrderEnums::STATUS_SHIP];
-                break;
-            case 3:
-                $statusList = [OrderEnums::STATUS_PENDING_VERIFICATION];
-                break;
-            case 4:
-                $statusList = [OrderEnums::STATUS_FINISHED];
-                break;
-            case 5:
-                $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
-                break;
-            default:
-                $statusList = [];
-                break;
-        }
-
-        return $statusList;
-    }
-
     private function handleOrderList($orderList)
     {
         $orderIds = $orderList->pluck('id')->toArray();
@@ -493,88 +440,6 @@ class OrderController extends Controller
                 'createdAt' => $order->created_at,
             ];
         });
-    }
-
-    public function qrCode()
-    {
-        $code = $this->verifyRequiredId('code');
-        $qrCode = QrCode::format('png')->size(400)->generate($code);
-        return response($qrCode)->header('Content-Type', 'image/png');
-    }
-
-    public function verifyCode()
-    {
-        $orderId = $this->verifyRequiredId('orderId');
-
-        $verifyCodeInfo = OrderVerifyService::getInstance()->getByOrderId($orderId);
-        if (is_null($verifyCodeInfo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
-        }
-
-        return $this->success($verifyCodeInfo->code);
-    }
-
-    public function verify()
-    {
-        $code = $this->verifyRequiredString('code');
-
-        $verifyCodeInfo = OrderVerifyService::getInstance()->getByCode($code);
-        if (is_null($verifyCodeInfo)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
-        }
-
-        $order = OrderService::getInstance()->getPendingVerifyOrderById($verifyCodeInfo->order_id);
-        if (is_null($order)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
-        }
-
-        $managerIds = ShopManagerService::getInstance()->getManagerList($order->shop_id)->pluck('user_id')->toArray();
-        if (!in_array($this->userId(), $managerIds)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
-        }
-
-        DB::transaction(function () use ($verifyCodeInfo, $order) {
-            OrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId(), $order->shop_id);
-            OrderService::getInstance()->userConfirm($order->user_id, $order->id);
-        });
-
-        return $this->success();
-    }
-
-    public function cancel()
-    {
-        $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->userCancel($this->userId(), $id);
-        return $this->success();
-    }
-
-    public function confirm()
-    {
-        $id = $this->verifyRequiredId('id');
-        DB::transaction(function () use ($id) {
-            OrderService::getInstance()->userConfirm($this->userId(), $id);
-        });
-        return $this->success();
-    }
-
-    public function delete()
-    {
-        $ids = $this->verifyArrayNotEmpty('ids', []);
-        $orderList = OrderService::getInstance()->getUserOrderList($this->userId(), $ids);
-        if (count($orderList) == 0) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
-        }
-        DB::transaction(function () use ($orderList) {
-            OrderService::getInstance()->delete($orderList);
-        });
-        return $this->success();
-    }
-
-    public function refund()
-    {
-        $id = $this->verifyRequiredId('id');
-        OrderService::getInstance()->userRefund($this->userId(), $id);
-        return $this->success();
     }
 
     public function detail()
@@ -608,7 +473,7 @@ class OrderController extends Controller
             'created_at',
             'updated_at',
         ];
-        $order = OrderService::getInstance()->getUserOrderById($this->userId(), $id, $columns);
+        $order = OrderService::getInstance()->getUserOrder($this->userId(), $id, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
@@ -631,5 +496,60 @@ class OrderController extends Controller
         }
 
         return $this->success($order);
+    }
+
+    public function qrCode()
+    {
+        $code = $this->verifyRequiredId('code');
+        $qrCode = QrCode::format('png')->size(400)->generate($code);
+        return response($qrCode)->header('Content-Type', 'image/png');
+    }
+
+    public function verifyCode()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+
+        $verifyCodeInfo = OrderVerifyService::getInstance()->getByOrderId($orderId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
+    }
+
+    public function confirm()
+    {
+        $id = $this->verifyRequiredId('id');
+        DB::transaction(function () use ($id) {
+            OrderService::getInstance()->userConfirm($this->userId(), $id);
+        });
+        return $this->success();
+    }
+
+    public function cancel()
+    {
+        $id = $this->verifyRequiredId('id');
+        OrderService::getInstance()->userCancel($this->userId(), $id);
+        return $this->success();
+    }
+
+    public function delete()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids', []);
+        $orderList = OrderService::getInstance()->getUserOrderList($this->userId(), $ids);
+        if (count($orderList) == 0) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
+        }
+        DB::transaction(function () use ($orderList) {
+            OrderService::getInstance()->delete($orderList);
+        });
+        return $this->success();
+    }
+
+    public function refund()
+    {
+        $id = $this->verifyRequiredId('id');
+        OrderService::getInstance()->userRefund($this->userId(), $id);
+        return $this->success();
     }
 }
