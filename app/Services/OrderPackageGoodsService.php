@@ -13,10 +13,10 @@ class OrderPackageGoodsService extends BaseService
         $goods->order_id = $orderId;
         $goods->package_id = $packageId;
         $goods->goods_id = $goodsId;
-        $goods->goods_cover = $goodsCover;
-        $goods->goods_name = $goodsName;
+        $goods->cover = $goodsCover;
+        $goods->name = $goodsName;
         $goods->selected_sku_name = $selectedSkuName;
-        $goods->goods_number = $goodsNumber;
+        $goods->number = $goodsNumber;
         $goods->save();
     }
 

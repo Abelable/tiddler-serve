@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\OrderGoodsService;
+use App\Services\OrderPackageGoodsService;
 use App\Services\OrderPackageService;
 use App\Services\OrderService;
 use App\Services\OrderVerifyService;
@@ -174,6 +175,23 @@ class ShopOrderController extends Controller
         });
 
         return $this->success();
+    }
+
+    public function pendingDeliveryGoodsList()
+    {
+        $shopId = $this->verifyRequiredInteger('shopId');
+        $orderId = $this->verifyRequiredId('orderId');
+
+        $order = OrderService::getInstance()->getShopOrder($shopId, $orderId);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+        $order['goods_list'] = $goodsList;
+
+        $packageGoodsList = OrderPackageGoodsService::getInstance()->getListByOrderId($order->id);
+        $order['package_goods_list'] = $packageGoodsList ?: [];
     }
 
     public function delivery()

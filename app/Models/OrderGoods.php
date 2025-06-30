@@ -15,7 +15,7 @@ namespace App\Models;
  * @property int $is_gift 是否为礼包商品：0-否，1-是
  * @property int $effective_duration 有效时长（月）
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
- * @property string $cover 列表图片
+ * @property string $cover 商品图片
  * @property string $name 商品名称
  * @property float $price 商品价格
  * @property float $sales_commission_rate 销售佣金比例%

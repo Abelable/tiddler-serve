@@ -24,7 +24,7 @@ class CreateOrderGoodsTable extends Migration
             $table->integer('is_gift')->default(0)->comment('是否为礼包商品：0-否，1-是');
             $table->integer('effective_duration')->default(0)->comment('有效时长（月）');
             $table->integer('refund_status')->comment('是否支持7天无理由：0-不支持，1-支持');
-            $table->string('cover')->comment('列表图片');
+            $table->string('cover')->comment('商品图片');
             $table->string('name')->comment('商品名称');
             $table->float('price')->comment('商品价格');
             $table->float('sales_commission_rate')->comment('销售佣金比例%');

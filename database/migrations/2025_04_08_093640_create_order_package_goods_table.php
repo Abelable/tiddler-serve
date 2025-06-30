@@ -18,10 +18,10 @@ class CreateOrderPackageGoodsTable extends Migration
             $table->integer('order_id')->comment('订单id');
             $table->integer('package_id')->comment('包裹id');
             $table->integer('goods_id')->comment('商品id');
-            $table->string('goods_cover')->comment('商品图片');
-            $table->string('goods_name')->comment('商品名称');
+            $table->string('cover')->comment('商品图片');
+            $table->string('name')->comment('商品名称');
             $table->string('selected_sku_name')->default('')->comment('商品规格');
-            $table->integer('goods_number')->comment('商品数量');
+            $table->integer('number')->comment('商品数量');
             $table->timestamps();
             $table->softDeletes();
         });
