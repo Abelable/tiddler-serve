@@ -177,7 +177,7 @@ class ShopOrderController extends Controller
         return $this->success();
     }
 
-    public function pendingDeliveryGoodsList()
+    public function unshippedGoodsList()
     {
         $shopId = $this->verifyRequiredInteger('shopId');
         $orderId = $this->verifyRequiredId('orderId');
@@ -187,14 +187,32 @@ class ShopOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
 
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
-        $order['goods_list'] = $goodsList;
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id)->toArray();
+        $packageGoodsList = OrderPackageGoodsService::getInstance()->getListByOrderId($order->id)->toArray();
 
-        $packageGoodsList = OrderPackageGoodsService::getInstance()->getListByOrderId($order->id);
-        $order['package_goods_list'] = $packageGoodsList ?: [];
+        $packagedCountMap = [];
+        foreach ($packageGoodsList as $packageGoods) {
+            $goodsId = $packageGoods['goods_id'];
+            $packagedCountMap[$goodsId] = ($packagedCountMap[$goodsId] ?? 0) + $packageGoods['number'];
+        }
+
+        $unshippedGoodsList = [];
+        foreach ($goodsList as $goods) {
+            $goodsId = $goods['goods_id'];
+            $totalNumber = $goods['number'];
+            $packagedNumber = $packagedCountMap[$goodsId] ?? 0;
+            $unshippedNumber = $totalNumber - $packagedNumber;
+
+            if ($unshippedNumber > 0) {
+                $goods['number'] = $unshippedNumber;
+                $unshippedGoodsList[] = $goods;
+            }
+        }
+
+        return $this->success($unshippedGoodsList);
     }
 
-    public function delivery()
+    public function ship()
     {
         $shopId = $this->verifyRequiredInteger('shopId');
         $orderId = $this->verifyRequiredInteger('orderId');

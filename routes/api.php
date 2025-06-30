@@ -137,7 +137,8 @@ Route::prefix('shop')->group(function () {
         Route::get('list', 'ShopOrderController@list');
         Route::get('detail', 'ShopOrderController@detail');
         Route::post('verify', 'ShopOrderController@verify');
-        Route::post('delivery', 'ShopOrderController@delivery');
+        Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
+        Route::post('ship', 'ShopOrderController@ship');
     });
 });
 
