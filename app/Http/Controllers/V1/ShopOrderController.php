@@ -164,8 +164,9 @@ class ShopOrderController extends Controller
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
         }
 
+        $merchantShopIds = $this->user()->shopIds();
         $managerIds = ShopManagerService::getInstance()->getManagerList($order->shop_id)->pluck('user_id')->toArray();
-        if (!in_array($this->userId(), $managerIds)) {
+        if (!in_array($order->shop_id, $merchantShopIds) && !in_array($this->userId(), $managerIds)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
         }
 
