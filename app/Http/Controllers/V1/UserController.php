@@ -39,6 +39,7 @@ class UserController extends Controller
         $user['merchantInfo'] = $user->merchant ?
             ['id' => $user->merchant->id, 'shopIds' => $user->shopIds()]
             : null;
+        $user['shopManagerList'] = $user->shopManagerList;
 
         $user['scenicProviderId'] = $user->scenicProvider->id ?? 0;
         $user['hotelProviderId'] = $user->hotelProvider->id ?? 0;
