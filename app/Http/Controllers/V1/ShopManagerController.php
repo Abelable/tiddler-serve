@@ -27,6 +27,7 @@ class ShopManagerController extends Controller
 
             $manager['avatar'] = $user->avatar;
             $manager['nickname'] = $user->nickname;
+            $manager['mobile'] = $user->mobile;
 
             return $manager;
         });
