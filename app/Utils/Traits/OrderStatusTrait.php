@@ -59,7 +59,7 @@ trait OrderStatusTrait
         'cancel' => [OrderEnums::STATUS_CREATE],
         'pay' => [OrderEnums::STATUS_CREATE],
         'ship' => [OrderEnums::STATUS_PAY],
-        'confirm' => [OrderEnums::STATUS_SHIP],
+        'confirm' => [OrderEnums::STATUS_SHIP, OrderEnums::STATUS_PENDING_VERIFICATION],
         'refund' => [
             OrderEnums::STATUS_PAY,
             OrderEnums::STATUS_PENDING_VERIFICATION,
