@@ -79,7 +79,7 @@ class CommissionController extends Controller
         $statusList = $this->verifyArray('statusList');
 
         $page = CommissionService::getInstance()
-            ->getUserCommissionListByTimeType($this->userId(), $timeType, $statusList,$input, $scene ?: null);
+            ->getUserCommissionPageByTimeType($this->userId(), $timeType, $statusList,$input, $scene ?: null);
         $commissionList = collect($page->items());
 
         $orderIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {

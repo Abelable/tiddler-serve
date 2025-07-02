@@ -91,49 +91,35 @@ class ShopIncomeController extends Controller
 
     public function incomeOrderList()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
-        /** @var PageInput $input */
-        $input = PageInput::new();
 
-        $incomeList = ShopIncomeService::getInstance()->getShopIncomeListByTimeType($shopId, $timeType, $statusList);
-        $groupIncomeList = $incomeList->groupBy('order_id');
-        $keyIncomeList = $incomeList->mapWithKeys(function ($income) {
-            return [ $income->order_id . '_' . $income->goods_id => $income ];
-        });
+        $page = ShopIncomeService::getInstance()->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
+        $incomeList = collect($page->items());
+
         $orderIds = $incomeList->pluck('order_id')->toArray();
-
         $goodsIds = $incomeList->pluck('goods_id')->toArray();
-        $goodsColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupGoodsList = OrderGoodsService::getInstance()->getListByGoodsIds($goodsIds, $goodsColumns)->groupBy('order_id');
-
-        $page = OrderService::getInstance()->getOrderPageByIds($orderIds, $input);
-        $list = collect($page->items())->map(function (Order $order) use ($groupGoodsList, $keyIncomeList, $groupIncomeList) {
-            $orderIncomeList = $groupIncomeList->get($order->id);
-            $incomeAmountSum = $orderIncomeList->sum('income_amount');
-            /** @var ShopIncome $firstIncome */
-            $firstIncome = $orderIncomeList->first();
-
-            $orderGoodsList = $groupGoodsList->get($order->id);
-            $orderGoodsList->map(function (OrderGoods $goods) use ($order, $keyIncomeList) {
-                $incomeKey = $order->id . '_' . $goods->goods_id;
-                /** @var ShopIncome $income */
-                $income = $keyIncomeList->get($incomeKey);
-                $goods['income'] = $income->income_amount;
-                unset($goods->order_id);
-                return $goods;
-            });
-
-            return [
-                'id' => $order->id,
-                'orderSn' => $order->order_sn,
-                'status' => $firstIncome->status,
-                'paymentAmount' => $order->payment_amount,
-                'incomeAmount' => bcadd($incomeAmountSum, 0, 2) ,
-                'goodsList' => $orderGoodsList,
-                'createdAt' => $order->created_at
+        $goodsMap = [];
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderIdsAndGoodsIds($orderIds, $goodsIds);
+        foreach ($goodsList as $goods) {
+            $goodsMap[$goods->order_id][$goods->goods_id] = [
+                'id' => $goods->goods_id,
+                'cover' => $goods->cover,
+                'name' => $goods->name,
+                'selected_sku_name' => $goods->selected_sku_name,
+                'price' => $goods->price,
+                'number' => $goods->number,
             ];
+        }
+
+        $list = $incomeList->map(function (ShopIncome $income) use ($goodsMap) {
+            $goodsInfo = $goodsMap[$income->order_id][$income->goods_id] ?? null;
+            $income['goodsInfo'] = $goodsInfo;
+            unset($income['goods_id']);
+            return $income;
         });
 
         return $this->success($this->paginate($page, $list));

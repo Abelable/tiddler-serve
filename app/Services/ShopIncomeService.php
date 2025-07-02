@@ -7,6 +7,7 @@ use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\ShopIncome;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
 class ShopIncomeService extends BaseService
@@ -38,9 +39,12 @@ class ShopIncomeService extends BaseService
         return $income;
     }
 
-    public function getShopIncomeListByTimeType($shopId, $timeType, array $statusList, $columns = ['*'])
+    public function getShopIncomePageByTimeType($shopId, $timeType, array $statusList, PageInput $input, $columns = ['*'])
     {
-        return $this->getShopIncomeQueryByTimeType($shopId, $timeType)->whereIn('status', $statusList)->get($columns);
+        return $this
+            ->getShopIncomeQueryByTimeType($shopId, $timeType)
+            ->whereIn('status', $statusList)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getShopIncomeQueryByTimeType($shopId, $timeType, $startTime = null)
