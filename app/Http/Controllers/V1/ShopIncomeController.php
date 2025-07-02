@@ -107,7 +107,7 @@ class ShopIncomeController extends Controller
                 'id' => $goods->goods_id,
                 'cover' => $goods->cover,
                 'name' => $goods->name,
-                'selected_sku_name' => $goods->selected_sku_name,
+                'selectedSkuName' => $goods->selected_sku_name,
                 'price' => $goods->price,
                 'number' => $goods->number,
             ];

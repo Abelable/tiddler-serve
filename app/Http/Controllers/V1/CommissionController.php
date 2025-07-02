@@ -96,7 +96,7 @@ class CommissionController extends Controller
             $scenicTicketMap[$scenicTicket->order_id][$scenicTicket->ticket_id] = [
                 'id' => $scenicTicket->ticket_id,
                 'name' => $scenicTicket->name,
-                'category_name' => $scenicTicket->category_name,
+                'categoryName' => $scenicTicket->category_name,
                 'price' => $scenicTicket->price,
                 'number' => $scenicTicket->number,
             ];
@@ -108,8 +108,8 @@ class CommissionController extends Controller
         foreach ($hotelRoomList as $hotelRoom) {
             $hotelRoomMap[$hotelRoom->order_id][$hotelRoom->room_id] = [
                 'id' => $hotelRoom->room_id,
-                'hotel_name' => $hotelRoom->hotel_name,
-                'type_name' => $hotelRoom->type_name,
+                'hotelName' => $hotelRoom->hotel_name,
+                'typeName' => $hotelRoom->type_name,
                 'price' => $hotelRoom->price,
                 'number' => $hotelRoom->number,
             ];
@@ -148,7 +148,7 @@ class CommissionController extends Controller
                 'id' => $goods->goods_id,
                 'cover' => $goods->cover,
                 'name' => $goods->name,
-                'selected_sku_name' => $goods->selected_sku_name,
+                'selectedSkuName' => $goods->selected_sku_name,
                 'price' => $goods->price,
                 'number' => $goods->number,
             ];
