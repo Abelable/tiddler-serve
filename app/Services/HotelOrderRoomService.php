@@ -51,6 +51,14 @@ class HotelOrderRoomService extends BaseService
         return HotelOrderRoom::query()->whereIn('order_id', $orderIds)->get($columns);
     }
 
+    public function getListByOrderIdsAndRoomIds(array $orderIds, array $roomIds,  $columns = ['*'])
+    {
+        return HotelOrderRoom::query()
+            ->whereIn('order_id', $orderIds)
+            ->whereIn('room_id', $roomIds)
+            ->get($columns);
+    }
+
     public function delete($orderId)
     {
         return HotelOrderRoom::query()->where('order_id', $orderId)->delete();

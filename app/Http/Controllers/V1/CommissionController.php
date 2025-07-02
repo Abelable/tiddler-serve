@@ -4,13 +4,14 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Commission;
-use App\Models\Order;
-use App\Models\OrderGoods;
 use App\Services\CommissionService;
+use App\Services\HotelOrderRoomService;
 use App\Services\OrderGoodsService;
-use App\Services\OrderService;
+use App\Services\OrderMealTicketService;
+use App\Services\OrderSetMealService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
+use App\Services\ScenicOrderTicketService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
@@ -81,41 +82,94 @@ class CommissionController extends Controller
             ->getUserCommissionListByTimeType($this->userId(), $timeType, $statusList,$input, $scene ?: null);
         $commissionList = collect($page->items());
 
+        $orderIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {
+            return $group->pluck('order_id')->unique()->toArray();
+        });
         $productIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {
             return $group->pluck('product_id')->unique()->toArray();
         });
 
-        $goodsMap = [];
-        if (!empty($productIdsByType[ProductType::GOODS])) {
-            $goodsColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-            $goodsList = OrderGoodsService::getInstance()
-                ->getListByGoodsIds($productIdsByType[ProductType::GOODS], $goodsColumns);
-            foreach ($goodsList as $goods) {
-                $goodsMap[$goods->order_id][$goods->goods_id] = [
-                    'id' => $goods->goods_id,
-                    'cover' => $goods->cover,
-                    'name' => $goods->name,
-                    'selected_sku_name' => $goods->selected_sku_name,
-                    'price' => $goods->price,
-                    'number' => $goods->number,
-                ];
-            }
+        $scenicTicketMap = [];
+        $scenicTicketList = ScenicOrderTicketService::getInstance()
+            ->getListByOrderIdsAndTicketIds($orderIdsByType[ProductType::SCENIC], $productIdsByType[ProductType::SCENIC]);
+        foreach ($scenicTicketList as $scenicTicket) {
+            $scenicTicketMap[$scenicTicket->order_id][$scenicTicket->ticket_id] = [
+                'id' => $scenicTicket->ticket_id,
+                'name' => $scenicTicket->name,
+                'category_name' => $scenicTicket->category_name,
+                'price' => $scenicTicket->price,
+                'number' => $scenicTicket->number,
+            ];
         }
 
-        $list = $commissionList->map(function (Commission $commission) use ($goodsMap) {
+        $hotelRoomMap = [];
+        $hotelRoomList = HotelOrderRoomService::getInstance()
+            ->getListByOrderIdsAndRoomIds($orderIdsByType[ProductType::HOTEL], $productIdsByType[ProductType::HOTEL]);
+        foreach ($hotelRoomList as $hotelRoom) {
+            $hotelRoomMap[$hotelRoom->order_id][$hotelRoom->room_id] = [
+                'id' => $hotelRoom->room_id,
+                'hotel_name' => $hotelRoom->hotel_name,
+                'type_name' => $hotelRoom->type_name,
+                'price' => $hotelRoom->price,
+                'number' => $hotelRoom->number,
+            ];
+        }
+
+        $setMealMap = [];
+        $setMealList = OrderSetMealService::getInstance()
+            ->getListByOrderIdsAndSetMealIds($orderIdsByType[ProductType::SET_MEAL], $productIdsByType[ProductType::SET_MEAL]);
+        foreach ($setMealList as $setMeal) {
+            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = [
+                'id' => $setMeal->set_meal_id,
+                'cover' => $setMeal->cover,
+                'name' => $setMeal->name,
+                'price' => $setMeal->price,
+                'number' => $setMeal->number,
+            ];
+        }
+
+        $mealTicketMap = [];
+        $mealTicketList = OrderMealTicketService::getInstance()
+            ->getListByOrderIdsAndMealTicketIds($orderIdsByType[ProductType::MEAL_TICKET], $productIdsByType[ProductType::MEAL_TICKET]);
+        foreach ($mealTicketList as $mealTicket) {
+            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
+                'id' => $mealTicket->ticket_id,
+                'price' => $mealTicket->price,
+                'number' => $mealTicket->number,
+            ];
+        }
+
+        $goodsMap = [];
+        $goodsList = OrderGoodsService::getInstance()
+            ->getListByOrderIdsAndGoodsIds($orderIdsByType[ProductType::GOODS], $productIdsByType[ProductType::GOODS]);
+        foreach ($goodsList as $goods) {
+            $goodsMap[$goods->order_id][$goods->goods_id] = [
+                'id' => $goods->goods_id,
+                'cover' => $goods->cover,
+                'name' => $goods->name,
+                'selected_sku_name' => $goods->selected_sku_name,
+                'price' => $goods->price,
+                'number' => $goods->number,
+            ];
+        }
+
+        $list = $commissionList->map(function (Commission $commission) use ($scenicTicketMap, $hotelRoomMap, $setMealMap, $mealTicketMap, $goodsMap) {
             $product = null;
             $orderId = $commission->order_id;
             $productId = $commission->product_id;
 
             switch ($commission->product_type) {
                 case ProductType::SCENIC:
-                    $product = $scenicMap[$orderId][$productId] ?? null;
+                    $product = $scenicTicketMap[$orderId][$productId] ?? null;
                     break;
                 case ProductType::HOTEL:
-                    $product = $hotelMap[$orderId][$productId] ?? null;
+                    $product = $hotelRoomMap[$orderId][$productId] ?? null;
                     break;
-                case ProductType::RESTAURANT:
-                    $product = $restaurantMap[$orderId][$productId] ?? null;
+                case ProductType::SET_MEAL:
+                    $product = $setMealMap[$orderId][$productId] ?? null;
+                    break;
+                case ProductType::MEAL_TICKET:
+                    $product = $mealTicketMap[$orderId][$productId] ?? null;
                     break;
                 case ProductType::GOODS:
                     $product = $goodsMap[$orderId][$productId] ?? null;

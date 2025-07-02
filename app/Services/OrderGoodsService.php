@@ -70,6 +70,14 @@ class OrderGoodsService extends BaseService
         return OrderGoods::query()->whereIn('goods_id', $goodsIds)->get($columns);
     }
 
+    public function getListByOrderIdsAndGoodsIds(array $orderIds, array $goodsIds, $columns = ['*'])
+    {
+        return OrderGoods::query()
+            ->whereIn('order_id', $orderIds)
+            ->whereIn('goods_id', $goodsIds)
+            ->get($columns);
+    }
+
     public function delete($orderId)
     {
         return OrderGoods::query()->where('order_id', $orderId)->delete();

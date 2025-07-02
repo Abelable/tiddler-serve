@@ -43,6 +43,14 @@ class OrderMealTicketService extends BaseService
         return OrderMealTicket::query()->whereIn('order_id', $orderIds)->get($columns);
     }
 
+    public function getListByOrderIdsAndMealTicketIds(array $orderIds, array $mealTicketIds,  $columns = ['*'])
+    {
+        return OrderMealTicket::query()
+            ->whereIn('order_id', $orderIds)
+            ->whereIn('meal_ticket_id', $mealTicketIds)
+            ->get($columns);
+    }
+
     public function delete($orderId)
     {
         return OrderMealTicket::query()->where('order_id', $orderId)->delete();
