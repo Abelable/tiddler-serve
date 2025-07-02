@@ -285,7 +285,7 @@ class OrderService extends BaseService
         // todo 设置订单支付超时任务
         // dispatch(new OverTimeCancelOrderJob($userId, $order->id));
 
-        return $order->id;
+        return $order;
     }
 
     public function calcFreightPrice(FreightTemplate $freightTemplate, Address $address, $totalPrice, $goodsNumber)

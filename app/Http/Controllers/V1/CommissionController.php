@@ -12,6 +12,7 @@ use App\Services\OrderService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
@@ -70,52 +71,61 @@ class CommissionController extends Controller
 
     public function commissionOrderList()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $scene = $this->verifyInteger('scene');
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
-        /** @var PageInput $input */
-        $input = PageInput::new();
 
-        $commissionList = CommissionService::getInstance()
-            ->getUserCommissionListByTimeType($this->userId(), $timeType, $statusList,$scene ?: null);
-        $groupCommissionList = $commissionList->groupBy('order_id');
-        $keyCommissionList = $commissionList->mapWithKeys(function ($commission) {
-            return [ $commission->order_id . '_' . $commission->goods_id => $commission ];
+        $page = CommissionService::getInstance()
+            ->getUserCommissionListByTimeType($this->userId(), $timeType, $statusList,$input, $scene ?: null);
+        $commissionList = collect($page->items());
+
+        $productIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {
+            return $group->pluck('product_id')->unique()->toArray();
         });
-        $orderIds = $commissionList->pluck('order_id')->toArray();
 
-        $goodsIds = $commissionList->pluck('goods_id')->toArray();
-        $goodsColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupGoodsList = OrderGoodsService::getInstance()->getListByGoodsIds($goodsIds, $goodsColumns)->groupBy('order_id');
+        $goodsMap = [];
+        if (!empty($productIdsByType[ProductType::GOODS])) {
+            $goodsColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
+            $goodsList = OrderGoodsService::getInstance()
+                ->getListByGoodsIds($productIdsByType[ProductType::GOODS], $goodsColumns);
+            foreach ($goodsList as $goods) {
+                $goodsMap[$goods->order_id][$goods->goods_id] = [
+                    'id' => $goods->goods_id,
+                    'cover' => $goods->cover,
+                    'name' => $goods->name,
+                    'selected_sku_name' => $goods->selected_sku_name,
+                    'price' => $goods->price,
+                    'number' => $goods->number,
+                ];
+            }
+        }
 
-        $page = OrderService::getInstance()->getOrderPageByIds($orderIds, $input);
-        $list = collect($page->items())->map(function (Order $order) use ($groupGoodsList, $keyCommissionList, $groupCommissionList) {
-            $orderCommissionList = $groupCommissionList->get($order->id);
-            $commissionBaseSum = $orderCommissionList->sum('commission_base');
-            $commissionAmountSum = $orderCommissionList->sum('commission_amount');
-            /** @var Commission $firstCommission */
-            $firstCommission = $orderCommissionList->first();
+        $list = $commissionList->map(function (Commission $commission) use ($goodsMap) {
+            $product = null;
+            $orderId = $commission->order_id;
+            $productId = $commission->product_id;
 
-            $orderGoodsList = $groupGoodsList->get($order->id);
-            $orderGoodsList->map(function (OrderGoods $goods) use ($order, $keyCommissionList) {
-                $commissionKey = $order->id . '_' . $goods->goods_id;
-                /** @var Commission $commission */
-                $commission = $keyCommissionList->get($commissionKey);
-                $goods['commission'] = $commission->commission_amount;
-                unset($goods->order_id);
-                return $goods;
-            });
+            switch ($commission->product_type) {
+                case ProductType::SCENIC:
+                    $product = $scenicMap[$orderId][$productId] ?? null;
+                    break;
+                case ProductType::HOTEL:
+                    $product = $hotelMap[$orderId][$productId] ?? null;
+                    break;
+                case ProductType::RESTAURANT:
+                    $product = $restaurantMap[$orderId][$productId] ?? null;
+                    break;
+                case ProductType::GOODS:
+                    $product = $goodsMap[$orderId][$productId] ?? null;
+                    break;
+            }
 
-            return [
-                'id' => $order->id,
-                'orderSn' => $order->order_sn,
-                'status' => $firstCommission->status,
-                'createdAt' => $order->created_at,
-                'commissionBase' => $commissionBaseSum,
-                'commissionAmount' => bcadd($commissionAmountSum, 0, 2) ,
-                'scene' => $firstCommission->scene,
-                'goodsList' => $orderGoodsList
-            ];
+            $commission['product'] = $product;
+            unset($commission['product_id']);
+
+            return $commission;
         });
 
         return $this->success($this->paginate($page, $list));

@@ -22,7 +22,8 @@ class CreateCommissionsTable extends Migration
             $table->integer('promoter_level')->comment('推广员等级');
             $table->integer('user_id')->comment('用户id');
             $table->integer('order_id')->comment('订单id');
-            $table->integer('product_type')->comment('产品类型：1-景点，2-酒店，3-餐馆，4-商品');
+            $table->string('order_sn')->comment('订单编号');
+            $table->integer('product_type')->comment('产品类型：1-景点，2-酒店，4-商品，5-套餐，6-餐券');
             $table->integer('product_id')->comment('产品id');
             $table->integer('refund_status')->default(0)->comment('是否支持7天无理由：0-不支持，1-支持');
             $table->float('payment_amount')->comment('支付金额');

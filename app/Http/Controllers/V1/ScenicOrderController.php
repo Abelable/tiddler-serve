@@ -107,7 +107,7 @@ class ScenicOrderController extends Controller
 
             // 生成佣金记录
             CommissionService::getInstance()
-                ->createScenicCommission($order->id, $ticket, $priceUnit, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+                ->createScenicCommission($order->id, $order->order_sn, $ticket, $priceUnit, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
 
             // 增加景点、门票销量
             ScenicService::getInstance()->addSalesVolumeByIds($ticketScenicIds, $input->num);

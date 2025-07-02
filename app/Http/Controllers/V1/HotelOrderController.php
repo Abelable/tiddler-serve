@@ -111,7 +111,7 @@ class HotelOrderController extends Controller
 
             // 生成佣金记录
             CommissionService::getInstance()
-                ->createHotelCommission($order->id, $room, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+                ->createHotelCommission($order->id, $order->order_sn, $room, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
 
             // 增加酒店、房间销量
             HotelService::getInstance()->increaseSalesVolume($room->hotel_id, $input->num);

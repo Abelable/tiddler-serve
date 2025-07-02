@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 
 class ShopIncomeService extends BaseService
 {
-    public function createIncome($shopId, $orderId, CartGoods $cartGoods, Coupon $coupon = null)
+    public function createIncome($shopId, $orderId, $orderSn, CartGoods $cartGoods, Coupon $coupon = null)
     {
         $couponDenomination = 0;
         if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
@@ -27,6 +27,7 @@ class ShopIncomeService extends BaseService
         $income = ShopIncome::new();
         $income->shop_id = $shopId;
         $income->order_id = $orderId;
+        $income->order_sn = $orderSn;
         $income->goods_id = $cartGoods->goods_id;
         $income->refund_status = $cartGoods->refund_status;
         $income->payment_amount = $paymentAmount;

@@ -94,7 +94,7 @@ class MealTicketOrderController extends Controller
 
             // 生成佣金记录
             CommissionService::getInstance()
-                ->createMealTicketCommission($order->id, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+                ->createMealTicketCommission($order->id, $order->order_sn, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
 
             // 增加餐馆、代金券销量
             RestaurantService::getInstance()->increaseSalesVolume($input->restaurantId, $input->num);

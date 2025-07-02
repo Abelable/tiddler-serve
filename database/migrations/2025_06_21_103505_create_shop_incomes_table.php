@@ -19,6 +19,7 @@ class CreateShopIncomesTable extends Migration
             $table->integer('status')->default(0)->comment('收益状态：0-订单待支付，1-待结算, 2-可提现，3-提现中，4-已结算');
             $table->integer('shop_id')->comment('店铺id');
             $table->integer('order_id')->comment('订单id');
+            $table->string('order_sn')->comment('订单编号');
             $table->integer('goods_id')->comment('商品id');
             $table->integer('refund_status')->default(0)->comment('是否支持7天无理由：0-不支持，1-支持');
             $table->float('payment_amount')->comment('支付金额');

@@ -94,7 +94,7 @@ class SetMealOrderController extends Controller
 
             // 生成佣金记录
             CommissionService::getInstance()
-                ->createSetMealCommission($order->id, $setMeal, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+                ->createSetMealCommission($order->id, $order->order_sn, $setMeal, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
 
             // 增加餐馆、套餐销量
             RestaurantService::getInstance()->increaseSalesVolume($input->restaurantId, $input->num);

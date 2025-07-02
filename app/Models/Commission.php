@@ -13,7 +13,8 @@ namespace App\Models;
  * @property int $promoter_level 推广员等级
  * @property int $user_id 用户id
  * @property int $order_id 订单id
- * @property int $product_type 产品类型：1-景点，2-酒店，3-餐馆，4-商品
+ * @property string $order_sn 订单编号
+ * @property int $product_type 产品类型：1-景点，2-酒店，4-商品，5-套餐，6-餐券
  * @property int $product_id 产品id
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
  * @property float $payment_amount 支付金额
@@ -36,6 +37,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Commission whereOrderSn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePaymentAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductType($value)

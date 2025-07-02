@@ -280,24 +280,24 @@ class OrderController extends Controller
                 });
 
                 // 7.生成订单
-                $orderId = OrderService::getInstance()
+                $order = OrderService::getInstance()
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon, $shop);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel);
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
                     if (!$cartGoods->is_gift) {
                         CommissionService::getInstance()
-                            ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                            ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
 
                     // 10.生成店铺收益
-                    ShopIncomeService::getInstance()->createIncome($shop->id, $orderId, $cartGoods, $coupon);
+                    ShopIncomeService::getInstance()->createIncome($shop->id, $order->id, $order->order_sn, $cartGoods, $coupon);
                 }
 
-                return $orderId;
+                return $order->id;
             });
             if (in_array(0, $shopIds)) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) {
@@ -305,21 +305,21 @@ class OrderController extends Controller
                 });
 
                 // 7.生成订单
-                $orderId = OrderService::getInstance()
+                $order = OrderService::getInstance()
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $orderId, $userId, $userLevel);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel);
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
                     if (!$cartGoods->is_gift) {
                         CommissionService::getInstance()
-                            ->createGoodsCommission($orderId, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                            ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
                 }
 
-                $orderIds->push($orderId);
+                $orderIds->push($order->id);
             }
 
             // 11.清空购物车

@@ -13,6 +13,7 @@ use App\Models\SetMeal;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\CommissionScene;
 use App\Utils\Enums\ProductType;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -60,6 +61,7 @@ class CommissionService extends BaseService
 {
     public function createScenicCommission(
         $orderId,
+        $orderSn,
         ScenicTicket $ticket,
         $priceUnit,
         $paymentAmount,
@@ -91,6 +93,7 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
+            $orderSn,
             ProductType::SCENIC,
             $ticket->id
         );
@@ -98,6 +101,7 @@ class CommissionService extends BaseService
 
     public function createHotelCommission(
         $orderId,
+        $orderSn,
         HotelRoom $room,
         $paymentAmount,
         $userId,
@@ -128,6 +132,7 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
+            $orderSn,
             ProductType::HOTEL,
             $room->id
         );
@@ -135,6 +140,7 @@ class CommissionService extends BaseService
 
     public function createMealTicketCommission(
         $orderId,
+        $orderSn,
         MealTicket $ticket,
         $paymentAmount,
         $userId,
@@ -165,6 +171,7 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
+            $orderSn,
             ProductType::SET_MEAL,
             $ticket->id
         );
@@ -172,6 +179,7 @@ class CommissionService extends BaseService
 
     public function createSetMealCommission(
         $orderId,
+        $orderSn,
         SetMeal $setMeal,
         $paymentAmount,
         $userId,
@@ -202,6 +210,7 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
+            $orderSn,
             ProductType::SET_MEAL,
             $setMeal->id
         );
@@ -209,6 +218,7 @@ class CommissionService extends BaseService
 
     public function createGoodsCommission(
         $orderId,
+        $orderSn,
         CartGoods $cartGoods,
         $userId,
         $userLevel,
@@ -246,6 +256,7 @@ class CommissionService extends BaseService
             $upperSuperiorId,
             $upperSuperiorLevel,
             $orderId,
+            $orderSn,
             ProductType::GOODS,
             $cartGoods->goods_id,
             $cartGoods->refund_status
@@ -266,6 +277,7 @@ class CommissionService extends BaseService
         $upperSuperiorId,
         $upperSuperiorLevel,
         $orderId,
+        $orderSn,
         $productType,
         $productId,
         $refundStatus = 0
@@ -296,6 +308,7 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -315,6 +328,7 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -330,6 +344,7 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -345,6 +360,7 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -367,6 +383,7 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -386,6 +403,7 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -405,6 +423,7 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -420,6 +439,7 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -435,6 +455,7 @@ class CommissionService extends BaseService
                 $upperSuperiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -454,6 +475,7 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -469,6 +491,7 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -484,6 +507,7 @@ class CommissionService extends BaseService
                 $superiorLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -506,6 +530,7 @@ class CommissionService extends BaseService
                 $userLevel,
                 $userId,
                 $orderId,
+                $orderSn,
                 $productType,
                 $productId,
                 $paymentAmount,
@@ -524,6 +549,7 @@ class CommissionService extends BaseService
         $promoterLevel,
         $userId,
         $orderId,
+        $orderSn,
         $productType,
         $productId,
         $paymentAmount,
@@ -540,6 +566,7 @@ class CommissionService extends BaseService
         $commission->promoter_level = $promoterLevel;
         $commission->user_id = $userId;
         $commission->order_id = $orderId;
+        $commission->order_sn = $orderSn;
         $commission->product_type = $productType;
         $commission->product_id = $productId;
         $commission->refund_status = $refundStatus;
@@ -717,7 +744,7 @@ class CommissionService extends BaseService
         return Commission::query()->whereIn('promoter_id', $userIds)->whereIn('status', $statusList);
     }
 
-    public function getUserCommissionListByTimeType($userId, $timeType, array $statusList, $scene = null, $columns = ['*'])
+    public function getUserCommissionListByTimeType($userId, $timeType, array $statusList, PageInput $input, $scene = null, $columns = ['*'])
     {
         $query = $this->getUserCommissionQueryByTimeType([$userId], $timeType);
         if (!is_null($scene)) {
@@ -731,7 +758,9 @@ class CommissionService extends BaseService
                 $query = $query->whereIn('scene', [2, 3, 4, 5]);
             }
         }
-        return $query->whereIn('status', $statusList)->get($columns);
+        return $query
+            ->whereIn('status', $statusList)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)
