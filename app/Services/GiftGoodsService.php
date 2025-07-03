@@ -61,6 +61,6 @@ class GiftGoodsService extends BaseService
 
     public function updateDuration($id, $duration)
     {
-        GiftGoods::query()->where('id', $id)->update(['effective_duration' => $duration]);
+        GiftGoods::query()->where('id', $id)->update(['duration' => $duration]);
     }
 }

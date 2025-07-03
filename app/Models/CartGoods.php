@@ -15,7 +15,7 @@ namespace App\Models;
  * @property int $shop_category_id 商品店铺分类id
  * @property int $freight_template_id 运费模板id
  * @property int $is_gift 是否为礼包商品：0-否，1-是
- * @property int $effective_duration 有效时长（月）
+ * @property int $duration 代言时长（天）
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
  * @property int $delivery_mode 提货方式：1-快递，2-自提，3-快递/自提
  * @property string $cover 商品图片
@@ -41,7 +41,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereDeliveryMode($value)
- * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereEffectiveDuration($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereDuration($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereFreightTemplateId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereId($value)

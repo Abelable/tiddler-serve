@@ -18,7 +18,7 @@ class PromoterService extends BaseService
     {
         /** @var OrderGoods $orderGoods */
         $orderGoods = OrderGoodsService::getInstance()->getById($orderGoodsId);
-        return $this->createPromoter($orderGoods->user_id, 2, $orderGoods->effective_duration, $orderGoods->order_id, $orderGoods->goods_id);
+        return $this->createPromoter($orderGoods->user_id, 2, $orderGoods->duration, $orderGoods->order_id, $orderGoods->goods_id);
     }
 
     public function createPromoter($userId, $path, $duration, $orderId = null, $giftGoodsId = null)

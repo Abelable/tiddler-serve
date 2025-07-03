@@ -66,7 +66,7 @@ class CartGoodsService extends BaseService
             $cartGoods->delivery_mode = $goods->delivery_mode;
             if (!is_null($giftGoods)) {
                 $cartGoods->is_gift =  1;
-                $cartGoods->effective_duration = $giftGoods->effective_duration;
+                $cartGoods->duration = $giftGoods->duration;
             }
             $cartGoods->cover = $goods->cover;
             $cartGoods->name = $goods->name;
