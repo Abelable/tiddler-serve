@@ -10,7 +10,7 @@ namespace App\Models;
  * @property int $goods_id 商品id
  * @property string $goods_cover 商品图片
  * @property string $goods_name 商品名称
- * @property int $effective_duration 有效时长（天）
+ * @property int $effective_duration 代言时长（天）
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
