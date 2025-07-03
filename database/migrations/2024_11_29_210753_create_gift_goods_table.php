@@ -19,7 +19,7 @@ class CreateGiftGoodsTable extends Migration
             $table->integer('goods_id')->comment('商品id');
             $table->string('goods_cover')->comment('商品图片');
             $table->string('goods_name')->comment('商品名称');
-            $table->integer('effective_duration')->comment('有效时长（月）');
+            $table->integer('effective_duration')->comment('有效时长（天）');
             $table->timestamps();
             $table->softDeletes();
         });

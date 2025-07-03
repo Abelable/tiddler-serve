@@ -24,7 +24,7 @@ class GiftGoodsController extends Controller
         /** @var GiftGoodsPageInput $input */
         $input = GiftGoodsPageInput::new();
 
-        $page = GiftGoodsService::getInstance()->getGoodsPage($input);
+        $page = GiftGoodsService::getInstance()->getPage($input);
         $giftGoodsList = collect($page->items());
 
         $goodsIds = $giftGoodsList->pluck('goods_id')->toArray();

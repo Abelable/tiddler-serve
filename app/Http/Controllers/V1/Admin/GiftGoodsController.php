@@ -18,7 +18,7 @@ class GiftGoodsController extends Controller
     {
         /** @var GiftGoodsPageInput $input */
         $input = GiftGoodsPageInput::new();
-        $list = GiftGoodsService::getInstance()->getGoodsPage($input);
+        $list = GiftGoodsService::getInstance()->getPage($input);
         return $this->successPaginate($list);
     }
 

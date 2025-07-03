@@ -97,7 +97,7 @@ class HistoryController extends Controller
 
         $giftGoodsIds = [];
         if ($type == ProductType::GOODS) {
-            $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+            $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
         }
 
         $list = $historyList->map(function (ProductHistory $item) use ($giftGoodsIds, $productList) {

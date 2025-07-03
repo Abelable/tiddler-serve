@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\GiftGoodsService;
 use App\Services\GoodsPickupAddressService;
 use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
@@ -234,6 +235,13 @@ class GoodsController extends Controller
     public function selfSupportGoodsOptions()
     {
         $options = GoodsService::getInstance()->getSelfGoodsList(['id', 'name', 'cover']);
+        return $this->success($options);
+    }
+
+    public function normalGoodsOptions()
+    {
+        $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
+        $options = GoodsService::getInstance()->getFilterGoodsList($giftGoodsIds, ['id', 'name', 'cover']);
         return $this->success($options);
     }
 }

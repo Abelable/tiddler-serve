@@ -768,6 +768,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GoodsController@delete');
         Route::get('options', 'GoodsController@options');
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
+        Route::get('normal_options', 'GoodsController@normalGoodsOptions');
     });
 
     Route::prefix('gift')->group(function () {

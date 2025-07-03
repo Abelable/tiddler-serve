@@ -8,7 +8,7 @@ use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsService extends BaseService
 {
-    public function getGoodsPage(GiftGoodsPageInput $input, $columns = ['*'])
+    public function getPage(GiftGoodsPageInput $input, $columns = ['*'])
     {
         $query = GiftGoods::query();
         if (!empty($input->typeId)) {
@@ -22,7 +22,7 @@ class GiftGoodsService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getGoodsList($columns = ['*'])
+    public function getList($columns = ['*'])
     {
         return GiftGoods::query()->get($columns);
     }

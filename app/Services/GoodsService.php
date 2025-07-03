@@ -129,6 +129,11 @@ class GoodsService extends BaseService
         return Goods::query()->where('shop_id', 0)->get($columns);
     }
 
+    public function getFilterGoodsList(array $goodsIds, $columns = ['*'])
+    {
+        return Goods::query()->whereNotIn('id', $goodsIds)->get($columns);
+    }
+
     public function getLiveUnlistedGoodsList($shopId, $goodsIds, $columns=['*'])
     {
         return Goods::query()

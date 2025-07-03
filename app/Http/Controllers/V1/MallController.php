@@ -100,7 +100,7 @@ class MallController extends Controller
             'created_at',
         ];
 
-        $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+        $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
 
         $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
         $list = collect($page->items())->map(function ($product) use ($giftGoodsIds) {

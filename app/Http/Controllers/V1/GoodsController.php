@@ -103,7 +103,7 @@ class GoodsController extends Controller
         $groupedCouponList = CouponService::getInstance()
             ->getCouponListByGoodsIds($goodsIds, ['goods_id', 'name', 'denomination', 'type', 'num_limit', 'price_limit'])
             ->groupBy('goods_id');
-        $giftGoodsIds = GiftGoodsService::getInstance()->getGoodsList()->pluck('goods_id')->toArray();
+        $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
 
         return $goodsList->map(function (Goods $goods) use ($shopList, $groupedCouponList, $giftGoodsIds) {
             $shopInfo = $goods->shop_id != 0 ? $shopList->get($goods->shop_id) : null;
