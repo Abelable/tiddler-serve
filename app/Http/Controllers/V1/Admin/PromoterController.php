@@ -75,7 +75,7 @@ class PromoterController extends Controller
         $id = $this->verifyRequiredId('id');
         $promoter = PromoterService::getInstance()->getPromoterById($id);
         if (is_null($promoter)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前推广员不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代言人不存在');
         }
         return $this->success($promoter);
     }
@@ -97,7 +97,7 @@ class PromoterController extends Controller
 
         $promoter = PromoterService::getInstance()->getPromoterById($id);
         if (is_null($promoter)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前推广员不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代言人不存在');
         }
         $promoter->level = $level;
         $promoter->scene = $scene;
@@ -111,7 +111,7 @@ class PromoterController extends Controller
         $id = $this->verifyRequiredId('id');
         $promoter = PromoterService::getInstance()->getPromoterById($id);
         if (is_null($promoter)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前推广员不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前代言人不存在');
         }
         DB::transaction(function () use ($promoter) {
             $promoter->delete();

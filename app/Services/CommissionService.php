@@ -586,7 +586,7 @@ class CommissionService extends BaseService
             $commission->status = 1;
             $commission->save();
 
-            // 更新推广员佣金总数
+            // 更新代言人佣金总数
             if ($commission->scene == 1) {
                 PromoterService::getInstance()->updateSelfCommissionSum($commission->promoter_id, $commission->commission_amount);
             }
@@ -666,7 +666,7 @@ class CommissionService extends BaseService
     {
         $commissionList = $this->getPaidListByOrderIds($orderIds, $productType);
         $commissionList->map(function (Commission $commission) {
-            // 更新推广员佣金总数
+            // 更新代言人佣金总数
             if ($commission->scene == 1) {
                 PromoterService::getInstance()->updateSelfCommissionSum($commission->promoter_id, -$commission->commission_amount);
             }
@@ -690,7 +690,7 @@ class CommissionService extends BaseService
             ->where('product_id', $productId)
             ->first();
 
-        // 更新推广员佣金总数
+        // 更新代言人佣金总数
         if ($commission->scene == 1) {
             PromoterService::getInstance()->updateSelfCommissionSum($commission->promoter_id, -$commission->commission_amount);
         }

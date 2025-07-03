@@ -641,8 +641,8 @@ class OrderService extends BaseService
 
     public function confirm($orderList, $role = 'user')
     {
-        // 订单确认时，如果存在普通用户购买礼包的逻辑，需要执行生成推广员的逻辑
-        // 如果是用户手动确认，则需根据订单商品是否支持7天无理由，延迟生成推广员身份（佣金逻辑同理）
+        // 订单确认时，如果存在普通用户购买礼包的逻辑，需要执行生成代言人的逻辑
+        // 如果是用户手动确认，则需根据订单商品是否支持7天无理由，延迟生成代言人身份（佣金逻辑同理）
         $orderIds = $orderList->pluck('id')->toArray();
         $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
 
@@ -670,7 +670,7 @@ class OrderService extends BaseService
             $orderGoods = $orderGoodsList->get($order->id);
             if ($orderGoods->is_gift == 1 && $orderGoods->user_level == 0) {
                 if ($orderGoods->refund_status == 1 && $role == 'user') {
-                    // 7天无理由商品：确认收货7天后生成推广员身份
+                    // 7天无理由商品：确认收货7天后生成代言人身份
                     dispatch(new PromoterConfirmJob($orderGoods->id));
                 } else {
                     PromoterService::getInstance()->createPromoterByGift($orderGoods->id);

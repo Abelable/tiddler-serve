@@ -24,7 +24,7 @@ class CommissionController extends Controller
         $promoterInfo = $this->user()->promoterInfo;
 
         if (is_null($promoterInfo)) {
-            return $this->fail(CodeResponse::FAIL, '非推广员无法查看数据');
+            return $this->fail(CodeResponse::FAIL, '非代言人无法查看数据');
         }
 
         $monthDifference = 2;
