@@ -264,8 +264,11 @@ class OrderController extends Controller
             }
 
             $userId = $this->userId();
-            $userLevel = $this->user()->promoterInfo->level ?: 0;
-            $promoterStatus = $this->user()->promoterInfo->status ?: 0;
+
+            $promoterInfo = $this->user()->promoterInfo;
+            $userLevel = $promoterInfo ? $promoterInfo->level : 0;
+            $promoterStatus = $promoterInfo ? $promoterInfo->status : 0;
+
             $superiorId = RelationService::getInstance()->getSuperiorId($userId);
             $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
             $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
