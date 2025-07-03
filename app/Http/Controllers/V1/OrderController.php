@@ -265,6 +265,7 @@ class OrderController extends Controller
 
             $userId = $this->userId();
             $userLevel = $this->user()->promoterInfo->level ?: 0;
+            $promoterStatus = $this->user()->promoterInfo->status ?: 0;
             $superiorId = RelationService::getInstance()->getSuperiorId($userId);
             $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
             $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
@@ -274,7 +275,8 @@ class OrderController extends Controller
             $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 
-            $orderIds = $shopList->map(function (Shop $shop) use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
+            $orderIds = $shopList
+                ->map(function (Shop $shop) use ($promoterStatus, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
                     return $cartGoods->shop_id == $shop->id;
                 });
@@ -284,7 +286,7 @@ class OrderController extends Controller
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon, $shop);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel, $promoterStatus);
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
@@ -309,7 +311,7 @@ class OrderController extends Controller
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel);
+                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel, $promoterStatus);
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录

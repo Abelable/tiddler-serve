@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\DB;
 
 class OrderGoodsService extends BaseService
 {
-    public function createList($cartGoodsList, $orderId, $userId, $userLevel)
+    public function createList($cartGoodsList, $orderId, $userId, $userLevel, $promoterStatus)
     {
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             $goods = OrderGoods::new();
             $goods->user_id = $userId;
             $goods->user_level = $userLevel;
+            $goods->promoter_status = $promoterStatus;
             $goods->order_id = $orderId;
             $goods->goods_id = $cartGoods->goods_id;
             $goods->shop_id = $cartGoods->shop_id;

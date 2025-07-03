@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Promoter;
 use App\Models\User;
 use App\Services\CommissionService;
+use App\Services\PromoterChangeLogService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
@@ -85,7 +86,14 @@ class PromoterController extends Controller
         $userId = $this->verifyRequiredId('userId');
         $level = $this->verifyRequiredInteger('level');
         $scene = $this->verifyRequiredInteger('scene');
-        PromoterService::getInstance()->adminCreate($userId, $level, $scene);
+        $duration = $this->verifyRequiredInteger('duration');
+
+        DB::transaction(function () use ($duration, $userId, $level, $scene) {
+            $promoter = PromoterService::getInstance()->adminCreate($userId, $level, $scene, $duration);
+            PromoterChangeLogService::getInstance()
+                ->createLog($promoter->id, 1, 0, $level);
+        });
+
         return $this->success();
     }
 

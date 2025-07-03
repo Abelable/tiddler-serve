@@ -12,6 +12,8 @@ namespace App\Models;
  * @property int $new_level 新等级
  * @property string $old_expiration_time 旧失效时间
  * @property string $new_expiration_time 新失效时间
+ * @property int $old_gift_goods_id 旧家乡好物id
+ * @property int $new_gift_goods_id 新家乡好物id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -24,8 +26,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereNewExpirationTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereNewGiftGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereNewLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereOldExpirationTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereOldGiftGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereOldLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog wherePromoterId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterChangeLog whereUpdatedAt($value)

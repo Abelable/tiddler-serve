@@ -9,6 +9,7 @@ namespace App\Models;
  * @property int $status 状态：0-待付款，1-已付款，2-已退款
  * @property int $user_id 用户id
  * @property int $user_level 用户等级
+ * @property int $promoter_status 用户代言人身份状态
  * @property int $order_id 订单id
  * @property int $shop_id 店铺id
  * @property int $goods_id 商品id
@@ -45,6 +46,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromoterStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereRefundStatus($value)

@@ -18,13 +18,47 @@ class PromoterService extends BaseService
     {
         /** @var OrderGoods $orderGoods */
         $orderGoods = OrderGoodsService::getInstance()->getById($orderGoodsId);
-        return $this->createPromoter($orderGoods->user_id, 2, $orderGoods->duration, $orderGoods->order_id, $orderGoods->goods_id);
+        $promoter = $this->createPromoter(
+            $orderGoods->user_id,
+            2,
+            $orderGoods->duration,
+            $orderGoods->order_id,
+            $orderGoods->goods_id
+        );
+        PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
+        return $promoter;
+    }
+
+    public function renewPromoterByGift($orderGoodsId)
+    {
+        /** @var OrderGoods $orderGoods */
+        $orderGoods = OrderGoodsService::getInstance()->getById($orderGoodsId);
+        $promoter = $this->getPromoterByUserId($orderGoods->user_id);
+
+        $expirationTime = Carbon::parse($promoter->expiration_time)
+            ->addDays($orderGoods->duration)
+            ->setTimezone('UTC')
+            ->format('Y-m-d\TH:i:s.v\Z');
+
+        PromoterChangeLogService::getInstance()
+            ->createLog(
+                $promoter->id,
+                2,
+                0,
+                1,
+                $promoter->expiration_time,
+                $expirationTime,
+                $promoter->gift_goods_id,
+                $orderGoodsId
+            );
+
+        return $this->renewPromoter($promoter, $orderGoods, $expirationTime);
     }
 
     public function createPromoter($userId, $path, $duration, $orderId = null, $giftGoodsId = null)
     {
         $expirationTime = Carbon::now()
-            ->addMonths($duration)
+            ->addDays($duration)
             ->setTimezone('UTC')
             ->format('Y-m-d\TH:i:s.v\Z');
 
@@ -39,14 +73,30 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function adminCreate($userId, $level, $scene)
+    public function renewPromoter(Promoter $promoter, OrderGoods $orderGoods, $expirationTime)
     {
+        $promoter->expiration_time = $expirationTime;
+        $promoter->order_id = $orderGoods->order_id;
+        $promoter->gift_goods_id = $orderGoods->goods_id;
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function adminCreate($userId, $level, $scene, $duration)
+    {
+        $expirationTime = Carbon::now()
+            ->addDays($duration)
+            ->setTimezone('UTC')
+            ->format('Y-m-d\TH:i:s.v\Z');
+
         $promoter = Promoter::new();
         $promoter->user_id = $userId;
         $promoter->level = $level;
         $promoter->scene = $scene;
         $promoter->path = 1;
+        $promoter->expiration_time = $expirationTime;
         $promoter->save();
+
         return $promoter;
     }
 

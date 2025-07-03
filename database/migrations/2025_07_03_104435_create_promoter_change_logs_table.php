@@ -21,6 +21,8 @@ class CreatePromoterChangeLogsTable extends Migration
             $table->integer('new_level')->default(0)->comment('新等级');
             $table->string('old_expiration_time')->default('')->comment('旧失效时间');
             $table->string('new_expiration_time')->default('')->comment('新失效时间');
+            $table->integer('old_gift_goods_id')->default(0)->comment('旧家乡好物id');
+            $table->integer('new_gift_goods_id')->default(0)->comment('新家乡好物id');
             $table->timestamps();
             $table->softDeletes();
         });

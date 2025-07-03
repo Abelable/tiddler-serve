@@ -3,7 +3,8 @@
 namespace App\Services;
 
 use App\Jobs\OverTimeCancelOrderJob;
-use App\Jobs\PromoterConfirmJob;
+use App\Jobs\createPromoterJob;
+use App\Jobs\renewPromoterJob;
 use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
@@ -668,12 +669,22 @@ class OrderService extends BaseService
 
             /** @var OrderGoods $orderGoods */
             $orderGoods = $orderGoodsList->get($order->id);
-            if ($orderGoods->is_gift == 1 && $orderGoods->user_level == 0) {
+            if ($orderGoods->is_gift == 1 && ($orderGoods->user_level == 0 || $orderGoods->promoter_status == 2)) {
                 if ($orderGoods->refund_status == 1 && $role == 'user') {
-                    // 7天无理由商品：确认收货7天后生成代言人身份
-                    dispatch(new PromoterConfirmJob($orderGoods->id));
+                    // 7天无理由商品：确认收货7天后生成代言人身份/更新身份有效期
+                    if ($orderGoods->user_level == 0) {
+                        dispatch(new createPromoterJob($orderGoods->id));
+                    }
+                    if ($orderGoods->promoter_status == 2) {
+                        dispatch(new renewPromoterJob($orderGoods->id));
+                    }
                 } else {
-                    PromoterService::getInstance()->createPromoterByGift($orderGoods->id);
+                    if ($orderGoods->user_level == 0) {
+                        PromoterService::getInstance()->createPromoterByGift($orderGoods->id);
+                    }
+                    if ($orderGoods->promoter_status == 2) {
+                        PromoterService::getInstance()->renewPromoterByGift($orderGoods->id);
+                    }
                 }
             }
 
