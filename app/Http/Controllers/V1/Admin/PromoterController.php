@@ -137,6 +137,9 @@ class PromoterController extends Controller
                     );
 
                 $promoter->expiration_time = $expirationTime;
+                if ($promoter->status == 2) {
+                    $promoter->status == 1;
+                }
             }
 
             $promoter->save();
