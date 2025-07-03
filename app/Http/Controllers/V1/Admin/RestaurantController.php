@@ -62,15 +62,7 @@ class RestaurantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
-
-        $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
-        if (is_null($restaurant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前餐馆不存在');
-        }
-
-        $restaurant->views = $views;
-        $restaurant->save();
-
+        RestaurantService::getInstance()->updateViews($id, $views);
         return $this->success();
     }
 

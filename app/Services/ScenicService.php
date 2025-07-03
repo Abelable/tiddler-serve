@@ -167,6 +167,11 @@ class ScenicService extends BaseService
         return $scenic;
     }
 
+    public function updateViews($id, $views)
+    {
+        return ScenicSpot::query()->where('id', $id)->update(['views' => $views]);
+    }
+
     public function getList()
     {
         return ScenicSpot::query()->get();

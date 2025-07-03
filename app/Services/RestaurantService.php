@@ -147,4 +147,9 @@ class RestaurantService extends BaseService
         $restaurant->save();
         return $restaurant;
     }
+
+    public function updateViews($id, $views)
+    {
+        return Restaurant::query()->where('id', $id)->update(['views' => $views]);
+    }
 }

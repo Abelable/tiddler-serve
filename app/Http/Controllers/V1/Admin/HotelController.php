@@ -60,15 +60,7 @@ class HotelController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
-
-        $hotel = HotelService::getInstance()->getHotelById($id);
-        if (is_null($hotel)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店不存在');
-        }
-
-        $hotel->views = $views;
-        $hotel->save();
-
+        HotelService::getInstance()->updateViews($id, $views);
         return $this->success();
     }
 

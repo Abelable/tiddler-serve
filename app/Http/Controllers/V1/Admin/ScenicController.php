@@ -60,15 +60,7 @@ class ScenicController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
-
-        $scenic = ScenicService::getInstance()->getScenicById($id);
-        if (is_null($scenic)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点不存在');
-        }
-
-        $scenic->views = $views;
-        $scenic->save();
-
+        ScenicService::getInstance()->updateViews($id, $views);
         return $this->success();
     }
 

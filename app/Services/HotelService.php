@@ -217,4 +217,9 @@ class HotelService extends BaseService
         $hotel->save();
         return $hotel;
     }
+
+    public function updateViews($id, $views)
+    {
+        return Hotel::query()->where('id', $id)->update(['views' => $views]);
+    }
 }
