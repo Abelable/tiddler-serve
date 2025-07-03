@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\GiftGoods;
+use App\Models\Goods;
 use App\Utils\Inputs\GiftGoodsInput;
 use App\Utils\Inputs\GiftGoodsPageInput;
 
@@ -43,5 +44,23 @@ class GiftGoodsService extends BaseService
     public function getGoodsById($id, $columns = ['*'])
     {
         return GiftGoods::query()->find($id, $columns);
+    }
+
+    public function create(GiftGoodsInput $input, Goods $goods)
+    {
+        $giftGoods = GiftGoods::new();
+        $giftGoods->type_id = $input->typeId;
+        $giftGoods->goods_id = $goods->id;
+        $giftGoods->goods_cover = $goods->cover;
+        $giftGoods->goods_name = $goods->name;
+        $giftGoods->duration = $input->duration;
+        $giftGoods->save();
+
+        return $giftGoods;
+    }
+
+    public function updateDuration($id, $duration)
+    {
+        GiftGoods::query()->where('id', $id)->update(['effective_duration' => $duration]);
     }
 }

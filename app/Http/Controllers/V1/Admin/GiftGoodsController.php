@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\GiftGoods;
 use App\Services\GiftGoodsService;
 use App\Services\GoodsService;
 use App\Utils\CodeResponse;
@@ -35,15 +34,17 @@ class GiftGoodsController extends Controller
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($input->goodsIds, ['id', 'cover', 'name']);
 
         foreach ($goodsList as $goods) {
-            $giftGoods = GiftGoods::new();
-            $giftGoods->type_id = $input->typeId;
-            $giftGoods->goods_id = $goods->id;
-            $giftGoods->goods_cover = $goods->cover;
-            $giftGoods->goods_name = $goods->name;
-            $giftGoods->effective_duration = $input->effectiveDuration;
-            $giftGoods->save();
+            GiftGoodsService::getInstance()->create($input, $goods);
         }
 
+        return $this->success();
+    }
+
+    public function editDuration()
+    {
+        $id = $this->verifyRequiredId('id');
+        $duration = $this->verifyRequiredInteger('duration');
+        GiftGoodsService::getInstance()->updateDuration($id, $duration);
         return $this->success();
     }
 
