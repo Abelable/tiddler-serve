@@ -14,6 +14,7 @@ use App\Services\CommissionWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class PromoterController extends Controller
@@ -97,19 +98,49 @@ class PromoterController extends Controller
         return $this->success();
     }
 
-    public function changeLevel()
+    public function edit()
     {
         $id = $this->verifyRequiredId('id');
         $level = $this->verifyRequiredInteger('level');
         $scene = $this->verifyRequiredInteger('scene');
+        $duration = $this->verifyInteger('duration');
 
         $promoter = PromoterService::getInstance()->getPromoterById($id);
         if (is_null($promoter)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前代言人不存在');
         }
-        $promoter->level = $level;
-        $promoter->scene = $scene;
-        $promoter->save();
+
+        DB::transaction(function () use ($duration, $promoter, $level, $scene) {
+            if ($promoter->level != $level) {
+                PromoterChangeLogService::getInstance()
+                    ->createLog($promoter->id, 1, $promoter->level, $level);
+
+                $promoter->level = $level;
+                $promoter->scene = $scene;
+            }
+
+            if ($duration) {
+                $expirationTime = Carbon::parse($promoter->expiration_time)
+                    ->addDays($duration)
+                    ->setTimezone('UTC')
+                    ->format('Y-m-d\TH:i:s.v\Z');
+
+                PromoterChangeLogService::getInstance()
+                    ->createLog(
+                        $promoter->id,
+                        2,
+                        0,
+                        1,
+                        $promoter->expiration_time,
+                        $expirationTime,
+                        $promoter->gift_goods_id
+                    );
+
+                $promoter->expiration_time = $expirationTime;
+            }
+
+            $promoter->save();
+        });
 
         return $this->success();
     }

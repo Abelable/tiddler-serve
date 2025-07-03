@@ -793,7 +793,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('list', 'PromoterController@list');
         Route::get('detail', 'PromoterController@detail');
         Route::post('add', 'PromoterController@add');
-        Route::post('change_level', 'PromoterController@changeLevel');
+        Route::post('edit', 'PromoterController@edit');
         Route::post('delete', 'PromoterController@delete');
         Route::get('options', 'PromoterController@options');
         Route::post('top_list', 'PromoterController@topPromoterList');
