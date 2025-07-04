@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\OrderService;
+use App\Services\PromoterChangeLogService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
@@ -22,8 +23,11 @@ class PromoterController extends Controller
         $subPromoterCount = PromoterService::getInstance()->getPromoterCountByUserIds($juniorIds);
         $promoterInfo['subPromoterCount'] = $subPromoterCount;
 
-        $GMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 6);
-        $promoterInfo['GMV'] = $GMV;
+        $levelChangeTime = PromoterChangeLogService::getInstance()
+            ->getLevelChangeLog($promoterInfo->id)
+            ->created_at;
+        $achievement = CommissionService::getInstance()->getLatestGMV($this->userId(), $levelChangeTime);
+        $promoterInfo['achievement'] = $achievement;
 
         return $this->success($promoterInfo);
     }

@@ -897,4 +897,31 @@ class CommissionService extends BaseService
     {
         return Commission::query()->whereIn('status', $statusList)->sum('commission_amount');
     }
+
+    public function getLatestGMV($userId, $levelChangeTime)
+    {
+        $monthDifference = 2;
+        if ($levelChangeTime) {
+            $currentMonth = date('n');
+            $levelChangeMonth = (int)date('n', strtotime($levelChangeTime));
+            $monthDifference = $currentMonth - $levelChangeMonth;
+            if ($monthDifference < 0) {
+                $monthDifference += 12;
+            }
+        }
+
+        if ($monthDifference == 0) {
+            $beforeLastMonthGMV = 0;
+            $lastMonthGMV = 0;
+        } elseif ($monthDifference == 1) {
+            $beforeLastMonthGMV = 0;
+            $lastMonthGMV = $this->getUserGMVByTimeType($userId(), 4);
+        } else {
+            $beforeLastMonthGMV = $this->getUserGMVByTimeType($userId(), 5);
+            $lastMonthGMV = $this->getUserGMVByTimeType($userId(), 4);
+        }
+        $curMonthGMV = $this->getUserGMVByTimeType($userId(), 3);
+
+        return bcadd(bcadd($beforeLastMonthGMV, $lastMonthGMV, 2), $curMonthGMV, 2);
+    }
 }

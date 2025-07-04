@@ -44,4 +44,13 @@ class PromoterChangeLogService extends BaseService
 
         return $log;
     }
+
+    public function getLevelChangeLog($promoterId, $columns = ['*'])
+    {
+        return PromoterChangeLog::query()
+            ->where('promoter_id', $promoterId)
+            ->where('change_type', 1)
+            ->orderBy('id', 'desc')
+            ->first($columns);
+    }
 }

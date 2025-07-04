@@ -12,64 +12,12 @@ use App\Services\OrderSetMealService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ScenicOrderTicketService;
-use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
 class CommissionController extends Controller
 {
-    public function achievement()
-    {
-        $promoterInfo = $this->user()->promoterInfo;
-
-        if (is_null($promoterInfo)) {
-            return $this->fail(CodeResponse::FAIL, '非代言人无法查看数据');
-        }
-
-        $monthDifference = 2;
-        if ($promoterInfo->level_change_time) {
-            $currentMonth = date('n');
-            $levelChangeMonth = (int)date('n', strtotime($promoterInfo->level_change_time));
-            $monthDifference = $currentMonth - $levelChangeMonth;
-            if ($monthDifference < 0) {
-                $monthDifference += 12;
-            }
-        }
-
-        if ($monthDifference == 0) {
-            $beforeLastMonthGMV = 0;
-            $lastMonthGMV = 0;
-        } elseif ($monthDifference == 1) {
-            $beforeLastMonthGMV = 0;
-            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
-        } else {
-            $beforeLastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 5);
-            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
-        }
-        $curMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 3);
-
-        $totalGMV = bcadd($beforeLastMonthGMV, $lastMonthGMV, 2);
-        $totalGMV = bcadd($totalGMV, $curMonthGMV, 2);
-
-        // 推广员升C1：3个月累计超3w
-        // C1升C2：3个月累计超20w
-        // C2生C3：3个月累计超60w
-        $level = $promoterInfo->level;
-        $targets = [1 => 30000, 2 => 200000, 3 => 600000];
-        $target = $targets[$level] ?? 0;
-        $percent = ($totalGMV >= $target) ? 100 : round(($totalGMV / $target) * 100, 2);
-
-        return $this->success([
-            'monthDifference' => $monthDifference,
-            'beforeLastMonthGMV' => $beforeLastMonthGMV,
-            'lastMonthGMV' => $lastMonthGMV,
-            'curMonthGMV' => $curMonthGMV,
-            'totalGMV' => $totalGMV,
-            'percent' => $percent
-        ]);
-    }
-
     public function commissionOrderList()
     {
         /** @var PageInput $input */
