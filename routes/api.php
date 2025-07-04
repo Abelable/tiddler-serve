@@ -588,6 +588,7 @@ Route::prefix('history')->group(function () {
 });
 
 Route::prefix('promoter')->group(function () {
+    Route::get('info', 'PromoterController@promoterInfo');
     Route::get('customer_data', 'PromoterController@customerData');
     Route::get('today_new_customer_list', 'PromoterController@todayNewCustomerList');
     Route::get('today_ordering_customer_list', 'PromoterController@todayOrderingCustomerList');

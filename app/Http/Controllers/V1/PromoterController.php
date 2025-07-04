@@ -13,6 +13,21 @@ use App\Utils\Inputs\SearchPageInput;
 
 class PromoterController extends Controller
 {
+    public function promoterInfo()
+    {
+        $promoterInfo = $this->user()->promoterInfo;
+
+        $juniorIds = RelationService::getInstance()
+            ->getListBySuperiorId($this->userId())->pluck('user_id')->toArray();
+        $subPromoterCount = PromoterService::getInstance()->getPromoterCountByUserIds($juniorIds);
+        $promoterInfo['subPromoterCount'] = $subPromoterCount;
+
+        $GMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 6);
+        $promoterInfo['GMV'] = $GMV;
+
+        return $this->success($promoterInfo);
+    }
+
     public function customerData()
     {
         $todayNewCustomerCount = RelationService::getInstance()->getTodayCountBySuperiorId($this->userId());
@@ -55,7 +70,7 @@ class PromoterController extends Controller
         $input = SearchPageInput::new();
 
         $totalCustomerIds = RelationService::getInstance()
-            ->getListBySuperiorId($this->userId())->pluck('fan_id')->toArray();
+            ->getListBySuperiorId($this->userId())->pluck('user_id')->toArray();
         if (!empty($input->keywords)) {
             $userList = UserService::getInstance()->searchListByUserIds($totalCustomerIds, $input->keywords);
             $totalCustomerIds = $userList->pluck('id')->toArray();
@@ -78,7 +93,7 @@ class PromoterController extends Controller
             $promoter = $promoterList->get($user->id);
 
             $userCommission = $userCommissionList->get($user->id);
-            $userCommissionSum = $userCommission ? $userCommission->sum('commission_amount') : 0;
+            $GMV = $userCommission ? $userCommission->sum('payment_amount') : 0;
 
             return [
                 'id' => $user->id,
@@ -87,7 +102,7 @@ class PromoterController extends Controller
                 'mobile' => $user->mobile,
                 'promoterId' => $promoter ? $promoter->id : 0,
                 'level' => $promoter ? $promoter->level : 0,
-                'GMV' => $userCommissionSum,
+                'GMV' => $GMV,
                 'createdAt' => $user->created_at
             ];
         });

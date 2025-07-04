@@ -806,7 +806,7 @@ class CommissionService extends BaseService
         return $this
             ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
             ->whereIn('status', [2, 3, 4])
-            ->sum('commission_amount');
+            ->sum('payment_amount');
     }
 
     public function restoreCommissionByWithdrawalId($withdrawalId)
