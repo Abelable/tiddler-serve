@@ -11,13 +11,15 @@ namespace App\Models;
  * @property int $level 代言人等级
  * @property int $scene 场景值，防串改，与等级对应「等级-场景值」：1-100, 2-201, 3-202, 4-203, 5-300
  * @property int $path 生成路径：1-管理后台添加，2-礼包购买
+ * @property string $expiration_time 身份失效时间
  * @property int $order_id 订单id
  * @property int $gift_goods_id 礼包商品id-用于售后退款删除代言人身份
- * @property int $promoted_user_number 推广人数
+ * @property int $sub_user_number 下级人数
+ * @property int $sub_promoter_number 下级代言人人数
+ * @property float $honor_points 近三月累计荣誉值
  * @property float $self_commission_sum 累计自购佣金
  * @property float $share_commission_sum 累计分享佣金
  * @property float $team_commission_sum 累计团队佣金
- * @property string $expiration_time 身份失效时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -29,15 +31,17 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereExpirationTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereGiftGoodsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereHonorPoints($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereLevel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePath($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Promoter wherePromotedUserNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereSelfCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereShareCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereSubPromoterNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereSubUserNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereTeamCommissionSum($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereUserId($value)
