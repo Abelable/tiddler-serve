@@ -26,7 +26,7 @@ class PromoterController extends Controller
         $levelChangeTime = PromoterChangeLogService::getInstance()
             ->getLevelChangeLog($promoterInfo->id)
             ->created_at;
-        $achievement = CommissionService::getInstance()->getLatestGMV($this->userId(), $levelChangeTime);
+        $achievement = CommissionService::getInstance()->getUserAchievement($this->userId(), $levelChangeTime);
         $promoterInfo['achievement'] = $achievement;
 
         return $this->success($promoterInfo);

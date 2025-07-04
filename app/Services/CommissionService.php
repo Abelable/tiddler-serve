@@ -763,50 +763,12 @@ class CommissionService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)
-    {
-        $query = Commission::query()->whereIn('promoter_id', $userIds);
-
-        switch ($timeType) {
-            case 1:
-                $query = $query->whereDate('created_at', Carbon::today());
-                break;
-            case 2:
-                $query = $query->whereDate('created_at', Carbon::yesterday());
-                break;
-            case 3:
-                $query = $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()]);
-                break;
-            case 4:
-                $query = $query->whereBetween('created_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
-                break;
-            case 5:
-                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()->subMonths(2)->endOfMonth()]);
-                break;
-            case 6:
-                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()]);
-                break;
-            case 7:
-                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()]);
-                break;
-        }
-        return $query;
-    }
-
     public function getSettledCommissionListByUserIds(array $userIds, $columns = ['*'])
     {
         return Commission::query()
             ->whereIn('promoter_id', $userIds)
             ->whereIn('status', [2, 3, 4])
             ->get($columns);
-    }
-
-    public function getUserGMVByTimeType($userId, $timeType, $startTime = null)
-    {
-        return $this
-            ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
-            ->whereIn('status', [2, 3, 4])
-            ->sum('payment_amount');
     }
 
     public function restoreCommissionByWithdrawalId($withdrawalId)
@@ -898,30 +860,51 @@ class CommissionService extends BaseService
         return Commission::query()->whereIn('status', $statusList)->sum('commission_amount');
     }
 
-    public function getLatestGMV($userId, $levelChangeTime)
+    public function getUserAchievement($userId, $levelChangeTime)
     {
-        $monthDifference = 2;
-        if ($levelChangeTime) {
-            $currentMonth = date('n');
-            $levelChangeMonth = (int)date('n', strtotime($levelChangeTime));
-            $monthDifference = $currentMonth - $levelChangeMonth;
-            if ($monthDifference < 0) {
-                $monthDifference += 12;
-            }
-        }
-
-        if ($monthDifference == 0) {
-            $beforeLastMonthGMV = 0;
-            $lastMonthGMV = 0;
-        } elseif ($monthDifference == 1) {
-            $beforeLastMonthGMV = 0;
-            $lastMonthGMV = $this->getUserGMVByTimeType($userId(), 4);
+        if (Carbon::parse($levelChangeTime)->gt(Carbon::now()->subMonths(3))) {
+            $achievement = $this->getUserGMVByTimeType($userId, 7, $levelChangeTime);
         } else {
-            $beforeLastMonthGMV = $this->getUserGMVByTimeType($userId(), 5);
-            $lastMonthGMV = $this->getUserGMVByTimeType($userId(), 4);
+            $achievement = $this->getUserGMVByTimeType($userId, 6);
         }
-        $curMonthGMV = $this->getUserGMVByTimeType($userId(), 3);
+        return $achievement;
+    }
 
-        return bcadd(bcadd($beforeLastMonthGMV, $lastMonthGMV, 2), $curMonthGMV, 2);
+    public function getUserGMVByTimeType($userId, $timeType, $startTime = null)
+    {
+        return $this
+            ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
+            ->whereIn('status', [2, 3, 4])
+            ->sum('payment_amount');
+    }
+
+    public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)
+    {
+        $query = Commission::query()->whereIn('promoter_id', $userIds);
+
+        switch ($timeType) {
+            case 1: // 今日
+                $query = $query->whereDate('created_at', Carbon::today());
+                break;
+            case 2: // 昨日
+                $query = $query->whereDate('created_at', Carbon::yesterday());
+                break;
+            case 3: // 本月
+                $query = $query->whereBetween('created_at', [Carbon::now()->startOfMonth(), Carbon::now()]);
+                break;
+            case 4: // 上月
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonth()->startOfMonth(), Carbon::now()->subMonth()->endOfMonth()]);
+                break;
+            case 5: // 上上月
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(2)->startOfMonth(), Carbon::now()->subMonths(2)->endOfMonth()]);
+                break;
+            case 6: // 近三月
+                $query = $query->whereBetween('created_at', [Carbon::now()->subMonths(3), Carbon::now()]);
+                break;
+            case 7: // 开始时间至今
+                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()]);
+                break;
+        }
+        return $query;
     }
 }
