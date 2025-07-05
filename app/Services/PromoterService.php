@@ -28,7 +28,7 @@ class PromoterService extends BaseService
 
         $superiorId = RelationService::getInstance()->getSuperiorId($orderGoods->user_id);
         if ($superiorId) {
-            $this->updateSupPromoterCount($superiorId);
+            $this->updateSubPromoterCount($superiorId);
         }
 
         return $promoter;
@@ -275,7 +275,7 @@ class PromoterService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function updateSupUserCount($userId, $count = 1)
+    public function updateSubUserCount($userId, $count = 1)
     {
         $promoter = $this->getPromoterByUserId($userId);
         $promoter->sub_user_number = $promoter->sub_user_number + $count;
@@ -283,7 +283,7 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function updateSupPromoterCount($userId, $count = 1)
+    public function updateSubPromoterCount($userId, $count = 1)
     {
         $promoter = $this->getPromoterByUserId($userId);
         $promoter->sub_promoter_number = $promoter->sub_promoter_number + $count;

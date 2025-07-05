@@ -46,7 +46,7 @@ class AuthController extends Controller
                 RelationService::getInstance()->banding($input->superiorId, $user->id);
 
                 // 增加上级邀请用户数量
-                PromoterService::getInstance()->updateSupUserCount($input->superiorId);
+                PromoterService::getInstance()->updateSubUserCount($input->superiorId);
             }
 
             // 创建用户余额

@@ -11,7 +11,6 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\UserInfoInput;
 use App\Utils\TimServe;
-use function PHPSTORM_META\map;
 
 class UserController extends Controller
 {
@@ -30,14 +29,27 @@ class UserController extends Controller
         $user['followedAuthorNumber'] = $followedAuthorNumbers;
         $user['fansNumber'] = $fansNumber;
 
-        $user['promoterId'] = $user->promoterInfo->id ?? 0;
-        $user['level'] = $user->promoterInfo->level ?? 0;
+        $promoterInfo = $user->promoterInfo;
+        $user['promoterInfo'] = $promoterInfo ? [
+            'id' => $promoterInfo->id,
+            'status' => $promoterInfo->status,
+            'level' => $promoterInfo->level,
+            'subUserCount' => $promoterInfo->sub_user_number,
+            'subPromoterCount' => $promoterInfo->sub_promoter_number,
+            'achievement' => $promoterInfo->achievement,
+            'selfCommissionSum' => $promoterInfo->self_commission_sum,
+            'shareCommissionSum' => $promoterInfo->share_commission_sum,
+            'teamCommissionSum' => $promoterInfo->team_commission_sum,
+            'expirationTime' => $promoterInfo->expiration_time,
+        ] : null;
+
         $user['superiorId'] = $user->superiorId() ?? 0;
 
         $user['authInfoId'] = $user->authInfo->id ?? 0;
 
-        $user['merchantInfo'] = $user->merchant ?
-            ['id' => $user->merchant->id, 'shopIds' => $user->shopIds()]
+        $merchant = $user->merchant;
+        $user['merchantInfo'] = $merchant ?
+            ['id' => $merchant->id, 'shopIds' => $user->shopIds()]
             : null;
         $user['shopManagerList'] = $user->shopManagerList;
 
@@ -46,7 +58,6 @@ class UserController extends Controller
         $user['cateringProviderId'] = $user->cateringProvider->id ?? 0;
 
         unset($user->openid);
-        unset($user->promoterInfo);
         unset($user->authInfo);
         unset($user->merchant);
         unset($user->scenicProvider);

@@ -97,7 +97,7 @@ class PromoterController extends Controller
 
             $superiorId = RelationService::getInstance()->getSuperiorId($userId);
             if ($superiorId) {
-                PromoterService::getInstance()->updateSupPromoterCount($superiorId);
+                PromoterService::getInstance()->updateSubPromoterCount($superiorId);
             }
         });
 
