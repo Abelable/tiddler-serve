@@ -209,7 +209,10 @@ class GoodsController extends Controller
         $goods['couponList'] = $couponList;
 
         $giftGoods = GiftGoodsService::getInstance()->getGoodsByGoodsId($goods->id);
-        $goods['isGift'] = !is_null($giftGoods) ? 1 : 0;
+        if ($giftGoods) {
+            $goods['isGift'] = 1;
+            $goods['giftDuration'] = $giftGoods->duration;
+        }
 
         if ($goods->shop_id != 0) {
             $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'logo', 'name']);

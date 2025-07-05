@@ -293,7 +293,7 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift) {
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
@@ -318,7 +318,7 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift) {
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }

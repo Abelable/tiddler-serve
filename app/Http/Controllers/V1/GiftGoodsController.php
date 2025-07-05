@@ -34,6 +34,7 @@ class GiftGoodsController extends Controller
         $list = $giftGoodsList->map(function (GiftGoods $giftGoods) use ($goodsList) {
             $goods = $goodsList->get($giftGoods->goods_id);
             $goods['isGift'] = 1;
+            $goods['giftDuration'] = $giftGoods->duration;
             return $goods;
         });
 
