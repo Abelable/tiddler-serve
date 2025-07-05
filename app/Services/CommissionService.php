@@ -734,7 +734,7 @@ class CommissionService extends BaseService
         return $this->getUserCommissionQuery([$userId], $statusList)->sum('commission_amount');
     }
 
-    public function getUserGMV(array $userIds, $statusList)
+    public function getUserGMV(array $userIds, array $statusList = [2, 3, 4])
     {
         return $this->getUserCommissionQuery($userIds, $statusList)->sum('commission_base');
     }
@@ -903,6 +903,12 @@ class CommissionService extends BaseService
                 break;
             case 7: // 开始时间至今
                 $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()]);
+                break;
+            case 8: // 开始时间至上月末
+                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()->subMonth()->endOfMonth()]);
+                break;
+            case 9: // 开始时间至上上月末
+                $query = $query->whereBetween('created_at', [Carbon::parse($startTime), Carbon::now()->subMonths(2)->endOfMonth()]);
                 break;
         }
         return $query;

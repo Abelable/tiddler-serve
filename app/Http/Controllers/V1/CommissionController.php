@@ -9,6 +9,7 @@ use App\Services\HotelOrderRoomService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderMealTicketService;
 use App\Services\OrderSetMealService;
+use App\Services\PromoterChangeLogService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ScenicOrderTicketService;
@@ -26,10 +27,14 @@ class CommissionController extends Controller
             return $this->fail(CodeResponse::FAIL, '非代言人无法查看数据');
         }
 
+        $levelChangeTime = PromoterChangeLogService::getInstance()
+            ->getLevelChangeLog($promoterInfo->id)
+            ->created_at;
+
         $monthDifference = 2;
-        if ($promoterInfo->level_change_time) {
+        if ($levelChangeTime) {
             $currentMonth = date('n');
-            $levelChangeMonth = (int)date('n', strtotime($promoterInfo->level_change_time));
+            $levelChangeMonth = (int)date('n', strtotime($levelChangeTime));
             $monthDifference = $currentMonth - $levelChangeMonth;
             if ($monthDifference < 0) {
                 $monthDifference += 12;
@@ -39,23 +44,31 @@ class CommissionController extends Controller
         if ($monthDifference == 0) {
             $beforeLastMonthGMV = 0;
             $lastMonthGMV = 0;
+            $curMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 7, $levelChangeTime);
         } elseif ($monthDifference == 1) {
             $beforeLastMonthGMV = 0;
-            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
+            $lastMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 8, $levelChangeTime);
+            $curMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 3);
         } else {
-            $beforeLastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 5);
-            $lastMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 4);
+            $beforeLastMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 9, $levelChangeTime);
+            $lastMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 4);
+            $curMonthGMV = CommissionService::getInstance()
+                ->getUserGMVByTimeType($this->userId(), 3);
         }
-        $curMonthGMV = CommissionService::getInstance()->getUserGMVByTimeType($this->userId(), 3);
 
         $totalGMV = bcadd($beforeLastMonthGMV, $lastMonthGMV, 2);
         $totalGMV = bcadd($totalGMV, $curMonthGMV, 2);
 
-        // 推广员升C1：3个月累计超3w
-        // C1升C2：3个月累计超20w
-        // C2生C3：3个月累计超60w
+        // 升Lv.2：3个月累计超3w
+        // 升Lv.3：3个月累计超10w
+        // 升Lv.4：3个月累计超50w
         $level = $promoterInfo->level;
-        $targets = [1 => 30000, 2 => 200000, 3 => 600000];
+        $targets = [1 => 30000, 2 => 100000, 3 => 500000];
         $target = $targets[$level] ?? 0;
         $percent = ($totalGMV >= $target) ? 100 : round(($totalGMV / $target) * 100, 2);
 
@@ -78,7 +91,7 @@ class CommissionController extends Controller
         $statusList = $this->verifyArray('statusList');
 
         $page = CommissionService::getInstance()
-            ->getUserCommissionPageByTimeType($this->userId(), $timeType, $statusList,$input, $scene ?: null);
+            ->getUserCommissionPageByTimeType($this->userId(), $timeType, $statusList, $input, $scene ?: null);
         $commissionList = collect($page->items());
 
         $orderIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {
