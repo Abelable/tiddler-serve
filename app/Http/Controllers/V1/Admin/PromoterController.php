@@ -91,8 +91,14 @@ class PromoterController extends Controller
 
         DB::transaction(function () use ($duration, $userId, $level, $scene) {
             $promoter = PromoterService::getInstance()->adminCreate($userId, $level, $scene, $duration);
+
             PromoterChangeLogService::getInstance()
                 ->createLog($promoter->id, 1, 0, $level);
+
+            $superiorId = RelationService::getInstance()->getSuperiorId($userId);
+            if ($superiorId) {
+                PromoterService::getInstance()->updateSupPromoterCount($superiorId);
+            }
         });
 
         return $this->success();

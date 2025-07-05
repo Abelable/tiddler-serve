@@ -15,6 +15,7 @@ class PromoterService extends BaseService
     {
         /** @var OrderGoods $orderGoods */
         $orderGoods = OrderGoodsService::getInstance()->getById($orderGoodsId);
+
         $promoter = $this->createPromoter(
             $orderGoods->user_id,
             2,
@@ -22,9 +23,14 @@ class PromoterService extends BaseService
             $orderGoods->order_id,
             $orderGoods->goods_id
         );
+
         PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
 
-        $superiorId = RelationService::getInstance()->getSuperiorId($orderGoods->goods_id);
+        $superiorId = RelationService::getInstance()->getSuperiorId($orderGoods->user_id);
+        if ($superiorId) {
+            $this->updateSupPromoterCount($superiorId);
+        }
+
         return $promoter;
     }
 
@@ -72,15 +78,6 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function renewPromoter(Promoter $promoter, OrderGoods $orderGoods, $expirationTime)
-    {
-        $promoter->expiration_time = $expirationTime;
-        $promoter->order_id = $orderGoods->order_id;
-        $promoter->gift_goods_id = $orderGoods->goods_id;
-        $promoter->save();
-        return $promoter;
-    }
-
     public function adminCreate($userId, $level, $scene, $duration)
     {
         $expirationTime = Carbon::now()
@@ -96,6 +93,15 @@ class PromoterService extends BaseService
         $promoter->expiration_time = $expirationTime;
         $promoter->save();
 
+        return $promoter;
+    }
+
+    public function renewPromoter(Promoter $promoter, OrderGoods $orderGoods, $expirationTime)
+    {
+        $promoter->expiration_time = $expirationTime;
+        $promoter->order_id = $orderGoods->order_id;
+        $promoter->gift_goods_id = $orderGoods->goods_id;
+        $promoter->save();
         return $promoter;
     }
 
