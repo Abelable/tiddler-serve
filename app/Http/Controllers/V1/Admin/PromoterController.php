@@ -118,9 +118,6 @@ class PromoterController extends Controller
 
         DB::transaction(function () use ($duration, $promoter, $level, $scene) {
             if ($promoter->level != $level) {
-                PromoterChangeLogService::getInstance()
-                    ->createLog($promoter->id, 1, $promoter->level, $level);
-
                 $promoter->level = $level;
                 $promoter->scene = $scene;
             }
@@ -130,18 +127,6 @@ class PromoterController extends Controller
                     ->addDays($duration)
                     ->setTimezone('UTC')
                     ->format('Y-m-d\TH:i:s.v\Z');
-
-                PromoterChangeLogService::getInstance()
-                    ->createLog(
-                        $promoter->id,
-                        2,
-                        0,
-                        1,
-                        $promoter->expiration_time,
-                        $expirationTime,
-                        $promoter->gift_goods_id
-                    );
-
                 $promoter->expiration_time = $expirationTime;
                 if ($promoter->status == 2) {
                     $promoter->status == 1;
