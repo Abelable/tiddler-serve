@@ -16,7 +16,6 @@ namespace App\Models;
  * @property int $gift_goods_id 礼包商品id-用于售后退款删除代言人身份
  * @property int $sub_user_number 下级人数
  * @property int $sub_promoter_number 下级代言人人数
- * @property float $achievement 近三月累计荣誉值
  * @property float $self_commission_sum 累计自购佣金
  * @property float $share_commission_sum 累计分享佣金
  * @property float $team_commission_sum 累计团队佣金
@@ -27,7 +26,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter newQuery()
  * @method static \Illuminate\Database\Query\Builder|Promoter onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter query()
- * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereAchievement($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Promoter whereExpirationTime($value)

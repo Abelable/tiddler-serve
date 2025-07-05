@@ -14,22 +14,16 @@ use App\Utils\Inputs\SearchPageInput;
 
 class PromoterController extends Controller
 {
-    public function promoterInfo()
+    public function achievement()
     {
         $promoterInfo = $this->user()->promoterInfo;
-
-        $juniorIds = RelationService::getInstance()
-            ->getListBySuperiorId($this->userId())->pluck('user_id')->toArray();
-        $subPromoterCount = PromoterService::getInstance()->getPromoterCountByUserIds($juniorIds);
-        $promoterInfo['subPromoterCount'] = $subPromoterCount;
 
         $levelChangeTime = PromoterChangeLogService::getInstance()
             ->getLevelChangeLog($promoterInfo->id)
             ->created_at;
         $achievement = CommissionService::getInstance()->getUserAchievement($this->userId(), $levelChangeTime);
-        $promoterInfo['achievement'] = $achievement;
 
-        return $this->success($promoterInfo);
+        return $this->success($achievement);
     }
 
     public function customerData()

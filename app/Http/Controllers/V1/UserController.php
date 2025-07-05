@@ -16,7 +16,7 @@ class UserController extends Controller
 {
     protected $except = ['superiorInfo', 'authorInfo', 'search', 'addTempUser'];
 
-    public function userInfo()
+    public function myInfo()
     {
         $user = $this->user();
 
@@ -36,7 +36,6 @@ class UserController extends Controller
             'level' => $promoterInfo->level,
             'subUserCount' => $promoterInfo->sub_user_number,
             'subPromoterCount' => $promoterInfo->sub_promoter_number,
-            'achievement' => $promoterInfo->achievement,
             'selfCommissionSum' => $promoterInfo->self_commission_sum,
             'shareCommissionSum' => $promoterInfo->share_commission_sum,
             'teamCommissionSum' => $promoterInfo->team_commission_sum,
@@ -104,16 +103,16 @@ class UserController extends Controller
         return $this->success($loginInfo);
     }
 
-    public function superiorInfo()
+    public function userInfo()
     {
-        $superiorId = $this->verifyRequiredId('superiorId');
+        $userId = $this->verifyRequiredId('userId');
 
-        $superiorInfo = UserService::getInstance()->getUserById($superiorId, ['id', 'mobile', 'avatar', 'nickname', 'gender', 'wx_qrcode', 'signature']);
-        if (is_null($superiorInfo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '用户上级不存在');
+        $userInfo = UserService::getInstance()->getUserById($userId, ['id', 'mobile', 'avatar', 'nickname', 'gender', 'wx_qrcode', 'signature']);
+        if (is_null($userInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户不存在');
         }
 
-        return $this->success($superiorInfo);
+        return $this->success($userInfo);
     }
 
     public function authorInfo()

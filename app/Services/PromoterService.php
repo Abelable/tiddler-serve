@@ -291,14 +291,6 @@ class PromoterService extends BaseService
         return $promoter;
     }
 
-    public function updateAchievement($userId, $achievement)
-    {
-        $promoter = $this->getPromoterByUserId($userId);
-        $promoter->achievement = bcadd($promoter->achievement, $achievement, 2);
-        $promoter->save();
-        return $promoter;
-    }
-
     public function updateSelfCommissionSum($userId, $commission)
     {
         $promoter = $this->getPromoterByUserId($userId);

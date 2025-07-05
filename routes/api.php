@@ -30,10 +30,10 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('user')->group(function () {
+    Route::get('me', 'UserController@myInfo');
     Route::get('info', 'UserController@userInfo');
     Route::post('update', 'UserController@updateUserInfo');
     Route::get('tim_login_info', 'UserController@timLoginInfo');
-    Route::get('superior_info', 'UserController@superiorInfo');
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
     Route::get('add_temp_user', 'UserController@addTempUser');
@@ -588,7 +588,7 @@ Route::prefix('history')->group(function () {
 });
 
 Route::prefix('promoter')->group(function () {
-    Route::get('info', 'PromoterController@promoterInfo');
+    Route::get('achievement', 'PromoterController@achievement');
     Route::get('customer_data', 'PromoterController@customerData');
     Route::get('today_new_customer_list', 'PromoterController@todayNewCustomerList');
     Route::get('today_ordering_customer_list', 'PromoterController@todayOrderingCustomerList');
