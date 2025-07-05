@@ -23,6 +23,8 @@ class PromoterService extends BaseService
             $orderGoods->goods_id
         );
         PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
+
+        $superiorId = RelationService::getInstance()->getSuperiorId($orderGoods->goods_id);
         return $promoter;
     }
 
@@ -261,16 +263,32 @@ class PromoterService extends BaseService
     {
         return Promoter::query()
             ->whereIn('status', $statusList)
-            ->select('*', DB::raw('(commission_sum + team_commission_sum) as total_commission'))
-            ->orderByDesc('promoted_user_number')
+            ->select('*', DB::raw('(self_commission_sum + share_commission_sum + team_commission_sum) as total_commission'))
+            ->orderByDesc('sub_user_number')
             ->orderByDesc('total_commission')
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function updatePromotedUserCount($userId, $count = 1)
+    public function updateSupUserCount($userId, $count = 1)
     {
         $promoter = $this->getPromoterByUserId($userId);
-        $promoter->promoted_user_number = $promoter->promoted_user_number + $count;
+        $promoter->sub_user_number = $promoter->sub_user_number + $count;
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function updateSupPromoterCount($userId, $count = 1)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->sub_promoter_number = $promoter->sub_promoter_number + $count;
+        $promoter->save();
+        return $promoter;
+    }
+
+    public function updateAchievement($userId, $achievement)
+    {
+        $promoter = $this->getPromoterByUserId($userId);
+        $promoter->achievement = bcadd($promoter->achievement, $achievement, 2);
         $promoter->save();
         return $promoter;
     }

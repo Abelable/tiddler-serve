@@ -59,13 +59,15 @@ class RelationService extends BaseService
 
     public function getTodayListBySuperiorId($superiorId, $columns = ['*'])
     {
-        return Relation::query()->whereDate('created_at', Carbon::today())->where('superior_id', $superiorId)->get($columns);
+        return Relation::query()
+            ->whereDate('created_at', Carbon::today())
+            ->where('superior_id', $superiorId)
+            ->get($columns);
     }
 
-    public function getSuperiorId($userId, $columns = ['*'])
+    public function getSuperiorId($userId)
     {
-        $relation = Relation::query()->where('user_id', $userId)->first($columns);
-        return $relation ? $relation->superior_id : 0;
+        return Relation::query()->where('user_id', $userId)->value('superior_id') ?? 0;
     }
 
     public function deleteBySuperiorId($superiorId)

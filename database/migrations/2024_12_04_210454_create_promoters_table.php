@@ -25,7 +25,7 @@ class CreatePromotersTable extends Migration
             $table->integer('gift_goods_id')->default(0)->comment('礼包商品id-用于售后退款删除代言人身份');
             $table->integer('sub_user_number')->default(0)->comment('下级人数');
             $table->integer('sub_promoter_number')->default(0)->comment('下级代言人人数');
-            $table->float('honor_points')->default(0)->comment('近三月累计荣誉值');
+            $table->float('achievement')->default(0)->comment('近三月累计荣誉值');
             $table->float('self_commission_sum')->default(0)->comment('累计自购佣金');
             $table->float('share_commission_sum')->default(0)->comment('累计分享佣金');
             $table->float('team_commission_sum')->default(0)->comment('累计团队佣金');
