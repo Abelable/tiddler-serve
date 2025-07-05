@@ -14,16 +14,34 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['superiorInfo', 'authorInfo', 'search', 'addTempUser'];
+    protected $except = ['userInfo', 'authorInfo', 'search', 'addTempUser'];
 
     public function myInfo()
     {
-        $user = $this->user();
+        $userInfo = $this->handelUserInfo($this->user());
+        return $this->success($userInfo);
+    }
 
-        $beLikedTimes = MediaService::getInstance()->beLikedTimes($this->userId());
-        $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($this->userId());
-        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($this->userId());
-        $fansNumber = FanService::getInstance()->fansNumber($this->userId());
+    public function userInfo()
+    {
+        $userId = $this->verifyRequiredId('userId');
+
+        $user = UserService::getInstance()->getUserById($userId);
+        if (is_null($user)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户不存在');
+        }
+
+        $userInfo = $this->handelUserInfo($user);
+
+        return $this->success($userInfo);
+    }
+
+    private function handelUserInfo(User $user)
+    {
+        $beLikedTimes = MediaService::getInstance()->beLikedTimes($user->id);
+        $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($user->id);
+        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($user->id);
+        $fansNumber = FanService::getInstance()->fansNumber($user->id);
         $user['beLikedTimes'] = $beLikedTimes;
         $user['beCollectedTimes'] = $beCollectedTimes;
         $user['followedAuthorNumber'] = $followedAuthorNumbers;
@@ -65,7 +83,7 @@ class UserController extends Controller
         unset($user->created_at);
         unset($user->updated_at);
 
-        return $this->success($user);
+        return $user;
     }
 
     public function updateUserInfo()
@@ -101,18 +119,6 @@ class UserController extends Controller
         $timServe->updateUserInfo($this->userId(), $this->user()->nickname, $this->user()->avatar);
         $loginInfo = $timServe->getLoginInfo($this->userId());
         return $this->success($loginInfo);
-    }
-
-    public function userInfo()
-    {
-        $userId = $this->verifyRequiredId('userId');
-
-        $userInfo = UserService::getInstance()->getUserById($userId, ['id', 'mobile', 'avatar', 'nickname', 'gender', 'wx_qrcode', 'signature']);
-        if (is_null($userInfo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '用户不存在');
-        }
-
-        return $this->success($userInfo);
     }
 
     public function authorInfo()
