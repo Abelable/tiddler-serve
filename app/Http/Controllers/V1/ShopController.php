@@ -8,6 +8,7 @@ use App\Services\ExpressService;
 use App\Services\ShopDepositPaymentLogService;
 use App\Services\MerchantService;
 use App\Services\ShopCategoryService;
+use App\Services\ShopDepositService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantInput;
@@ -50,6 +51,7 @@ class ShopController extends Controller
                 $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
                 ShopDepositPaymentLogService::getInstance()
                     ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
+                ShopDepositService::getInstance()->createShopDeposit($shop->id);
             });
         }
 
@@ -58,8 +60,8 @@ class ShopController extends Controller
 
     public function merchantStatusInfo()
     {
-        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
+        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
         $shop = ShopService::getInstance()->getShopByUserId($this->userId());
 
         return $this->success($merchant ? [

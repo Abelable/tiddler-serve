@@ -4,9 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
-use App\Models\ShopDepositPaymentLog;
 use App\Services\MerchantService;
-use App\Services\ShopDepositPaymentLogService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantPageInput;
 
