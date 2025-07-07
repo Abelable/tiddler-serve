@@ -25,7 +25,7 @@ class PromoterChangeLogService extends BaseService
         $newGiftGoodsId = 0
     )
     {
-        $log = new PromoterChangeLog();
+        $log = PromoterChangeLog::new();
         $log->promoter_id = $promoterId;
         $log->change_type = $changeType;
 

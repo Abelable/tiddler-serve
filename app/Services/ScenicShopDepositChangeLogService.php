@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\ShopDepositChangeLog;
+use App\Models\ScenicShopDepositChangeLog;
 use App\Utils\Inputs\PageInput;
 
-class ShopDepositChangeLogService extends BaseService
+class ScenicShopDepositChangeLogService extends BaseService
 {
     public function getLogPage($shopId, PageInput $input, $columns = ['*'])
     {
-        return ShopDepositChangeLog::query()
+        return ScenicShopDepositChangeLog::query()
             ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -17,7 +17,7 @@ class ShopDepositChangeLogService extends BaseService
 
     public function createLog($shopId, $oldBalance, $newBalance, $changeType, $changeAmount, $referenceId = '')
     {
-        $log = ShopDepositChangeLog::new();
+        $log = ScenicShopDepositChangeLog::new();
         $log->shop_id = $shopId;
         $log->old_balance = $oldBalance;
         $log->new_balance = $newBalance;

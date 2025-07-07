@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicTicket;
-use App\Services\ScenicProviderService;
+use App\Services\ScenicMerchantService;
 use App\Services\ScenicTicketService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicTicketListInput;
@@ -34,7 +34,7 @@ class ScenicTicketController extends Controller
         }
         $ticket['scenicIds'] = $ticket->scenicIds();
 
-        $provider = ScenicProviderService::getInstance()->getProviderById($ticket->provider_id);
+        $provider = ScenicMerchantService::getInstance()->getProviderById($ticket->provider_id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
         }

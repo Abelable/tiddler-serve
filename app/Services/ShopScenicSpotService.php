@@ -2,20 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\ProviderScenicSpot;
+use App\Models\ShopScenicSpot;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 
-class ProviderScenicSpotService extends BaseService
+class ShopScenicSpotService extends BaseService
 {
     public function getListTotal($userId, $status)
     {
-        return ProviderScenicSpot::query()->where('user_id', $userId)->where('status', $status)->count();
+        return ShopScenicSpot::query()->where('user_id', $userId)->where('status', $status)->count();
     }
 
     public function getUserSpotList($userId, StatusPageInput $input, $columns = ['*'])
     {
-        return ProviderScenicSpot::query()
+        return ShopScenicSpot::query()
             ->where('user_id', $userId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
@@ -24,17 +24,17 @@ class ProviderScenicSpotService extends BaseService
 
     public function getUserSpotById($userId, $id, $columns = ['*'])
     {
-        return ProviderScenicSpot::query()->where('user_id', $userId)->find($id, $columns);
+        return ShopScenicSpot::query()->where('user_id', $userId)->find($id, $columns);
     }
 
     public function getSpotByScenicId($userId, $scenicId, $columns = ['*'])
     {
-        return ProviderScenicSpot::query()->where('user_id', $userId)->where('scenic_id', $scenicId)->first($columns);
+        return ShopScenicSpot::query()->where('user_id', $userId)->where('scenic_id', $scenicId)->first($columns);
     }
 
     public function getScenicList(StatusPageInput $input, $columns = ['*'])
     {
-        $query = ProviderScenicSpot::query();
+        $query = ShopScenicSpot::query();
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
@@ -45,12 +45,12 @@ class ProviderScenicSpotService extends BaseService
 
     public function getScenicById($id, $columns = ['*'])
     {
-        return ProviderScenicSpot::query()->find($id, $columns);
+        return ShopScenicSpot::query()->find($id, $columns);
     }
 
     public function getUserScenicOptions($userId, $columns = ['*'])
     {
-        return ProviderScenicSpot::query()->where('user_id', $userId)->get($columns);
+        return ShopScenicSpot::query()->where('user_id', $userId)->get($columns);
     }
 
     public function createScenicList($userId, $providerId, array $scenicIds)
@@ -61,7 +61,7 @@ class ProviderScenicSpotService extends BaseService
                 $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '包含已添加景点，请重试');
             }
 
-            $scenic = ProviderScenicSpot::new();
+            $scenic = ShopScenicSpot::new();
             $scenic->user_id = $userId;
             $scenic->provider_id = $providerId;
             $scenic->scenic_id = $scenicId;

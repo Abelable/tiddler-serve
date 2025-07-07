@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\ScenicProvider;
-use App\Utils\Inputs\ScenicProviderInput;
-use App\Utils\Inputs\ScenicProviderListInput;
+use App\Models\ScenicMerchant;
+use App\Utils\Inputs\ScenicMerchantInput;
+use App\Utils\Inputs\ScenicMerchantListInput;
 
-class ScenicProviderService extends BaseService
+class ScenicMerchantService extends BaseService
 {
-    public function createProvider(ScenicProviderInput $input, $userId)
+    public function createProvider(ScenicMerchantInput $input, $userId)
     {
-        $provider = ScenicProvider::new();
+        $provider = ScenicMerchant::new();
         $provider->user_id = $userId;
         $provider->company_name = $input->companyName;
         $provider->business_license_photo = $input->businessLicensePhoto;
@@ -31,9 +31,9 @@ class ScenicProviderService extends BaseService
 
         return $provider;
     }
-    public function getProviderList(ScenicProviderListInput $input, $columns = ['*'])
+    public function getProviderList(ScenicMerchantListInput $input, $columns = ['*'])
     {
-        $query = ScenicProvider::query();
+        $query = ScenicMerchant::query();
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
@@ -48,17 +48,17 @@ class ScenicProviderService extends BaseService
 
     public function getProviderByUserId($userId, $columns = ['*'])
     {
-        return ScenicProvider::query()->where('user_id', $userId)->first($columns);
+        return ScenicMerchant::query()->where('user_id', $userId)->first($columns);
     }
 
     public function getProviderById($id, $columns = ['*'])
     {
-        return ScenicProvider::query()->find($id, $columns);
+        return ScenicMerchant::query()->find($id, $columns);
     }
 
     public function getProviderListByIds(array $ids, $columns = ['*'])
     {
-        return ScenicProvider::query()->whereIn('id', $ids)->get($columns);
+        return ScenicMerchant::query()->whereIn('id', $ids)->get($columns);
     }
 
     public function paySuccess(int $providerId)

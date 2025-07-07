@@ -63,18 +63,18 @@ Route::prefix('keyword')->group(function () {
     Route::get('hot_list', 'KeywordController@hotList');
 });
 
+Route::prefix('merchant')->group(function () {
+    Route::post('settle_in', 'MerchantController@addMerchant');
+    Route::get('status', 'MerchantController@merchantStatusInfo');
+    Route::get('info', 'MerchantController@merchantInfo');
+    Route::post('pay_deposit', 'MerchantController@payDeposit');
+    Route::post('delete', 'MerchantController@deleteMerchant');
+});
+
 Route::prefix('shop')->group(function () {
+    Route::get('category_options', 'ShopController@categoryOptions');
     Route::get('info', 'ShopController@shopInfo');
     Route::post('update_info', 'ShopController@updateShopInfo');
-    Route::get('category_options', 'ShopController@categoryOptions');
-
-    Route::prefix('merchant')->group(function () {
-        Route::post('settle_in', 'ShopController@addMerchant');
-        Route::get('status', 'ShopController@merchantStatusInfo');
-        Route::get('info', 'ShopController@merchantInfo');
-        Route::post('pay_deposit', 'ShopController@payDeposit');
-        Route::post('delete', 'ShopController@deleteMerchant');
-    });
 
     Route::prefix('manager')->group(function () {
         Route::get('list', 'ShopManagerController@list');

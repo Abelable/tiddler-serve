@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class ScenicProviderInput extends BaseInput
+class ScenicMerchantInput extends BaseInput
 {
     public $companyName;
     public $regionDesc;

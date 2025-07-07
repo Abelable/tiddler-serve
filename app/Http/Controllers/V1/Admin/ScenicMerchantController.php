@@ -3,29 +3,29 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProviderScenicSpot;
+use App\Models\ShopScenicSpot;
 use App\Models\ScenicProvider;
 use App\Models\ScenicProviderOrder;
 use App\Models\ScenicSpot;
-use App\Services\ProviderScenicSpotService;
+use App\Services\ShopScenicSpotService;
 use App\Services\ScenicProviderOrderService;
-use App\Services\ScenicProviderService;
+use App\Services\ScenicMerchantService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\ScenicProviderListInput;
+use App\Utils\Inputs\ScenicMerchantListInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 
-class ScenicProviderController extends Controller
+class ScenicMerchantController extends Controller
 {
     protected $guard = 'Admin';
 
     public function list()
     {
-        $input = ScenicProviderListInput::new();
+        $input = ScenicMerchantListInput::new();
         $columns = ['id', 'status', 'failure_reason', 'company_name', 'name', 'mobile', 'created_at', 'updated_at'];
-        $page = ScenicProviderService::getInstance()->getProviderList($input, $columns);
+        $page = ScenicMerchantService::getInstance()->getProviderList($input, $columns);
         $providerList = collect($page->items());
         $providerIds = $providerList->pluck('id')->toArray();
         $providerOrderList = ScenicProviderOrderService::getInstance()->getOrderListByProviderIds($providerIds)->keyBy('provider_id');
@@ -47,7 +47,7 @@ class ScenicProviderController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        $provider = ScenicMerchantService::getInstance()->getProviderById($id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
@@ -58,7 +58,7 @@ class ScenicProviderController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        $provider = ScenicMerchantService::getInstance()->getProviderById($id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
@@ -79,7 +79,7 @@ class ScenicProviderController extends Controller
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
 
-        $provider = ScenicProviderService::getInstance()->getProviderById($id);
+        $provider = ScenicMerchantService::getInstance()->getProviderById($id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
@@ -99,7 +99,7 @@ class ScenicProviderController extends Controller
         $page = ScenicProviderOrderService::getInstance()->getOrderList($input, $columns);
         $orderList = collect($page->items());
         $providerIds = $orderList->pluck('provider_id')->toArray();
-        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name'])->keyBy('id');
+        $providerList = ScenicMerchantService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name'])->keyBy('id');
         $list = $orderList->map(function (ScenicProviderOrder $order) use ($providerList) {
             /** @var ScenicProvider $provider */
             $provider = $providerList->get($order->provider_id);
@@ -114,16 +114,16 @@ class ScenicProviderController extends Controller
     {
         /** @var StatusPageInput  $input */
         $input = StatusPageInput::new();
-        $page = ProviderScenicSpotService::getInstance()->getScenicList($input, ['id', 'scenic_id', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ShopScenicSpotService::getInstance()->getScenicList($input, ['id', 'scenic_id', 'provider_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicList = collect($page->items());
 
         $providerIds = $providerScenicList->pluck('provider_id')->toArray();
-        $providerList = ScenicProviderService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name', 'business_license_photo'])->keyBy('id');
+        $providerList = ScenicMerchantService::getInstance()->getProviderListByIds($providerIds, ['id', 'company_name', 'business_license_photo'])->keyBy('id');
 
         $scenicIds = $providerScenicList->pluck('scenic_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
 
-        $list = $providerScenicList->map(function (ProviderScenicSpot $providerScenic) use ($scenicList, $providerList) {
+        $list = $providerScenicList->map(function (ShopScenicSpot $providerScenic) use ($scenicList, $providerList) {
             /** @var ScenicProvider $provider */
             $provider = $providerList->get($providerScenic->provider_id);
             $providerScenic['provider_company_name'] = $provider->company_name;
@@ -143,7 +143,7 @@ class ScenicProviderController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        $scenic = ShopScenicSpotService::getInstance()->getScenicById($id);
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
         }
@@ -158,7 +158,7 @@ class ScenicProviderController extends Controller
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
 
-        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        $scenic = ShopScenicSpotService::getInstance()->getScenicById($id);
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
         }
@@ -173,7 +173,7 @@ class ScenicProviderController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $scenic = ProviderScenicSpotService::getInstance()->getScenicById($id);
+        $scenic = ShopScenicSpotService::getInstance()->getScenicById($id);
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商景区不存在');
         }

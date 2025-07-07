@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProviderScenicSpotsTable extends Migration
+class CreateShopScenicSpotsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateProviderScenicSpotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('provider_scenic_spots', function (Blueprint $table) {
+        Schema::create('shop_scenic_spots', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('用户id');
-            $table->integer('provider_id')->comment('供应商id');
+            $table->integer('shop_id')->comment('店铺id');
             $table->integer('scenic_id')->comment('景点id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
@@ -32,6 +32,6 @@ class CreateProviderScenicSpotsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('provider_scenic_spots');
+        Schema::dropIfExists('shop_scenic_spots');
     }
 }

@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Models\ScenicShop;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
-use App\Utils\Inputs\ScenicProviderInput;
+use App\Utils\Inputs\ScenicMerchantInput;
 
 class ScenicShopService extends BaseService
 {
-    public function createShop(int $userId, int $providerId, ScenicProviderInput $input)
+    public function createShop(int $userId, int $providerId, ScenicMerchantInput $input)
     {
         $shop = ScenicShop::new();
         $shop->user_id = $userId;
@@ -55,11 +56,14 @@ class ScenicShopService extends BaseService
         return ScenicShop::query()->where('user_id', $userId)->first($columns);
     }
 
-    public function paySuccess(int $providerId)
+    public function paySuccess(int $shopId)
     {
-        $shop = $this->getShopByProviderId($providerId);
+        $shop = $this->getShopById($shopId);
         if (is_null($shop)) {
             $this->throwBadArgumentValue();
+        }
+        if ($shop->status != 0) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
         }
         $shop->status = 1;
         $shop->save();

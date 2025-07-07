@@ -17,7 +17,7 @@ class AccountChangeLogService extends BaseService
 
     public function createLog($accountId, $oldBalance, $newBalance, $changeType, $changeAmount, $referenceId = '', $productType = 0)
     {
-        $log = new AccountChangeLog();
+        $log = AccountChangeLog::new();
         $log->account_id = $accountId;
         $log->old_balance = $oldBalance;
         $log->new_balance = $newBalance;

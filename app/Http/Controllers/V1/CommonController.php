@@ -11,12 +11,14 @@ use App\Services\HotelProviderService;
 use App\Services\HotelShopService;
 use App\Services\MealTicketOrderService;
 use App\Services\MerchantService;
+use App\Services\ScenicShopDepositPaymentLogService;
+use App\Services\ScenicShopDepositService;
 use App\Services\ShopDepositPaymentLogService;
 use App\Services\OrderService;
 use App\Services\RestaurantService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicProviderOrderService;
-use App\Services\ScenicProviderService;
+use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopService;
 use App\Services\SetMealOrderService;
 use App\Services\ShopDepositService;
@@ -91,12 +93,13 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'scenic_provider_order_sn') !== false) {
-            Log::info('scenic_provider_wx_pay_notify', $data);
+        if (strpos($data['attach'], 'scenic_shop_id') !== false) {
+            Log::info('scenic_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $order = ScenicProviderOrderService::getInstance()->wxPaySuccess($data);
-                ScenicProviderService::getInstance()->paySuccess($order->provider_id);
-                ScenicShopService::getInstance()->paySuccess($order->provider_id);
+                $log = ScenicShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                MerchantService::getInstance()->paySuccess($log->provider_id);
+                ScenicShopService::getInstance()->paySuccess($log->shop_id);
+                ScenicShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
             });
         }
 

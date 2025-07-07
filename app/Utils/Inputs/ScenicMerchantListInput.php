@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class ScenicProviderListInput extends PageInput
+class ScenicMerchantListInput extends PageInput
 {
     public $status;
     public $name;

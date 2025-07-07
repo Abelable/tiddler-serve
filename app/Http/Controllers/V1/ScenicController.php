@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
 use App\Services\KeywordService;
 use App\Services\ProductHistoryService;
-use App\Services\ProviderScenicSpotService;
+use App\Services\ShopScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
@@ -141,7 +141,7 @@ class ScenicController extends Controller
         /** @var ScenicInput $input */
         $input = ScenicInput::new();
 
-        $providerScenicSpot = ProviderScenicSpotService::getInstance()->getSpotByScenicId($this->userId(), $id);
+        $providerScenicSpot = ShopScenicSpotService::getInstance()->getSpotByScenicId($this->userId(), $id);
         if (is_null($providerScenicSpot)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无该景点编辑权限');
         }
@@ -154,7 +154,7 @@ class ScenicController extends Controller
 
     public function providerOptions()
     {
-        $providerScenicIds = ProviderScenicSpotService::getInstance()
+        $providerScenicIds = ShopScenicSpotService::getInstance()
             ->getUserScenicOptions($this->userId())
             ->pluck('scenic_id')
             ->toArray();

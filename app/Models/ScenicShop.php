@@ -8,9 +8,10 @@ namespace App\Models;
  * @property int $id
  * @property int $status 状态：0-未支付保证金，1-已支付保证金
  * @property int $user_id 用户id
- * @property int $provider_id 服务商id
+ * @property int $merchant_id 商家id
  * @property string $name 店铺名称
  * @property int $type 店铺类型：1-景区官方，2-旅行社，3-平台自营
+ * @property float $deposit 店铺保证金
  * @property string $cover 店铺封面图片
  * @property string $logo 店铺logo
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -23,10 +24,11 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereDeposit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereLogo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereMerchantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereUpdatedAt($value)

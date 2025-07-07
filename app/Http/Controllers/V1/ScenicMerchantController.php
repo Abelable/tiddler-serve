@@ -3,34 +3,40 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProviderScenicSpot;
+use App\Models\ShopScenicSpot;
 use App\Models\ScenicSpot;
-use App\Services\ProviderScenicSpotService;
+use App\Services\ShopScenicSpotService;
 use App\Services\ScenicProviderOrderService;
-use App\Services\ScenicProviderService;
+use App\Services\ScenicMerchantService;
 use App\Services\ScenicService;
+use App\Services\ScenicShopDepositPaymentLogService;
+use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicProviderInput;
+use App\Utils\Inputs\ScenicMerchantInput;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
 
-class ScenicProviderController extends Controller
+class ScenicMerchantController extends Controller
 {
     public function settleIn()
     {
-        /** @var ScenicProviderInput $input */
-        $input = ScenicProviderInput::new();
+        /** @var ScenicMerchantInput $input */
+        $input = ScenicMerchantInput::new();
 
-        $provider = ScenicProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = ScenicMerchantService::getInstance()->getProviderByUserId($this->userId());
         if (!is_null($provider)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '您已提交申请，请勿重复操作');
         }
 
         DB::transaction(function () use ($input) {
-            $provider = ScenicProviderService::getInstance()->createProvider($input, $this->userId());
-            ScenicShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
+            $provider = ScenicMerchantService::getInstance()->createProvider($input, $this->userId());
+            $shop = ScenicShopService::getInstance()->createShop($this->userId(), $provider->id, $input);
+            // todo 暂时设置保证金金额为10000
+            ScenicShopDepositPaymentLogService::getInstance()
+                ->createLog($this->userId(), $provider->id, $shop->id, 10000);
+            ScenicShopDepositService::getInstance()->createShopDeposit($shop->id);
         });
 
         return $this->success();
@@ -38,7 +44,7 @@ class ScenicProviderController extends Controller
 
     public function statusInfo()
     {
-        $provider = ScenicProviderService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
+        $provider = ScenicMerchantService::getInstance()->getProviderByUserId($this->userId(), ['id', 'status', 'failure_reason']);
         $providerOrder = ScenicProviderOrderService::getInstance()->getOrderByUserId($this->userId(), ['id']);
 
         return $this->success($provider ? [
@@ -59,7 +65,7 @@ class ScenicProviderController extends Controller
 
     public function deleteProvider()
     {
-        $provider = ScenicProviderService::getInstance()->getProviderByUserId($this->userId());
+        $provider = ScenicMerchantService::getInstance()->getProviderByUserId($this->userId());
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景区服务商信息不存在');
         }
@@ -80,9 +86,9 @@ class ScenicProviderController extends Controller
     public function scenicListTotals()
     {
         return $this->success([
-            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 1),
-            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 0),
-            ProviderScenicSpotService::getInstance()->getListTotal($this->userId(), 2),
+            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 1),
+            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 0),
+            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 2),
         ]);
     }
 
@@ -91,11 +97,11 @@ class ScenicProviderController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
 
-        $page = ProviderScenicSpotService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ShopScenicSpotService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicSpotList = collect($page->items());
         $scenicIds = $providerScenicSpotList->pluck('scenic_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
-        $list = $providerScenicSpotList->map(function (ProviderScenicSpot $providerScenicSpot) use ($scenicList) {
+        $list = $providerScenicSpotList->map(function (ShopScenicSpot $providerScenicSpot) use ($scenicList) {
             /** @var ScenicSpot $scenic */
             $scenic = $scenicList->get($providerScenicSpot->scenic_id);
             $providerScenicSpot['scenic_image'] = json_decode($scenic->image_list)[0];
@@ -111,18 +117,18 @@ class ScenicProviderController extends Controller
     public function applyScenicSpot()
     {
         $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
-        $scenicProvider = $this->user()->scenicProvider;
-        if (is_null($scenicProvider)) {
+        $scenicMerchant = $this->user()->scenicMerchant;
+        if (is_null($scenicMerchant)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加景点');
         }
-        ProviderScenicSpotService::getInstance()->createScenicList($this->userId(), $scenicProvider->id, $scenicIds);
+        ShopScenicSpotService::getInstance()->createScenicList($this->userId(), $scenicMerchant->id, $scenicIds);
         return $this->success();
     }
 
-    public function deleteProviderScenicSpot()
+    public function deleteShopScenicSpot()
     {
         $id = $this->verifyRequiredId('id');
-        $spot = ProviderScenicSpotService::getInstance()->getUserSpotById($this->userId(), $id);
+        $spot = ShopScenicSpotService::getInstance()->getUserSpotById($this->userId(), $id);
         if (is_null($spot)) {
             return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
         }
@@ -132,7 +138,7 @@ class ScenicProviderController extends Controller
 
     public function providerScenicOptions()
     {
-        $scenicIds = ProviderScenicSpotService::getInstance()->getUserScenicOptions($this->userId())->pluck('scenic_id')->toArray();
+        $scenicIds = ShopScenicSpotService::getInstance()->getUserScenicOptions($this->userId())->pluck('scenic_id')->toArray();
         $scenicOptions = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name']);
         return $this->success($scenicOptions);
     }
