@@ -97,7 +97,7 @@ class CommonController extends Controller
             Log::info('scenic_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 $log = ScenicShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                MerchantService::getInstance()->paySuccess($log->provider_id);
+                ScenicMerchantService::getInstance()->paySuccess($log->merchant_id);
                 ScenicShopService::getInstance()->paySuccess($log->shop_id);
                 ScenicShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
             });

@@ -60,11 +60,11 @@ class ScenicTicketService extends BaseService
         return ScenicTicket::query()->where('user_id', $userId)->find($id, $columns);
     }
 
-    public function createTicket($userId, $providerId, $shopId, ScenicTicketInput $input)
+    public function createTicket($userId, $merchantId, $shopId, ScenicTicketInput $input)
     {
         $ticket = ScenicTicket::new();
         $ticket->user_id = $userId;
-        $ticket->provider_id = $providerId;
+        $ticket->merchant_id = $merchantId;
         $ticket->shop_id = $shopId;
 
         return $this->updateTicket($ticket, $input);

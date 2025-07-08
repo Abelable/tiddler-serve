@@ -34,12 +34,12 @@ class ScenicTicketController extends Controller
         }
         $ticket['scenicIds'] = $ticket->scenicIds();
 
-        $provider = ScenicMerchantService::getInstance()->getProviderById($ticket->provider_id);
-        if (is_null($provider)) {
+        $merchant = ScenicMerchantService::getInstance()->getMerchantById($ticket->merchant_id);
+        if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
         }
 
-        $ticket['provider_info'] = $provider;
+        $ticket['merchant_info'] = $merchant;
 
         return $this->success($ticket);
     }

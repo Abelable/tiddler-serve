@@ -27,6 +27,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\ScenicShopDepositPaymentLog|null $depositInfo
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicMerchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicMerchant newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicMerchant onlyTrashed()
@@ -59,4 +60,10 @@ namespace App\Models;
  */
 class ScenicMerchant extends BaseModel
 {
+    public function depositInfo()
+    {
+        return $this
+            ->hasOne(ScenicShopDepositPaymentLog::class, 'merchant_id')
+            ->where('status', 1);
+    }
 }

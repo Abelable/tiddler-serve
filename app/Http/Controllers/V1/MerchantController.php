@@ -40,7 +40,7 @@ class MerchantController extends Controller
         return $this->success();
     }
 
-    public function merchantStatusInfo()
+    public function status()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
@@ -55,7 +55,7 @@ class MerchantController extends Controller
         ] : null);
     }
 
-    public function merchantInfo()
+    public function info()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (is_null($merchant)) {
@@ -63,16 +63,16 @@ class MerchantController extends Controller
         }
 
         $shop = ShopService::getInstance()->getShopByUserId($this->userId());
-        $merchant['shopCover'] = $shop->cover;
-        $merchant['shopLogo'] = $shop->logo;
-        $merchant['shopName'] = $shop->name;
         $merchant['shopCategoryIds'] = array_map('intval', json_decode($shop->category_ids));
         $merchant['deposit'] = $shop->deposit;
+        $merchant['shopBg'] = $shop->bg;
+        $merchant['shopLogo'] = $shop->logo;
+        $merchant['shopName'] = $shop->name;
 
         return $this->success($merchant);
     }
 
-    public function deleteMerchant()
+    public function delete()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (is_null($merchant)) {

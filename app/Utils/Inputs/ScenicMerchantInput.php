@@ -19,11 +19,11 @@ class ScenicMerchantInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
+    public $shopType;
+    public $deposit;
+    public $shopBg;
     public $shopLogo;
     public $shopName;
-    public $shopType;
-    public $shopCover;
-
     public function rules()
     {
         return [
@@ -42,10 +42,11 @@ class ScenicMerchantInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
+            'shopType' => 'required|integer|in:1,2,3',
+            'deposit' => 'required|numeric',
+            'shopBg' => 'string',
             'shopLogo' => 'required|string',
             'shopName' => 'required|string',
-            'shopType' => 'required|integer|in:1,2,3',
-            'shopCover' => 'string',
         ];
     }
 }

@@ -17,7 +17,7 @@ class CreateScenicShopDepositPaymentLogsTable extends Migration
             $table->id();
             $table->integer('status')->default(0)->comment('状态：0-待支付，1-支付成功');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('provider_id')->comment('服务商id');
+            $table->integer('merchant_id')->comment('商家id');
             $table->integer('shop_id')->comment('店铺id');
             $table->float('payment_amount')->comment('支付金额');
             $table->string('pay_id')->default('')->comment('微信支付id');

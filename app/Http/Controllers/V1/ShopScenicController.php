@@ -14,10 +14,12 @@ class ShopScenicController extends Controller
 {
     public function listTotals()
     {
+        $shopId = $this->verifyRequiredId('shopId');
+
         return $this->success([
-            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 1),
-            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 0),
-            ShopScenicSpotService::getInstance()->getListTotal($this->userId(), 2),
+            ShopScenicSpotService::getInstance()->getListTotal($shopId, 1),
+            ShopScenicSpotService::getInstance()->getListTotal($shopId, 0),
+            ShopScenicSpotService::getInstance()->getListTotal($shopId, 2),
         ]);
     }
 
@@ -25,8 +27,9 @@ class ShopScenicController extends Controller
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $page = ShopScenicSpotService::getInstance()->getUserSpotList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ShopScenicSpotService::getInstance()->getScenicList($this->userId(), $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $providerScenicSpotList = collect($page->items());
         $scenicIds = $providerScenicSpotList->pluck('scenic_id')->toArray();
         $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list', 'level', 'address'])->keyBy('id');
@@ -57,7 +60,7 @@ class ShopScenicController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
-        $spot = ShopScenicSpotService::getInstance()->getUserSpotById($this->userId(), $id);
+        $spot = ShopScenicSpotService::getInstance()->getShopScenicById($this->userId(), $id);
         if (is_null($spot)) {
             return $this->fail(CodeResponse::NOT_FOUND, '供应商景点不存在');
         }

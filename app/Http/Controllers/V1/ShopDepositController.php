@@ -8,9 +8,19 @@ use App\Services\ShopDepositService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
+use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopDepositController extends Controller
 {
+    public function payDeposit()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $wxPayOrder = ShopService::getInstance()
+            ->createWxPayOrder($shopId, $this->userId(), $this->user()->openid);
+        $payParams = Pay::wechat()->miniapp($wxPayOrder);
+        return $this->success($payParams);
+    }
+
     public function depositInfo()
     {
         $shopId = $this->verifyRequiredId('shopId');

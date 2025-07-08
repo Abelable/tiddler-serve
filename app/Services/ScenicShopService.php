@@ -6,20 +6,31 @@ use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\ScenicMerchantInput;
+use App\Utils\Inputs\ScenicShopInput;
 
 class ScenicShopService extends BaseService
 {
-    public function createShop(int $userId, int $providerId, ScenicMerchantInput $input)
+    public function createShop(int $userId, int $merchantId, ScenicMerchantInput $input)
     {
         $shop = ScenicShop::new();
         $shop->user_id = $userId;
-        $shop->provider_id = $providerId;
+        $shop->merchant_id = $merchantId;
         $shop->type = $input->shopType;
+        $shop->deposit = $input->deposit;
         $shop->logo = $input->shopLogo;
         $shop->name = $input->shopName;
-        if (!empty($input->shopCover)) {
-            $shop->cover = $input->shopCover;
+        if (!empty($input->shopBg)) {
+            $shop->bg = $input->shopBg;
         }
+        $shop->save();
+        return $shop;
+    }
+
+    public function updateShopInfo(ScenicShop $shop, ScenicShopInput $input)
+    {
+        $shop->bg = $input->bg ?? '';
+        $shop->logo = $input->logo;
+        $shop->name = $input->name;
         $shop->save();
         return $shop;
     }
@@ -41,9 +52,9 @@ class ScenicShopService extends BaseService
         return ScenicShop::query()->find($id, $columns);
     }
 
-    public function getShopByProviderId(int $providerId, $columns = ['*'])
+    public function getShopByMerchantId(int $merchantId, $columns = ['*'])
     {
-        return ScenicShop::query()->where('provider_id', $providerId)->first($columns);
+        return ScenicShop::query()->where('merchant_id', $merchantId)->first($columns);
     }
 
     public function getShopListByIds(array $ids, $columns = ['*'])

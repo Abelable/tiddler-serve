@@ -49,14 +49,6 @@ class ShopDepositPaymentLogService extends BaseService
         return ShopDepositPaymentLog::query()->where('shop_id', $shopId)->first($columns);
     }
 
-    public function getLogByMerchantId($merchantId, $columns = ['*'])
-    {
-        return ShopDepositPaymentLog::query()
-            ->where('merchant_id', $merchantId)
-            ->where('status', 1)
-            ->first($columns);
-    }
-
     public function getLogPage(PageInput $input, $columns = ['*'])
     {
         return ShopDepositPaymentLog::query()

@@ -64,11 +64,10 @@ Route::prefix('keyword')->group(function () {
 });
 
 Route::prefix('merchant')->group(function () {
-    Route::post('settle_in', 'MerchantController@addMerchant');
-    Route::get('status', 'MerchantController@merchantStatusInfo');
-    Route::get('info', 'MerchantController@merchantInfo');
-    Route::post('pay_deposit', 'MerchantController@payDeposit');
-    Route::post('delete', 'MerchantController@deleteMerchant');
+    Route::post('settle_in', 'MerchantController@settleIn');
+    Route::get('status', 'MerchantController@status');
+    Route::get('info', 'MerchantController@info');
+    Route::post('delete', 'MerchantController@delete');
 });
 
 Route::prefix('shop')->group(function () {
@@ -85,6 +84,7 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('deposit')->group(function () {
+        Route::post('pay_deposit', 'ShopDepositController@payDeposit');
         Route::get('info', 'ShopDepositController@depositInfo');
         Route::get('log_list', 'ShopDepositController@changeLogList');
     });
@@ -246,12 +246,14 @@ Route::prefix('scenic')->group(function () {
         Route::post('delete', 'ScenicEvaluationController@delete');
     });
 
-    Route::prefix('provider')->group(function () {
-        Route::post('settle_in', 'ScenicProviderController@settleIn');
-        Route::get('status', 'ScenicProviderController@statusInfo');
-        Route::post('pay_deposit', 'ScenicProviderController@payDeposit');
-        Route::post('delete', 'ScenicProviderController@deleteProvider');
+    Route::prefix('merchant')->group(function () {
+        Route::post('settle_in', 'ScenicMerchantController@settleIn');
+        Route::get('status', 'ScenicMerchantController@status');
+        Route::post('pay_deposit', 'ScenicMerchantController@payDeposit');
+        Route::post('delete', 'ScenicMerchantController@delete');
+    });
 
+    Route::prefix('provider')->group(function () {
         Route::prefix('scenic')->group(function () {
             Route::get('totals', 'ProviderScenicController@listTotals');
             Route::get('list', 'ProviderScenicController@list');
@@ -273,7 +275,7 @@ Route::prefix('scenic')->group(function () {
     });
 
     Route::prefix('shop')->group(function () {
-        Route::get('my_shop_info', 'ScenicProviderController@myShopInfo');
+        Route::get('my_shop_info', 'ScenicMerchantController@myShopInfo');
     });
 
     Route::prefix('ticket')->group(function () {
@@ -820,17 +822,17 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'ScenicController@options');
 
         Route::prefix('provider')->group(function () {
-            Route::post('list', 'ScenicProviderController@list');
-            Route::get('detail', 'ScenicProviderController@detail');
-            Route::post('approved', 'ScenicProviderController@approved');
-            Route::post('reject', 'ScenicProviderController@reject');
-            Route::post('order_list', 'ScenicProviderController@orderList');
+            Route::post('list', 'ScenicMerchantController@list');
+            Route::get('detail', 'ScenicMerchantController@detail');
+            Route::post('approved', 'ScenicMerchantController@approved');
+            Route::post('reject', 'ScenicMerchantController@reject');
+            Route::post('order_list', 'ScenicMerchantController@orderList');
 
             Route::prefix('scenic')->group(function () {
-                Route::post('list', 'ScenicProviderController@providerScenicList');
-                Route::post('approved', 'ScenicProviderController@approvedScenicApply');
-                Route::post('reject', 'ScenicProviderController@rejectScenicApply');
-                Route::post('delete', 'ScenicProviderController@deleteScenicApply');
+                Route::post('list', 'ScenicMerchantController@providerScenicList');
+                Route::post('approved', 'ScenicMerchantController@approvedScenicApply');
+                Route::post('reject', 'ScenicMerchantController@rejectScenicApply');
+                Route::post('delete', 'ScenicMerchantController@deleteScenicApply');
             });
         });
 

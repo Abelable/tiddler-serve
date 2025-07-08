@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $user_id 用户id
- * @property int $provider_id 供应商id
+ * @property int $merchant_id 商家id
  * @property int $shop_id 店铺id
  * @property int $type 门票类型：1-单景点门票，2-多景点联票
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
@@ -64,12 +64,12 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereInvoiceTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereLimitNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereMarketPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereMerchantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereNeedExchange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePromotionCommissionUpperLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereRefundTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereReminderTips($value)

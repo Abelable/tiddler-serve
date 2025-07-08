@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Log;
 
 class ScenicShopDepositPaymentLogService extends BaseService
 {
-    public function createLog(int $userId, int $providerId, int $shopId, float $paymentAmount)
+    public function createLog(int $userId, int $merchantId, int $shopId, float $paymentAmount)
     {
         $log = ScenicShopDepositPaymentLog::new();
         $log->user_id = $userId;
-        $log->provider_id = $providerId;
+        $log->merchant_id = $merchantId;
         $log->shop_id = $shopId;
         $log->payment_amount = $paymentAmount;
         $log->save();
@@ -47,14 +47,6 @@ class ScenicShopDepositPaymentLogService extends BaseService
     public function getLogByShopId($shopId, $columns = ['*'])
     {
         return ScenicShopDepositPaymentLog::query()->where('shop_id', $shopId)->first($columns);
-    }
-
-    public function getLogByProviderId($providerId, $columns = ['*'])
-    {
-        return ScenicShopDepositPaymentLog::query()
-            ->where('provider_id', $providerId)
-            ->where('status', 1)
-            ->first($columns);
     }
 
     public function getLogPage(PageInput $input, $columns = ['*'])
