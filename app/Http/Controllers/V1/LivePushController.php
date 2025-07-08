@@ -181,7 +181,7 @@ class LivePushController extends Controller
 
             // todo 改为参数传入shopId
             $goodsList = GoodsService::getInstance()
-                ->getLiveUnlistedGoodsList($this->user()->shopIds()[0], $goodsIds, $columns);
+                ->getLiveUnlistedGoodsList($this->user()->shop->id, $goodsIds, $columns);
         }
 
         return $this->success($goodsList);

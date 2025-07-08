@@ -37,8 +37,7 @@ use Illuminate\Notifications\Notifiable;
  * @property-read \App\Models\Promoter|null $promoterInfo
  * @property-read \App\Models\ScenicMerchant|null $scenicMerchant
  * @property-read \App\Models\ScenicShop|null $scenicShop
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Shop[] $shopInfoList
- * @property-read int|null $shop_info_list_count
+ * @property-read \App\Models\Shop|null $shop
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ShopManager[] $shopManagerList
  * @property-read int|null $shop_manager_list_count
  * @method static \Database\Factories\UserFactory factory(...$parameters)
@@ -136,14 +135,9 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
     }
 
-    public function shopIds()
+    public function shop()
     {
-        return $this->shopInfoList()->pluck('id')->toArray();
-    }
-
-    public function shopInfoList()
-    {
-        return $this->hasMany(Shop::class, 'user_id')->where('status', 1);
+        return $this->hasOne(Shop::class, 'user_id')->where('status', 1);
     }
 
     public function shopManagerList()

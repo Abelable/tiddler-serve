@@ -326,7 +326,7 @@ class GoodsController extends Controller
         $input = GoodsInput::new();
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if (!in_array($shopId, $this->user()->shopIds()) && !in_array($this->userId(), $shopManagerIds)) {
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限上传商品');
         }
 
@@ -347,7 +347,7 @@ class GoodsController extends Controller
         $input = GoodsInput::new();
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if (!in_array($shopId, $this->user()->shopIds()) && !in_array($this->userId(), $shopManagerIds)) {
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
@@ -374,7 +374,7 @@ class GoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if (!in_array($shopId, $this->user()->shopIds()) && !in_array($this->userId(), $shopManagerIds)) {
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法上架商品');
         }
 
@@ -397,7 +397,7 @@ class GoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if (!in_array($shopId, $this->user()->shopIds()) && !in_array($this->userId(), $shopManagerIds)) {
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法下架商品');
         }
 
@@ -420,7 +420,7 @@ class GoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if (!in_array($shopId, $this->user()->shopIds()) && !in_array($this->userId(), $shopManagerIds)) {
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法删除商品');
         }
 
