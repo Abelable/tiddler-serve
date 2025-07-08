@@ -77,7 +77,7 @@ Route::prefix('shop')->group(function () {
     Route::post('update_info', 'ShopController@updateShopInfo');
 
     Route::prefix('deposit')->group(function () {
-        Route::post('pay_deposit', 'ShopDepositController@payDeposit');
+        Route::post('pay_params', 'ShopDepositController@payParams');
         Route::get('info', 'ShopDepositController@depositInfo');
         Route::get('log_list', 'ShopDepositController@changeLogList');
     });
@@ -257,7 +257,7 @@ Route::prefix('scenic')->group(function () {
         Route::post('update_info', 'ScenicShopController@updateShopInfo');
 
         Route::prefix('deposit')->group(function () {
-            Route::post('pay_deposit', 'ScenicShopDepositController@payDeposit');
+            Route::post('pay_params', 'ScenicShopDepositController@payParams');
             Route::get('info', 'ScenicShopDepositController@depositInfo');
             Route::get('log_list', 'ScenicShopDepositController@changeLogList');
         });

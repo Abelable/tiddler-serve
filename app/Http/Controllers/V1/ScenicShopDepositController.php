@@ -12,7 +12,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class ScenicShopDepositController extends Controller
 {
-    public function payDeposit()
+    public function payParams()
     {
         $shopId = $this->verifyRequiredId('shopId');
         $wxPayOrder = ScenicShopService::getInstance()

@@ -12,7 +12,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopDepositController extends Controller
 {
-    public function payDeposit()
+    public function payParams()
     {
         $shopId = $this->verifyRequiredId('shopId');
         $wxPayOrder = ShopService::getInstance()
