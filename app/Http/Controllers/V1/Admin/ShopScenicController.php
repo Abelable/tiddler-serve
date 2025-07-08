@@ -46,7 +46,7 @@ class ShopScenicController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function approvedScenicApply()
+    public function approveScenicApply()
     {
         $id = $this->verifyRequiredId('id');
 

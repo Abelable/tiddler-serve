@@ -54,7 +54,7 @@ class HotelProviderController extends Controller
         return $this->success($provider);
     }
 
-    public function approved()
+    public function approve()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -139,7 +139,7 @@ class HotelProviderController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function approvedHotelApply()
+    public function approveHotelApply()
     {
         $id = $this->verifyRequiredId('id');
 

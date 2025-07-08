@@ -36,7 +36,7 @@ class ScenicMerchantController extends Controller
         return $this->success($merchant);
     }
 
-    public function approved()
+    public function approve()
     {
         $id = $this->verifyRequiredId('id');
 

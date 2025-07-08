@@ -50,7 +50,7 @@ class CateringProviderController extends Controller
         return $this->success($provider);
     }
 
-    public function approved()
+    public function approve()
     {
         $id = $this->verifyRequiredId('id');
 

@@ -676,7 +676,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::prefix('auth_info')->group(function () {
         Route::post('list', 'AuthInfoController@list');
         Route::get('detail', 'AuthInfoController@detail');
-        Route::post('approved', 'AuthInfoController@approved');
+        Route::post('approve', 'AuthInfoController@approve');
         Route::post('reject', 'AuthInfoController@reject');
         Route::post('delete', 'AuthInfoController@delete');
     });
@@ -694,7 +694,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::prefix('merchant')->group(function () {
         Route::post('list', 'MerchantController@list');
         Route::get('detail', 'MerchantController@detail');
-        Route::post('approved', 'MerchantController@approved');
+        Route::post('approve', 'MerchantController@approve');
         Route::post('reject', 'MerchantController@reject');
         Route::get('options', 'MerchantController@options');
     });
@@ -825,16 +825,16 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'ScenicController@delete');
         Route::get('options', 'ScenicController@options');
 
-        Route::prefix('provider')->group(function () {
+        Route::prefix('merchant')->group(function () {
             Route::post('list', 'ScenicMerchantController@list');
             Route::get('detail', 'ScenicMerchantController@detail');
-            Route::post('approved', 'ScenicMerchantController@approved');
+            Route::post('approve', 'ScenicMerchantController@approve');
             Route::post('reject', 'ScenicMerchantController@reject');
             Route::post('order_list', 'ScenicMerchantController@orderList');
 
             Route::prefix('scenic')->group(function () {
                 Route::post('list', 'ScenicMerchantController@providerScenicList');
-                Route::post('approved', 'ScenicMerchantController@approvedScenicApply');
+                Route::post('approve', 'ScenicMerchantController@approveScenicApply');
                 Route::post('reject', 'ScenicMerchantController@rejectScenicApply');
                 Route::post('delete', 'ScenicMerchantController@deleteScenicApply');
             });
@@ -892,13 +892,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::prefix('provider')->group(function () {
             Route::post('list', 'HotelProviderController@list');
             Route::get('detail', 'HotelProviderController@detail');
-            Route::post('approved', 'HotelProviderController@approved');
+            Route::post('approve', 'HotelProviderController@approve');
             Route::post('reject', 'HotelProviderController@reject');
             Route::post('order_list', 'HotelProviderController@orderList');
 
             Route::prefix('hotel')->group(function () {
                 Route::post('list', 'HotelProviderController@providerHotelList');
-                Route::post('approved', 'HotelProviderController@approvedHotelApply');
+                Route::post('approve', 'HotelProviderController@approveHotelApply');
                 Route::post('reject', 'HotelProviderController@rejectHotelApply');
                 Route::post('delete', 'HotelProviderController@deleteHotelApply');
             });
@@ -930,13 +930,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::prefix('provider')->group(function () {
             Route::post('list', 'CateringProviderController@list');
             Route::get('detail', 'CateringProviderController@detail');
-            Route::post('approved', 'CateringProviderController@approved');
+            Route::post('approve', 'CateringProviderController@approve');
             Route::post('reject', 'CateringProviderController@reject');
             Route::post('order_list', 'CateringProviderController@orderList');
 
             Route::prefix('restaurant')->group(function () {
                 Route::post('list', 'ProviderRestaurantController@list');
-                Route::post('approved', 'ProviderRestaurantController@approvedApply');
+                Route::post('approve', 'ProviderRestaurantController@approveApply');
                 Route::post('reject', 'ProviderRestaurantController@rejectApply');
                 Route::post('delete', 'ProviderRestaurantController@deleteApply');
             });

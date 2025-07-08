@@ -30,7 +30,7 @@ class AuthInfoController extends Controller
         return $this->success($authInfo);
     }
 
-    public function approved()
+    public function approve()
     {
         $id = $this->verifyRequiredId('id');
 

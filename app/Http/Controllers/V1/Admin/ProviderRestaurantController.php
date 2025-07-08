@@ -44,7 +44,7 @@ class ProviderRestaurantController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function approvedApply()
+    public function approveApply()
     {
         $id = $this->verifyRequiredId('id');
         $restaurant = ProviderRestaurantService::getInstance()->getRestaurant($id);
