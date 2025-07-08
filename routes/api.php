@@ -262,6 +262,14 @@ Route::prefix('scenic')->group(function () {
             Route::get('log_list', 'ScenicShopDepositController@changeLogList');
         });
 
+        Route::prefix('manager')->group(function () {
+            Route::get('list', 'ScenicShopManagerController@list');
+            Route::get('detail', 'ScenicShopManagerController@detail');
+            Route::post('add', 'ScenicShopManagerController@add');
+            Route::post('edit', 'ScenicShopManagerController@edit');
+            Route::post('delete', 'ScenicShopManagerController@delete');
+        });
+
         Route::prefix('scenic')->group(function () {
             Route::get('totals', 'ShopScenicController@listTotals');
             Route::get('list', 'ShopScenicController@list');

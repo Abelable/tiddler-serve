@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateScenicManagersTable extends Migration
+class CreateScenicShopManagersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateScenicManagersTable extends Migration
      */
     public function up()
     {
-        Schema::create('scenic_managers', function (Blueprint $table) {
+        Schema::create('scenic_shop_managers', function (Blueprint $table) {
             $table->id();
-            $table->integer('scenic_id')->comment('景点id');
-            $table->integer('manager_id')->comment('管理员id');
+            $table->integer('shop_id')->comment('店铺id');
+            $table->integer('user_id')->comment('用户id');
+            $table->integer('role_id')->comment('管理员角色id：1-超级管理员，2-运营，3-核销员');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +30,6 @@ class CreateScenicManagersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('scenic_managers');
+        Schema::dropIfExists('scenic_shop_managers');
     }
 }

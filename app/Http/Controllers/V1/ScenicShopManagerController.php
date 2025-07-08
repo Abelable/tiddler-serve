@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicManager;
 use App\Models\ShopManager;
 use App\Models\User;
-use App\Services\ShopManagerService;
+use App\Services\ScenicManagerService;
+use App\Services\ScenicShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use Illuminate\Support\Facades\DB;
 
-class ShopManagerController extends Controller
+class ScenicShopManagerController extends Controller
 {
     public function list()
     {
         $shopId = $this->verifyRequiredId('shopId');
         $columns = ['id', 'user_id', 'role_id'];
 
-        $managerList = ShopManagerService::getInstance()->getManagerList($shopId, $columns);
+        $managerList = ScenicShopManagerService::getInstance()->getManagerList($shopId, $columns);
 
         $userIds = $managerList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
@@ -38,14 +41,17 @@ class ShopManagerController extends Controller
 
     public function detail()
     {
-        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'user_id', 'role_id'];
 
-        $manager = ShopManagerService::getInstance()->getShopManager($shopId, $id, $columns);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($id, $columns);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
+
+        $scenicIds = ScenicManagerService::getInstance()
+            ->getListByManagerId($manager->id)->pluck('scenic_id')->toArray();
+        $manager['scenicIds'] = $scenicIds;
 
         return $this->success($manager);
     }
@@ -55,8 +61,14 @@ class ShopManagerController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $userId = $this->verifyRequiredId('userId');
         $roleId = $this->verifyRequiredId('roleId');
+        $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
 
-        ShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+        DB::transaction(function () use ($shopId, $userId, $roleId, $scenicIds) {
+            $manager = ScenicShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+            foreach ($scenicIds as $scenicId) {
+                ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
+            }
+        });
 
         return $this->success();
     }
@@ -64,26 +76,31 @@ class ShopManagerController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
         $roleId = $this->verifyRequiredId('roleId');
+        $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
 
-        $manager = ShopManagerService::getInstance()->getShopManager($shopId, $id);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
 
-        ShopManagerService::getInstance()->updateManager($manager, $userId, $roleId);
+        DB::transaction(function () use ($manager, $roleId, $scenicIds) {
+            ScenicShopManagerService::getInstance()->updateManager($manager, $roleId);
+
+            ScenicManagerService::getInstance()->deleteManager($manager->id);
+            foreach ($scenicIds as $scenicId) {
+                ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
+            }
+        });
 
         return $this->success();
     }
 
     public function delete()
     {
-        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $manager = ShopManagerService::getInstance()->getShopManager($shopId, $id);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }

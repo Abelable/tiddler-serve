@@ -10,13 +10,13 @@ class ShopManagerService extends BaseService
     {
         $manager = ShopManager::new();
         $manager->shop_id = $shopId;
+        $manager->user_id = $userId;
 
         return $this->updateManager($manager, $userId, $roleId);
     }
 
-    public function updateManager($manager, $userId, $roleId)
+    public function updateManager(ShopManager $manager, $roleId)
     {
-        $manager->user_id = $userId;
         $manager->role_id = $roleId;
         $manager->save();
 

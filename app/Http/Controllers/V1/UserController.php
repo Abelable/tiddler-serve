@@ -68,6 +68,7 @@ class UserController extends Controller
         $user['shopManagerList'] = $user->shopManagerList;
 
         $user['scenicShopId'] = $user->scenicShop->id ?? 0;
+        $user['scenicShopManagerList'] = $user->scenicShopManagerList;
 
         $user['hotelProviderId'] = $user->hotelProvider->id ?? 0;
         $user['cateringProviderId'] = $user->cateringProvider->id ?? 0;
