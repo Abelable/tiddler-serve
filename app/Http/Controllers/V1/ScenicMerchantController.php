@@ -19,9 +19,6 @@ class ScenicMerchantController extends Controller
         $input = ScenicMerchantInput::new();
 
         $merchant = ScenicMerchantService::getInstance()->getMerchantByUserId($this->userId());
-        if (!is_null($merchant)) {
-            return $this->fail(CodeResponse::DATA_EXISTED, '您已提交申请，请勿重复操作');
-        }
 
         if (!is_null($merchant)) {
             if ($merchant->status == 3) {
