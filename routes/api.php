@@ -71,9 +71,16 @@ Route::prefix('merchant')->group(function () {
 });
 
 Route::prefix('shop')->group(function () {
+    Route::get('express_options', 'ShopController@expressOptions');
     Route::get('category_options', 'ShopController@categoryOptions');
     Route::get('info', 'ShopController@shopInfo');
     Route::post('update_info', 'ShopController@updateShopInfo');
+
+    Route::prefix('deposit')->group(function () {
+        Route::post('pay_deposit', 'ShopDepositController@payDeposit');
+        Route::get('info', 'ShopDepositController@depositInfo');
+        Route::get('log_list', 'ShopDepositController@changeLogList');
+    });
 
     Route::prefix('manager')->group(function () {
         Route::get('list', 'ShopManagerController@list');
@@ -82,26 +89,6 @@ Route::prefix('shop')->group(function () {
         Route::post('edit', 'ShopManagerController@edit');
         Route::post('delete', 'ShopManagerController@delete');
     });
-
-    Route::prefix('deposit')->group(function () {
-        Route::post('pay_deposit', 'ShopDepositController@payDeposit');
-        Route::get('info', 'ShopDepositController@depositInfo');
-        Route::get('log_list', 'ShopDepositController@changeLogList');
-    });
-
-    Route::prefix('income')->group(function () {
-        Route::get('data_overview', 'ShopIncomeController@dataOverview');
-        Route::get('sum', 'ShopIncomeController@sum');
-        Route::get('time_data', 'ShopIncomeController@timeData');
-        Route::post('order_list', 'ShopIncomeController@incomeOrderList');
-
-        Route::prefix('withdraw')->group(function () {
-            Route::post('submit', 'CommissionWithdrawalController@submit');
-            Route::get('record_list', 'CommissionWithdrawalController@recordList');
-        });
-    });
-
-    Route::get('express_options', 'ShopController@expressOptions');
 
     Route::prefix('freight_template')->group(function () {
         Route::get('list', 'FreightTemplateController@list');
@@ -147,6 +134,18 @@ Route::prefix('shop')->group(function () {
         Route::post('verify', 'ShopOrderController@verify');
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
         Route::post('ship', 'ShopOrderController@ship');
+    });
+
+    Route::prefix('income')->group(function () {
+        Route::get('data_overview', 'ShopIncomeController@dataOverview');
+        Route::get('sum', 'ShopIncomeController@sum');
+        Route::get('time_data', 'ShopIncomeController@timeData');
+        Route::post('order_list', 'ShopIncomeController@incomeOrderList');
+
+        Route::prefix('withdraw')->group(function () {
+            Route::post('submit', 'CommissionWithdrawalController@submit');
+            Route::get('record_list', 'CommissionWithdrawalController@recordList');
+        });
     });
 });
 
@@ -249,17 +248,26 @@ Route::prefix('scenic')->group(function () {
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'ScenicMerchantController@settleIn');
         Route::get('status', 'ScenicMerchantController@status');
-        Route::post('pay_deposit', 'ScenicMerchantController@payDeposit');
+        Route::get('info', 'ScenicMerchantController@info');
         Route::post('delete', 'ScenicMerchantController@delete');
     });
 
-    Route::prefix('provider')->group(function () {
+    Route::prefix('shop')->group(function () {
+        Route::get('info', 'ScenicShopController@shopInfo');
+        Route::post('update_info', 'ScenicShopController@updateShopInfo');
+
+        Route::prefix('deposit')->group(function () {
+            Route::post('pay_deposit', 'ScenicShopDepositController@payDeposit');
+            Route::get('info', 'ScenicShopDepositController@depositInfo');
+            Route::get('log_list', 'ScenicShopDepositController@changeLogList');
+        });
+
         Route::prefix('scenic')->group(function () {
-            Route::get('totals', 'ProviderScenicController@listTotals');
-            Route::get('list', 'ProviderScenicController@list');
-            Route::post('apply', 'ProviderScenicController@apply');
-            Route::post('delete', 'ProviderScenicController@delete');
-            Route::get('options', 'ProviderScenicController@options');
+            Route::get('totals', 'ShopScenicController@listTotals');
+            Route::get('list', 'ShopScenicController@list');
+            Route::post('apply', 'ShopScenicController@apply');
+            Route::post('delete', 'ShopScenicController@delete');
+            Route::get('options', 'ShopScenicController@options');
         });
 
         Route::prefix('ticket')->group(function () {
@@ -272,10 +280,6 @@ Route::prefix('scenic')->group(function () {
             Route::post('down', 'ScenicTicketController@down');
             Route::post('delete', 'ScenicTicketController@delete');
         });
-    });
-
-    Route::prefix('shop')->group(function () {
-        Route::get('my_shop_info', 'ScenicMerchantController@myShopInfo');
     });
 
     Route::prefix('ticket')->group(function () {

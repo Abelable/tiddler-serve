@@ -62,9 +62,34 @@ class ScenicShopService extends BaseService
         return ScenicShop::query()->whereIn('id', $ids)->get($columns);
     }
 
+    public function getUserShopByShopId($userId, $shopId, $columns = ['*'])
+    {
+        return ScenicShop::query()->where('user_id', $userId)->find($shopId, $columns);
+    }
+
+
     public function getShopByUserId(int $userId, $columns = ['*'])
     {
         return ScenicShop::query()->where('user_id', $userId)->first($columns);
+    }
+
+    public function createWxPayOrder($shopId, $userId, string $openid)
+    {
+        $shop = $this->getUserShopByShopId($userId, $shopId);
+        if (is_null($shop)) {
+            $this->throwBadArgumentValue();
+        }
+        if ($shop->status != 0) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
+        }
+
+        return [
+            'out_trade_no' => time(),
+            'body' => '店铺保证金',
+            'attach' => 'shop_id:' . $shopId,
+            'total_fee' => bcmul($shop->deposit, 100),
+            'openid' => $openid
+        ];
     }
 
     public function paySuccess(int $shopId)
