@@ -76,23 +76,6 @@ class CommonController extends Controller
     {
         $data = Pay::wechat()->verify()->toArray();
 
-        if (strpos($data['attach'], 'shop_id') !== false) {
-            Log::info('shop_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                MerchantService::getInstance()->paySuccess($log->merchant_id);
-                ShopService::getInstance()->paySuccess($log->shop_id);
-                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-            });
-        }
-
-        if (strpos($data['attach'], 'order_sn_list') !== false) {
-            Log::info('order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                OrderService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
         if (strpos($data['attach'], 'scenic_shop_id') !== false) {
             Log::info('scenic_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
@@ -107,6 +90,23 @@ class CommonController extends Controller
             Log::info('scenic_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 ScenicOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
+        if (strpos($data['attach'], 'shop_id') !== false) {
+            Log::info('shop_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                MerchantService::getInstance()->paySuccess($log->merchant_id);
+                ShopService::getInstance()->paySuccess($log->shop_id);
+                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+            });
+        }
+
+        if (strpos($data['attach'], 'order_sn_list') !== false) {
+            Log::info('order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                OrderService::getInstance()->wxPaySuccess($data);
             });
         }
 
