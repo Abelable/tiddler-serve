@@ -26,6 +26,7 @@ class ShopOrderController extends Controller
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(1)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(2)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(3)),
+            0,
             OrderService::getInstance()->getShopTotal($shopId, [OrderEnums::STATUS_REFUND]),
         ]);
     }
