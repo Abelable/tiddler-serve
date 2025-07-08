@@ -121,6 +121,16 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasOne(Relation::class, 'user_id')->value('superior_id');
     }
 
+    public function scenicMerchant()
+    {
+        return $this->hasOne(ScenicMerchant::class, 'user_id')->where('status', 2);
+    }
+
+    public function scenicShop()
+    {
+        return $this->hasOne(ScenicShop::class, 'user_id')->where('status', 1);
+    }
+
     public function merchant()
     {
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
@@ -139,16 +149,6 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shopManagerList()
     {
         return $this->hasMany(ShopManager::class, 'user_id');
-    }
-
-    public function scenicMerchant()
-    {
-        return $this->hasOne(ScenicMerchant::class, 'user_id')->where('status', 2);
-    }
-
-    public function scenicShop()
-    {
-        return $this->hasOne(ScenicShop::class, 'user_id')->where('status', 1);
     }
 
     public function hotelProvider()
