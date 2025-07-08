@@ -76,7 +76,9 @@ class UserController extends Controller
         unset($user->openid);
         unset($user->authInfo);
         unset($user->merchant);
+        unset($user->shop);
         unset($user->scenicMerchant);
+        unset($user->scenicShop);
         unset($user->hotelProvider);
         unset($user->cateringProvider);
         unset($user->created_at);
