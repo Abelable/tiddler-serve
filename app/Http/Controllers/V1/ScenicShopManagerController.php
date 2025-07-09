@@ -59,7 +59,7 @@ class ScenicShopManagerController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $userId = $this->verifyRequiredId('userId');
         $roleId = $this->verifyRequiredId('roleId');
-        $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
+        $scenicIds = $this->verifyArray('scenicIds');
 
         DB::transaction(function () use ($shopId, $userId, $roleId, $scenicIds) {
             $manager = ScenicShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
