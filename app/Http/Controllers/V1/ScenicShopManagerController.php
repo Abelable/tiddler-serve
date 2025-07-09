@@ -34,7 +34,6 @@ class ScenicShopManagerController extends Controller
             return $manager;
         });
 
-
         return $this->success($list);
     }
 
