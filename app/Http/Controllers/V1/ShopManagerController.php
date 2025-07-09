@@ -63,9 +63,8 @@ class ShopManagerController extends Controller
 
     public function edit()
     {
-        $id = $this->verifyRequiredId('id');
         $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
+        $id = $this->verifyRequiredId('id');
         $roleId = $this->verifyRequiredId('roleId');
 
         $manager = ShopManagerService::getInstance()->getShopManager($shopId, $id);
@@ -73,7 +72,7 @@ class ShopManagerController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
 
-        ShopManagerService::getInstance()->updateManager($manager, $userId, $roleId);
+        ShopManagerService::getInstance()->updateManager($manager, $roleId);
 
         return $this->success();
     }

@@ -12,7 +12,7 @@ class ShopManagerService extends BaseService
         $manager->shop_id = $shopId;
         $manager->user_id = $userId;
 
-        return $this->updateManager($manager, $userId, $roleId);
+        return $this->updateManager($manager, $roleId);
     }
 
     public function updateManager(ShopManager $manager, $roleId)
@@ -31,10 +31,5 @@ class ShopManagerService extends BaseService
     public function getShopManager($shopId, $id, $columns = ['*'])
     {
         return ShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
-    }
-
-    public function deleteManager($shopId, $userId)
-    {
-        ShopManager::query()->where('shop_id', $shopId)->where('user_id', $userId)->delete();
     }
 }

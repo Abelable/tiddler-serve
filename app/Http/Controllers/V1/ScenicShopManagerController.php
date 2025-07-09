@@ -39,10 +39,11 @@ class ScenicShopManagerController extends Controller
 
     public function detail()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'user_id', 'role_id'];
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($id, $columns);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id, $columns);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
@@ -73,11 +74,12 @@ class ScenicShopManagerController extends Controller
 
     public function edit()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
         $roleId = $this->verifyRequiredId('roleId');
         $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($id);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
@@ -96,9 +98,10 @@ class ScenicShopManagerController extends Controller
 
     public function delete()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($id);
+        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }

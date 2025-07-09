@@ -33,13 +33,8 @@ class ScenicShopManagerService extends BaseService
         return ScenicShopManager::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getShopManager($id, $columns = ['*'])
+    public function getShopManager($shopId, $id, $columns = ['*'])
     {
-        return ScenicShopManager::query()->find($id, $columns);
-    }
-
-    public function deleteManager($shopId, $userId)
-    {
-        ScenicShopManager::query()->where('shop_id', $shopId)->where('user_id', $userId)->delete();
+        return ScenicShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 }
