@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicManager;
 use App\Models\ShopManager;
 use App\Models\User;
 use App\Services\ScenicManagerService;
