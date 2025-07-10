@@ -50,6 +50,7 @@ class ShopScenicSpotService extends BaseService
             $query = $query->where('status', $input->status);
         }
         return $query
+            ->orderByRaw("FIELD(status, 0) DESC")
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
