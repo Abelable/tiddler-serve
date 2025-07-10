@@ -4,9 +4,8 @@ namespace App\Utils\Inputs\Admin;
 
 use App\Utils\Inputs\BaseInput;
 
-class GoodsCommissionInput extends BaseInput
+class CommissionInput extends BaseInput
 {
-    public $id;
     public $promotionCommissionRate;
     public $promotionCommissionUpperLimit;
     public $superiorPromotionCommissionRate;
@@ -15,7 +14,6 @@ class GoodsCommissionInput extends BaseInput
     public function rules()
     {
         return [
-            'id' => 'required|integer|digits_between:1,20',
             'promotionCommissionRate' => 'numeric',
             'promotionCommissionUpperLimit' => 'numeric',
             'superiorPromotionCommissionRate' => 'numeric',

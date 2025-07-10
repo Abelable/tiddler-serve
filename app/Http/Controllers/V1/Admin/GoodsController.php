@@ -10,7 +10,7 @@ use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\Admin\GoodsCommissionInput;
+use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
 use Illuminate\Support\Facades\DB;
@@ -64,10 +64,10 @@ class GoodsController extends Controller
                 return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
             }
 
-            unset($shop->merchant_id);
-            unset($goods->shop_id);
             $goods['shop_info'] = $shop;
             $goods['merchant_info'] = $merchant;
+            unset($shop->merchant_id);
+            unset($goods->shop_id);
         }
 
         $goods->image_list = json_decode($goods->image_list);
@@ -122,10 +122,11 @@ class GoodsController extends Controller
 
     public function editCommission()
     {
-        /** @var GoodsCommissionInput $input */
-        $input = GoodsCommissionInput::new();
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
+        $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($input->id);
+        $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
@@ -165,10 +166,11 @@ class GoodsController extends Controller
 
     public function approve()
     {
-        /** @var GoodsCommissionInput $input */
-        $input = GoodsCommissionInput::new();
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
+        $id = $this->verifyRequiredId('id');
 
-        $goods = GoodsService::getInstance()->getGoodsById($input->id);
+        $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
