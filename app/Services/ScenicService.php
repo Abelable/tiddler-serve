@@ -154,7 +154,7 @@ class ScenicService extends BaseService
         return $scenic;
     }
 
-    public function getSelectableOptions($scenicIds, $keywords, $columns = ['*'])
+    public function getSelectableOptions($scenicIds, $keywords = '', $columns = ['*'])
     {
         $query = ScenicSpot::query()->whereNotIn('id', $scenicIds);
         if (!empty($keywords)) {
