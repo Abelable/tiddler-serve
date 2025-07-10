@@ -30,7 +30,7 @@ class HotelController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = HotelService::getInstance()->getHotelPage($input);
-        $list = $this->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -39,7 +39,7 @@ class HotelController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = HotelService::getInstance()->search($input);
-        $list = $this->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -47,8 +47,8 @@ class HotelController extends Controller
     {
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
-        $page = HotelService::getInstance()->getNearbyList($input);
-        $list = $this->handelList(collect($page->items()));
+        $page = HotelService::getInstance()->getNearbyPage($input);
+        $list = HotelService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -62,28 +62,9 @@ class HotelController extends Controller
         } else {
             $page = HotelService::getInstance()->getHotelPage($input);
         }
-        $list = $this->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handelList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
-    }
-
-    private function handelList($hotelList)
-    {
-        return $hotelList->map(function (Hotel $hotel) {
-            return [
-                'id' => $hotel->id,
-                'cover' => $hotel->cover,
-                'name' => $hotel->name,
-                'englishName' => $hotel->english_name,
-                'price' => $hotel->price,
-                'score' => $hotel->score,
-                'grade' => $hotel->grade,
-                'longitude' => $hotel->longitude,
-                'latitude' => $hotel->latitude,
-                'address' => $hotel->address,
-                'featureTagList' => json_decode($hotel->feature_tag_list),
-            ];
-        });
     }
 
     public function detail()

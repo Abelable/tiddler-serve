@@ -63,7 +63,7 @@ class HotelService extends BaseService
             ->paginate($input->limit, 'page', $input->page);
     }
 
-    public function getNearbyList(NearbyPageInput $input, $columns = ['*'])
+    public function getNearbyPage(NearbyPageInput $input, $columns = ['*'])
     {
         $query = Hotel::query();
         if (!empty($input->id)) {
@@ -80,6 +80,52 @@ class HotelService extends BaseService
             ->orderBy('distance')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getTopNearbyList($longitude, $latitude, $limit, $hotelId = null, $radius = 10, $columns = ['*'])
+    {
+        $query = Hotel::query();
+        if (!is_null($hotelId)) {
+            $query = $query->where('id', '!=', $hotelId);
+        }
+        $list = $query
+            ->select(
+                '*',
+                DB::raw(
+                    '(6371 * acos(cos(radians(' . $latitude . ')) * cos(radians(latitude)) * cos(radians(longitude) - radians(' . $longitude . ')) + sin(radians(' . $latitude . ')) * sin(radians(latitude)))) AS distance'
+                )
+            )
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
+            ->take($limit)
+            ->get($columns);
+        return $this->handelList($list);
+    }
+
+    public function handelList($hotelList)
+    {
+        return $hotelList->map(function (Hotel $hotel) {
+            return [
+                'id' => $hotel->id,
+                'cover' => $hotel->cover,
+                'name' => $hotel->name,
+                'englishName' => $hotel->english_name,
+                'price' => $hotel->price,
+                'score' => $hotel->score,
+                'grade' => $hotel->grade,
+                'longitude' => $hotel->longitude,
+                'latitude' => $hotel->latitude,
+                'address' => $hotel->address,
+                'featureTagList' => json_decode($hotel->feature_tag_list),
+            ];
+        });
+    }
+
+    public function nearbySummary($longitude, $latitude, $limit, $hotelId = null, $radius = 10, $columns = ['*'])
+    {
+        $list = $this->getTopNearbyList($longitude, $latitude, $limit, $hotelId, $radius, $columns);
+        $total = $this->getTotal();
+        return ['list' => $list, 'total' => $total - 1];
     }
 
     public function getHotelById($id, $columns=['*'])
@@ -203,6 +249,11 @@ class HotelService extends BaseService
     public function getList()
     {
         return Hotel::query()->get();
+    }
+
+    public function getTotal()
+    {
+        return Hotel::query()->count();
     }
 
     public function getListByIds(array $ids, $columns = ['*'])

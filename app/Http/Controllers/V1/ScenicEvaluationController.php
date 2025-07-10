@@ -19,25 +19,11 @@ class ScenicEvaluationController extends Controller
 
     public function list()
     {
-        $scenicId = $this->verifyRequiredId('scenicId');
         /** @var PageInput $input */
         $input = PageInput::new();
-
+        $scenicId = $this->verifyRequiredId('scenicId');
         $page = ScenicEvaluationService::getInstance()->evaluationPage($scenicId, $input);
-        $evaluationList = collect($page->items());
-
-        $userIds = $evaluationList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');
-
-        $list = $evaluationList->map(function (ScenicEvaluation $evaluation) use ($userList) {
-            $userInfo = $userList->get($evaluation->user_id);
-            $evaluation['userInfo'] = $userInfo;
-            $evaluation->image_list = json_decode($evaluation->image_list);
-            unset($evaluation->user_id);
-            unset($evaluation->scenic_id);
-            return $evaluation;
-        });
-
+        $list = ScenicEvaluationService::getInstance()->handelEvaluationList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 

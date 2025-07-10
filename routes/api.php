@@ -226,7 +226,6 @@ Route::prefix('scenic')->group(function () {
     Route::get('add_sales', 'ScenicController@addSales');
 
     Route::prefix('question')->group(function () {
-        Route::get('summary', 'ScenicQAController@questionSummary');
         Route::get('list', 'ScenicQAController@questionList');
         Route::get('detail', 'ScenicQAController@questionDetail');
         Route::post('add', 'ScenicQAController@addQuestion');

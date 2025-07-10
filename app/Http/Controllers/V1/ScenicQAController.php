@@ -14,44 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ScenicQAController extends Controller
 {
-    protected $except = ['questionSummary', 'questionList', 'questionDetail', 'answerList'];
-
-    public function questionSummary()
-    {
-        $scenicId = $this->verifyRequiredId('scenicId');
-
-        $total = ScenicQuestionService::getInstance()->questionTotal($scenicId);
-
-        $questionList = ScenicQuestionService::getInstance()->questionList($scenicId, 3);
-        $list = $questionList->map(function (ScenicQuestion $question, $index) {
-            if ($index == 0) {
-                /** @var ScenicAnswer $firstAnswer */
-                $firstAnswer = $question->firstAnswer();
-                if (!is_null($firstAnswer)) {
-                    $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
-                    $firstAnswer['userInfo'] = $userInfo;
-                    unset($firstAnswer->user_id);
-                }
-                return [
-                    'content' => $question->content,
-                    'firstAnswer' => $firstAnswer,
-                ];
-            } else {
-                $userIds = $question->answerList->pluck('user_id')->toArray();
-                $userList = UserService::getInstance()->getListByIds(array_slice($userIds, 0, 3), ['id', 'avatar']);
-                return [
-                    'content' => $question->content,
-                    'answerNum' => $question->answer_num,
-                    'userList' => $userList,
-                ];
-            }
-        });
-
-        return $this->success([
-            'list' => $list,
-            'total' => $total,
-        ]);
-    }
+    protected $except = ['questionList', 'questionDetail', 'answerList'];
 
     public function questionList()
     {

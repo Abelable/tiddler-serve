@@ -2,18 +2,54 @@
 
 namespace App\Services;
 
+use App\Models\ScenicAnswer;
 use App\Models\ScenicQuestion;
 use App\Utils\Inputs\PageInput;
 
 class ScenicQuestionService extends BaseService
 {
-    public function questionList($scenicId, $count, $columns = ['*'])
+    public function qaSummary($scenicId, $limit)
     {
-        return ScenicQuestion::query()
+        $list = $this->topQuestionList($scenicId, $limit);
+        $total = $this->questionTotal($scenicId);
+        return ['list' => $list, 'total' => $total];
+    }
+
+    public function topQuestionList($scenicId, $limit, $columns = ['*'])
+    {
+        $list = ScenicQuestion::query()
             ->where('scenic_id', $scenicId)
             ->orderBy('answer_num', 'desc')
-            ->take($count)
+            ->take($limit)
             ->get($columns);
+        return $this->handelQuestionList($list);
+    }
+
+    public function handelQuestionList($questionList)
+    {
+        return $questionList->map(function (ScenicQuestion $question, $index) {
+            if ($index == 0) {
+                /** @var ScenicAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                if (!is_null($firstAnswer)) {
+                    $userInfo = UserService::getInstance()->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                    $firstAnswer['userInfo'] = $userInfo;
+                    unset($firstAnswer->user_id);
+                }
+                return [
+                    'content' => $question->content,
+                    'firstAnswer' => $firstAnswer,
+                ];
+            } else {
+                $userIds = $question->answerList->pluck('user_id')->toArray();
+                $userList = UserService::getInstance()->getListByIds(array_slice($userIds, 0, 3), ['id', 'avatar']);
+                return [
+                    'content' => $question->content,
+                    'answerNum' => $question->answer_num,
+                    'userList' => $userList,
+                ];
+            }
+        });
     }
 
     public function questionPage($scenicId, PageInput $input, $columns = ['*'])

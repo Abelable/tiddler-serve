@@ -17,6 +17,43 @@ class ScenicEvaluationService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function evaluationSummary($scenicId, $limit)
+    {
+        $list = $this->topEvaluationList($scenicId, $limit);
+        $total = $this->getEvaluationTotal($scenicId);
+        return ['list' => $list, 'total' => $total];
+    }
+
+    public function topEvaluationList($scenicId, $limit, $columns = ['*'])
+    {
+        $list = ScenicEvaluation::query()
+            ->where('scenic_id', $scenicId)
+            ->orderBy('like_number', 'desc')
+            ->take($limit)
+            ->get($columns);
+        return $this->handelEvaluationList($list);
+    }
+
+    public function handelEvaluationList($evaluationList)
+    {
+        $userIds = $evaluationList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');
+        return $evaluationList->map(function (ScenicEvaluation $evaluation) use ($userList) {
+            $userInfo = $userList->get($evaluation->user_id);
+            $evaluation['userInfo'] = $userInfo;
+            $evaluation->image_list = json_decode($evaluation->image_list);
+            unset($evaluation->user_id);
+            unset($evaluation->scenic_id);
+            return $evaluation;
+        });
+    }
+
+    public function getEvaluationTotal($scenicId)
+    {
+        return ScenicEvaluation::query()->where('scenic_id', $scenicId)->count();
+    }
+
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
         return ScenicEvaluation::query()->where('user_id', $userId)->find($id, $columns);

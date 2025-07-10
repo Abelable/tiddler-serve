@@ -55,7 +55,7 @@ class ScenicService extends BaseService
             ->paginate($input->limit, 'page', $input->page);
     }
 
-    public function getNearbyList(NearbyPageInput $input, $columns = ['*'])
+    public function getNearbyPage(NearbyPageInput $input, $columns = ['*'])
     {
         $query = ScenicSpot::query();
         if (!empty($input->id)) {
@@ -72,6 +72,52 @@ class ScenicService extends BaseService
             ->orderBy('distance')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getTopNearbyList($longitude, $latitude, $limit, $scenicId = null, $radius = 10, $columns = ['*'])
+    {
+        $query = ScenicSpot::query();
+        if (!is_null($scenicId)) {
+            $query = $query->where('id', '!=', $scenicId);
+        }
+        $list = $query
+            ->select(
+                '*',
+                DB::raw(
+                    '(6371 * acos(cos(radians(' . $latitude . ')) * cos(radians(latitude)) * cos(radians(longitude) - radians(' . $longitude . ')) + sin(radians(' . $latitude . ')) * sin(radians(latitude)))) AS distance'
+                )
+            )
+            ->having('distance', '<=', $radius)
+            ->orderBy('distance')
+            ->take($limit)
+            ->get($columns);
+        return $this->handelList($list);
+    }
+
+    public function handelList($scenicList)
+    {
+        return $scenicList->map(function (ScenicSpot $spot) {
+            return [
+                'id' => $spot->id,
+                'cover' => json_decode($spot->image_list)[0],
+                'name' => $spot->name,
+                'level' => $spot->level,
+                'score' => $spot->score,
+                'price' => $spot->price,
+                'longitude' => $spot->longitude,
+                'latitude' => $spot->latitude,
+                'address' => $spot->address,
+                'featureTagList' => json_decode($spot->feature_tag_list),
+                'salesVolume' => $spot->sales_volume
+            ];
+        });
+    }
+
+    public function nearbySummary($longitude, $latitude, $limit, $scenicId, $radius = 10, $columns = ['*'])
+    {
+        $list = $this->getTopNearbyList($longitude, $latitude, $limit, $scenicId, $radius, $columns);
+        $total = $this->getTotal();
+        return ['list' => $list, 'total' => $total - 1];
     }
 
     public function getScenicById($id, $columns=['*'])
@@ -179,6 +225,11 @@ class ScenicService extends BaseService
     public function getList()
     {
         return ScenicSpot::query()->get();
+    }
+
+    public function getTotal()
+    {
+        return ScenicSpot::query()->count();
     }
 
     public function getListByIds(array $ids, $columns = ['*'])

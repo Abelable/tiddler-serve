@@ -4,8 +4,10 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
-use App\Services\KeywordService;
+use App\Services\HotelService;
 use App\Services\ProductHistoryService;
+use App\Services\ScenicEvaluationService;
+use App\Services\ScenicQuestionService;
 use App\Services\ShopScenicSpotService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
@@ -31,7 +33,7 @@ class ScenicController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = ScenicService::getInstance()->getScenicPage($input);
-        $list = $this->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -40,7 +42,7 @@ class ScenicController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = ScenicService::getInstance()->search($input);
-        $list = $this->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -48,8 +50,8 @@ class ScenicController extends Controller
     {
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
-        $page = ScenicService::getInstance()->getNearbyList($input);
-        $list = $this->handelList(collect($page->items()));
+        $page = ScenicService::getInstance()->getNearbyPage($input);
+        $list = ScenicService::getInstance()->handelList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -63,28 +65,9 @@ class ScenicController extends Controller
         } else {
             $page = ScenicService::getInstance()->getScenicPage($input);
         }
-        $list = $this->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handelList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
-    }
-
-    private function handelList($scenicList)
-    {
-        return $scenicList->map(function (ScenicSpot $spot) {
-            return [
-                'id' => $spot->id,
-                'cover' => json_decode($spot->image_list)[0],
-                'name' => $spot->name,
-                'level' => $spot->level,
-                'score' => $spot->score,
-                'price' => $spot->price,
-                'longitude' => $spot->longitude,
-                'latitude' => $spot->latitude,
-                'address' => $spot->address,
-                'featureTagList' => json_decode($spot->feature_tag_list),
-                'salesVolume' => $spot->sales_volume
-            ];
-        });
     }
 
     public function detail()
@@ -95,6 +78,11 @@ class ScenicController extends Controller
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
+
+        $scenic['evaluationSummary'] = ScenicEvaluationService::getInstance()->evaluationSummary($id, 2);
+        $scenic['qaSummary'] = ScenicQuestionService::getInstance()->qaSummary($id, 3);
+        $scenic['nearbyHotelSummary'] = HotelService::getInstance()->nearbySummary($scenic->longitude, $scenic->latitude, 10);
+        $scenic['nearbyScenicSummary'] = ScenicService::getInstance()->nearbySummary($scenic->longitude, $scenic->latitude, 10, $id);
 
         if ($this->isLogin()) {
             DB::transaction(function () use ($scenic) {
