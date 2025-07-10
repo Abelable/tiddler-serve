@@ -20,7 +20,8 @@ class ShopScenicController extends Controller
     {
         /** @var StatusPageInput  $input */
         $input = StatusPageInput::new();
-        $page = ShopScenicSpotService::getInstance()->getAdminScenicPage($input, ['id', 'scenic_id', 'merchant_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ShopScenicSpotService::getInstance()
+            ->getAdminScenicPage($input, ['id', 'scenic_id', 'merchant_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $shopScenicList = collect($page->items());
 
         $shopIds = $shopScenicList->pluck('shop_id')->toArray();
@@ -46,7 +47,7 @@ class ShopScenicController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function approveScenicApply()
+    public function approve()
     {
         $id = $this->verifyRequiredId('id');
 
@@ -60,7 +61,7 @@ class ShopScenicController extends Controller
         return $this->success();
     }
 
-    public function rejectScenicApply()
+    public function reject()
     {
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
@@ -76,7 +77,7 @@ class ShopScenicController extends Controller
         return $this->success();
     }
 
-    public function deleteScenicApply()
+    public function delete()
     {
         $id = $this->verifyRequiredId('id');
 

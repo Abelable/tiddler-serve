@@ -839,18 +839,18 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('approve', 'ScenicMerchantController@approve');
             Route::post('reject', 'ScenicMerchantController@reject');
             Route::post('order_list', 'ScenicMerchantController@orderList');
-
-            Route::prefix('scenic')->group(function () {
-                Route::post('list', 'ScenicMerchantController@providerScenicList');
-                Route::post('approve', 'ScenicMerchantController@approveScenicApply');
-                Route::post('reject', 'ScenicMerchantController@rejectScenicApply');
-                Route::post('delete', 'ScenicMerchantController@deleteScenicApply');
-            });
         });
 
         Route::prefix('shop')->group(function () {
             Route::post('list', 'ScenicShopController@list');
             Route::get('detail', 'ScenicShopController@detail');
+
+            Route::prefix('scenic')->group(function () {
+                Route::post('list', 'ShopScenicController@list');
+                Route::post('approve', 'ShopScenicController@approve');
+                Route::post('reject', 'ShopScenicController@reject');
+                Route::post('delete', 'ShopScenicController@delete');
+            });
         });
 
         Route::prefix('ticket')->group(function () {
