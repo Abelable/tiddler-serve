@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScenicMerchant;
 use App\Models\ScenicShop;
 use App\Models\ShopScenicSpot;
 use App\Models\ScenicSpot;
+use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopService;
 use App\Services\ShopScenicSpotService;
 use App\Services\ScenicService;
@@ -20,22 +22,29 @@ class ShopScenicController extends Controller
     {
         /** @var StatusPageInput  $input */
         $input = StatusPageInput::new();
-        $page = ShopScenicSpotService::getInstance()
-            ->getAdminScenicPage($input, ['id', 'scenic_id', 'merchant_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+        $page = ShopScenicSpotService::getInstance()->getAdminScenicPage($input);
         $shopScenicList = collect($page->items());
 
         $shopIds = $shopScenicList->pluck('shop_id')->toArray();
-        $shopList = ScenicShopService::getInstance()
-            ->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
+        $shopList = ScenicShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+
+        $merchantIds = $shopList->pluck('merchant_id')->toArray();
+        $merchantList = ScenicMerchantService::getInstance()->getMerchantListByIds($merchantIds)->keyBy('id');
 
         $scenicIds = $shopScenicList->pluck('scenic_id')->toArray();
-        $scenicList = ScenicService::getInstance()->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
+        $scenicList = ScenicService::getInstance()
+            ->getScenicListByIds($scenicIds, ['id', 'name', 'image_list'])->keyBy('id');
 
-        $list = $shopScenicList->map(function (ShopScenicSpot $shopScenic) use ($scenicList, $shopList) {
+        $list = $shopScenicList->map(function (ShopScenicSpot $shopScenic) use ($scenicList, $shopList, $merchantList) {
             /** @var ScenicShop $shop */
             $shop = $shopList->get($shopScenic->shop_id);
             $shopScenic['shop_logo'] = $shop->logo;
             $shopScenic['shop_name'] = $shop->name;
+
+            /** @var ScenicMerchant $merchant */
+            $merchant = $merchantList->get($shop->merchant_id);
+            $shopScenic['merchant_name'] = $merchant->company_name;
+            $shopScenic['business_license'] = $merchant->business_license_photo;
 
             /** @var ScenicSpot $scenic */
             $scenic = $scenicList->get($shopScenic->scenic_id);

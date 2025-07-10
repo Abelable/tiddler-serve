@@ -155,12 +155,13 @@ class ScenicController extends Controller
     public function shopOptions()
     {
         $shopId = $this->verifyRequiredId('shopId');
+        $keywords = $this->verifyString('keywords');
 
         $scenicIds = ShopScenicSpotService::getInstance()
             ->getShopScenicOptions($shopId)
             ->pluck('scenic_id')
             ->toArray();
-        $options = ScenicService::getInstance()->getSelectableOptions($scenicIds, ['id', 'name']);
+        $options = ScenicService::getInstance()->getSelectableOptions($scenicIds, $keywords, ['id', 'name']);
 
         return $this->success($options);
     }

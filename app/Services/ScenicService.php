@@ -154,9 +154,13 @@ class ScenicService extends BaseService
         return $scenic;
     }
 
-    public function getSelectableOptions($scenicIds, $columns = ['*'])
+    public function getSelectableOptions($scenicIds, $keywords, $columns = ['*'])
     {
-        return ScenicSpot::query()->whereNotIn('id', $scenicIds)->get($columns);
+        $query = ScenicSpot::query()->whereNotIn('id', $scenicIds);
+        if (!empty($keywords)) {
+            $query = $query->where('name', 'like', '%' . $keywords . '%');
+        }
+        return $query->get($columns);
     }
 
     public function updateScenicAvgScore($scenicId, $avgScore)
