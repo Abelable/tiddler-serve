@@ -222,7 +222,7 @@ Route::prefix('scenic')->group(function () {
     Route::get('options', 'ScenicController@options');
     Route::post('add', 'ScenicController@add');
     Route::post('edit', 'ScenicController@edit');
-    Route::get('provider_options', 'ScenicController@providerOptions');
+    Route::get('shop_options', 'ScenicController@shopOptions');
     Route::get('add_sales', 'ScenicController@addSales');
 
     Route::prefix('question')->group(function () {

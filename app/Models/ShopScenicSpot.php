@@ -2,14 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 /**
  * App\Models\ShopScenicSpot
  *
  * @property int $id
- * @property int $user_id 用户id
  * @property int $shop_id 店铺id
  * @property int $scenic_id 景点id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核失败
@@ -29,7 +25,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopScenicSpot whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopScenicSpot whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopScenicSpot whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShopScenicSpot whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|ShopScenicSpot withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ShopScenicSpot withoutTrashed()
  * @mixin \Eloquent

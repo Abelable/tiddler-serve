@@ -15,7 +15,6 @@ class CreateShopScenicSpotsTable extends Migration
     {
         Schema::create('shop_scenic_spots', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
             $table->integer('shop_id')->comment('店铺id');
             $table->integer('scenic_id')->comment('景点id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核失败');

@@ -11,7 +11,7 @@ class ShopScenicSpotService extends BaseService
     public function getListTotal($shopId, $status)
     {
         return ShopScenicSpot::query()
-            ->where('ship_id', $shopId)
+            ->where('shop_id', $shopId)
             ->where('status', $status)
             ->count();
     }
@@ -28,6 +28,14 @@ class ShopScenicSpotService extends BaseService
     public function getShopScenicById($shopId, $id, $columns = ['*'])
     {
         return ShopScenicSpot::query()->where('shop_id', $shopId)->find($id, $columns);
+    }
+
+    public function getByScenicId($shopId, $scenicId, $columns = ['*'])
+    {
+        return ShopScenicSpot::query()
+            ->where('shop_id', $shopId)
+            ->where('scenic_id', $scenicId)
+            ->first($columns);
     }
 
     public function getSpotByScenicId($userId, $scenicId, $columns = ['*'])
@@ -51,21 +59,20 @@ class ShopScenicSpotService extends BaseService
         return ShopScenicSpot::query()->find($id, $columns);
     }
 
-    public function getUserScenicOptions($userId, $columns = ['*'])
+    public function getShopScenicOptions($shopId, $columns = ['*'])
     {
-        return ShopScenicSpot::query()->where('user_id', $userId)->get($columns);
+        return ShopScenicSpot::query()->where('shop_id', $shopId)->get($columns);
     }
 
-    public function createScenicList($userId, $shopId, array $scenicIds)
+    public function createScenicList($shopId, array $scenicIds)
     {
         foreach ($scenicIds as $scenicId) {
-            $scenic = $this->getShopScenicById($userId, $scenicId);
+            $scenic = $this->getByScenicId($shopId, $scenicId);
             if (!is_null($scenic)) {
                 $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '包含已添加景点，请重试');
             }
 
             $scenic = ShopScenicSpot::new();
-            $scenic->user_id = $userId;
             $scenic->shop_id = $shopId;
             $scenic->scenic_id = $scenicId;
             $scenic->save();

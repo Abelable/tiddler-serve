@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class ScenicController extends Controller
 {
-    protected $only = ['mediaRelativeList', 'add', 'edit', 'providerOptions'];
+    protected $only = ['mediaRelativeList', 'add', 'edit', 'shopOptions'];
 
     public function categoryOptions()
     {
@@ -152,13 +152,16 @@ class ScenicController extends Controller
         return $this->success();
     }
 
-    public function providerOptions()
+    public function shopOptions()
     {
-        $providerScenicIds = ShopScenicSpotService::getInstance()
-            ->getUserScenicOptions($this->userId())
+        $shopId = $this->verifyRequiredId('shopId');
+
+        $scenicIds = ShopScenicSpotService::getInstance()
+            ->getShopScenicOptions($shopId)
             ->pluck('scenic_id')
             ->toArray();
-        $options = ScenicService::getInstance()->getProviderScenicOptions($providerScenicIds, ['id', 'name']);
+        $options = ScenicService::getInstance()->getSelectableOptions($scenicIds, ['id', 'name']);
+
         return $this->success($options);
     }
 
