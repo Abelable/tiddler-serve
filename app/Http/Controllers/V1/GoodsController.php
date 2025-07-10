@@ -321,9 +321,9 @@ class GoodsController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
         if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
@@ -341,10 +341,10 @@ class GoodsController extends Controller
 
     public function edit()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $id = $this->verifyRequiredId('id');
         /** @var GoodsInput $input */
         $input = GoodsInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
         if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {

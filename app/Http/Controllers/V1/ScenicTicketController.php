@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicShop;
 use App\Models\ScenicTicket;
+use App\Services\ScenicShopManagerService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class ScenicTicketController extends Controller
 {
-    protected $except = ['categoryOptions', 'listByScenicId'];
+    protected $except = ['categoryOptions', 'listOfScenic'];
 
     public function categoryOptions()
     {
@@ -25,7 +26,7 @@ class ScenicTicketController extends Controller
         return $this->success($options);
     }
 
-    public function listByScenicId()
+    public function listOfScenic()
     {
         $scenicId = $this->verifyRequiredId('scenicId');
 
@@ -58,20 +59,23 @@ class ScenicTicketController extends Controller
 
     public function ticketListTotals()
     {
+        $shopId = $this->verifyRequiredId('shopId');
+
         return $this->success([
-            ScenicTicketService::getInstance()->getListTotal($this->userId(), 1),
-            ScenicTicketService::getInstance()->getListTotal($this->userId(), 3),
-            ScenicTicketService::getInstance()->getListTotal($this->userId(), 0),
-            ScenicTicketService::getInstance()->getListTotal($this->userId(), 2),
+            ScenicTicketService::getInstance()->getListTotal($shopId, 1),
+            ScenicTicketService::getInstance()->getListTotal($shopId, 3),
+            ScenicTicketService::getInstance()->getListTotal($shopId, 0),
+            ScenicTicketService::getInstance()->getListTotal($shopId, 2),
         ]);
     }
 
-    public function userTicketList()
+    public function shopTicketList()
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $page = ScenicTicketService::getInstance()->getTicketListByStatus($this->userId(), $input);
+        $page = ScenicTicketService::getInstance()->getTicketListByStatus($shopId, $input);
         $ticketList = collect($page->items());
         $list = $ticketList->map(function (ScenicTicket $ticket) {
             $ticket['scenicIds'] = $ticket->scenicIds();
@@ -83,9 +87,10 @@ class ScenicTicketController extends Controller
 
     public function detail()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getTicketById($id);
+        $ticket = ScenicTicketService::getInstance()->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
@@ -102,14 +107,16 @@ class ScenicTicketController extends Controller
     {
         /** @var ScenicTicketInput $input */
         $input = ScenicTicketInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $shopId = $this->user()->scenicShop->id;
-        if ($shopId == 0) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法上传景点门票');
+        $shopManagerIds = ScenicShopManagerService::getInstance()
+            ->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->scenicShop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限添加景点门票');
         }
 
         DB::transaction(function () use ($shopId, $input) {
-            $ticket = ScenicTicketService::getInstance()->createTicket($this->userId(), $this->user()->scenicProvider->id, $shopId, $input);
+            $ticket = ScenicTicketService::getInstance()->createTicket($shopId, $input);
             TicketScenicService::getInstance()->createTicketScenicSpots($ticket->id, $input->scenicIds);
             TicketSpecService::getInstance()->createTicketSpecList($ticket->id, $input->specList);
         });
@@ -119,11 +126,18 @@ class ScenicTicketController extends Controller
 
     public function edit()
     {
-        $id = $this->verifyRequiredId('id');
         /** @var ScenicTicketInput $input */
         $input = ScenicTicketInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
+        $shopManagerIds = ScenicShopManagerService::getInstance()
+            ->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->scenicShop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限添加景点门票');
+        }
+
+        $ticket = ScenicTicketService::getInstance()->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
@@ -139,9 +153,10 @@ class ScenicTicketController extends Controller
 
     public function up()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
+        $ticket = ScenicTicketService::getInstance()->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
@@ -156,9 +171,10 @@ class ScenicTicketController extends Controller
 
     public function down()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
+        $ticket = ScenicTicketService::getInstance()->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
@@ -173,9 +189,10 @@ class ScenicTicketController extends Controller
 
     public function delete()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $ticket = ScenicTicketService::getInstance()->getUserTicket($this->userId(), $id);
+        $ticket = ScenicTicketService::getInstance()->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }

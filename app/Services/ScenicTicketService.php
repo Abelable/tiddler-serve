@@ -36,15 +36,15 @@ class ScenicTicketService extends BaseService
         return ScenicTicket::query()->where('status', 1)->whereIn('id', $ids)->with('specList')->get($columns);
     }
 
-    public function getListTotal($userId, $status)
+    public function getListTotal($shopId, $status)
     {
-        return ScenicTicket::query()->where('user_id', $userId)->where('status', $status)->count();
+        return ScenicTicket::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 
-    public function getTicketListByStatus($userId, StatusPageInput $input, $columns=['*'])
+    public function getTicketListByStatus($shopId, StatusPageInput $input, $columns=['*'])
     {
         return ScenicTicket::query()
-            ->where('user_id', $userId)
+            ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -55,16 +55,14 @@ class ScenicTicketService extends BaseService
         return ScenicTicket::query()->find($id, $columns);
     }
 
-    public function getUserTicket($userId, $id, $columns=['*'])
+    public function getShopTicket($shopId, $id, $columns=['*'])
     {
-        return ScenicTicket::query()->where('user_id', $userId)->find($id, $columns);
+        return ScenicTicket::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
-    public function createTicket($userId, $merchantId, $shopId, ScenicTicketInput $input)
+    public function createTicket($shopId, ScenicTicketInput $input)
     {
         $ticket = ScenicTicket::new();
-        $ticket->user_id = $userId;
-        $ticket->merchant_id = $merchantId;
         $ticket->shop_id = $shopId;
 
         return $this->updateTicket($ticket, $input);
@@ -82,10 +80,6 @@ class ScenicTicketService extends BaseService
         $ticket->price = $input->price;
         $ticket->market_price = $input->marketPrice ?: '';
         $ticket->sales_commission_rate = $input->salesCommissionRate ?: 0;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate ?: 0;
-        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit ?: 0;
-        $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate ?: 0;
-        $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit ?: 0;
         $ticket->fee_include_tips = $input->feeIncludeTips ?: '';
         $ticket->fee_not_include_tips = $input->feeNotIncludeTips ?: '';
         $ticket->booking_time = $input->bookingTime;

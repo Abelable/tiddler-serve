@@ -15,8 +15,6 @@ class CreateScenicTicketsTable extends Migration
     {
         Schema::create('scenic_tickets', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('merchant_id')->comment('商家id');
             $table->integer('shop_id')->comment('店铺id');
             $table->integer('type')->comment('门票类型：1-单景点门票，2-多景点联票');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
@@ -25,7 +23,7 @@ class CreateScenicTicketsTable extends Migration
             $table->string('brief_name')->comment('门票简称');
             $table->float('price')->comment('门票最低价格');
             $table->float('market_price')->default(0)->comment('门票市场价格');
-            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例');
+            $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例%');
             $table->float('promotion_commission_rate')->default(0)->comment('推广佣金比例%');
             $table->float('promotion_commission_upper_limit')->default(0)->comment('推广佣金上限');
             $table->float('superior_promotion_commission_rate')->default(0)->comment('上级推广佣金比例%');

@@ -6,8 +6,6 @@ namespace App\Models;
  * App\Models\ScenicTicket
  *
  * @property int $id
- * @property int $user_id 用户id
- * @property int $merchant_id 商家id
  * @property int $shop_id 店铺id
  * @property int $type 门票类型：1-单景点门票，2-多景点联票
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
@@ -16,7 +14,7 @@ namespace App\Models;
  * @property string $brief_name 门票简称
  * @property float $price 门票最低价格
  * @property float $market_price 门票市场价格
- * @property float $sales_commission_rate 销售佣金比例
+ * @property float $sales_commission_rate 销售佣金比例%
  * @property float $promotion_commission_rate 推广佣金比例%
  * @property float $promotion_commission_upper_limit 推广佣金上限
  * @property float $superior_promotion_commission_rate 上级推广佣金比例%
@@ -64,7 +62,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereInvoiceTips($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereLimitNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereMarketPrice($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereMerchantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereNeedExchange($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket wherePrice($value)
@@ -81,7 +78,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket whereValidityTime($value)
  * @method static \Illuminate\Database\Query\Builder|ScenicTicket withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ScenicTicket withoutTrashed()

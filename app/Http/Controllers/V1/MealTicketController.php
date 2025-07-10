@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\DB;
 
 class MealTicketController extends Controller
 {
-    protected $except = ['listByScenicId'];
+    protected $except = ['listOfRestaurant'];
 
-    public function listByRestaurantId()
+    public function listOfRestaurant()
     {
         $restaurantId = $this->verifyRequiredId('restaurantId');
 
