@@ -279,9 +279,8 @@ Route::prefix('scenic')->group(function () {
         });
 
         Route::prefix('ticket')->group(function () {
-            Route::get('totals', 'ScenicTicketController@ticketListTotals');
-            Route::get('list', 'ScenicTicketController@shopTicketList');
-            Route::get('detail', 'ScenicTicketController@detail');
+            Route::get('totals', 'ScenicTicketController@totals');
+            Route::get('list', 'ScenicTicketController@shopList');
             Route::post('add', 'ScenicTicketController@add');
             Route::post('edit', 'ScenicTicketController@edit');
             Route::post('up', 'ScenicTicketController@up');
@@ -294,7 +293,6 @@ Route::prefix('scenic')->group(function () {
         Route::get('category_options', 'ScenicTicketController@categoryOptions');
         Route::get('list', 'ScenicTicketController@list');
         Route::get('detail', 'ScenicTicketController@detail');
-        Route::get('list_of_scenic', 'ScenicTicketController@listOfScenic');
     });
 
     Route::prefix('order')->group(function () {
