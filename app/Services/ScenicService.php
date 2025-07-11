@@ -107,7 +107,7 @@ class ScenicService extends BaseService
                 'longitude' => $spot->longitude,
                 'latitude' => $spot->latitude,
                 'address' => $spot->address,
-                'featureTagList' => json_decode($spot->feature_tag_list),
+                'featureTagList' => json_decode($spot->feature_tag_list) ?? [],
                 'salesVolume' => $spot->sales_volume
             ];
         });

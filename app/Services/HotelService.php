@@ -116,7 +116,7 @@ class HotelService extends BaseService
                 'longitude' => $hotel->longitude,
                 'latitude' => $hotel->latitude,
                 'address' => $hotel->address,
-                'featureTagList' => json_decode($hotel->feature_tag_list),
+                'featureTagList' => json_decode($hotel->feature_tag_list) ?? [],
             ];
         });
     }
