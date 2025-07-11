@@ -21,7 +21,7 @@ use App\Services\ScenicTicketService;
 use App\Services\TicketScenicService;
 use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\ScenicOrderEnums;
+use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -181,16 +181,27 @@ class ScenicOrderController extends Controller
     private function statusList($status) {
         switch ($status) {
             case 1:
-                $statusList = [ScenicOrderEnums::STATUS_CREATE];
+                $statusList = [ScenicOrderStatus::CREATED];
                 break;
             case 2:
-                $statusList = [ScenicOrderEnums::STATUS_PAY];
+                $statusList = [ScenicOrderStatus::PAID];
                 break;
             case 3:
-                $statusList = [ScenicOrderEnums::STATUS_CONFIRM, ScenicOrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [ScenicOrderStatus::MERCHANT_APPROVED];
                 break;
             case 4:
-                $statusList = [ScenicOrderEnums::STATUS_REFUND, ScenicOrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [
+                    ScenicOrderStatus::CONFIRMED,
+                    ScenicOrderStatus::AUTO_CONFIRMED,
+                    ScenicOrderStatus::ADMIN_CONFIRMED
+                ];
+                break;
+            case 5:
+                $statusList = [
+                    ScenicOrderStatus::REFUNDING,
+                    ScenicOrderStatus::MERCHANT_REFUNDING,
+                    ScenicOrderStatus::REFUNDED
+                ];
                 break;
             default:
                 $statusList = [];
@@ -209,7 +220,7 @@ class ScenicOrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => ScenicOrderEnums::STATUS_TEXT_MAP[$order->status],
+                'statusDesc' => ScenicOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,

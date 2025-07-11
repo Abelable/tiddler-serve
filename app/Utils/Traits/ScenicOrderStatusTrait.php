@@ -2,7 +2,7 @@
 
 namespace App\Utils\Traits;
 
-use App\Utils\Enums\ScenicOrderEnums;
+use App\Utils\Enums\ScenicOrderStatus;
 use Illuminate\Support\Str;
 
 /**
@@ -13,8 +13,8 @@ use Illuminate\Support\Str;
  * @method bool canCommentHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
- * @method bool canRebuyHandle()
- * @method bool canAftersaleHandle()
+ * @method bool canReBuyHandle()
+ * @method bool canAfterSaleHandle()
  * @method bool canAgreeRefundHandle()
  * @method bool canFinishHandle()
  * @method bool isPayStatus()
@@ -46,7 +46,7 @@ trait ScenicOrderStatusTrait
                 ->replaceFirst('is', '')
                 ->replaceLast('Status', '')
                 ->snake()->upper()->prepend('STATUS');
-            $status = (new \ReflectionClass(ScenicOrderEnums::class))->getConstant($key);
+            $status = (new \ReflectionClass(ScenicOrderStatus::class))->getConstant($key);
             return $this->status == $status;
         }
 
@@ -54,47 +54,52 @@ trait ScenicOrderStatusTrait
     }
 
     private $canHandleMap = [
-        'cancel' => [ScenicOrderEnums::STATUS_CREATE],
-        'pay' => [ScenicOrderEnums::STATUS_CREATE],
-        'confirm' => [ScenicOrderEnums::STATUS_PAY],
-        'refund' => [ScenicOrderEnums::STATUS_PAY],
-        // 同意退款
-        'agreerefund' => [ScenicOrderEnums::STATUS_REFUND],
-        'comment' => [
-            ScenicOrderEnums::STATUS_CONFIRM,
-            ScenicOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 售后
-        'aftersale' => [
-            ScenicOrderEnums::STATUS_CONFIRM,
-            ScenicOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 回购
-        'rebuy' => [
-            ScenicOrderEnums::STATUS_CONFIRM,
-            ScenicOrderEnums::STATUS_AUTO_CONFIRM
-        ],
+        'cancel' => [ScenicOrderStatus::CREATED],
+        'pay' => [ScenicOrderStatus::CREATED],
         'delete' => [
-            ScenicOrderEnums::STATUS_CANCEL,
-            ScenicOrderEnums::STATUS_AUTO_CANCEL,
-            ScenicOrderEnums::STATUS_ADMIN_CANCEL,
-            ScenicOrderEnums::STATUS_REFUND_CONFIRM,
-            ScenicOrderEnums::STATUS_CONFIRM,
-            ScenicOrderEnums::STATUS_AUTO_CONFIRM
+            ScenicOrderStatus::CANCELED,
+            ScenicOrderStatus::AUTO_CANCELED,
+            ScenicOrderStatus::ADMIN_CANCELED,
+        ],
+        'refund' => [ScenicOrderStatus::PAID],
+        'agreeRefund' => [
+            ScenicOrderStatus::REFUNDING,
+            ScenicOrderStatus::MERCHANT_REFUNDING
+        ],
+        'confirm' => [ScenicOrderStatus::MERCHANT_APPROVED],
+        'comment' => [
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED
         ],
         'finish' => [
-            ScenicOrderEnums::STATUS_CONFIRM,
-            ScenicOrderEnums::STATUS_AUTO_CONFIRM,
-        ]
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED
+        ],
+        'afterSale' => [
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED,
+            ScenicOrderStatus::FINISHED,
+            ScenicOrderStatus::AUTO_FINISHED,
+        ],
+        'reBuy' => [
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED,
+            ScenicOrderStatus::FINISHED,
+            ScenicOrderStatus::AUTO_FINISHED,
+        ],
     ];
 
-    public function isHadPaid()
+    public function isPaid()
     {
         return !in_array($this->status, [
-            ScenicOrderEnums::STATUS_CREATE,
-            ScenicOrderEnums::STATUS_CANCEL,
-            ScenicOrderEnums::STATUS_AUTO_CANCEL,
-            ScenicOrderEnums::STATUS_ADMIN_CANCEL,
+            ScenicOrderStatus::CREATED,
+            ScenicOrderStatus::CANCELED,
+            ScenicOrderStatus::AUTO_CANCELED,
+            ScenicOrderStatus::ADMIN_CANCELED,
         ]);
     }
 
@@ -102,14 +107,15 @@ trait ScenicOrderStatusTrait
     {
         return [
             'cancel' => $this->canCancelHandle(),
-            'delete' => $this->canDeleteHandle(),
             'pay' => $this->canPayHandle(),
-            'comment' => $this->canCommentHandle(),
-            'confirm' => $this->canConfirmHandle(),
+            'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
-            'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle(),
+            'agreeRefund' => $this->canAgreeRefundHandle(),
+            'confirm' => $this->canConfirmHandle(),
+            'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
+            'afterSale' => $this->canAftersaleHandle(),
+            'reBuy' => $this->canRebuyHandle(),
         ];
     }
 }

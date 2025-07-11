@@ -7,7 +7,7 @@ use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
-use App\Utils\Enums\ScenicOrderEnums;
+use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
@@ -62,14 +62,14 @@ class ScenicOrderService extends BaseService
 
     public function getPaidOrderById($id, $columns = ['*'])
     {
-        return ScenicOrder::query()->where('status', ScenicOrderEnums::STATUS_PAY)->find($id, $columns);
+        return ScenicOrder::query()->where('status', ScenicOrderStatus::PAID)->find($id, $columns);
     }
 
     // todo 核销有效期
     public function getTimeoutUnConfirmOrders($columns = ['*'])
     {
         return ScenicOrder::query()
-            ->where('status', ScenicOrderEnums::STATUS_PAY)
+            ->where('status', ScenicOrderStatus::PAID)
             ->where('pay_time', '<=', now()->subDays(30))
             ->where('pay_time', '>', now()->subDays(45))
             ->get($columns);
@@ -80,7 +80,7 @@ class ScenicOrderService extends BaseService
         return ScenicOrder::query()
             ->where('user_id', $userId)
             ->where('id', $orderId)
-            ->where('status', ScenicOrderEnums::STATUS_CREATE)
+            ->where('status', ScenicOrderStatus::CREATED)
             ->first($columns);
     }
 
@@ -88,7 +88,7 @@ class ScenicOrderService extends BaseService
     {
         return ScenicOrder::query()
             ->where('order_sn', $orderSn)
-            ->where('status', ScenicOrderEnums::STATUS_CREATE)
+            ->where('status', ScenicOrderStatus::CREATED)
             ->first($columns);
     }
 
@@ -112,7 +112,11 @@ class ScenicOrderService extends BaseService
     public function getTimeoutUnFinishedOrders($columns = ['*'])
     {
         return ScenicOrder::query()
-            ->whereIn('status', [ScenicOrderEnums::STATUS_CONFIRM, ScenicOrderEnums::STATUS_AUTO_CONFIRM, ScenicOrderEnums::STATUS_ADMIN_CONFIRM])
+            ->whereIn('status', [
+                ScenicOrderStatus::CONFIRMED,
+                ScenicOrderStatus::AUTO_CONFIRMED,
+                ScenicOrderStatus::ADMIN_CONFIRMED
+            ])
             ->where('confirm_time', '<=', now()->subDays(15))
             ->where('confirm_time', '>', now()->subDays(30))
             ->get($columns);
@@ -136,7 +140,7 @@ class ScenicOrderService extends BaseService
 
         $order = ScenicOrder::new();
         $order->order_sn = $orderSn;
-        $order->status = ScenicOrderEnums::STATUS_CREATE;
+        $order->status = ScenicOrderStatus::CREATED;
         $order->user_id = $userId;
         $order->consignee = $input->consignee;
         $order->mobile = $input->mobile;
@@ -166,7 +170,7 @@ class ScenicOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'scenic_order_sn:' . $order->order_sn,
+            'body' => '订单编号：' . $order->order_sn,
             'attach' => $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
@@ -190,7 +194,7 @@ class ScenicOrderService extends BaseService
 
         $order->pay_id = $payId;
         $order->pay_time = now()->format('Y-m-d\TH:i:s');
-        $order->status = ScenicOrderEnums::STATUS_PAY;
+        $order->status = ScenicOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -228,18 +232,18 @@ class ScenicOrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != ScenicOrderEnums::STATUS_CREATE) {
+        if ($order->status != ScenicOrderStatus::CREATED) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
         }
         switch ($role) {
             case 'system':
-                $order->status = ScenicOrderEnums::STATUS_AUTO_CANCEL;
+                $order->status = ScenicOrderStatus::AUTO_CANCELED;
                 break;
             case 'admin':
-                $order->status = ScenicOrderEnums::STATUS_ADMIN_CANCEL;
+                $order->status = ScenicOrderStatus::ADMIN_CANCELED;
                 break;
             case 'user':
-                $order->status = ScenicOrderEnums::STATUS_CANCEL;
+                $order->status = ScenicOrderStatus::CANCELED;
                 break;
         }
         if ($order->cas() == 0) {
@@ -247,7 +251,8 @@ class ScenicOrderService extends BaseService
         }
 
         // 删除佣金记录
-        CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::SCENIC);
+        CommissionService::getInstance()
+            ->deleteUnpaidListByOrderIds([$order->id], ProductType::SCENIC);
 
         return $order;
     }
@@ -290,13 +295,13 @@ class ScenicOrderService extends BaseService
             }
             switch ($role) {
                 case 'system':
-                    $order->status = ScenicOrderEnums::STATUS_AUTO_CONFIRM;
+                    $order->status = ScenicOrderStatus::AUTO_CONFIRMED;
                     break;
                 case 'admin':
-                    $order->status = ScenicOrderEnums::STATUS_ADMIN_CONFIRM;
+                    $order->status = ScenicOrderStatus::ADMIN_CONFIRMED;
                     break;
                 case 'user':
-                    $order->status = ScenicOrderEnums::STATUS_CONFIRM;
+                    $order->status = ScenicOrderStatus::CONFIRMED;
                     break;
             }
             $order->confirm_time = now()->format('Y-m-d\TH:i:s');
@@ -309,7 +314,8 @@ class ScenicOrderService extends BaseService
 
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
+        CommissionService::getInstance()
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
@@ -324,7 +330,7 @@ class ScenicOrderService extends BaseService
                 if (!$order->canFinishHandle()) {
                     $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
                 }
-                $order->status = ScenicOrderEnums::STATUS_AUTO_FINISHED;
+                $order->status = ScenicOrderStatus::AUTO_FINISHED;
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -343,7 +349,7 @@ class ScenicOrderService extends BaseService
         if (!$order->canFinishHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
         }
-        $order->status = ScenicOrderEnums::STATUS_FINISHED;
+        $order->status = ScenicOrderStatus::FINISHED;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -393,7 +399,7 @@ class ScenicOrderService extends BaseService
                     Log::info('scenic_order_wx_refund', $result->toArray());
                 }
 
-                $order->status = ScenicOrderEnums::STATUS_REFUND_CONFIRM;
+                $order->status = ScenicOrderStatus::REFUNDED;
                 $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
