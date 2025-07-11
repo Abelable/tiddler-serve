@@ -5,34 +5,28 @@ namespace App\Services;
 use App\Jobs\ShopIncomeConfirmJob;
 use App\Models\CartGoods;
 use App\Models\Coupon;
-use App\Models\ShopIncome;
+use App\Models\ScenicShopIncome;
+use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
-class ShopIncomeService extends BaseService
+class ScenicShopIncomeService extends BaseService
 {
-    public function createIncome($shopId, $orderId, $orderSn, CartGoods $cartGoods, Coupon $coupon = null)
+    public function createIncome($shopId, $orderId, $orderSn, ScenicTicket $ticket, $paymentAmount)
     {
-        $couponDenomination = 0;
-        if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
-            $couponDenomination = $coupon->denomination;
-        }
-        $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
-        $paymentAmount = bcsub($totalPrice, $couponDenomination, 2);
-
-        $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 4);
+        $salesCommissionRate = bcdiv($ticket->sales_commission_rate, 100, 4);
         $incomeRate = bcsub('1', $salesCommissionRate, 4);
         $incomeAmount = bcmul($paymentAmount, $incomeRate, 2);
 
-        $income = ShopIncome::new();
+        $income = ScenicShopIncome::new();
         $income->shop_id = $shopId;
         $income->order_id = $orderId;
         $income->order_sn = $orderSn;
-        $income->goods_id = $cartGoods->goods_id;
-        $income->refund_status = $cartGoods->refund_status;
+        $income->ticket_id = $ticket->id;
+        $income->refund_status = $ticket->refund_status;
         $income->payment_amount = $paymentAmount;
-        $income->sales_commission_rate = $cartGoods->sales_commission_rate;
+        $income->sales_commission_rate = $ticket->sales_commission_rate;
         $income->income_amount = $incomeAmount;
         $income->save();
 
@@ -49,7 +43,7 @@ class ShopIncomeService extends BaseService
 
     public function getShopIncomeQueryByTimeType($shopId, $timeType, $startTime = null)
     {
-        $query = ShopIncome::query()->where('shop_id', $shopId);
+        $query = ScenicShopIncome::query()->where('shop_id', $shopId);
 
         switch ($timeType) {
             case 1:
@@ -114,12 +108,12 @@ class ShopIncomeService extends BaseService
 
     public function getShopIncomeQuery($shopId, array $statusList)
     {
-        return ShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
+        return ScenicShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
 
     public function updateListToPaidStatus(array $orderIds)
     {
-        return ShopIncome::query()
+        return ScenicShopIncome::query()
             ->whereIn('order_id', $orderIds)
             ->where('status', 0)
             ->update(['status' => 1]);
@@ -153,17 +147,17 @@ class ShopIncomeService extends BaseService
 
     public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
     {
-        return ShopIncome::query()->whereIn('order_id', $orderIds)->where('status', 1)->get($columns);
+        return ScenicShopIncome::query()->whereIn('order_id', $orderIds)->where('status', 1)->get($columns);
     }
 
     public function getPaidIncomeById($id, $columns = ['*'])
     {
-        return ShopIncome::query()->where('status', 1)->find($id, $columns);
+        return ScenicShopIncome::query()->where('status', 1)->find($id, $columns);
     }
 
     public function deleteListByOrderIds(array $orderId, $status)
     {
-        return ShopIncome::query()
+        return ScenicShopIncome::query()
             ->where('order_id', $orderId)
             ->where('status', $status)
             ->delete();
@@ -171,7 +165,7 @@ class ShopIncomeService extends BaseService
 
     public function deleteIncome($orderId, $goodsId, $status)
     {
-        return ShopIncome::query()
+        return ScenicShopIncome::query()
             ->where('order_id', $orderId)
             ->where('goods_id', $goodsId)
             ->where('status', $status)

@@ -63,7 +63,6 @@ class CommissionService extends BaseService
         $orderId,
         $orderSn,
         ScenicTicket $ticket,
-        $priceUnit,
         $paymentAmount,
         $userId,
         $userLevel,
@@ -73,7 +72,7 @@ class CommissionService extends BaseService
         $upperSuperiorLevel
     )
     {
-        $salesCommissionRate = bcdiv($priceUnit->salesCommissionRate ?? $ticket->sales_commission_rate, 100, 2);
+        $salesCommissionRate = bcdiv($ticket->sales_commission_rate, 100, 2);
         $promotionCommissionRate = bcdiv($ticket->promotion_commission_rate, 100, 2);
         $promotionCommissionUpperLimit = $ticket->promotion_commission_upper_limit;
         $superiorPromotionCommissionRate = bcdiv($ticket->superior_promotion_commission_rate, 100, 2);

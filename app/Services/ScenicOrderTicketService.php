@@ -25,7 +25,7 @@ class ScenicOrderTicketService extends BaseService
         $orderTicket->name = $ticket->name;
         $orderTicket->selected_date_timestamp = $timeStamp;
         $orderTicket->price = $priceUnit->price;
-        $orderTicket->sales_commission_rate = $priceUnit->salesCommissionRate ?? $ticket->sales_commission_rate;
+        $orderTicket->sales_commission_rate = $ticket->sales_commission_rate;
         $orderTicket->promotion_commission_rate = $ticket->promotion_commission_rate;
         $orderTicket->promotion_commission_upper_limit = $ticket->promotion_commission_upper_limit;
         $orderTicket->superior_promotion_commission_rate = $ticket->superior_promotion_commission_rate;

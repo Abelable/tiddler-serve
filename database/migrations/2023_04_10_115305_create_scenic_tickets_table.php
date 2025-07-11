@@ -15,10 +15,10 @@ class CreateScenicTicketsTable extends Migration
     {
         Schema::create('scenic_tickets', function (Blueprint $table) {
             $table->id();
-            $table->integer('shop_id')->comment('店铺id');
-            $table->integer('type')->comment('门票类型：1-单景点门票，2-多景点联票');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
+            $table->integer('shop_id')->comment('店铺id');
+            $table->integer('type')->comment('门票类型：1-单景点门票，2-多景点联票');
             $table->string('name')->comment('门票名称');
             $table->string('brief_name')->comment('门票简称');
             $table->float('price')->comment('门票最低价格');

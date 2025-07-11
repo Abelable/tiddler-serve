@@ -13,6 +13,7 @@ use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicOrderVerifyService;
 use App\Services\ScenicService;
+use App\Services\ScenicShopIncomeService;
 use App\Services\ScenicShopManagerService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
@@ -79,8 +80,9 @@ class ScenicOrderController extends Controller
             }
         }
 
+        $promoterInfo = $this->user()->promoterInfo;
         $userId = $this->userId();
-        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $userLevel = $promoterInfo ? $promoterInfo->level : 0;
         $superiorId = RelationService::getInstance()->getSuperiorId($userId);
         $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
         $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
@@ -94,6 +96,7 @@ class ScenicOrderController extends Controller
         $paymentAmount = (float)bcmul($priceUnit->price, $input->num, 2);
 
         $orderId = DB::transaction(function () use ($ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
+            // 生成订单
             $order = ScenicOrderService::getInstance()->createOrder($this->userId(), $input, $shop, $paymentAmount);
 
             // 生成景点对应核销码
@@ -108,7 +111,11 @@ class ScenicOrderController extends Controller
 
             // 生成佣金记录
             CommissionService::getInstance()
-                ->createScenicCommission($order->id, $order->order_sn, $ticket, $priceUnit, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+                ->createScenicCommission($order->id, $order->order_sn, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+
+            // 生成店铺收益
+            ScenicShopIncomeService::getInstance()
+                ->createIncome($shop->id, $order->id, $order->order_sn, $ticket, $paymentAmount);
 
             // 增加景点、门票销量
             ScenicService::getInstance()->addSalesVolumeByIds($ticketScenicIds, $input->num);

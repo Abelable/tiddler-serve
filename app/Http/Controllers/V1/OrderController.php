@@ -263,12 +263,11 @@ class OrderController extends Controller
                     })->keyBy('id');
             }
 
-            $userId = $this->userId();
 
             $promoterInfo = $this->user()->promoterInfo;
-            $userLevel = $promoterInfo ? $promoterInfo->level : 0;
             $promoterStatus = $promoterInfo ? $promoterInfo->status : 0;
-
+            $userId = $this->userId();
+            $userLevel = $promoterInfo ? $promoterInfo->level : 0;
             $superiorId = RelationService::getInstance()->getSuperiorId($userId);
             $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
             $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
@@ -293,7 +292,7 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
@@ -318,7 +317,7 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
