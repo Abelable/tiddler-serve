@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Jobs\ShopIncomeConfirmJob;
-use App\Models\CartGoods;
-use App\Models\Coupon;
 use App\Models\ScenicShopIncome;
 use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
@@ -79,7 +77,7 @@ class ScenicShopIncomeService extends BaseService
     public function applyWithdrawal($shopId, $withdrawalId)
     {
         $incomeList = $this->getWithdrawingList($shopId);
-        /** @var ShopIncome $income */
+        /** @var ScenicShopIncome $income */
         foreach ($incomeList as $income) {
             $income->withdrawal_id = $withdrawalId;
             $income->status = 3;
@@ -90,7 +88,7 @@ class ScenicShopIncomeService extends BaseService
     public function finishWithdrawal($shopId, $withdrawalId)
     {
         $incomeList = $this->getWithdrawingList($shopId);
-        /** @var ShopIncome $income */
+        /** @var ScenicShopIncome $income */
         foreach ($incomeList as $income) {
             $income->withdrawal_id = $withdrawalId;
             $income->status = 4;
@@ -122,7 +120,7 @@ class ScenicShopIncomeService extends BaseService
     public function updateListToConfirmStatus($orderIds, $role = 'user')
     {
         $incomeList = $this->getPaidListByOrderIds($orderIds);
-        return $incomeList->map(function (ShopIncome $income) use ($role) {
+        return $incomeList->map(function (ScenicShopIncome $income) use ($role) {
             if ($income->refund_status == 1 && $role == 'user') {
                 // 7天无理由商品：确认收货7天后更新收益状态
                 dispatch(new ShopIncomeConfirmJob($income->id));
@@ -147,7 +145,10 @@ class ScenicShopIncomeService extends BaseService
 
     public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
     {
-        return ScenicShopIncome::query()->whereIn('order_id', $orderIds)->where('status', 1)->get($columns);
+        return ScenicShopIncome::query()
+            ->whereIn('order_id', $orderIds)
+            ->where('status', 1)
+            ->get($columns);
     }
 
     public function getPaidIncomeById($id, $columns = ['*'])
@@ -163,11 +164,11 @@ class ScenicShopIncomeService extends BaseService
             ->delete();
     }
 
-    public function deleteIncome($orderId, $goodsId, $status)
+    public function deleteIncome($orderId, $ticketId, $status)
     {
         return ScenicShopIncome::query()
             ->where('order_id', $orderId)
-            ->where('goods_id', $goodsId)
+            ->where('ticket_id', $ticketId)
             ->where('status', $status)
             ->delete();
     }

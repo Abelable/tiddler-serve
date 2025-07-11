@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class renewPromoterJob implements ShouldQueue
+class CreatePromoterJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -37,7 +37,7 @@ class renewPromoterJob implements ShouldQueue
     public function handle()
     {
         try {
-            PromoterService::getInstance()->renewPromoterByGift($this->orderGoodsId);
+            PromoterService::getInstance()->createPromoterByGift($this->orderGoodsId);
         } catch (BusinessException $e) {
             Log::error($e->getMessage());
         }
