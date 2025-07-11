@@ -44,8 +44,8 @@ class ScenicTicketController extends Controller
             unset($ticket->shop_id);
             unset($ticket->status);
             unset($ticket->failure_reason);
-            unset($ticket->promotion_commission_rate);
-            unset($ticket->sales_commission_rate);
+            unset($ticket->superior_promotion_commission_rate);
+            unset($ticket->superior_promotion_commission_upper_limit);
             unset($ticket->created_at);
             unset($ticket->updated_at);
 
