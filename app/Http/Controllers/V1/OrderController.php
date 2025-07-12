@@ -26,12 +26,11 @@ use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\OrderStatus;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
@@ -359,7 +358,7 @@ class OrderController extends Controller
             OrderService::getInstance()->getTotal($this->userId(), $this->statusList(2)),
             OrderService::getInstance()->getTotal($this->userId(), $this->statusList(3)),
             OrderService::getInstance()->getTotal($this->userId(), $this->statusList(4)),
-            OrderService::getInstance()->getTotal($this->userId(), [OrderEnums::STATUS_REFUND]),
+            OrderService::getInstance()->getTotal($this->userId(), [OrderStatus::REFUNDING]),
         ]);
     }
 
@@ -392,22 +391,22 @@ class OrderController extends Controller
     private function statusList($status) {
         switch ($status) {
             case 1:
-                $statusList = [OrderEnums::STATUS_CREATE];
+                $statusList = [OrderStatus::CREATED];
                 break;
             case 2:
-                $statusList = [OrderEnums::STATUS_PAY, OrderEnums::STATUS_EXPORTED];
+                $statusList = [OrderStatus::PAID, OrderStatus::EXPORTED];
                 break;
             case 3:
-                $statusList = [OrderEnums::STATUS_SHIP, OrderEnums::STATUS_PENDING_VERIFICATION];
+                $statusList = [OrderStatus::SHIPPED, OrderStatus::PENDING_VERIFICATION];
                 break;
             case 4:
-                $statusList = [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM, OrderEnums::STATUS_ADMIN_CONFIRM];
+                $statusList = [OrderStatus::CONFIRMED, OrderStatus::AUTO_CONFIRMED, OrderStatus::ADMIN_CONFIRMED];
                 break;
             case 5:
-                $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [OrderStatus::REFUNDING, OrderStatus::REFUNDED];
                 break;
             case 6:
-                $statusList = [OrderEnums::STATUS_FINISHED];
+                $statusList = [OrderStatus::FINISHED];
                 break;
             default:
                 $statusList = [];
@@ -428,7 +427,7 @@ class OrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
+                'statusDesc' => OrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
@@ -492,7 +491,7 @@ class OrderController extends Controller
             $order['pickup_address'] = $pickupAddress;
             unset($order['pickup_address_id']);
 
-            if ($order->status !== OrderEnums::STATUS_CREATE) {
+            if ($order->status !== OrderStatus::CREATED) {
                 $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
                 $order['verify_code'] = $verifyInfo->code ?: null;
             }

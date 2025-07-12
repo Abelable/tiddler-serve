@@ -12,7 +12,7 @@ use App\Services\OrderVerifyService;
 use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\OrderStatus;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +27,7 @@ class ShopOrderController extends Controller
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(2)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(3)),
             0,
-            OrderService::getInstance()->getShopTotal($shopId, [OrderEnums::STATUS_REFUND]),
+            OrderService::getInstance()->getShopTotal($shopId, [OrderStatus::REFUNDING]),
         ]);
     }
 
@@ -49,19 +49,19 @@ class ShopOrderController extends Controller
     private function statusList($status) {
         switch ($status) {
             case 1:
-                $statusList = [OrderEnums::STATUS_PAY, OrderEnums::STATUS_EXPORTED];
+                $statusList = [OrderStatus::PAID, OrderStatus::EXPORTED];
                 break;
             case 2:
-                $statusList = [OrderEnums::STATUS_SHIP];
+                $statusList = [OrderStatus::SHIPPED];
                 break;
             case 3:
-                $statusList = [OrderEnums::STATUS_PENDING_VERIFICATION];
+                $statusList = [OrderStatus::PENDING_VERIFICATION];
                 break;
             case 4:
-                $statusList = [OrderEnums::STATUS_FINISHED];
+                $statusList = [OrderStatus::FINISHED];
                 break;
             case 5:
-                $statusList = [OrderEnums::STATUS_REFUND, OrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [OrderStatus::REFUNDING, OrderStatus::REFUNDED];
                 break;
             default:
                 $statusList = [];
@@ -82,7 +82,7 @@ class ShopOrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => OrderEnums::STATUS_TEXT_MAP[$order->status],
+                'statusDesc' => OrderStatus::TEXT_MAP[$order->status],
                 'goodsList' => $goodsList,
                 'payTime' => $order->pay_time,
                 'paymentAmount' => $order->payment_amount,

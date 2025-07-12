@@ -14,7 +14,7 @@ use App\Models\OrderGoods;
 use App\Models\Shop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
-use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\OrderStatus;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
@@ -134,7 +134,7 @@ class OrderService extends BaseService
         return Order::query()
             ->where('user_id', $userId)
             ->whereIn('id', $orderIds)
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', OrderStatus::CREATED)
             ->get($columns);
     }
 
@@ -142,7 +142,7 @@ class OrderService extends BaseService
     {
         return Order::query()
             ->whereIn('order_sn', $orderSnList)
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', OrderStatus::CREATED)
             ->get($columns);
     }
 
@@ -150,14 +150,14 @@ class OrderService extends BaseService
     {
         return Order::query()
             ->whereIn('id', $ids)
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', OrderStatus::CREATED)
             ->get($columns);
     }
 
     public function getOverTimeUnpaidList($columns = ['*'])
     {
         return Order::query()
-            ->where('status', OrderEnums::STATUS_CREATE)
+            ->where('status', OrderStatus::CREATED)
             ->where('created_at', '<=', now()->subHours(24))
             ->get($columns);
     }
@@ -165,7 +165,7 @@ class OrderService extends BaseService
     public function getTimeoutUnConfirmOrders($columns = ['*'])
     {
         return Order::query()
-            ->where('status', OrderEnums::STATUS_SHIP)
+            ->where('status', OrderStatus::SHIPPED)
             ->where('ship_time', '<=', now()->subDays(15))
             ->where('ship_time', '>', now()->subDays(30))
             ->get($columns);
@@ -173,13 +173,13 @@ class OrderService extends BaseService
 
     public function getPendingVerifyOrderById($id, $columns = ['*'])
     {
-        return Order::query()->where('status', OrderEnums::STATUS_PENDING_VERIFICATION)->find($id, $columns);
+        return Order::query()->where('status', OrderStatus::PENDING_VERIFICATION)->find($id, $columns);
     }
 
     public function getTimeoutUnFinishedOrders($columns = ['*'])
     {
         return Order::query()
-            ->whereIn('status', [OrderEnums::STATUS_CONFIRM, OrderEnums::STATUS_AUTO_CONFIRM, OrderEnums::STATUS_ADMIN_CONFIRM])
+            ->whereIn('status', [OrderStatus::CONFIRMED, OrderStatus::AUTO_CONFIRMED, OrderStatus::ADMIN_CONFIRMED])
             ->where('confirm_time', '<=', now()->subDays(15))
             ->where('confirm_time', '>', now()->subDays(30))
             ->get($columns);
@@ -255,7 +255,7 @@ class OrderService extends BaseService
 
         $order = Order::new();
         $order->order_sn = $orderSn;
-        $order->status = OrderEnums::STATUS_CREATE;
+        $order->status = OrderStatus::CREATED;
         $order->user_id = $userId;
         $order->delivery_mode = $input->deliveryMode;
         if ($input->deliveryMode == 1) {
@@ -367,10 +367,10 @@ class OrderService extends BaseService
                 }
                 $order->pay_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->delivery_mode == 1) {
-                    $order->status = OrderEnums::STATUS_PAY;
+                    $order->status = OrderStatus::PAID;
                     // todo 待发货通知
                 } else {
-                    $order->status = OrderEnums::STATUS_PENDING_VERIFICATION;
+                    $order->status = OrderStatus::PENDING_VERIFICATION;
                     OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
                     // 同步微信后台订单发货
@@ -448,18 +448,18 @@ class OrderService extends BaseService
     public function cancel($orderList, $role = 'user')
     {
         $orderList = $orderList->map(function (Order $order) use ($role) {
-            if ($order->status != OrderEnums::STATUS_CREATE) {
+            if ($order->status != OrderStatus::CREATED) {
                 $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
             }
             switch ($role) {
                 case 'system':
-                    $order->status = OrderEnums::STATUS_AUTO_CANCEL;
+                    $order->status = OrderStatus::AUTO_CANCELED;
                     break;
                 case 'admin':
-                    $order->status = OrderEnums::STATUS_ADMIN_CANCEL;
+                    $order->status = OrderStatus::ADMIN_CANCELED;
                     break;
                 case 'user':
-                    $order->status = OrderEnums::STATUS_CANCEL;
+                    $order->status = OrderStatus::CANCELED;
                     break;
             }
             $order->finish_time = now()->format('Y-m-d\TH:i:s');
@@ -543,7 +543,7 @@ class OrderService extends BaseService
         }
 
         DB::transaction(function () use ($order, $shipChannel, $shipCode, $shipSn) {
-            $order->status = OrderEnums::STATUS_SHIP;
+            $order->status = OrderStatus::SHIPPED;
             $order->ship_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
@@ -572,7 +572,7 @@ class OrderService extends BaseService
     {
         DB::transaction(function () use ($order, $packageList, $isAllDelivered) {
             if ($isAllDelivered) {
-                $order->status = OrderEnums::STATUS_SHIP;
+                $order->status = OrderStatus::SHIPPED;
                 $order->ship_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
@@ -653,13 +653,13 @@ class OrderService extends BaseService
             }
             switch ($role) {
                 case 'system':
-                    $order->status = OrderEnums::STATUS_AUTO_CONFIRM;
+                    $order->status = OrderStatus::AUTO_CONFIRMED;
                     break;
                 case 'admin':
-                    $order->status = OrderEnums::STATUS_ADMIN_CONFIRM;
+                    $order->status = OrderStatus::ADMIN_CONFIRMED;
                     break;
                 case 'user':
-                    $order->status = OrderEnums::STATUS_CONFIRM;
+                    $order->status = OrderStatus::CONFIRMED;
                     break;
             }
             $order->confirm_time = now()->format('Y-m-d\TH:i:s');
@@ -708,7 +708,7 @@ class OrderService extends BaseService
                 if (!$order->canFinishHandle()) {
                     $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
                 }
-                $order->status = OrderEnums::STATUS_AUTO_FINISHED;
+                $order->status = OrderStatus::AUTO_FINISHED;
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -727,7 +727,7 @@ class OrderService extends BaseService
         if (!$order->canFinishHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
         }
-        $order->status = OrderEnums::STATUS_FINISHED;
+        $order->status = OrderStatus::FINISHED;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -777,7 +777,7 @@ class OrderService extends BaseService
                     Log::info('order_wx_refund', $result->toArray());
                 }
 
-                $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
+                $order->status = OrderStatus::REFUNDED;
                 $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
@@ -814,7 +814,7 @@ class OrderService extends BaseService
         if (!$order->canAftersaleHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单无法申请售后');
         }
-        $order->status = OrderEnums::STATUS_REFUND;
+        $order->status = OrderStatus::REFUNDING;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -862,7 +862,7 @@ class OrderService extends BaseService
             $result = Pay::wechat()->refund($refundParams);
             Log::info('order_wx_refund', $result->toArray());
 
-            $order->status = OrderEnums::STATUS_REFUND_CONFIRM;
+            $order->status = OrderStatus::REFUNDED;
             $order->refund_id = $result['refund_id'];
             $order->refund_time = now()->format('Y-m-d\TH:i:s');
             if ($order->cas() == 0) {

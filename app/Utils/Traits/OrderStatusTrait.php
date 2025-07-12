@@ -2,7 +2,7 @@
 
 namespace App\Utils\Traits;
 
-use App\Utils\Enums\OrderEnums;
+use App\Utils\Enums\OrderStatus;
 use Illuminate\Support\Str;
 
 /**
@@ -14,8 +14,8 @@ use Illuminate\Support\Str;
  * @method bool canCommentHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
- * @method bool canRebuyHandle()
- * @method bool canAftersaleHandle()
+ * @method bool canReBuyHandle()
+ * @method bool canAfterSaleHandle()
  * @method bool canAgreeRefundHandle()
  * @method bool canFinishHandle()
  * @method bool isPayStatus()
@@ -48,7 +48,7 @@ trait OrderStatusTrait
                 ->replaceFirst('is', '')
                 ->replaceLast('Status', '')
                 ->snake()->upper()->prepend('STATUS');
-            $status = (new \ReflectionClass(OrderEnums::class))->getConstant($key);
+            $status = (new \ReflectionClass(OrderStatus::class))->getConstant($key);
             return $this->status == $status;
         }
 
@@ -56,53 +56,54 @@ trait OrderStatusTrait
     }
 
     private $canHandleMap = [
-        'cancel' => [OrderEnums::STATUS_CREATE],
-        'pay' => [OrderEnums::STATUS_CREATE],
-        'ship' => [OrderEnums::STATUS_PAY],
-        'confirm' => [OrderEnums::STATUS_SHIP, OrderEnums::STATUS_PENDING_VERIFICATION],
-        'refund' => [
-            OrderEnums::STATUS_PAY,
-            OrderEnums::STATUS_PENDING_VERIFICATION,
-            OrderEnums::STATUS_EXPORTED,
-            OrderEnums::STATUS_REFUND
-        ],
-        // 同意退款
-        'agreerefund' => [OrderEnums::STATUS_REFUND],
-        'comment' => [
-            OrderEnums::STATUS_CONFIRM,
-            OrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 售后
-        'aftersale' => [
-            OrderEnums::STATUS_CONFIRM,
-            OrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 回购
-        'rebuy' => [
-            OrderEnums::STATUS_CONFIRM,
-            OrderEnums::STATUS_AUTO_CONFIRM
-        ],
+        'cancel' => [OrderStatus::CREATED],
+        'pay' => [OrderStatus::CREATED],
         'delete' => [
-            OrderEnums::STATUS_CANCEL,
-            OrderEnums::STATUS_AUTO_CANCEL,
-            OrderEnums::STATUS_ADMIN_CANCEL,
-            OrderEnums::STATUS_REFUND_CONFIRM,
-            OrderEnums::STATUS_CONFIRM,
-            OrderEnums::STATUS_AUTO_CONFIRM
+            OrderStatus::CANCELED,
+            OrderStatus::AUTO_CANCELED,
+            OrderStatus::ADMIN_CANCELED,
+        ],
+        'refund' => [
+            OrderStatus::PAID,
+            OrderStatus::PENDING_VERIFICATION,
+            OrderStatus::EXPORTED,
+        ],
+        'agreeRefund' => [OrderStatus::REFUNDING],
+        'ship' => [OrderStatus::PAID],
+        'confirm' => [OrderStatus::SHIPPED, OrderStatus::PENDING_VERIFICATION],
+        'comment' => [
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
         ],
         'finish' => [
-            OrderEnums::STATUS_CONFIRM,
-            OrderEnums::STATUS_AUTO_CONFIRM,
-        ]
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
+        ],
+        'afterSale' => [
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
+            OrderStatus::FINISHED,
+            OrderStatus::AUTO_FINISHED,
+        ],
+        'reBuy' => [
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
+            OrderStatus::FINISHED,
+            OrderStatus::AUTO_FINISHED,
+        ],
     ];
 
-    public function isHadPaid()
+    public function isPaid()
     {
         return !in_array($this->status, [
-            OrderEnums::STATUS_CREATE,
-            OrderEnums::STATUS_CANCEL,
-            OrderEnums::STATUS_AUTO_CANCEL,
-            OrderEnums::STATUS_ADMIN_CANCEL,
+            OrderStatus::CREATED,
+            OrderStatus::CANCELED,
+            OrderStatus::AUTO_CANCELED,
+            OrderStatus::AUTO_CANCELED,
         ]);
     }
 
@@ -110,14 +111,16 @@ trait OrderStatusTrait
     {
         return [
             'cancel' => $this->canCancelHandle(),
-            'delete' => $this->canDeleteHandle(),
             'pay' => $this->canPayHandle(),
-            'comment' => $this->canCommentHandle(),
-            'confirm' => $this->canConfirmHandle(),
+            'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
-            'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle(),
+            'agreeRefund' => $this->canAgreeRefundHandle(),
+            'ship' => $this->canShipHandle(),
+            'confirm' => $this->canConfirmHandle(),
+            'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
+            'afterSale' => $this->canAftersaleHandle(),
+            'reBuy' => $this->canRebuyHandle(),
         ];
     }
 }
