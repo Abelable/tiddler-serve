@@ -28,7 +28,7 @@ class CreateMealTicketOrdersTable extends Migration
             $table->float('deduction_balance')->default(0)->comment('余额抵扣金额');
             $table->float('payment_amount')->comment('支付金额');
             $table->float('total_payment_amount')->default(0)->comment('总支付金额，拆单场景');
-            $table->integer('pay_id')->default(0)->comment('支付id');
+            $table->string('pay_id')->default('')->comment('支付id');
             $table->string('pay_time')->default('')->comment('支付时间');
             $table->string('confirm_time')->default('')->comment('用户核销使用时间');
             $table->string('finish_time')->default('')->comment('订单关闭时间');

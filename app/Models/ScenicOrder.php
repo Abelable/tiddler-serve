@@ -22,7 +22,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property float $deduction_balance 余额抵扣金额
  * @property float $payment_amount 支付金额
  * @property float $total_payment_amount 总支付金额，拆单场景
- * @property int $pay_id 支付id
+ * @property string $pay_id 支付id
  * @property string $pay_time 支付时间
  * @property string $approve_time 商家确认时间
  * @property string $confirm_time 用户核销使用时间
