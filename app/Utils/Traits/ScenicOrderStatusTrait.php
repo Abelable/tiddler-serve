@@ -64,8 +64,7 @@ trait ScenicOrderStatusTrait
         ],
         'refund' => [ScenicOrderStatus::PAID],
         'agreeRefund' => [
-            ScenicOrderStatus::REFUNDING,
-            ScenicOrderStatus::MERCHANT_REFUNDING
+            ScenicOrderStatus::REFUNDING
         ],
         'approve' => [ScenicOrderStatus::PAID],
         'confirm' => [ScenicOrderStatus::MERCHANT_APPROVED],

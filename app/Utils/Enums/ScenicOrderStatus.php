@@ -10,8 +10,9 @@ class ScenicOrderStatus
     const ADMIN_CANCELED = 104;
     const PAID = 201;
     const REFUNDING = 202;
-    const MERCHANT_REFUNDING = 203;
-    const REFUNDED = 204;
+    const REFUNDED = 203;
+    const MERCHANT_REJECTED = 204;
+
     const MERCHANT_APPROVED = 301;
     const CONFIRMED = 401;
     const AUTO_CONFIRMED = 402;
@@ -26,8 +27,8 @@ class ScenicOrderStatus
         self::ADMIN_CANCELED => '已取消（管理员）',
         self::PAID => '已付款，待商家确认',
         self::REFUNDING => '退款中（用户）',
-        self::MERCHANT_REFUNDING => '退款中（商家）',
         self::REFUNDED => '已退款',
+        self::MERCHANT_REJECTED => '商家驳回，已退款',
         self::MERCHANT_APPROVED => '商家已确认，待使用',
         self::CONFIRMED => '已确认（用户）',
         self::AUTO_CONFIRMED => '已确认（系统）',

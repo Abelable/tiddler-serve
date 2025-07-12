@@ -192,8 +192,8 @@ class ScenicOrderController extends Controller
             case 5:
                 $statusList = [
                     ScenicOrderStatus::REFUNDING,
-                    ScenicOrderStatus::MERCHANT_REFUNDING,
-                    ScenicOrderStatus::REFUNDED
+                    ScenicOrderStatus::REFUNDED,
+                    ScenicOrderStatus::MERCHANT_REJECTED
                 ];
                 break;
             default:

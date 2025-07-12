@@ -318,6 +318,7 @@ Route::prefix('scenic')->group(function () {
         Route::get('payment_amount', 'ScenicOrderController@paymentAmount');
         Route::post('submit', 'ScenicOrderController@submit');
         Route::post('pay_params', 'ScenicOrderController@payParams');
+        Route::get('total', 'ScenicOrderController@total');
         Route::get('list', 'ScenicOrderController@list');
         Route::get('detail', 'ScenicOrderController@detail');
         Route::get('verify_code', 'ScenicOrderController@verifyCode');
