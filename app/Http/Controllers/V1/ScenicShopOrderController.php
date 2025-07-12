@@ -80,6 +80,7 @@ class ScenicShopOrderController extends Controller
                 'status' => $order->status,
                 'statusDesc' => ScenicOrderStatus::TEXT_MAP[$order->status],
                 'ticketInfo' => $ticket,
+                'totalPrice' => $order->total_price,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
@@ -105,7 +106,7 @@ class ScenicShopOrderController extends Controller
             'updated_at',
         ];
 
-        $order = ScenicOrderService::getInstance()->getUserOrder($shopId, $orderId, $columns);
+        $order = ScenicOrderService::getInstance()->getShopOrder($shopId, $orderId, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }

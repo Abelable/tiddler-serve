@@ -166,22 +166,16 @@ class ScenicOrderService extends BaseService
             ->get($columns);
     }
 
-    public function createOrder($userId, ScenicOrderInput $input, ScenicShop $shop, $paymentAmount)
+    public function createOrder(
+        $userId,
+        ScenicOrderInput $input,
+        ScenicShop $shop,
+        $totalPrice,
+        $deductionBalance,
+        $paymentAmount
+    )
     {
         $orderSn = $this->generateOrderSn();
-
-        // 余额抵扣
-        $deductionBalance = 0;
-        if ($input->useBalance == 1) {
-            $account = AccountService::getInstance()->getUserAccount($userId);
-            $deductionBalance = min($paymentAmount, $account->balance);
-            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
-
-            // 更新余额
-            AccountService::getInstance()
-                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::SCENIC);
-        }
-
         $order = ScenicOrder::new();
         $order->order_sn = $orderSn;
         $order->status = ScenicOrderStatus::CREATED;
@@ -192,9 +186,9 @@ class ScenicOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->total_price = $totalPrice;
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
-        $order->total_payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
         $order->save();
 

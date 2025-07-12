@@ -24,11 +24,11 @@ class CreateScenicOrdersTable extends Migration
             $table->string('consignee')->comment('出游人姓名');
             $table->string('mobile')->comment('出游人手机号');
             $table->string('id_card_number')->comment('出游人身份证号');
+            $table->float('total_price')->comment('门票总价');
             $table->integer('coupon_id')->default(0)->comment('优惠券id');
             $table->float('coupon_denomination')->default(0)->comment('优惠券抵扣金额');
             $table->float('deduction_balance')->default(0)->comment('余额抵扣金额');
             $table->float('payment_amount')->comment('支付金额');
-            $table->float('total_payment_amount')->default(0)->comment('总支付金额，拆单场景');
             $table->string('pay_id')->default('')->comment('支付id');
             $table->string('pay_time')->default('')->comment('支付时间');
             $table->string('approve_time')->default('')->comment('商家确认时间');

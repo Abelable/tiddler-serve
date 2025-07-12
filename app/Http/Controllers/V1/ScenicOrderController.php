@@ -19,6 +19,8 @@ use App\Services\ScenicTicketService;
 use App\Services\TicketScenicService;
 use App\Services\TicketSpecService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
+use App\Utils\Enums\ProductType;
 use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
@@ -91,11 +93,27 @@ class ScenicOrderController extends Controller
         $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
 
         $priceUnit = TicketSpecService::getInstance()->getPriceUnit($input->ticketId, $input->categoryId, $input->timeStamp);
-        $paymentAmount = (float)bcmul($priceUnit->price, $input->num, 2);
+        $totalPrice = (float)bcmul($priceUnit->price, $input->num, 2);
+        $paymentAmount = $totalPrice;
 
-        $orderId = DB::transaction(function () use ($ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($userId);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+        }
+
+        $orderId = DB::transaction(function () use ($totalPrice, $deductionBalance, $ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
             // 生成订单
-            $order = ScenicOrderService::getInstance()->createOrder($userId, $input, $shop, $paymentAmount);
+            $order = ScenicOrderService::getInstance()
+                ->createOrder($userId, $input, $shop, $totalPrice, $deductionBalance, $paymentAmount);
+
+            if ($input->useBalance == 1) {
+                // 更新余额
+                AccountService::getInstance()
+                    ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $order->order_sn, ProductType::SCENIC);
+            }
 
             // 生成景点对应核销码
             foreach ($ticketScenicIds as $scenicId) {

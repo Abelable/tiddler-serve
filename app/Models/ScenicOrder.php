@@ -17,11 +17,11 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property string $consignee 出游人姓名
  * @property string $mobile 出游人手机号
  * @property string $id_card_number 出游人身份证号
+ * @property float $total_price 门票总价
  * @property int $coupon_id 优惠券id
  * @property float $coupon_denomination 优惠券抵扣金额
  * @property float $deduction_balance 余额抵扣金额
  * @property float $payment_amount 支付金额
- * @property float $total_payment_amount 总支付金额，拆单场景
  * @property string $pay_id 支付id
  * @property string $pay_time 支付时间
  * @property string $approve_time 商家确认时间
@@ -66,7 +66,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereShopName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereTotalPaymentAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|ScenicOrder withTrashed()
