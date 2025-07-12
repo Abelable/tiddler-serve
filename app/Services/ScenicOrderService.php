@@ -215,7 +215,7 @@ class ScenicOrderService extends BaseService
         return [
             'out_trade_no' => time(),
             'body' => '订单编号：' . $order->order_sn,
-            'attach' => $order->order_sn,
+            'attach' => 'scenic_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -223,7 +223,7 @@ class ScenicOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['attach'];
+        $orderSn = $data['attach'] ? str_replace('scenic_order_sn:', '', $data['attach']): '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -249,6 +249,9 @@ class ScenicOrderService extends BaseService
 
         // 佣金记录状态更新为：已支付待结算
         CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::SCENIC);
+
+        // 收益记录状态更新为：已支付待结算
+        ScenicShopIncomeService::getInstance()->updateListToPaidStatus([$order->id]);
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
