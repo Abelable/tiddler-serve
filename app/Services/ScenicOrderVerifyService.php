@@ -25,7 +25,10 @@ class ScenicOrderVerifyService extends BaseService
 
     public function getByCode($code, $columns = ['*'])
     {
-        return ScenicOrderVerifyCode::query()->where('code', $code)->where('status', 0)->first($columns);
+        return ScenicOrderVerifyCode::query()
+            ->where('code', $code)
+            ->where('status', 0)
+            ->first($columns);
     }
 
     public function getById($id, $columns = ['*'])
@@ -57,5 +60,7 @@ class ScenicOrderVerifyService extends BaseService
         $log->verifier_id = $userId;
         $log->verify_time = now()->format('Y-m-d\TH:i:s');
         $log->save();
+        
+        return $log;
     }
 }

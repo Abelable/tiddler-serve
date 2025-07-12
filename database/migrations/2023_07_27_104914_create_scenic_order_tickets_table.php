@@ -15,6 +15,7 @@ class CreateScenicOrderTicketsTable extends Migration
     {
         Schema::create('scenic_order_tickets', function (Blueprint $table) {
             $table->id();
+            $table->integer('user_id')->comment('用户id');
             $table->integer('order_id')->comment('订单id');
             $table->integer('ticket_id')->comment('门票id');
             $table->string('name')->comment('门票名称');

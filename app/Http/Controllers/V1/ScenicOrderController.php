@@ -8,13 +8,11 @@ use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
-use App\Services\ScenicManagerService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicOrderVerifyService;
 use App\Services\ScenicService;
 use App\Services\ScenicShopIncomeService;
-use App\Services\ScenicShopManagerService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
@@ -107,7 +105,7 @@ class ScenicOrderController extends Controller
             // 生成订单门票快照
             $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
             ScenicOrderTicketService::getInstance()
-                ->createOrderTicket($order->id, $category, $input->timeStamp, $priceUnit, $input->num, $ticket);
+                ->createOrderTicket($userId, $order->id, $category, $input->timeStamp, $priceUnit, $input->num, $ticket);
 
             // 生成佣金记录
             CommissionService::getInstance()
@@ -136,6 +134,17 @@ class ScenicOrderController extends Controller
         return $this->success($payParams);
     }
 
+    public function total()
+    {
+        return $this->success([
+            ScenicOrderService::getInstance()->getTotal($this->userId(), $this->statusList(1)),
+            ScenicOrderService::getInstance()->getTotal($this->userId(), $this->statusList(2)),
+            ScenicOrderService::getInstance()->getTotal($this->userId(), $this->statusList(3)),
+            ScenicOrderService::getInstance()->getTotal($this->userId(), $this->statusList(4)),
+            ScenicOrderService::getInstance()->getTotal($this->userId(), [ScenicOrderStatus::REFUNDING]),
+        ]);
+    }
+
     public function list()
     {
         /** @var PageInput $input */
@@ -150,7 +159,6 @@ class ScenicOrderController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    // todo 景点订单搜索
     public function search()
     {
         $keywords = $this->verifyRequiredString('keywords');
@@ -161,21 +169,6 @@ class ScenicOrderController extends Controller
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);
-    }
-
-    public function shopList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $status = $this->verifyRequiredInteger('status');
-        $shopId = $this->verifyId('shopId');
-
-        $statusList = $this->statusList($status);
-        $page = ScenicOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $orderList = collect($page->items());
-        $list = $this->handleOrderList($orderList);
-
-        return $this->success($this->paginate($page, $list));
     }
 
     private function statusList($status) {
@@ -233,6 +226,33 @@ class ScenicOrderController extends Controller
         });
     }
 
+    public function detail()
+    {
+        $id = $this->verifyRequiredId('id');
+        $columns = [
+            'id',
+            'order_sn',
+            'status',
+            'consignee',
+            'mobile',
+            'shop_id',
+            'shop_logo',
+            'shop_name',
+            'payment_amount',
+            'pay_time',
+            'confirm_time',
+            'created_at',
+            'updated_at',
+        ];
+        $order = ScenicOrderService::getInstance()->getUserOrder($this->userId(), $id, $columns);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+        $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
+        $order['ticketInfo'] = $ticket;
+        return $this->success($order);
+    }
+
     public function cancel()
     {
         $id = $this->verifyRequiredId('id');
@@ -253,39 +273,6 @@ class ScenicOrderController extends Controller
         return $this->success($verifyCodeInfo->code);
     }
 
-    public function verify()
-    {
-        $code = $this->verifyRequiredString('code');
-
-        $verifyCodeInfo = ScenicOrderVerifyService::getInstance()->getByCode($code);
-        if (is_null($verifyCodeInfo)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
-        }
-
-        $order = ScenicOrderService::getInstance()->getPaidOrderById($verifyCodeInfo->order_id);
-        if (is_null($order)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
-        }
-
-        $managerIds = ScenicManagerService::getInstance()
-            ->getListByScenicId($verifyCodeInfo->scenic_id)->pluck('manager_id')->toArray();
-        $managerUserIds = array_unique(ScenicShopManagerService::getInstance()
-            ->getListByIds($managerIds)->pluck('user_id')->toArray());
-        if (!in_array($this->userId(), $managerUserIds)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前景点核销员，无法核销');
-        }
-
-        DB::transaction(function () use ($verifyCodeInfo, $order) {
-            ScenicOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
-
-            if (!ScenicOrderVerifyService::getInstance()->hasUnverifiedCodes($verifyCodeInfo->order_id)) {
-                ScenicOrderService::getInstance()->userConfirm($order->user_id, $order->id);
-            }
-        });
-
-        return $this->success();
-    }
-
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
@@ -300,32 +287,5 @@ class ScenicOrderController extends Controller
         $id = $this->verifyRequiredId('id');
         ScenicOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
-    }
-
-    public function detail()
-    {
-        $id = $this->verifyRequiredId('id');
-        $columns = [
-            'id',
-            'order_sn',
-            'status',
-            'consignee',
-            'mobile',
-            'shop_id',
-            'shop_logo',
-            'shop_name',
-            'payment_amount',
-            'pay_time',
-            'confirm_time',
-            'created_at',
-            'updated_at',
-        ];
-        $order = ScenicOrderService::getInstance()->getUserOrderById($this->userId(), $id, $columns);
-        if (is_null($order)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
-        }
-        $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
-        $order['ticketInfo'] = $ticket;
-        return $this->success($order);
     }
 }

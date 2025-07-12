@@ -6,6 +6,7 @@ namespace App\Models;
  * App\Models\ScenicOrderTicket
  *
  * @property int $id
+ * @property int $user_id 用户id
  * @property int $order_id 订单id
  * @property int $ticket_id 门票id
  * @property string $name 门票名称
@@ -50,6 +51,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereValidityTime($value)
  * @method static \Illuminate\Database\Query\Builder|ScenicOrderTicket withTrashed()
  * @method static \Illuminate\Database\Query\Builder|ScenicOrderTicket withoutTrashed()

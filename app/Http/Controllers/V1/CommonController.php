@@ -58,7 +58,7 @@ class CommonController extends Controller
     public function qrCode()
     {
         $code = $this->verifyRequiredId('code');
-        $qrCode = QrCode::format('png')->size(300)->generate($code);
+        $qrCode = QrCode::format('png')->size(400)->generate($code);
         return response($qrCode)->header('Content-Type', 'image/png');
     }
 

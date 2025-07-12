@@ -75,7 +75,8 @@ class ShopOrderController extends Controller
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
+        $groupedGoodsList = OrderGoodsService::getInstance()
+            ->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
         return $orderList->map(function (Order $order) use ($groupedGoodsList) {
             $goodsList = $groupedGoodsList->get($order->id);
             return [
@@ -141,11 +142,6 @@ class ShopOrderController extends Controller
                 ->getAddressById($order->pickup_address_id, ['id', 'name', 'address_detail', 'latitude', 'longitude']);
             $order['pickup_address'] = $pickupAddress;
             unset($order['pickup_address_id']);
-
-            if ($order->status !== OrderEnums::STATUS_CREATE) {
-                $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
-                $order['verify_code'] = $verifyInfo->code ?: null;
-            }
         }
 
         return $this->success($order);

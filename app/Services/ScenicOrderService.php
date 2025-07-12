@@ -18,6 +18,22 @@ use Yansongda\Pay\Exceptions\GatewayException;
 
 class ScenicOrderService extends BaseService
 {
+    public function getTotal($userId, $statusList)
+    {
+        return ScenicOrder::query()
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
+    public function getShopTotal($shopId, $statusList)
+    {
+        return ScenicOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
         $query = ScenicOrder::query()->where('user_id', $userId);
@@ -40,9 +56,14 @@ class ScenicOrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getUserOrderById($userId, $id, $columns = ['*'])
+    public function getUserOrder($userId, $id, $columns = ['*'])
     {
         return ScenicOrder::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getShopOrder($shopId, $id, $columns = ['*'])
+    {
+        return ScenicOrder::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
@@ -65,13 +86,18 @@ class ScenicOrderService extends BaseService
         return ScenicOrder::query()->where('status', ScenicOrderStatus::PAID)->find($id, $columns);
     }
 
+    public function getApprovedOrderById($id, $columns = ['*'])
+    {
+        return ScenicOrder::query()->where('status', ScenicOrderStatus::MERCHANT_APPROVED)->find($id, $columns);
+    }
+
     // todo 核销有效期
     public function getTimeoutUnConfirmOrders($columns = ['*'])
     {
         return ScenicOrder::query()
-            ->where('status', ScenicOrderStatus::PAID)
-            ->where('pay_time', '<=', now()->subDays(30))
-            ->where('pay_time', '>', now()->subDays(45))
+            ->where('status', ScenicOrderStatus::MERCHANT_APPROVED)
+            ->where('approve_time', '<=', now()->subDays(30))
+            ->where('approve_time', '>', now()->subDays(45))
             ->get($columns);
     }
 
@@ -212,6 +238,25 @@ class ScenicOrderService extends BaseService
         return $order;
     }
 
+    public function approve($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canApproveHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+        }
+
+        $order->status = ScenicOrderStatus::MERCHANT_APPROVED;
+        $order->approve_time = now()->format('Y-m-d\TH:i:s');
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+
+        return $order;
+    }
+
     public function userCancel($userId, $orderId)
     {
         return DB::transaction(function () use ($userId, $orderId) {
@@ -228,7 +273,7 @@ class ScenicOrderService extends BaseService
 
     public function cancel($userId, $orderId, $role = 'user')
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -316,6 +361,8 @@ class ScenicOrderService extends BaseService
         $orderIds = $orderList->pluck('id')->toArray();
         CommissionService::getInstance()
             ->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
+        // 收益记录变更为待提现
+        ScenicShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
@@ -342,7 +389,7 @@ class ScenicOrderService extends BaseService
 
     public function finish($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -358,7 +405,16 @@ class ScenicOrderService extends BaseService
 
     public function userRefund($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        $this->refund($order);
+    }
+
+    public function shopRefund($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -423,7 +479,7 @@ class ScenicOrderService extends BaseService
 
     public function delete($userId, $orderId)
     {
-        $order = $this->getUserOrderById($userId, $orderId);
+        $order = $this->getUserOrder($userId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\ShopIncomeConfirmJob;
+use App\Jobs\ScenicShopIncomeConfirmJob;
 use App\Models\ScenicShopIncome;
 use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
@@ -123,7 +123,7 @@ class ScenicShopIncomeService extends BaseService
         return $incomeList->map(function (ScenicShopIncome $income) use ($role) {
             if ($income->refund_status == 1 && $role == 'user') {
                 // 7天无理由商品：确认收货7天后更新收益状态
-                dispatch(new ShopIncomeConfirmJob($income->id));
+                dispatch(new ScenicShopIncomeConfirmJob($income->id));
             } else {
                 $income->status = 2;
                 $income->save();

@@ -143,8 +143,8 @@ Route::prefix('shop')->group(function () {
         Route::post('order_list', 'ShopIncomeController@incomeOrderList');
 
         Route::prefix('withdraw')->group(function () {
-            Route::post('submit', 'CommissionWithdrawalController@submit');
-            Route::get('record_list', 'CommissionWithdrawalController@recordList');
+            Route::post('submit', 'ShopWithdrawalController@submit');
+            Route::get('record_list', 'ShopWithdrawalController@recordList');
         });
     });
 });
@@ -198,9 +198,8 @@ Route::prefix('order')->group(function () {
     Route::get('list', 'OrderController@list');
     Route::get('search', 'OrderController@search');
     Route::get('detail', 'OrderController@detail');
-    Route::post('confirm', 'OrderController@confirm');
     Route::get('verify_code', 'OrderController@verifyCode');
-    Route::get('qr_code', 'OrderController@qrCode');
+    Route::post('confirm', 'OrderController@confirm');
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
     Route::post('delete', 'OrderController@delete');
@@ -286,6 +285,27 @@ Route::prefix('scenic')->group(function () {
             Route::post('down', 'ScenicTicketController@down');
             Route::post('delete', 'ScenicTicketController@delete');
         });
+
+        Route::prefix('order')->group(function () {
+            Route::get('total', 'ScenicShopOrderController@total');
+            Route::get('list', 'ScenicShopOrderController@list');
+            Route::get('detail', 'ScenicShopOrderController@detail');
+            Route::post('approve', 'ScenicShopOrderController@approve');
+            Route::post('refund', 'ScenicShopOrderController@refund');
+            Route::post('verify', 'ScenicShopOrderController@verify');
+        });
+
+        Route::prefix('income')->group(function () {
+            Route::get('data_overview', 'ScenicShopIncomeController@dataOverview');
+            Route::get('sum', 'ScenicShopIncomeController@sum');
+            Route::get('time_data', 'ScenicShopIncomeController@timeData');
+            Route::post('order_list', 'ScenicShopIncomeController@incomeOrderList');
+
+            Route::prefix('withdraw')->group(function () {
+                Route::post('submit', 'ScenicShopWithdrawalController@submit');
+                Route::get('record_list', 'ScenicShopWithdrawalController@recordList');
+            });
+        });
     });
 
     Route::prefix('ticket')->group(function () {
@@ -295,14 +315,12 @@ Route::prefix('scenic')->group(function () {
     });
 
     Route::prefix('order')->group(function () {
-        Route::get('calc_payment_amount', 'ScenicOrderController@paymentAmount');
+        Route::get('payment_amount', 'ScenicOrderController@paymentAmount');
         Route::post('submit', 'ScenicOrderController@submit');
         Route::post('pay_params', 'ScenicOrderController@payParams');
         Route::get('list', 'ScenicOrderController@list');
-        Route::get('shop_list', 'ScenicOrderController@shopList');
         Route::get('detail', 'ScenicOrderController@detail');
         Route::get('verify_code', 'ScenicOrderController@verifyCode');
-        Route::post('verify', 'ScenicOrderController@verify');
         Route::post('refund', 'ScenicOrderController@refund');
         Route::post('cancel', 'ScenicOrderController@cancel');
         Route::post('delete', 'ScenicOrderController@delete');

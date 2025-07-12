@@ -19,7 +19,10 @@ class OrderVerifyService extends BaseService
 
     public function getByCode($code, $columns = ['*'])
     {
-        return OrderVerifyCode::query()->where('code', $code)->where('status', 0)->first($columns);
+        return OrderVerifyCode::query()
+            ->where('code', $code)
+            ->where('status', 0)
+            ->first($columns);
     }
 
     public function getByOrderId($orderId, $columns = ['*'])

@@ -24,6 +24,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property float $total_payment_amount 总支付金额，拆单场景
  * @property int $pay_id 支付id
  * @property string $pay_time 支付时间
+ * @property string $approve_time 商家确认时间
  * @property string $confirm_time 用户核销使用时间
  * @property string $finish_time 订单关闭时间
  * @property float $refund_amount 退款金额
@@ -39,6 +40,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicOrder onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereApproveTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereConfirmTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereConsignee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder whereCouponDenomination($value)

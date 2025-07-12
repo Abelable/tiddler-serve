@@ -9,6 +9,7 @@ use App\Models\ScenicTicketCategory;
 class ScenicOrderTicketService extends BaseService
 {
     public function createOrderTicket(
+        $userId,
         $orderId,
         ScenicTicketCategory $categoryInfo,
         $timeStamp,
@@ -18,6 +19,7 @@ class ScenicOrderTicketService extends BaseService
     )
     {
         $orderTicket = ScenicOrderTicket::new();
+        $orderTicket->user_id = $userId;
         $orderTicket->order_id = $orderId;
         $orderTicket->category_id = $categoryInfo->id;
         $orderTicket->category_name = $categoryInfo->name;
@@ -68,7 +70,6 @@ class ScenicOrderTicketService extends BaseService
 
     public function searchList($userId, $keyword, $columns = ['*'])
     {
-        // todo 景点订单搜索
         return ScenicOrderTicket::query()
             ->where('user_id', $userId)
             ->where('name', 'like', "%{$keyword}%")

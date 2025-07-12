@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
  * @method bool canDeleteHandle()
  * @method bool canPayHandle()
  * @method bool canCommentHandle()
+ * @method bool canApproveHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
  * @method bool canReBuyHandle()
@@ -66,6 +67,7 @@ trait ScenicOrderStatusTrait
             ScenicOrderStatus::REFUNDING,
             ScenicOrderStatus::MERCHANT_REFUNDING
         ],
+        'approve' => [ScenicOrderStatus::PAID],
         'confirm' => [ScenicOrderStatus::MERCHANT_APPROVED],
         'comment' => [
             ScenicOrderStatus::CONFIRMED,
@@ -111,6 +113,7 @@ trait ScenicOrderStatusTrait
             'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
             'agreeRefund' => $this->canAgreeRefundHandle(),
+            'approve' => $this->canApproveHandle(),
             'confirm' => $this->canConfirmHandle(),
             'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),

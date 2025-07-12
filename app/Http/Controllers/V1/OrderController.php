@@ -36,8 +36,6 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
 {
-    protected $except = ['qrCode'];
-
     public function preOrderInfo()
     {
         $cartGoodsIds = $this->verifyArrayNotEmpty('cartGoodsIds');
@@ -423,7 +421,8 @@ class OrderController extends Controller
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupedGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
+        $groupedGoodsList = OrderGoodsService::getInstance()
+            ->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
         return $orderList->map(function (Order $order) use ($groupedGoodsList) {
             $goodsList = $groupedGoodsList->get($order->id);
             return [
@@ -500,13 +499,6 @@ class OrderController extends Controller
         }
 
         return $this->success($order);
-    }
-
-    public function qrCode()
-    {
-        $code = $this->verifyRequiredId('code');
-        $qrCode = QrCode::format('png')->size(400)->generate($code);
-        return response($qrCode)->header('Content-Type', 'image/png');
     }
 
     public function verifyCode()
