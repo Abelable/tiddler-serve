@@ -23,7 +23,7 @@ class ScenicShopOrderController extends Controller
         return $this->success([
             ScenicOrderService::getInstance()->getShopTotal($shopId, $this->statusList(1)),
             ScenicOrderService::getInstance()->getShopTotal($shopId, $this->statusList(2)),
-            ScenicOrderService::getInstance()->getShopTotal($shopId, $this->statusList(3)),
+            0,
             ScenicOrderService::getInstance()->getShopTotal($shopId, [ScenicOrderStatus::REFUNDING]),
         ]);
     }
