@@ -120,16 +120,16 @@ class ScenicShopOrderController extends Controller
     public function approve()
     {
         $shopId = $this->verifyRequiredId('shopId');
-        $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->approve($shopId, $id);
+        $orderId = $this->verifyRequiredId('orderId');
+        ScenicOrderService::getInstance()->approve($shopId, $orderId);
         return $this->success();
     }
 
     public function refund()
     {
         $shopId = $this->verifyRequiredId('shopId');
-        $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->shopRefund($shopId, $id);
+        $orderId = $this->verifyRequiredId('orderId');
+        ScenicOrderService::getInstance()->shopRefund($shopId, $orderId);
         return $this->success();
     }
 
