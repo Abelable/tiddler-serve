@@ -3,37 +3,38 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopIncome;
-use App\Services\GoodsService;
+use App\Models\ScenicShopIncome;
 use App\Services\ProductHistoryService;
-use App\Services\ShopIncomeService;
-use App\Services\OrderGoodsService;
-use App\Services\OrderService;
+use App\Services\ScenicOrderService;
+use App\Services\ScenicOrderTicketService;
+use App\Services\ScenicShopIncomeService;
+use App\Services\ShopScenicSpotService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
-class ShopIncomeController extends Controller
+class ScenicShopIncomeController extends Controller
 {
     public function dataOverview()
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $totalIncome = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
+        $totalIncome = ScenicShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
-        $todayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId);
+        $todayOrderQuery = ScenicOrderService::getInstance()->getShopDateQuery($shopId);
         $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
         $todayOrderCount = (clone $todayOrderQuery)->count();
 
-        $yesterdayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $yesterdayOrderQuery = ScenicOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
         $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
-        $goodsIds = GoodsService::getInstance()->getShopGoodsList($shopId, [1])->pluck('id')->toArray();
+        $scenicIds = ShopScenicSpotService::getInstance()
+            ->getScenicList($shopId, [1])->pluck('id')->toArray();
         $todayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::GOODS, $goodsIds);
+            ->getHistoryDateCount(ProductType::SCENIC, $scenicIds);
         $yesterdayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::GOODS, $goodsIds, 'yesterday');
+            ->getHistoryDateCount(ProductType::SCENIC, $scenicIds, 'yesterday');
 
         return $this->success([
             'totalIncome' => $totalIncome,
@@ -50,13 +51,13 @@ class ShopIncomeController extends Controller
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $cashAmount = ShopIncomeService::getInstance()
+        $cashAmount = ScenicShopIncomeService::getInstance()
             ->getShopIncomeQuery($shopId, [2])
             ->whereMonth('created_at', '!=', Carbon::now()->month)
             ->sum('income_amount');
-        $pendingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
-        $withdrawingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
-        $settledAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
+        $pendingAmount = ScenicShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
+        $withdrawingAmount = ScenicShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
+        $settledAmount = ScenicShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
 
         return $this->success([
             'cashAmount' => $cashAmount,
@@ -71,7 +72,7 @@ class ShopIncomeController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $timeType = $this->verifyRequiredInteger('timeType');
 
-        $query = ShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
+        $query = ScenicShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
@@ -94,28 +95,28 @@ class ShopIncomeController extends Controller
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
 
-        $page = ShopIncomeService::getInstance()->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
+        $page = ScenicShopIncomeService::getInstance()
+            ->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
         $incomeList = collect($page->items());
 
         $orderIds = $incomeList->pluck('order_id')->toArray();
-        $goodsIds = $incomeList->pluck('goods_id')->toArray();
-        $goodsMap = [];
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderIdsAndGoodsIds($orderIds, $goodsIds);
-        foreach ($goodsList as $goods) {
-            $goodsMap[$goods->order_id][$goods->goods_id] = [
-                'id' => $goods->goods_id,
-                'cover' => $goods->cover,
-                'name' => $goods->name,
-                'selectedSkuName' => $goods->selected_sku_name,
-                'price' => $goods->price,
-                'number' => $goods->number,
+        $ticketIds = $incomeList->pluck('ticket_id')->toArray();
+        $ticketMap = [];
+        $ticketList = ScenicOrderTicketService::getInstance()
+            ->getListByOrderIdsAndTicketIds($orderIds, $ticketIds);
+        foreach ($ticketList as $ticket) {
+            $ticketMap[$ticket->order_id][$ticket->ticket_id] = [
+                'id' => $ticket->ticket_id,
+                'name' => $ticket->name,
+                'price' => $ticket->price,
+                'number' => $ticket->number,
             ];
         }
 
-        $list = $incomeList->map(function (ShopIncome $income) use ($goodsMap) {
-            $goodsInfo = $goodsMap[$income->order_id][$income->goods_id] ?? null;
-            $income['goodsInfo'] = $goodsInfo;
-            unset($income['goods_id']);
+        $list = $incomeList->map(function (ScenicShopIncome $income) use ($ticketMap) {
+            $ticketInfo = $ticketMap[$income->order_id][$income->ticket_id] ?? null;
+            $income['ticketInfo'] = $ticketInfo;
+            unset($income['ticket_id']);
             return $income;
         });
 

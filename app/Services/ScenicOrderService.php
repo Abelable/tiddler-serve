@@ -11,6 +11,7 @@ use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -69,6 +70,23 @@ class ScenicOrderService extends BaseService
     public function getUserOrderList($userId, $ids, $columns = ['*'])
     {
         return ScenicOrder::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+    }
+
+    public function getShopDateQuery($shopId, $dateDesc = 'today')
+    {
+        switch ($dateDesc) {
+            case 'today':
+                $date = Carbon::today();
+                break;
+            case 'yesterday':
+                $date = Carbon::yesterday();
+                break;
+        }
+
+        return ScenicOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereDate('created_at', $date)
+            ->whereIn('status', [201, 301, 401, 402, 403, 501, 502]);
     }
 
     public function getOrderListByIds(array $ids, $columns = ['*'])

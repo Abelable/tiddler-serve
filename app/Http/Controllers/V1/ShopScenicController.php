@@ -30,7 +30,7 @@ class ShopScenicController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
 
         $page = ShopScenicSpotService::getInstance()
-            ->getScenicList($shopId, $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
+            ->getScenicPage($shopId, $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $shopScenicSpotList = collect($page->items());
 
         $scenicIds = $shopScenicSpotList->pluck('scenic_id')->toArray();

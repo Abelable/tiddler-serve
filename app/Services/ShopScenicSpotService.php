@@ -16,13 +16,21 @@ class ShopScenicSpotService extends BaseService
             ->count();
     }
 
-    public function getScenicList($shopId, StatusPageInput $input, $columns = ['*'])
+    public function getScenicPage($shopId, StatusPageInput $input, $columns = ['*'])
     {
         return ShopScenicSpot::query()
             ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getScenicList($shopId, array $statusList, $columns = ['*'])
+    {
+        return ShopScenicSpot::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->get($columns);
     }
 
     public function getShopScenicById($shopId, $id, $columns = ['*'])
