@@ -95,7 +95,7 @@ class ScenicOrderController extends Controller
 
         $orderId = DB::transaction(function () use ($ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
             // 生成订单
-            $order = ScenicOrderService::getInstance()->createOrder($this->userId(), $input, $shop, $paymentAmount);
+            $order = ScenicOrderService::getInstance()->createOrder($userId, $input, $shop, $paymentAmount);
 
             // 生成景点对应核销码
             foreach ($ticketScenicIds as $scenicId) {
