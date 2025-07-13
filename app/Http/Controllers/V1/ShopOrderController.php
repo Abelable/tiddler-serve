@@ -64,7 +64,19 @@ class ShopOrderController extends Controller
                 $statusList = [OrderStatus::REFUNDING, OrderStatus::REFUNDED];
                 break;
             default:
-                $statusList = [];
+                $statusList = [
+                    OrderStatus::PAID,
+                    OrderStatus::EXPORTED,
+                    OrderStatus::REFUNDING,
+                    OrderStatus::REFUNDED,
+                    OrderStatus::SHIPPED,
+                    OrderStatus::PENDING_VERIFICATION,
+                    OrderStatus::CONFIRMED,
+                    OrderStatus::AUTO_CONFIRMED,
+                    OrderStatus::ADMIN_CONFIRMED,
+                    OrderStatus::FINISHED,
+                    OrderStatus::AUTO_FINISHED
+                ];
                 break;
         }
 
