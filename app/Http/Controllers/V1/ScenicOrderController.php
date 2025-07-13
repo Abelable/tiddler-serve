@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicOrder;
+use App\Models\ScenicOrderTicket;
 use App\Models\ScenicSpot;
 use App\Models\ScenicTicket;
 use App\Services\AccountService;
@@ -97,6 +98,7 @@ class ScenicOrderController extends Controller
             ->getScenicListByIds($ticketScenicIds, ['id', 'name', 'image_list'])
             ->map(function (ScenicSpot $scenic) {
                 $scenic['cover'] = json_decode($scenic->image_list, true)[0];
+                unset($scenic['image_list']);
                 return $scenic;
             })
             ->toArray();
@@ -236,10 +238,14 @@ class ScenicOrderController extends Controller
     private function handleOrderList($orderList)
     {
         $orderIds = $orderList->pluck('id')->toArray();
-        $ticketList = ScenicOrderTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
+        $ticketList = ScenicOrderTicketService::getInstance()
+            ->getListByOrderIds($orderIds)
+            ->keyBy('order_id');
 
         return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
+            /** @var ScenicOrderTicket $ticket */
             $ticket = $ticketList->get($order->id);
+
             return [
                 'id' => $order->id,
                 'orderSn' => $order->order_sn,
@@ -248,10 +254,24 @@ class ScenicOrderController extends Controller
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
-                'ticketInfo' => $ticket,
+                'ticketInfo' => [
+                    'id' => $ticket->ticket_id,
+                    'name' => $ticket->name,
+                    'categoryName' => $ticket->category_name,
+                    'price' => $ticket->price,
+                    'number' => $ticket->number,
+                    'scenicList' => json_decode($ticket->scenic_list),
+                    'validityTime' => $ticket->validity_time,
+                    'selectedDateTimestamp' => $ticket->selected_date_timestamp,
+                    'effectiveTime' => $ticket->effective_time,
+                    'refundStatus' => $ticket->refund_status,
+                    'needExchange' => $ticket->need_exchange
+                ],
+                'totalPrice' => $order->total_price,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
+                'idCardNumber' => $order->id_card_number,
                 'payTime' => $order->pay_time,
                 'createdAt' => $order->created_at
             ];

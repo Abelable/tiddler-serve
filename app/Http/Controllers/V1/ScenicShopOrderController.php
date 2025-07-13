@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicOrder;
+use App\Models\ScenicOrderTicket;
 use App\Services\ScenicManagerService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
@@ -72,19 +73,38 @@ class ScenicShopOrderController extends Controller
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = ScenicOrderTicketService::getInstance()
-            ->getListByOrderIds($orderIds)->keyBy('order_id');
+            ->getListByOrderIds($orderIds)
+            ->keyBy('order_id');
+
         return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
+            /** @var ScenicOrderTicket $ticket */
             $ticket = $ticketList->get($order->id);
+
             return [
                 'id' => $order->id,
+                'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => ScenicOrderStatus::TEXT_MAP[$order->status],
-                'ticketInfo' => $ticket,
+                'ticketInfo' => [
+                    'id' => $ticket->ticket_id,
+                    'name' => $ticket->name,
+                    'categoryName' => $ticket->category_name,
+                    'price' => $ticket->price,
+                    'number' => $ticket->number,
+                    'scenicList' => json_decode($ticket->scenic_list),
+                    'validityTime' => $ticket->validity_time,
+                    'selectedDateTimestamp' => $ticket->selected_date_timestamp,
+                    'effectiveTime' => $ticket->effective_time,
+                    'refundStatus' => $ticket->refund_status,
+                    'needExchange' => $ticket->need_exchange
+                ],
                 'totalPrice' => $order->total_price,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'orderSn' => $order->order_sn
+                'idCardNumber' => $order->id_card_number,
+                'payTime' => $order->pay_time,
+                'createdAt' => $order->created_at
             ];
         });
     }
