@@ -33,6 +33,7 @@ class CreateScenicOrderTicketsTable extends Migration
             $table->integer('validity_time')->comment('有效期, 单位天');
             $table->integer('refund_status')->comment('退票状态：1-随时可退，2-有条件退，3-不可退');
             $table->integer('need_exchange')->comment('是否需要换票：0-无需换票，1-需要换票');
+            $table->string('scenic_list')->default('')->comment('关联景点列表');
             $table->timestamps();
             $table->softDeletes();
         });

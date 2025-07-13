@@ -4,6 +4,8 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\ScenicOrder;
+use App\Models\ScenicSpot;
+use App\Models\ScenicTicket;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\PromoterService;
@@ -89,7 +91,16 @@ class ScenicOrderController extends Controller
         $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
 
         $ticket = ScenicTicketService::getInstance()->getTicketById($input->ticketId);
+
         $ticketScenicIds = TicketScenicService::getInstance()->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
+        $scenicList = ScenicService::getInstance()
+            ->getScenicListByIds($ticketScenicIds, ['id', 'name', 'image_list'])
+            ->map(function (ScenicSpot $scenic) {
+                $scenic['cover'] = json_decode($scenic->image_list, true)[0];
+                return $scenic;
+            })
+            ->toArray();
+
         $shop = ScenicShopService::getInstance()->getShopById($ticket->shop_id);
 
         $priceUnit = TicketSpecService::getInstance()->getPriceUnit($input->ticketId, $input->categoryId, $input->timeStamp);
@@ -104,26 +115,20 @@ class ScenicOrderController extends Controller
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
         }
 
-        $orderId = DB::transaction(function () use ($totalPrice, $deductionBalance, $ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
+        $orderId = DB::transaction(function () use ($scenicList, $totalPrice, $deductionBalance, $ticketScenicIds, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $ticket, $priceUnit, $input) {
             // 生成订单
             $order = ScenicOrderService::getInstance()
                 ->createOrder($userId, $input, $shop, $totalPrice, $deductionBalance, $paymentAmount);
 
-            if ($input->useBalance == 1) {
-                // 更新余额
-                AccountService::getInstance()
-                    ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $order->order_sn, ProductType::SCENIC);
-            }
+            // 生成订单门票快照
+            $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
+            ScenicOrderTicketService::getInstance()
+                ->createOrderTicket($userId, $order->id, $category, $input->timeStamp, $priceUnit, $input->num, $ticket, $scenicList);
 
             // 生成景点对应核销码
             foreach ($ticketScenicIds as $scenicId) {
                 ScenicOrderVerifyService::getInstance()->createVerifyCode($order->id, $scenicId);
             }
-
-            // 生成订单门票快照
-            $category = ScenicTicketCategoryService::getInstance()->getCategoryById($input->categoryId);
-            ScenicOrderTicketService::getInstance()
-                ->createOrderTicket($userId, $order->id, $category, $input->timeStamp, $priceUnit, $input->num, $ticket);
 
             // 生成佣金记录
             CommissionService::getInstance()
@@ -132,6 +137,12 @@ class ScenicOrderController extends Controller
             // 生成店铺收益
             ScenicShopIncomeService::getInstance()
                 ->createIncome($shop->id, $order->id, $order->order_sn, $ticket, $paymentAmount);
+
+            // 更新余额
+            if ($input->useBalance == 1) {
+                AccountService::getInstance()
+                    ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $order->order_sn, ProductType::SCENIC);
+            }
 
             // 增加景点、门票销量
             ScenicService::getInstance()->addSalesVolumeByIds($ticketScenicIds, $input->num);
@@ -226,10 +237,12 @@ class ScenicOrderController extends Controller
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = ScenicOrderTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
+
         return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
             $ticket = $ticketList->get($order->id);
             return [
                 'id' => $order->id,
+                'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => ScenicOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
@@ -239,7 +252,8 @@ class ScenicOrderController extends Controller
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'orderSn' => $order->order_sn
+                'payTime' => $order->pay_time,
+                'createdAt' => $order->created_at
             ];
         });
     }

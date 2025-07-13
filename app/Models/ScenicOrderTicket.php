@@ -24,6 +24,7 @@ namespace App\Models;
  * @property int $validity_time 有效期, 单位天
  * @property int $refund_status 退票状态：1-随时可退，2-有条件退，3-不可退
  * @property int $need_exchange 是否需要换票：0-无需换票，1-需要换票
+ * @property string $scenic_list 关联景点列表
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -46,6 +47,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket wherePromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSalesCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereScenicList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSelectedDateTimestamp($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSuperiorPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrderTicket whereSuperiorPromotionCommissionUpperLimit($value)

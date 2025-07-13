@@ -15,7 +15,8 @@ class ScenicOrderTicketService extends BaseService
         $timeStamp,
         $priceUnit,
         $number,
-        ScenicTicket $ticket
+        ScenicTicket $ticket,
+        $scenicList
     )
     {
         $orderTicket = ScenicOrderTicket::new();
@@ -37,6 +38,7 @@ class ScenicOrderTicketService extends BaseService
         $orderTicket->validity_time = $ticket->validity_time;
         $orderTicket->refund_status = $ticket->refund_status;
         $orderTicket->need_exchange = $ticket->need_exchange;
+        $orderTicket->scenic_list = json_encode($scenicList);
         $orderTicket->save();
     }
 
