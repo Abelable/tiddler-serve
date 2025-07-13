@@ -114,7 +114,7 @@ class WxMpServe
         return $result;
     }
 
-    public function getQRCode($scene, $page)
+    public function getQrCode($scene, $page)
     {
         return  $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
     }

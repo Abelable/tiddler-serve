@@ -17,7 +17,6 @@ use App\Services\ShopDepositPaymentLogService;
 use App\Services\OrderService;
 use App\Services\RestaurantService;
 use App\Services\ScenicOrderService;
-use App\Services\ScenicProviderOrderService;
 use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopService;
 use App\Services\SetMealOrderService;
@@ -32,7 +31,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class CommonController extends Controller
 {
-    protected $except = ['ossConfig', 'wxPayNotify'];
+    protected $except = ['ossConfig', 'wxPayNotify', 'qrCode'];
 
     public function ossConfig()
     {
@@ -40,12 +39,12 @@ class CommonController extends Controller
         return $this->success($config);
     }
 
-    public function wxQRCode()
+    public function wxQrCode()
     {
         $scene = $this->verifyRequiredString('scene');
         $page = $this->verifyRequiredString('page');
 
-        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+        $imageData = WxMpServe::new()->getQrCode($scene, $page);
         $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
 
         return $this->success($qrcode);

@@ -392,7 +392,7 @@ class TourismNoteController extends Controller
         $note->share_times = $shareTimes;
         $note->save();
 
-        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+        $imageData = WxMpServe::new()->getQrCode($scene, $page);
         $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
 
         return $this->success(['qrcode' => $qrcode, 'shareTimes' => $shareTimes]);

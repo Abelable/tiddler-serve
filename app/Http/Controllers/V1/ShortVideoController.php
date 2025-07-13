@@ -306,7 +306,7 @@ class ShortVideoController extends Controller
         $video->share_times = $shareTimes;
         $video->save();
 
-        $imageData = WxMpServe::new()->getQRCode($scene, $page);
+        $imageData = WxMpServe::new()->getQrCode($scene, $page);
         $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
 
         return $this->success(['qrcode' => $qrcode, 'shareTimes' => $shareTimes]);
