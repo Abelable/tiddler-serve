@@ -111,6 +111,12 @@ class CommissionController extends Controller
                 'categoryName' => $scenicTicket->category_name,
                 'price' => $scenicTicket->price,
                 'number' => $scenicTicket->number,
+                'scenicList' => json_decode($scenicTicket->scenic_list),
+                'validityTime' => $scenicTicket->validity_time,
+                'selectedDateTimestamp' => $scenicTicket->selected_date_timestamp,
+                'effectiveTime' => $scenicTicket->effective_time,
+                'refundStatus' => $scenicTicket->refund_status,
+                'needExchange' => $scenicTicket->need_exchange
             ];
         }
 
