@@ -121,8 +121,8 @@ class ScenicShopIncomeService extends BaseService
     {
         $incomeList = $this->getPaidListByOrderIds($orderIds);
         return $incomeList->map(function (ScenicShopIncome $income) use ($role) {
-            if ($income->refund_status == 1 && $role == 'user') {
-                // 7天无理由商品：确认收货7天后更新收益状态
+            if (($income->refund_status == 1 || $income->refund_status == 2) && $role == 'user') {
+                // todo 确认景点门票是否支持售后退款（1-有条件退，2-随时退）
                 dispatch(new ScenicShopIncomeConfirmJob($income->id));
             } else {
                 $income->status = 2;

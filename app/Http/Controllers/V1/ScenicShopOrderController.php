@@ -197,7 +197,7 @@ class ScenicShopOrderController extends Controller
             ->getListByScenicId($verifyCodeInfo->scenic_id)->pluck('manager_id')->toArray();
         $managerUserIds = array_unique(ScenicShopManagerService::getInstance()
             ->getListByIds($managerIds)->pluck('user_id')->toArray());
-        if (!in_array($this->userId(), $managerUserIds)) {
+        if ($order->shop_id != $this->user()->scenicShop->id && !in_array($this->userId(), $managerUserIds)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前景点核销员，无法核销');
         }
 
