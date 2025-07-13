@@ -132,7 +132,19 @@ class ScenicShopOrderController extends Controller
         }
 
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
-        $order['ticketInfo'] = $ticket;
+        $order['ticketInfo'] =  [
+            'id' => $ticket->ticket_id,
+            'name' => $ticket->name,
+            'categoryName' => $ticket->category_name,
+            'price' => $ticket->price,
+            'number' => $ticket->number,
+            'scenicList' => json_decode($ticket->scenic_list),
+            'validityTime' => $ticket->validity_time,
+            'selectedDateTimestamp' => $ticket->selected_date_timestamp,
+            'effectiveTime' => $ticket->effective_time,
+            'refundStatus' => $ticket->refund_status,
+            'needExchange' => $ticket->need_exchange
+        ];
 
         return $this->success($order);
     }
