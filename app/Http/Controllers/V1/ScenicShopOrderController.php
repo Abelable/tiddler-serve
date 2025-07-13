@@ -62,7 +62,18 @@ class ScenicShopOrderController extends Controller
                 ];
                 break;
             default:
-                $statusList = [];
+                $statusList = [
+                    ScenicOrderStatus::PAID,
+                    ScenicOrderStatus::REFUNDING,
+                    ScenicOrderStatus::REFUNDED,
+                    ScenicOrderStatus::MERCHANT_REJECTED,
+                    ScenicOrderStatus::MERCHANT_APPROVED,
+                    ScenicOrderStatus::CONFIRMED,
+                    ScenicOrderStatus::AUTO_CONFIRMED,
+                    ScenicOrderStatus::ADMIN_CONFIRMED,
+                    ScenicOrderStatus::FINISHED,
+                    ScenicOrderStatus::AUTO_FINISHED,
+                ];
                 break;
         }
 

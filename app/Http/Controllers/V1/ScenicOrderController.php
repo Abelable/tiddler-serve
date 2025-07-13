@@ -291,6 +291,7 @@ class ScenicOrderController extends Controller
             'shop_name',
             'payment_amount',
             'pay_time',
+            'approve_time',
             'confirm_time',
             'created_at',
             'updated_at',
