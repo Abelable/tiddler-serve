@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\ScenicOrder;
 use App\Models\ScenicOrderTicket;
 use App\Models\ScenicSpot;
-use App\Models\ScenicTicket;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\PromoterService;
@@ -300,6 +299,7 @@ class ScenicOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
         $order['ticketInfo'] =  [
             'id' => $ticket->ticket_id,
@@ -314,6 +314,7 @@ class ScenicOrderController extends Controller
             'refundStatus' => $ticket->refund_status,
             'needExchange' => $ticket->need_exchange
         ];
+
         return $this->success($order);
     }
 
