@@ -284,6 +284,7 @@ class ScenicOrderController extends Controller
             'id',
             'order_sn',
             'status',
+            'user_id',
             'consignee',
             'mobile',
             'shop_id',
