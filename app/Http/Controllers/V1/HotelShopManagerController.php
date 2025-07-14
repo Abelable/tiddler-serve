@@ -3,27 +3,27 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicShopManager;
+use App\Models\HotelShopManager;
 use App\Models\User;
-use App\Services\ScenicManagerService;
-use App\Services\ScenicShopManagerService;
+use App\Services\HotelManagerService;
+use App\Services\HotelShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use Illuminate\Support\Facades\DB;
 
-class ScenicShopManagerController extends Controller
+class HotelShopManagerController extends Controller
 {
     public function list()
     {
         $shopId = $this->verifyRequiredId('shopId');
         $columns = ['id', 'user_id', 'role_id'];
 
-        $managerList = ScenicShopManagerService::getInstance()->getManagerList($shopId, $columns);
+        $managerList = HotelShopManagerService::getInstance()->getManagerList($shopId, $columns);
 
         $userIds = $managerList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
 
-        $list = $managerList->map(function (ScenicShopManager $manager) use ($userList) {
+        $list = $managerList->map(function (HotelShopManager $manager) use ($userList) {
             /** @var User $user */
             $user = $userList->get($manager->user_id);
 
@@ -43,14 +43,14 @@ class ScenicShopManagerController extends Controller
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'user_id', 'role_id'];
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id, $columns);
+        $manager = HotelShopManagerService::getInstance()->getShopManager($shopId, $id, $columns);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
 
-        $scenicIds = ScenicManagerService::getInstance()
-            ->getListByManagerId($manager->id)->pluck('scenic_id')->toArray();
-        $manager['scenicIds'] = $scenicIds;
+        $hotelIds = HotelManagerService::getInstance()
+            ->getListByManagerId($manager->id)->pluck('hotel_id')->toArray();
+        $manager['hotelIds'] = $hotelIds;
 
         return $this->success($manager);
     }
@@ -60,12 +60,12 @@ class ScenicShopManagerController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $userId = $this->verifyRequiredId('userId');
         $roleId = $this->verifyRequiredId('roleId');
-        $scenicIds = $this->verifyArray('scenicIds');
+        $hotelIds = $this->verifyArray('hotelIds');
 
-        DB::transaction(function () use ($shopId, $userId, $roleId, $scenicIds) {
-            $manager = ScenicShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
-            foreach ($scenicIds as $scenicId) {
-                ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
+        DB::transaction(function () use ($shopId, $userId, $roleId, $hotelIds) {
+            $manager = HotelShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+            foreach ($hotelIds as $hotelId) {
+                HotelManagerService::getInstance()->createManager($hotelId, $manager->id);
             }
         });
 
@@ -77,19 +77,19 @@ class ScenicShopManagerController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
         $roleId = $this->verifyRequiredId('roleId');
-        $scenicIds = $this->verifyArrayNotEmpty('scenicIds');
+        $hotelIds = $this->verifyArrayNotEmpty('hotelIds');
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id);
+        $manager = HotelShopManagerService::getInstance()->getShopManager($shopId, $id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
 
-        DB::transaction(function () use ($manager, $roleId, $scenicIds) {
-            ScenicShopManagerService::getInstance()->updateManager($manager, $roleId);
+        DB::transaction(function () use ($manager, $roleId, $hotelIds) {
+            HotelShopManagerService::getInstance()->updateManager($manager, $roleId);
 
-            ScenicManagerService::getInstance()->deleteManager($manager->id);
-            foreach ($scenicIds as $scenicId) {
-                ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
+            HotelManagerService::getInstance()->deleteManager($manager->id);
+            foreach ($hotelIds as $hotelId) {
+                HotelManagerService::getInstance()->createManager($hotelId, $manager->id);
             }
         });
 
@@ -101,7 +101,7 @@ class ScenicShopManagerController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $manager = ScenicShopManagerService::getInstance()->getShopManager($shopId, $id);
+        $manager = HotelShopManagerService::getInstance()->getShopManager($shopId, $id);
         if (is_null($manager)) {
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }

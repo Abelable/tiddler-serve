@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class HotelProviderListInput extends PageInput
+class HotelMerchantPageInput extends PageInput
 {
     public $status;
     public $name;

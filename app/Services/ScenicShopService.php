@@ -26,7 +26,7 @@ class ScenicShopService extends BaseService
         return $shop;
     }
 
-    public function updateShopInfo(ScenicShop $shop, ScenicShopInput $input)
+    public function updateShop(ScenicShop $shop, ScenicShopInput $input)
     {
         $shop->bg = $input->bg ?? '';
         $shop->logo = $input->logo;

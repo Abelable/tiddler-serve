@@ -3,23 +3,23 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicMerchant;
-use App\Services\ScenicMerchantService;
+use App\Models\HotelMerchant;
+use App\Services\HotelMerchantService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicMerchantListInput;
+use App\Utils\Inputs\HotelMerchantPageInput;
 
-class ScenicMerchantController extends Controller
+class HotelMerchantController extends Controller
 {
     protected $guard = 'Admin';
 
     public function list()
     {
-        /** @var ScenicMerchantListInput $input */
-        $input = ScenicMerchantListInput::new();
+        /** @var HotelMerchantPageInput $input */
+        $input = HotelMerchantPageInput::new();
 
-        $page = ScenicMerchantService::getInstance()->getMerchantList($input);
+        $page = HotelMerchantService::getInstance()->getMerchantList($input);
 
-        $list = collect($page->items())->map(function (ScenicMerchant $merchant) {
+        $list = collect($page->items())->map(function (HotelMerchant $merchant) {
             $merchant['depositInfo'] = $merchant->depositInfo;
             return $merchant;
         });
@@ -30,9 +30,9 @@ class ScenicMerchantController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
-        $merchant = ScenicMerchantService::getInstance()->getMerchantById($id);
+        $merchant = HotelMerchantService::getInstance()->getMerchantById($id);
         if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店服务商不存在');
         }
         return $this->success($merchant);
     }
@@ -41,15 +41,15 @@ class ScenicMerchantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $merchant = ScenicMerchantService::getInstance()->getMerchantById($id);
+        $merchant = HotelMerchantService::getInstance()->getMerchantById($id);
         if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店服务商不存在');
         }
 
         $merchant->status = 1;
         $merchant->save();
 
-        // todo：短信通知景区服务商
+        // todo：短信通知酒店服务商
 
         return $this->success();
     }
@@ -59,16 +59,16 @@ class ScenicMerchantController extends Controller
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
 
-        $merchant = ScenicMerchantService::getInstance()->getMerchantById($id);
+        $merchant = HotelMerchantService::getInstance()->getMerchantById($id);
         if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店服务商不存在');
         }
 
         $merchant->status = 3;
         $merchant->failure_reason = $reason;
         $merchant->save();
 
-        // todo：短信通知景区服务商
+        // todo：短信通知酒店服务商
 
         return $this->success();
     }

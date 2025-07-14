@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Hotel;
 use App\Models\HotelRoom;
 use App\Models\HotelRoomType;
-use App\Services\HotelProviderService;
+use App\Services\HotelMerchantService;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
 use App\Services\HotelRoomService;
@@ -59,7 +59,7 @@ class HotelRoomController extends Controller
         $roomType = HotelRoomTypeService::getInstance()->getTypeById($room->type_id);
         $room['typeName'] = $roomType->name;
 
-        $provider = HotelProviderService::getInstance()->getProviderById($room->provider_id);
+        $provider = HotelMerchantService::getInstance()->getMerchantById($room->provider_id);
         if (is_null($provider)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
         }

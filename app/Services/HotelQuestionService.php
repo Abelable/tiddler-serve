@@ -2,11 +2,58 @@
 
 namespace App\Services;
 
+use App\Models\HotelAnswer;
 use App\Models\HotelQuestion;
 use App\Utils\Inputs\PageInput;
 
 class HotelQuestionService extends BaseService
 {
+    public function qaSummary($hotelId, $limit)
+    {
+        $list = $this->topQuestionList($hotelId, $limit);
+        $total = $this->questionTotal($hotelId);
+        return ['list' => $list, 'total' => $total];
+    }
+
+    public function topQuestionList($hotelId, $limit, $columns = ['*'])
+    {
+        $list = HotelQuestion::query()
+            ->where('hotel_id', $hotelId)
+            ->orderBy('answer_num', 'desc')
+            ->take($limit)
+            ->get($columns);
+        return $this->handelQuestionList($list);
+    }
+
+    public function handelQuestionList($questionList)
+    {
+        return $questionList->map(function (HotelQuestion $question, $index) {
+            if ($index == 0) {
+                /** @var HotelAnswer $firstAnswer */
+                $firstAnswer = $question->firstAnswer();
+                if (!is_null($firstAnswer)) {
+                    $userInfo = UserService::getInstance()
+                        ->getUserById($firstAnswer->user_id, ['id', 'avatar', 'nickname']);
+                    $firstAnswer['userInfo'] = $userInfo;
+                    unset($firstAnswer->user_id);
+                }
+                return [
+                    'content' => $question->content,
+                    'firstAnswer' => $firstAnswer,
+                ];
+            } else {
+                $userIds = $question->answerList->pluck('user_id')->toArray();
+                $userList = UserService::getInstance()
+                    ->getListByIds(array_slice($userIds, 0, 3), ['id', 'avatar']);
+                return [
+                    'content' => $question->content,
+                    'answerNum' => $question->answer_num,
+                    'userList' => $userList,
+                ];
+            }
+        });
+    }
+
     public function questionList($hotelId, $count, $columns = ['*'])
     {
         return HotelQuestion::query()

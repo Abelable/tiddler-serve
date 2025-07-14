@@ -238,6 +238,15 @@ class HotelService extends BaseService
         return Hotel::query()->whereNotIn('id', $hotelIds)->get($columns);
     }
 
+    public function getSelectableOptions($hotelIds, $keywords = '', $columns = ['*'])
+    {
+        $query = Hotel::query()->whereNotIn('id', $hotelIds);
+        if (!empty($keywords)) {
+            $query = $query->where('name', 'like', '%' . $keywords . '%');
+        }
+        return $query->get($columns);
+    }
+
     public function updateHotelAvgScore($hotelId, $avgScore)
     {
         $hotel = $this->getHotelById($hotelId);

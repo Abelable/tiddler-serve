@@ -6,18 +6,23 @@ use App\Models\HotelManager;
 
 class HotelManagerService extends BaseService
 {
-    public function createManager($hotelId, $userId)
+    public function createManager($hotelId, $managerId)
     {
         $address = HotelManager::new();
         $address->hotel_id = $hotelId;
-        $address->user_id = $userId;
+        $address->manager_id = $managerId;
         $address->save();
         return $address;
     }
 
-    public function getManagerList($hotelId, $columns = ['*'])
+    public function getListByHotelId($hotelId, $columns = ['*'])
     {
         return HotelManager::query()->where('hotel_id', $hotelId)->get($columns);
+    }
+
+    public function getListByManagerId($managerId, $columns = ['*'])
+    {
+        return HotelManager::query()->where('manager_id', $managerId)->get($columns);
     }
 
     public function deleteManager($hotelId)

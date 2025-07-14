@@ -27,6 +27,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\HotelShopDepositPaymentLog|null $depositInfo
  * @method static \Illuminate\Database\Eloquent\Builder|HotelMerchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelMerchant newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelMerchant onlyTrashed()
@@ -59,4 +60,10 @@ namespace App\Models;
  */
 class HotelMerchant extends BaseModel
 {
+    public function depositInfo()
+    {
+        return $this
+            ->hasOne(HotelShopDepositPaymentLog::class, 'merchant_id')
+            ->where('status', 1);
+    }
 }

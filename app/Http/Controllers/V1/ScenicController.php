@@ -125,12 +125,13 @@ class ScenicController extends Controller
 
     public function edit()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
         /** @var ScenicInput $input */
         $input = ScenicInput::new();
 
-        $providerScenicSpot = ShopScenicSpotService::getInstance()->getSpotByScenicId($this->userId(), $id);
-        if (is_null($providerScenicSpot)) {
+        $shopScenicSpot = ShopScenicSpotService::getInstance()->getByScenicId($shopId, $id);
+        if (is_null($shopScenicSpot)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无该景点编辑权限');
         }
 
@@ -152,18 +153,5 @@ class ScenicController extends Controller
         $options = ScenicService::getInstance()->getSelectableOptions($scenicIds, $keywords, ['id', 'name']);
 
         return $this->success($options);
-    }
-
-    public function addSales()
-    {
-        $list = ScenicService::getInstance()->getList();
-        /** @var ScenicSpot $scenic */
-        foreach ($list as $scenic) {
-            if ($scenic->price != 0 && $scenic->sales_volume == 0) {
-                $scenic->sales_volume = mt_rand(20, 100);
-                $scenic->save();
-            }
-        }
-        return $this->success();
     }
 }

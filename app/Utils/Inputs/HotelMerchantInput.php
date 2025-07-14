@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class HotelProviderInput extends BaseInput
+class HotelMerchantInput extends BaseInput
 {
     public $companyName;
     public $regionDesc;
@@ -19,10 +19,11 @@ class HotelProviderInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
+    public $shopType;
+    public $deposit;
+    public $shopBg;
     public $shopLogo;
     public $shopName;
-    public $shopType;
-    public $shopCover;
 
     public function rules()
     {
@@ -42,10 +43,11 @@ class HotelProviderInput extends BaseInput
             'bankCardOwnerName' => 'required|string',
             'bankCardNumber' => 'required|string',
             'bankName' => 'required|string',
+            'shopType' => 'required|integer|in:1,2,3',
+            'deposit' => 'required|numeric',
+            'shopBg' => 'string',
             'shopLogo' => 'required|string',
             'shopName' => 'required|string',
-            'shopType' => 'required|integer|in:1,2,3',
-            'shopCover' => 'string',
         ];
     }
 }

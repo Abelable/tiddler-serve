@@ -247,7 +247,7 @@ class HotelOrderController extends Controller
         }
 
         $managerIds = HotelManagerService::getInstance()
-            ->getManagerList($verifyCodeInfo->hotel_id)->pluck('user_id')->toArray();
+            ->getListByHotelId($verifyCodeInfo->hotel_id)->pluck('user_id')->toArray();
         if (!in_array($this->userId(), $managerIds)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前酒店核销员，无法核销');
         }

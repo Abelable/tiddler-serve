@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\CateringProviderOrderService;
 use App\Services\CateringProviderService;
 use App\Services\HotelOrderService;
-use App\Services\HotelProviderOrderService;
-use App\Services\HotelProviderService;
+use App\Services\HotelMerchantService;
+use App\Services\HotelShopDepositPaymentLogService;
+use App\Services\HotelShopDepositService;
 use App\Services\HotelShopService;
 use App\Services\MealTicketOrderService;
 use App\Services\MerchantService;
@@ -92,6 +93,23 @@ class CommonController extends Controller
             });
         }
 
+        if (strpos($data['attach'], 'hotel_shop_id') !== false) {
+            Log::info('hotel_shop_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $log = HotelShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                HotelMerchantService::getInstance()->paySuccess($log->merchant_id);
+                HotelShopService::getInstance()->paySuccess($log->shop_id);
+                HotelShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+            });
+        }
+
+        if (strpos($data['attach'], 'hotel_order_sn') !== false) {
+            Log::info('hotel_order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                HotelOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
         if (strpos($data['attach'], 'shop_id') !== false) {
             Log::info('shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
@@ -106,22 +124,6 @@ class CommonController extends Controller
             Log::info('order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 OrderService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
-        if (strpos($data['attach'], 'hotel_provider_order_sn') !== false) {
-            Log::info('hotel_provider_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = HotelProviderOrderService::getInstance()->wxPaySuccess($data);
-                HotelProviderService::getInstance()->paySuccess($order->provider_id);
-                HotelShopService::getInstance()->paySuccess($order->provider_id);
-            });
-        }
-
-        if (strpos($data['attach'], 'hotel_order_sn') !== false) {
-            Log::info('hotel_order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                HotelOrderService::getInstance()->wxPaySuccess($data);
             });
         }
 

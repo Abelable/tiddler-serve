@@ -2,20 +2,20 @@
 
 namespace App\Services;
 
-use App\Models\ScenicShopManager;
+use App\Models\HotelShopManager;
 
-class ScenicShopManagerService extends BaseService
+class HotelShopManagerService extends BaseService
 {
     public function createManager($shopId, $userId, $roleId)
     {
-        $manager = ScenicShopManager::new();
+        $manager = HotelShopManager::new();
         $manager->shop_id = $shopId;
         $manager->user_id = $userId;
 
         return $this->updateManager($manager, $roleId);
     }
 
-    public function updateManager(ScenicShopManager $manager, $roleId)
+    public function updateManager(HotelShopManager $manager, $roleId)
     {
         $manager->role_id = $roleId;
         $manager->save();
@@ -25,16 +25,16 @@ class ScenicShopManagerService extends BaseService
 
     public function getManagerList($shopId, $columns = ['*'])
     {
-        return ScenicShopManager::query()->where('shop_id', $shopId)->get($columns);
+        return HotelShopManager::query()->where('shop_id', $shopId)->get($columns);
     }
 
     public function getListByIds(array $ids, $columns = ['*'])
     {
-        return ScenicShopManager::query()->whereIn('id', $ids)->get($columns);
+        return HotelShopManager::query()->whereIn('id', $ids)->get($columns);
     }
 
     public function getShopManager($shopId, $id, $columns = ['*'])
     {
-        return ScenicShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
+        return HotelShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 }

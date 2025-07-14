@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ScenicShopService;
+use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicShopInput;
+use App\Utils\Inputs\HotelShopInput;
 
-class ScenicShopController extends Controller
+class HotelShopController extends Controller
 {
     protected $except = ['shopInfo'];
 
@@ -16,7 +16,7 @@ class ScenicShopController extends Controller
         $id = $this->verifyRequiredId('id');
         $columns = ['id', 'type', 'bg', 'logo', 'name'];
 
-        $shop = ScenicShopService::getInstance()->getShopById($id, $columns);
+        $shop = HotelShopService::getInstance()->getShopById($id, $columns);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }
@@ -26,15 +26,15 @@ class ScenicShopController extends Controller
 
     public function updateShopInfo()
     {
-        /** @var ScenicShopInput $input */
-        $input = ScenicShopInput::new();
+        /** @var HotelShopInput $input */
+        $input = HotelShopInput::new();
 
-        $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = HotelShopService::getInstance()->getShopByUserId($this->userId());
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
         }
 
-        ScenicShopService::getInstance()->updateShop($shop, $input);
+        HotelShopService::getInstance()->updateShop($shop, $input);
 
         return $this->success();
     }

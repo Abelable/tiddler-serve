@@ -30,7 +30,7 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read \App\Models\CateringProvider|null $cateringProvider
- * @property-read \App\Models\HotelProvider|null $hotelProvider
+ * @property-read \App\Models\HotelMerchant|null $hotelMerchant
  * @property-read \App\Models\Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
@@ -137,6 +137,11 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasMany(ScenicShopManager::class, 'user_id');
     }
 
+    public function hotelMerchant()
+    {
+        return $this->hasOne(HotelMerchant::class, 'user_id')->where('status', 2);
+    }
+
     public function merchant()
     {
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
@@ -150,11 +155,6 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shopManagerList()
     {
         return $this->hasMany(ShopManager::class, 'user_id');
-    }
-
-    public function hotelProvider()
-    {
-        return $this->hasOne(HotelProvider::class, 'user_id')->where('status', 2);
     }
 
     public function cateringProvider()
