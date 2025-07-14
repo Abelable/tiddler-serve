@@ -146,7 +146,7 @@ class ScenicShopOrderController extends Controller
         }
 
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
-        $order['ticketInfo'] =  [
+        $order['ticketInfo'] = [
             'id' => $ticket->ticket_id,
             'name' => $ticket->name,
             'categoryName' => $ticket->category_name,

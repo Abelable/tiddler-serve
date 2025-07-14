@@ -18,7 +18,7 @@ use App\Services\HotelShopService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\HotelOrderEnums;
+use App\Utils\Enums\HotelOrderStatus;
 use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -163,19 +163,27 @@ class HotelOrderController extends Controller
     {
         switch ($status) {
             case 1:
-                $statusList = [HotelOrderEnums::STATUS_CREATE];
+                $statusList = [HotelOrderStatus::CREATED];
                 break;
             case 2:
-                $statusList = [HotelOrderEnums::STATUS_PAY];
+                $statusList = [HotelOrderStatus::PAID];
                 break;
             case 3:
-                $statusList = [HotelOrderEnums::STATUS_SETTLE_IN];
+                $statusList = [HotelOrderStatus::MERCHANT_APPROVED];
                 break;
             case 4:
-                $statusList = [HotelOrderEnums::STATUS_CONFIRM, HotelOrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [
+                    HotelOrderStatus::CONFIRMED,
+                    HotelOrderStatus::AUTO_CONFIRMED,
+                    HotelOrderStatus::ADMIN_CONFIRMED
+                ];
                 break;
             case 5:
-                $statusList = [HotelOrderEnums::STATUS_REFUND, HotelOrderEnums::STATUS_SUPPLIER_REFUND, HotelOrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [
+                    HotelOrderStatus::REFUNDING,
+                    HotelOrderStatus::REFUNDED,
+                    HotelOrderStatus::MERCHANT_REJECTED
+                ];
                 break;
             default:
                 $statusList = [];
@@ -199,7 +207,7 @@ class HotelOrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => HotelOrderEnums::STATUS_TEXT_MAP[$order->status],
+                'statusDesc' => HotelOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,

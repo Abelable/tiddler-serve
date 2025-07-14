@@ -31,6 +31,9 @@ use Illuminate\Notifications\Notifiable;
  * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read \App\Models\CateringProvider|null $cateringProvider
  * @property-read \App\Models\HotelMerchant|null $hotelMerchant
+ * @property-read \App\Models\HotelShop|null $hotelShop
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelShopManager[] $hotelShopManagerList
+ * @property-read int|null $hotel_shop_manager_list_count
  * @property-read \App\Models\Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
@@ -140,6 +143,16 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function hotelMerchant()
     {
         return $this->hasOne(HotelMerchant::class, 'user_id')->where('status', 2);
+    }
+
+    public function hotelShop()
+    {
+        return $this->hasOne(HotelShop::class, 'user_id')->where('status', 1);
+    }
+
+    public function hotelShopManagerList()
+    {
+        return $this->hasMany(HotelShopManager::class, 'user_id');
     }
 
     public function merchant()

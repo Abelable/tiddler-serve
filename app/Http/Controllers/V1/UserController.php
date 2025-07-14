@@ -67,6 +67,9 @@ class UserController extends Controller
         $user['scenicShopId'] = $user->scenicShop->id ?? 0;
         $user['scenicShopManagerList'] = $user->scenicShopManagerList;
 
+        $user['hotelShopId'] = $user->hotelShop->id ?? 0;
+        $user['hotelShopManagerList'] = $user->hotelShopManagerList;
+
         $user['cateringProviderId'] = $user->cateringProvider->id ?? 0;
 
         $user['shopId'] = $user->shop->id ?? 0;
@@ -74,12 +77,13 @@ class UserController extends Controller
 
         unset($user->openid);
         unset($user->authInfo);
-        unset($user->merchant);
-        unset($user->shop);
         unset($user->scenicMerchant);
         unset($user->scenicShop);
         unset($user->hotelMerchant);
+        unset($user->hotelShop);
         unset($user->cateringProvider);
+        unset($user->merchant);
+        unset($user->shop);
         unset($user->created_at);
         unset($user->updated_at);
 

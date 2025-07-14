@@ -2,7 +2,7 @@
 
 namespace App\Utils\Traits;
 
-use App\Utils\Enums\HotelOrderEnums;
+use App\Utils\Enums\HotelOrderStatus;
 use Illuminate\Support\Str;
 
 /**
@@ -10,16 +10,15 @@ use Illuminate\Support\Str;
  * @method bool canCancelHandle()
  * @method bool canDeleteHandle()
  * @method bool canPayHandle()
- * @method bool canShipHandle()
  * @method bool canCommentHandle()
+ * @method bool canApproveHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
- * @method bool canRebuyHandle()
- * @method bool canAftersaleHandle()
+ * @method bool canReBuyHandle()
+ * @method bool canAfterSaleHandle()
  * @method bool canAgreeRefundHandle()
  * @method bool canFinishHandle()
  * @method bool isPayStatus()
- * @method bool isShipStatus()
  * @method bool isConfirmStatus()
  * @method bool isCancelStatus()
  * @method bool isAutoCancelStatus()
@@ -48,7 +47,7 @@ trait HotelOrderStatusTrait
                 ->replaceFirst('is', '')
                 ->replaceLast('Status', '')
                 ->snake()->upper()->prepend('STATUS');
-            $status = (new \ReflectionClass(HotelOrderEnums::class))->getConstant($key);
+            $status = (new \ReflectionClass(HotelOrderStatus::class))->getConstant($key);
             return $this->status == $status;
         }
 
@@ -56,50 +55,52 @@ trait HotelOrderStatusTrait
     }
 
     private $canHandleMap = [
-        'cancel' => [HotelOrderEnums::STATUS_CREATE],
-        'pay' => [HotelOrderEnums::STATUS_CREATE],
-        'confirm' => [HotelOrderEnums::STATUS_SETTLE_IN],
-        'refund' => [HotelOrderEnums::STATUS_PAY],
-        // 同意退款
-        'agreerefund' => [
-            HotelOrderEnums::STATUS_REFUND,
-            HotelOrderEnums::STATUS_SUPPLIER_REFUND
-        ],
-        'comment' => [
-            HotelOrderEnums::STATUS_CONFIRM,
-            HotelOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 售后
-        'aftersale' => [
-            HotelOrderEnums::STATUS_CONFIRM,
-            HotelOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 回购
-        'rebuy' => [
-            HotelOrderEnums::STATUS_CONFIRM,
-            HotelOrderEnums::STATUS_AUTO_CONFIRM
-        ],
+        'cancel' => [HotelOrderStatus::CREATED],
+        'pay' => [HotelOrderStatus::CREATED],
         'delete' => [
-            HotelOrderEnums::STATUS_CANCEL,
-            HotelOrderEnums::STATUS_AUTO_CANCEL,
-            HotelOrderEnums::STATUS_ADMIN_CANCEL,
-            HotelOrderEnums::STATUS_REFUND_CONFIRM,
-            HotelOrderEnums::STATUS_CONFIRM,
-            HotelOrderEnums::STATUS_AUTO_CONFIRM
+            HotelOrderStatus::CANCELED,
+            HotelOrderStatus::AUTO_CANCELED,
+            HotelOrderStatus::ADMIN_CANCELED,
+        ],
+        'refund' => [HotelOrderStatus::PAID],
+        'agreeRefund' => [
+            HotelOrderStatus::REFUNDING
+        ],
+        'approve' => [HotelOrderStatus::PAID],
+        'confirm' => [HotelOrderStatus::MERCHANT_APPROVED],
+        'comment' => [
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED
         ],
         'finish' => [
-            HotelOrderEnums::STATUS_CONFIRM,
-            HotelOrderEnums::STATUS_AUTO_CONFIRM,
-        ]
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED
+        ],
+        'afterSale' => [
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED,
+            HotelOrderStatus::FINISHED,
+            HotelOrderStatus::AUTO_FINISHED,
+        ],
+        'reBuy' => [
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED,
+            HotelOrderStatus::FINISHED,
+            HotelOrderStatus::AUTO_FINISHED,
+        ],
     ];
 
-    public function isHadPaid()
+    public function isPaid()
     {
         return !in_array($this->status, [
-            HotelOrderEnums::STATUS_CREATE,
-            HotelOrderEnums::STATUS_CANCEL,
-            HotelOrderEnums::STATUS_AUTO_CANCEL,
-            HotelOrderEnums::STATUS_ADMIN_CANCEL,
+            HotelOrderStatus::CREATED,
+            HotelOrderStatus::CANCELED,
+            HotelOrderStatus::AUTO_CANCELED,
+            HotelOrderStatus::ADMIN_CANCELED,
         ]);
     }
 
@@ -107,14 +108,16 @@ trait HotelOrderStatusTrait
     {
         return [
             'cancel' => $this->canCancelHandle(),
-            'delete' => $this->canDeleteHandle(),
             'pay' => $this->canPayHandle(),
-            'comment' => $this->canCommentHandle(),
-            'confirm' => $this->canConfirmHandle(),
+            'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
-            'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle(),
+            'agreeRefund' => $this->canAgreeRefundHandle(),
+            'approve' => $this->canApproveHandle(),
+            'confirm' => $this->canConfirmHandle(),
+            'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
+            'afterSale' => $this->canAftersaleHandle(),
+            'reBuy' => $this->canRebuyHandle(),
         ];
     }
 }

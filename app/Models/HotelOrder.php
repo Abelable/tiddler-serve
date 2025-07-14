@@ -11,18 +11,19 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @property string $order_sn 订单编号
  * @property int $status 订单状态
  * @property int $user_id 用户id
- * @property string $consignee 入住人姓名
- * @property string $mobile 入住人手机号
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺头像
  * @property string $shop_name 店铺名称
+ * @property string $consignee 入住人姓名
+ * @property string $mobile 入住人手机号
+ * @property float $total_price 房间总价
  * @property int $coupon_id 优惠券id
  * @property float $coupon_denomination 优惠券抵扣金额
  * @property float $deduction_balance 余额抵扣金额
  * @property float $payment_amount 支付金额
- * @property float $total_payment_amount 总支付金额，拆单场景
  * @property string $pay_id 支付id
  * @property string $pay_time 支付时间
+ * @property string $approve_time 商家确认时间
  * @property string $confirm_time 用户核销使用时间
  * @property string $finish_time 订单关闭时间
  * @property float $refund_amount 退款金额
@@ -38,6 +39,7 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelOrder onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder query()
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereApproveTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereConfirmTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereConsignee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereCouponDenomination($value)
@@ -62,7 +64,7 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereShopLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereShopName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereTotalPaymentAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|HotelOrder withTrashed()

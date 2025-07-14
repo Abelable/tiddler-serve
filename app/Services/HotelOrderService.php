@@ -6,7 +6,7 @@ use App\Models\HotelOrder;
 use App\Models\HotelShop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
-use App\Utils\Enums\HotelOrderEnums;
+use App\Utils\Enums\HotelOrderStatus;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
@@ -19,6 +19,22 @@ use Yansongda\Pay\Exceptions\GatewayException;
 
 class HotelOrderService extends BaseService
 {
+    public function getTotal($userId, $statusList)
+    {
+        return HotelOrder::query()
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
+    public function getShopTotal($shopId, $statusList)
+    {
+        return HotelOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
         $query = HotelOrder::query()->where('user_id', $userId);
@@ -56,6 +72,11 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getShopOrder($shopId, $id, $columns = ['*'])
+    {
+        return HotelOrder::query()->where('shop_id', $shopId)->find($id, $columns);
+    }
+
     public function getOrderListByIds(array $ids, $columns = ['*'])
     {
         return HotelOrder::query()->whereIn('id', $ids)->get($columns);
@@ -66,7 +87,7 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()
             ->where('user_id', $userId)
             ->where('id', $orderId)
-            ->where('status', HotelOrderEnums::STATUS_CREATE)
+            ->where('status', HotelOrderStatus::CREATED)
             ->first($columns);
     }
 
@@ -74,20 +95,29 @@ class HotelOrderService extends BaseService
     {
         return HotelOrder::query()
             ->where('order_sn', $orderSn)
-            ->where('status', HotelOrderEnums::STATUS_CREATE)
+            ->where('status', HotelOrderStatus::CREATED)
             ->first($columns);
+    }
+
+    public function getApprovedOrderById($id, $columns = ['*'])
+    {
+        return HotelOrder::query()
+            ->where('status', HotelOrderStatus::MERCHANT_APPROVED)
+            ->find($id, $columns);
     }
 
     public function getPendingSettleInOrderById($id, $columns = ['*'])
     {
-        return HotelOrder::query()->whereIn('status', [HotelOrderEnums::STATUS_PAY, HotelOrderEnums::STATUS_SETTLE_IN])->find($id, $columns);
+        return HotelOrder::query()
+            ->whereIn('status', [HotelOrderStatus::PAID, HotelOrderStatus::MERCHANT_APPROVED])
+            ->find($id, $columns);
     }
 
     // todo 核销有效期
     public function getTimeoutUnConfirmOrders($columns = ['*'])
     {
         return HotelOrder::query()
-            ->where('status', HotelOrderEnums::STATUS_PAY)
+            ->where('status', HotelOrderStatus::PAID)
             ->where('pay_time', '<=', now()->subDays(30))
             ->where('pay_time', '>', now()->subDays(45))
             ->get($columns);
@@ -96,7 +126,11 @@ class HotelOrderService extends BaseService
     public function getTimeoutUnFinishedOrders($columns = ['*'])
     {
         return HotelOrder::query()
-            ->whereIn('status', [HotelOrderEnums::STATUS_CONFIRM, HotelOrderEnums::STATUS_AUTO_CONFIRM, HotelOrderEnums::STATUS_ADMIN_CONFIRM])
+            ->whereIn('status', [
+                HotelOrderStatus::CONFIRMED,
+                HotelOrderStatus::AUTO_CONFIRMED,
+                HotelOrderStatus::ADMIN_CONFIRMED
+            ])
             ->where('confirm_time', '<=', now()->subDays(15))
             ->where('confirm_time', '>', now()->subDays(30))
             ->get($columns);
@@ -137,7 +171,7 @@ class HotelOrderService extends BaseService
 
         $order = HotelOrder::new();
         $order->order_sn = $orderSn;
-        $order->status = HotelOrderEnums::STATUS_CREATE;
+        $order->status = HotelOrderStatus::CREATED;
         $order->user_id = $userId;
         $order->consignee = $input->consignee;
         $order->mobile = $input->mobile;
@@ -224,7 +258,7 @@ class HotelOrderService extends BaseService
 
         $order->pay_id = $payId;
         $order->pay_time = now()->format('Y-m-d\TH:i:s');
-        $order->status = HotelOrderEnums::STATUS_PAY;
+        $order->status = HotelOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -238,6 +272,25 @@ class HotelOrderService extends BaseService
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
+
+        return $order;
+    }
+
+    public function approve($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canApproveHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+        }
+
+        $order->status = HotelOrderStatus::MERCHANT_APPROVED;
+        $order->approve_time = now()->format('Y-m-d\TH:i:s');
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
 
         return $order;
     }
@@ -262,18 +315,18 @@ class HotelOrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != HotelOrderEnums::STATUS_CREATE) {
+        if ($order->status != HotelOrderStatus::CREATED) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
         }
         switch ($role) {
             case 'system':
-                $order->status = HotelOrderEnums::STATUS_AUTO_CANCEL;
+                $order->status = HotelOrderStatus::AUTO_CANCELED;
                 break;
             case 'admin':
-                $order->status = HotelOrderEnums::STATUS_ADMIN_CANCEL;
+                $order->status = HotelOrderStatus::ADMIN_CANCELED;
                 break;
             case 'user':
-                $order->status = HotelOrderEnums::STATUS_CANCEL;
+                $order->status = HotelOrderStatus::CANCELED;
                 break;
         }
         if ($order->cas() == 0) {
@@ -324,13 +377,13 @@ class HotelOrderService extends BaseService
             }
             switch ($role) {
                 case 'system':
-                    $order->status = HotelOrderEnums::STATUS_AUTO_CONFIRM;
+                    $order->status = HotelOrderStatus::AUTO_CONFIRMED;
                     break;
                 case 'admin':
-                    $order->status = HotelOrderEnums::STATUS_ADMIN_CONFIRM;
+                    $order->status = HotelOrderStatus::ADMIN_CONFIRMED;
                     break;
                 case 'user':
-                    $order->status = HotelOrderEnums::STATUS_CONFIRM;
+                    $order->status = HotelOrderStatus::CONFIRMED;
                     break;
             }
             $order->confirm_time = now()->format('Y-m-d\TH:i:s');
@@ -358,7 +411,7 @@ class HotelOrderService extends BaseService
                 if (!$order->canFinishHandle()) {
                     $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
                 }
-                $order->status = HotelOrderEnums::STATUS_AUTO_FINISHED;
+                $order->status = HotelOrderStatus::AUTO_FINISHED;
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -377,7 +430,7 @@ class HotelOrderService extends BaseService
         if (!$order->canFinishHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
         }
-        $order->status = HotelOrderEnums::STATUS_FINISHED;
+        $order->status = HotelOrderStatus::FINISHED;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -387,6 +440,15 @@ class HotelOrderService extends BaseService
     public function userRefund($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        $this->refund($order);
+    }
+
+    public function shopRefund($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -427,7 +489,7 @@ class HotelOrderService extends BaseService
                     Log::info('hotel_order_wx_refund', $result->toArray());
                 }
 
-                $order->status = HotelOrderEnums::STATUS_REFUND_CONFIRM;
+                $order->status = HotelOrderStatus::REFUNDED;
                 $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
