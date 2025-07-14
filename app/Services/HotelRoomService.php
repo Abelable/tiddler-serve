@@ -29,15 +29,15 @@ class HotelRoomService extends BaseService
         return HotelRoom::query()->where('hotel_id', $hotelId)->where('status', 1)->get($columns);
     }
 
-    public function getListTotal($userId, $status)
+    public function getListTotal($shopId, $status)
     {
-        return HotelRoom::query()->where('user_id', $userId)->where('status', $status)->count();
+        return HotelRoom::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 
-    public function getRoomListByStatus($userId, StatusPageInput $input, $columns=['*'])
+    public function getRoomListByStatus($shopId, StatusPageInput $input, $columns=['*'])
     {
         return HotelRoom::query()
-            ->where('user_id', $userId)
+            ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -48,18 +48,15 @@ class HotelRoomService extends BaseService
         return HotelRoom::query()->find($id, $columns);
     }
 
-    public function getUserRoom($userId, $id, $columns=['*'])
+    public function getShopRoom($shopId, $id, $columns=['*'])
     {
-        return HotelRoom::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelRoom::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
     public function createRoom($userId, $providerId, $shopId, HotelRoomInput $input)
     {
         $room = HotelRoom::new();
-        $room->user_id = $userId;
-        $room->provider_id = $providerId;
         $room->shop_id = $shopId;
-
         return $this->updateRoom($room, $input);
     }
 

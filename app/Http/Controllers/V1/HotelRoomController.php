@@ -7,15 +7,16 @@ use App\Models\HotelRoom;
 use App\Models\HotelRoomType;
 use App\Models\HotelShop;
 use App\Services\HotelRoomTypeService;
-use App\Services\HotelShopService;
 use App\Services\HotelRoomService;
+use App\Services\HotelShopManagerService;
+use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelRoomInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class HotelRoomController extends Controller
 {
-    protected $except = ['typeOptions', 'listByHotelId'];
+    protected $except = ['typeOptions', 'list'];
 
     public function typeOptions()
     {
@@ -34,13 +35,14 @@ class HotelRoomController extends Controller
         return $this->success($options);
     }
 
-    public function listByHotelId()
+    public function list()
     {
         $hotelId = $this->verifyRequiredId('hotelId');
 
         $roomList = HotelRoomService::getInstance()->getListByHotelId($hotelId);
         $shopIds = $roomList->pluck('shop_id')->toArray();
-        $shopList = HotelShopService::getInstance()->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
+        $shopList = HotelShopService::getInstance()
+            ->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
 
         $roomList = $roomList->map(function (HotelRoom $room) use ($shopList) {
             /** @var HotelShop $shop */
@@ -49,10 +51,8 @@ class HotelRoomController extends Controller
 
             $room->price_list = json_decode($room->price_list);
 
-            unset($room->user_id);
             unset($room->hotel_id);
             unset($room->shop_id);
-            unset($room->provider_id);
             unset($room->price);
             unset($room->sales_volume);
             unset($room->status);
@@ -71,21 +71,38 @@ class HotelRoomController extends Controller
         return $this->success($roomList);
     }
 
-    public function roomListTotals()
+    public function detail()
     {
+        $id = $this->verifyRequiredId('id');
+
+        $room = HotelRoomService::getInstance()->getRoomById($id);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
+        }
+        $room->price_list = json_decode($room->price_list);
+
+        return $this->success($room);
+    }
+
+    public function totals()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+
         return $this->success([
-            HotelRoomService::getInstance()->getListTotal($this->userId(), 1),
-            HotelRoomService::getInstance()->getListTotal($this->userId(), 3),
-            HotelRoomService::getInstance()->getListTotal($this->userId(), 0),
-            HotelRoomService::getInstance()->getListTotal($this->userId(), 2),
+            HotelRoomService::getInstance()->getListTotal($shopId, 1),
+            HotelRoomService::getInstance()->getListTotal($shopId, 3),
+            HotelRoomService::getInstance()->getListTotal($shopId, 0),
+            HotelRoomService::getInstance()->getListTotal($shopId, 2),
         ]);
     }
 
-    public function userRoomList()
+    public function shopList()
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
-        $page = HotelRoomService::getInstance()->getRoomListByStatus($this->userId(), $input);
+        $shopId = $this->verifyRequiredId('shopId');
+
+        $page = HotelRoomService::getInstance()->getRoomListByStatus($shopId, $input);
         $roomList = collect($page->items());
 
         $typeIds = $roomList->pluck('type_id')->toArray();
@@ -101,41 +118,38 @@ class HotelRoomController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function detail()
-    {
-        $id = $this->verifyRequiredId('id');
-
-        $room = HotelRoomService::getInstance()->getRoomById($id);
-        if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
-        }
-        $room->price_list = json_decode($room->price_list);
-
-        return $this->success($room);
-    }
-
     public function add()
     {
         /** @var HotelRoomInput $input */
         $input = HotelRoomInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $shopId = $this->user()->hotelShop->id;
-        if ($shopId == 0) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是服务商，无法添加酒店房间');
+        $shopManagerIds = HotelShopManagerService::getInstance()
+            ->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->hotelShop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前酒店商家或管理员，无权限添加酒店房间');
         }
 
-        HotelRoomService::getInstance()->createRoom($this->userId(), $this->user()->hotelProvider->id, $shopId, $input);
+        HotelRoomService::getInstance()
+            ->createRoom($this->userId(), $this->user()->hotelMerchant->id, $shopId, $input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        $id = $this->verifyRequiredId('id');
         /** @var HotelRoomInput $input */
         $input = HotelRoomInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
+        $shopManagerIds = HotelShopManagerService::getInstance()
+            ->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->hotelShop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前酒店商家或管理员，无权限添加酒店房间');
+        }
+
+        $room = HotelRoomService::getInstance()->getShopRoom($shopId, $id);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
@@ -147,9 +161,10 @@ class HotelRoomController extends Controller
 
     public function up()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getShopRoom($shopId, $id);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
@@ -164,9 +179,10 @@ class HotelRoomController extends Controller
 
     public function down()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getShopRoom($shopId, $id);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
@@ -181,9 +197,10 @@ class HotelRoomController extends Controller
 
     public function delete()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $room = HotelRoomService::getInstance()->getUserRoom($this->userId(), $id);
+        $room = HotelRoomService::getInstance()->getShopRoom($shopId, $id);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }

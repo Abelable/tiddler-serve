@@ -30,11 +30,13 @@ class ScenicTicketController extends Controller
     {
         $scenicId = $this->verifyRequiredId('scenicId');
 
-        $ticketIds = TicketScenicService::getInstance()->getListByScenicId($scenicId)->pluck('ticket_id')->toArray();
+        $ticketIds = TicketScenicService::getInstance()
+            ->getListByScenicId($scenicId)->pluck('ticket_id')->toArray();
         $ticketList = ScenicTicketService::getInstance()->getListByIds($ticketIds);
 
         $shopIds = $ticketList->pluck('shop_id')->toArray();
-        $shopList = ScenicShopService::getInstance()->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
+        $shopList = ScenicShopService::getInstance()
+            ->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
 
         $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($shopList) {
             /** @var ScenicShop $shop */
@@ -64,8 +66,10 @@ class ScenicTicketController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
 
-        $scenicIds = TicketScenicService::getInstance()->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
-        $specList = TicketSpecService::getInstance()->getSpecListByTicketId($ticket->id, ['category_id', 'price_list']);
+        $scenicIds = TicketScenicService::getInstance()
+            ->getListByTicketId($ticket->id)->pluck('scenic_id')->toArray();
+        $specList = TicketSpecService::getInstance()
+            ->getSpecListByTicketId($ticket->id, ['category_id', 'price_list']);
         $ticket['scenicIds'] = $scenicIds;
         $ticket['specList'] = $specList;
 
