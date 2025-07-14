@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHotelProvidersTable extends Migration
+class CreateHotelMerchantsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,18 @@ class CreateHotelProvidersTable extends Migration
      */
     public function up()
     {
-        Schema::create('hotel_providers', function (Blueprint $table) {
+        Schema::create('hotel_merchants', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('用户id');
-            $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过（待支付），2-完成支付，3-审核失败');
+            $table->integer('status')->default(0)
+                ->comment('申请状态：0-待审核，1-审核通过，待支付保证金，2-已支付保证金，3-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
             $table->string('company_name')->comment('公司名称');
             $table->string('region_desc')->comment('省市区描述');
             $table->string('region_code_list')->comment('省市区编码');
             $table->string('address_detail')->comment('地址详情');
-            $table->string('business_license_photo')->default('')->comment('营业执照照片');
+            $table->string('business_license_photo')
+                ->default('')->comment('营业执照照片');
             $table->string('name')->comment('联系人姓名');
             $table->string('mobile')->comment('手机号');
             $table->string('email')->comment('邮箱');
@@ -45,6 +47,6 @@ class CreateHotelProvidersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hotel_providers');
+        Schema::dropIfExists('hotel_merchants');
     }
 }

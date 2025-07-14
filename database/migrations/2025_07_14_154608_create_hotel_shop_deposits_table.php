@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHotelManagersTable extends Migration
+class CreateHotelShopDepositsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,11 @@ class CreateHotelManagersTable extends Migration
      */
     public function up()
     {
-        Schema::create('hotel_managers', function (Blueprint $table) {
+        Schema::create('hotel_shop_deposits', function (Blueprint $table) {
             $table->id();
-            $table->integer('hotel_id')->comment('酒店id');
-            $table->integer('manager_id')->comment('管理员id');
+            $table->integer('status')->default(1)->comment('账户状态：1-正常，2-异常');
+            $table->integer('shop_id')->comment('店铺id');
+            $table->float('balance')->default(0)->comment('保证金余额');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +30,6 @@ class CreateHotelManagersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('hotel_managers');
+        Schema::dropIfExists('hotel_shop_deposits');
     }
 }

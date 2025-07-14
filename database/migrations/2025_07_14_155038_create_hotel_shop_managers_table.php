@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProviderHotelsTable extends Migration
+class CreateHotelShopManagersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateProviderHotelsTable extends Migration
      */
     public function up()
     {
-        Schema::create('provider_hotels', function (Blueprint $table) {
+        Schema::create('hotel_shop_managers', function (Blueprint $table) {
             $table->id();
+            $table->integer('shop_id')->comment('店铺id');
             $table->integer('user_id')->comment('用户id');
-            $table->integer('provider_id')->comment('供应商id');
-            $table->integer('hotel_id')->comment('酒店id');
-            $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核失败');
-            $table->string('failure_reason')->default('')->comment('审核失败原因');
+            $table->integer('role_id')->comment('管理员角色id：1-超级管理员，2-运营，3-核销员');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +30,6 @@ class CreateProviderHotelsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('provider_hotels');
+        Schema::dropIfExists('hotel_shop_managers');
     }
 }

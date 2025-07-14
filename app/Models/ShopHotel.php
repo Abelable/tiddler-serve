@@ -2,6 +2,6 @@
 
 namespace App\Models;
 
-class HotelShop extends BaseModel
+class ShopHotel extends BaseModel
 {
 }
