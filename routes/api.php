@@ -361,7 +361,7 @@ Route::prefix('hotel')->group(function () {
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'HotelMerchantController@settleIn');
         Route::get('status', 'HotelMerchantController@status');
-        Route::post('info', 'HotelMerchantController@info');
+        Route::get('info', 'HotelMerchantController@info');
         Route::post('delete', 'HotelMerchantController@delete');
     });
 

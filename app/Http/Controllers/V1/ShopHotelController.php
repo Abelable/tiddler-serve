@@ -34,13 +34,12 @@ class ShopHotelController extends Controller
         $shopHotelList = collect($page->items());
 
         $hotelIds = $shopHotelList->pluck('hotel_id')->toArray();
-        $hotelList = HotelService::getInstance()
-            ->getHotelListByIds($hotelIds, ['id', 'name', 'cover', 'address'])
-            ->keyBy('id');
+        $hotelList = HotelService::getInstance()->getHotelListByIds($hotelIds)->keyBy('id');
 
         $list = $shopHotelList->map(function (ShopHotel $shopHotel) use ($hotelList) {
             /** @var Hotel $hotel */
             $hotel = $hotelList->get($shopHotel->hotel_id);
+            $shopHotel['hotel_grade'] = $hotel->grade;
             $shopHotel['hotel_cover'] = $hotel->cover;
             $shopHotel['hotel_name'] = $hotel->name;
             $shopHotel['hotel_address'] = $hotel->address;
