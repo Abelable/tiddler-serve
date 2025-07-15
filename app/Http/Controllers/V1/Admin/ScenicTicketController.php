@@ -43,9 +43,8 @@ class ScenicTicketController extends Controller
         }
         $merchant = ScenicMerchantService::getInstance()->getMerchantById($shop->merchant_id);
         if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前景点服务商不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前景点商家不存在');
         }
-
         $ticket['shop_info'] = $shop;
         $ticket['merchant_info'] = $merchant;
         unset($shop->merchant_id);

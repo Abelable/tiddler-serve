@@ -10,6 +10,7 @@ use App\Services\HotelMerchantService;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
 use App\Services\HotelRoomService;
+use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelRoomListInput;
 
@@ -48,6 +49,7 @@ class HotelRoomController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
@@ -59,11 +61,18 @@ class HotelRoomController extends Controller
         $roomType = HotelRoomTypeService::getInstance()->getTypeById($room->type_id);
         $room['typeName'] = $roomType->name;
 
-        $provider = HotelMerchantService::getInstance()->getMerchantById($room->provider_id);
-        if (is_null($provider)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
+        $shop = HotelShopService::getInstance()->getShopById($room->shop_id);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店商家店铺不存在');
         }
-        $room['provider_info'] = $provider;
+        $merchant = HotelMerchantService::getInstance()->getMerchantById($shop->merchant_id);
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店商家不存在');
+        }
+        $room['shop_info'] = $shop;
+        $room['merchant_info'] = $merchant;
+        unset($shop->merchant_id);
+        unset($room->shop_id);
 
         return $this->success($room);
     }

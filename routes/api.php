@@ -392,8 +392,8 @@ Route::prefix('hotel')->group(function () {
         });
 
         Route::prefix('room')->group(function () {
-            Route::get('totals', 'HotelRoomController@roomListTotals');
-            Route::get('list', 'HotelRoomController@userRoomList');
+            Route::get('totals', 'HotelRoomController@totals');
+            Route::get('list', 'HotelRoomController@shopList');
             Route::get('detail', 'HotelRoomController@detail');
             Route::post('add', 'HotelRoomController@add');
             Route::post('edit', 'HotelRoomController@edit');
