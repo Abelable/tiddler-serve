@@ -12,6 +12,7 @@ use App\Services\HotelService;
 use App\Services\HotelRoomService;
 use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\HotelRoomListInput;
 
 class HotelRoomController extends Controller
@@ -52,7 +53,7 @@ class HotelRoomController extends Controller
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
 
         $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
@@ -77,13 +78,41 @@ class HotelRoomController extends Controller
         return $this->success($room);
     }
 
+    public function editCommission()
+    {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
+        $id = $this->verifyRequiredId('id');
+
+        $room = HotelRoomService::getInstance()->getRoomById($id);
+        if (is_null($room)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房价不存在');
+        }
+
+        if ($input->promotionCommissionRate) {
+            $room->promotion_commission_rate = $input->promotionCommissionRate;
+        }
+        if ($input->promotionCommissionUpperLimit) {
+            $room->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        }
+        if ($input->superiorPromotionCommissionRate) {
+            $room->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        }
+        if ($input->superiorPromotionCommissionUpperLimit) {
+            $room->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        }
+        $room->save();
+
+        return $this->success();
+    }
+
     public function approve()
     {
         $id = $this->verifyRequiredId('id');
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         $room->status = 1;
         $room->save();
@@ -98,7 +127,7 @@ class HotelRoomController extends Controller
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         $room->status = 2;
         $room->failure_reason = $reason;
@@ -113,7 +142,7 @@ class HotelRoomController extends Controller
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前房间不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         $room->delete();
 

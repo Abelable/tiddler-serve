@@ -973,6 +973,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
             Route::post('list', 'HotelRoomController@list');
             Route::get('detail', 'HotelRoomController@detail');
+            Route::post('edit_commission', 'HotelRoomController@editCommission');
             Route::post('approve', 'HotelRoomController@approve');
             Route::post('reject', 'HotelRoomController@reject');
             Route::post('delete', 'HotelRoomController@delete');
