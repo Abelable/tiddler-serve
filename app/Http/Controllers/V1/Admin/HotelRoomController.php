@@ -108,6 +108,8 @@ class HotelRoomController extends Controller
 
     public function approve()
     {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
         $id = $this->verifyRequiredId('id');
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
@@ -115,6 +117,10 @@ class HotelRoomController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
         $room->status = 1;
+        $room->promotion_commission_rate = $input->promotionCommissionRate;
+        $room->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        $room->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        $room->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
         $room->save();
 
         return $this->success();
