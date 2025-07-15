@@ -12,7 +12,7 @@ use App\Utils\Inputs\StatusPageInput;
 
 class ShopScenicController extends Controller
 {
-    public function listTotals()
+    public function totals()
     {
         $shopId = $this->verifyRequiredId('shopId');
 
