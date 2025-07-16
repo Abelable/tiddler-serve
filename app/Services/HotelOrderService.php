@@ -67,6 +67,23 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
     }
 
+    public function getShopDateQuery($shopId, $dateDesc = 'today')
+    {
+        switch ($dateDesc) {
+            case 'today':
+                $date = Carbon::today();
+                break;
+            case 'yesterday':
+                $date = Carbon::yesterday();
+                break;
+        }
+
+        return HotelOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereDate('created_at', $date)
+            ->whereIn('status', [201, 301, 401, 402, 403, 501, 502]);
+    }
+
     public function getUserOrderById($userId, $id, $columns = ['*'])
     {
         return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);

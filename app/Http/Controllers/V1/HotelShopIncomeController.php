@@ -4,13 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\HotelShopIncome;
-use App\Models\ScenicShopIncome;
 use App\Services\HotelOrderRoomService;
+use App\Services\HotelOrderService;
 use App\Services\ProductHistoryService;
-use App\Services\ScenicOrderService;
-use App\Services\ScenicOrderTicketService;
 use App\Services\HotelShopIncomeService;
-use App\Services\ShopScenicSpotService;
+use App\Services\ShopHotelService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
@@ -23,20 +21,20 @@ class HotelShopIncomeController extends Controller
 
         $totalIncome = HotelShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
-        $todayOrderQuery = ScenicOrderService::getInstance()->getShopDateQuery($shopId);
+        $todayOrderQuery = HotelOrderService::getInstance()->getShopDateQuery($shopId);
         $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
         $todayOrderCount = (clone $todayOrderQuery)->count();
 
-        $yesterdayOrderQuery = ScenicOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $yesterdayOrderQuery = HotelOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
         $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
-        $scenicIds = ShopScenicSpotService::getInstance()
-            ->getScenicList($shopId, [1])->pluck('id')->toArray();
+        $hotelIds = ShopHotelService::getInstance()
+            ->getHotelList($shopId, [1])->pluck('id')->toArray();
         $todayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::SCENIC, $scenicIds);
+            ->getHistoryDateCount(ProductType::HOTEL, $hotelIds);
         $yesterdayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::SCENIC, $scenicIds, 'yesterday');
+            ->getHistoryDateCount(ProductType::HOTEL, $hotelIds, 'yesterday');
 
         return $this->success([
             'totalIncome' => $totalIncome,
