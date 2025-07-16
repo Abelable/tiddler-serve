@@ -124,13 +124,9 @@ class CommissionController extends Controller
         $hotelRoomList = HotelOrderRoomService::getInstance()
             ->getListByOrderIdsAndRoomIds($orderIdsByType[ProductType::HOTEL] ?? [], $productIdsByType[ProductType::HOTEL] ?? []);
         foreach ($hotelRoomList as $hotelRoom) {
-            $hotelRoomMap[$hotelRoom->order_id][$hotelRoom->room_id] = [
-                'id' => $hotelRoom->room_id,
-                'hotelName' => $hotelRoom->hotel_name,
-                'typeName' => $hotelRoom->type_name,
-                'price' => $hotelRoom->price,
-                'number' => $hotelRoom->number,
-            ];
+            $hotelRoom->image_list = json_decode($hotelRoom->image_list);
+            $hotelRoom->facility_list = json_decode($hotelRoom->facility_list);
+            $hotelRoomMap[$hotelRoom->order_id][$hotelRoom->room_id] = $hotelRoom;
         }
 
 
