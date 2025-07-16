@@ -53,13 +53,8 @@ class HotelRoomController extends Controller
 
             unset($room->hotel_id);
             unset($room->shop_id);
-            unset($room->price);
-            unset($room->sales_volume);
             unset($room->status);
             unset($room->failure_reason);
-            unset($room->sales_commission_rate);
-            unset($room->promotion_commission_rate);
-            unset($room->promotion_commission_upper_limit);
             unset($room->superior_promotion_commission_rate);
             unset($room->superior_promotion_commission_upper_limit);
             unset($room->created_at);
