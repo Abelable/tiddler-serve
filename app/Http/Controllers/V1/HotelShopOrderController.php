@@ -180,10 +180,7 @@ class HotelShopOrderController extends Controller
 
         DB::transaction(function () use ($verifyCodeInfo, $order) {
             HotelOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
-
-            if (!HotelOrderVerifyService::getInstance()->hasUnverifiedCodes($verifyCodeInfo->order_id)) {
-                HotelOrderService::getInstance()->userConfirm($order->user_id, $order->id);
-            }
+            HotelOrderService::getInstance()->userConfirm($order->user_id, $order->id);
         });
 
         return $this->success();

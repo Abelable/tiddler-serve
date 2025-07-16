@@ -38,14 +38,6 @@ class HotelOrderVerifyService extends BaseService
         return HotelOrderVerifyCode::query()->where('order_id', $orderId)->where('status', 0)->get($columns);
     }
 
-    public function hasUnverifiedCodes($orderId)
-    {
-        return HotelOrderVerifyCode::query()
-            ->where('order_id', $orderId)
-            ->where('status', 0)
-            ->exists();
-    }
-
     public function verify(HotelOrderVerifyCode $verifyCodeInfo, $userId)
     {
         $verifyCodeInfo->status = 1;
