@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\HotelShopIncome;
 use App\Models\ScenicShopIncome;
+use App\Services\HotelOrderRoomService;
 use App\Services\ProductHistoryService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
@@ -100,30 +102,19 @@ class HotelShopIncomeController extends Controller
         $incomeList = collect($page->items());
 
         $orderIds = $incomeList->pluck('order_id')->toArray();
-        $ticketIds = $incomeList->pluck('ticket_id')->toArray();
-        $ticketMap = [];
-        $ticketList = ScenicOrderTicketService::getInstance()
-            ->getListByOrderIdsAndTicketIds($orderIds, $ticketIds);
-        foreach ($ticketList as $ticket) {
-            $ticketMap[$ticket->order_id][$ticket->ticket_id] = [
-                'id' => $ticket->ticket_id,
-                'name' => $ticket->name,
-                'categoryName' => $ticket->category_name,
-                'price' => $ticket->price,
-                'number' => $ticket->number,
-                'scenicList' => json_decode($ticket->scenic_list),
-                'validityTime' => $ticket->validity_time,
-                'selectedDateTimestamp' => $ticket->selected_date_timestamp,
-                'effectiveTime' => $ticket->effective_time,
-                'refundStatus' => $ticket->refund_status,
-                'needExchange' => $ticket->need_exchange
-            ];
+        $roomIds = $incomeList->pluck('room_id')->toArray();
+        $roomMap = [];
+        $roomList = HotelOrderRoomService::getInstance()->getListByOrderIdsAndRoomIds($orderIds, $roomIds);
+        foreach ($roomList as $room) {
+            $room->image_list = json_decode($room->image_list);
+            $room->facility_list = json_decode($room->facility_list);
+            $roomMap[$room->order_id][$room->room_id] = $room;
         }
 
-        $list = $incomeList->map(function (ScenicShopIncome $income) use ($ticketMap) {
-            $ticketInfo = $ticketMap[$income->order_id][$income->ticket_id] ?? null;
-            $income['ticketInfo'] = $ticketInfo;
-            unset($income['ticket_id']);
+        $list = $incomeList->map(function (HotelShopIncome $income) use ($roomMap) {
+            $roomInfo = $roomMap[$income->order_id][$income->room_id] ?? null;
+            $income['roomInfo'] = $roomInfo;
+            unset($income['room_id']);
             return $income;
         });
 
