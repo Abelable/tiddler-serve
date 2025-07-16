@@ -275,16 +275,18 @@ class HotelOrderController extends Controller
 
             return [
                 'id' => $order->id,
+                'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => HotelOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
                 'roomInfo' => $room,
+                'totalPrice' => $order->total_price,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'orderSn' => $order->order_sn
+                'createdAt' => $order->created_at
             ];
         });
     }
@@ -301,20 +303,24 @@ class HotelOrderController extends Controller
             'shop_id',
             'shop_logo',
             'shop_name',
+            'total_price',
             'payment_amount',
             'pay_time',
             'confirm_time',
             'created_at',
             'updated_at',
         ];
+
         $order = HotelOrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
         $room = HotelOrderRoomService::getInstance()->getRoomByOrderId($order->id);
         $room->image_list = json_decode($room->image_list);
         $room->facility_list = json_decode($room->facility_list);
         $order['roomInfo'] = $room;
+
         return $this->success($order);
     }
 

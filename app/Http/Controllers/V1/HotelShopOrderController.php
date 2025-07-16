@@ -90,25 +90,15 @@ class HotelShopOrderController extends Controller
         return $orderList->map(function (HotelOrder $order) use ($roomList) {
             /** @var HotelOrderRoom $room */
             $room = $roomList->get($order->id);
+            $room->image_list = json_decode($room->image_list);
+            $room->facility_list = json_decode($room->facility_list);
 
             return [
                 'id' => $order->id,
                 'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => HotelOrderStatus::TEXT_MAP[$order->status],
-                'roomInfo' => [
-                    'id' => $room->room_id,
-                    'hotelId' => $room->hotel_id,
-                    'hotelName' => $room->hotel_name,
-                    'typeName' => $room->type_name,
-                    'price' => $room->price,
-                    'number' => $room->number,
-                    'checkInDate' => $room->check_in_date,
-                    'checkOutDate' => $room->check_out_date,
-                    'breakfastNum' => $room->breakfast_num,
-                    'guestNum' => $room->guest_num,
-                    'cancellable' => $room->cancellable
-                ],
+                'roomInfo' => $room,
                 'totalPrice' => $order->total_price,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
@@ -131,7 +121,6 @@ class HotelShopOrderController extends Controller
             'mobile',
             'total_price',
             'payment_amount',
-            'approve_time',
             'pay_time',
             'confirm_time',
             'created_at',
@@ -144,19 +133,9 @@ class HotelShopOrderController extends Controller
         }
 
         $room = HotelOrderRoomService::getInstance()->getRoomByOrderId($order->id);
-        $order['roomInfo'] = [
-            'id' => $room->room_id,
-            'hotelId' => $room->hotel_id,
-            'hotelName' => $room->hotel_name,
-            'typeName' => $room->type_name,
-            'price' => $room->price,
-            'number' => $room->number,
-            'checkInDate' => $room->check_in_date,
-            'checkOutDate' => $room->check_out_date,
-            'breakfastNum' => $room->breakfast_num,
-            'guestNum' => $room->guest_num,
-            'cancellable' => $room->cancellable
-        ];
+        $room->image_list = json_decode($room->image_list);
+        $room->facility_list = json_decode($room->facility_list);
+        $order['roomInfo'] = $room;
 
         return $this->success($order);
     }
