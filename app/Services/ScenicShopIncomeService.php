@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Jobs\ScenicShopIncomeConfirmJob;
 use App\Models\ScenicShopIncome;
 use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
@@ -117,17 +116,12 @@ class ScenicShopIncomeService extends BaseService
             ->update(['status' => 1]);
     }
 
-    public function updateListToConfirmStatus($orderIds, $role = 'user')
+    public function updateListToConfirmStatus($orderIds)
     {
         $incomeList = $this->getPaidListByOrderIds($orderIds);
-        return $incomeList->map(function (ScenicShopIncome $income) use ($role) {
-            if (($income->refund_status == 1 || $income->refund_status == 2) && $role == 'user') {
-                // todo 确认景点门票是否支持售后退款（1-有条件退，2-随时退）
-                dispatch(new ScenicShopIncomeConfirmJob($income->id));
-            } else {
-                $income->status = 2;
-                $income->save();
-            }
+        return $incomeList->map(function (ScenicShopIncome $income) {
+            $income->status = 2;
+            $income->save();
             return $income;
         });
     }

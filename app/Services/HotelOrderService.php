@@ -153,21 +153,16 @@ class HotelOrderService extends BaseService
         return HotelOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, HotelOrderInput $input, HotelShop $shop, $paymentAmount)
+    public function createOrder(
+        $userId,
+        HotelOrderInput $input,
+        HotelShop $shop,
+        $totalPrice,
+        $deductionBalance,
+        $paymentAmount
+    )
     {
         $orderSn = $this->generateOrderSn();
-
-        // 余额抵扣
-        $deductionBalance = 0;
-        if ($input->useBalance == 1) {
-            $account = AccountService::getInstance()->getUserAccount($userId);
-            $deductionBalance = min($paymentAmount, $account->balance);
-            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
-
-            // 更新余额
-            AccountService::getInstance()
-                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::HOTEL);
-        }
 
         $order = HotelOrder::new();
         $order->order_sn = $orderSn;
@@ -178,9 +173,9 @@ class HotelOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->total_price = $totalPrice;
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
-        $order->total_payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
         $order->save();
 
@@ -234,8 +229,8 @@ class HotelOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'hotel_order_sn:' . $order->order_sn,
-            'attach' => $order->order_sn,
+            'body' => '订单编号：' . $order->order_sn,
+            'attach' => 'hotel_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -243,7 +238,7 @@ class HotelOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['attach'];
+        $orderSn = $data['attach'] ? str_replace('hotel_order_sn:', '', $data['attach']): '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -269,6 +264,9 @@ class HotelOrderService extends BaseService
 
         // 佣金记录状态更新为：已支付待结算
         CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::HOTEL);
+
+        // 收益记录状态更新为：已支付待结算
+        HotelShopIncomeService::getInstance()->updateListToPaidStatus([$order->id]);
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
@@ -334,7 +332,11 @@ class HotelOrderService extends BaseService
         }
 
         // 删除佣金记录
-        CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::HOTEL);
+        CommissionService::getInstance()
+            ->deleteUnpaidListByOrderIds([$order->id], ProductType::HOTEL);
+
+        // 删除收益记录
+        HotelShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 0);
 
         return $order;
     }
@@ -396,7 +398,11 @@ class HotelOrderService extends BaseService
 
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL, $role);
+        CommissionService::getInstance()
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL, $role);
+
+        // 收益记录变更为待提现
+        HotelShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
@@ -478,7 +484,7 @@ class HotelOrderService extends BaseService
                     $refundParams = [
                         'transaction_id' => $order->pay_id,
                         'out_refund_no' => time(),
-                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'total_fee' => bcmul($order->payment_amount, 100),
                         'refund_fee' => bcmul($order->refund_amount, 100),
                         'refund_desc' => '酒店房间退款',
                         'type' => 'miniapp'
@@ -497,12 +503,20 @@ class HotelOrderService extends BaseService
 
                 // 退还余额
                 if ($order->deduction_balance != 0) {
-                    AccountService::getInstance()
-                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::HOTEL);
+                    AccountService::getInstance()->updateBalance(
+                        $order->user_id,
+                        AccountChangeType::REFUND,
+                        $order->deduction_balance,
+                        $order->order_sn,
+                        ProductType::HOTEL
+                    );
                 }
 
                 // 删除佣金记录
                 CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::HOTEL);
+
+                // 删除店铺收益
+                HotelShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
 
                 // todo 通知商家
             } catch (GatewayException $exception) {
@@ -520,8 +534,6 @@ class HotelOrderService extends BaseService
         if (!$order->canDeleteHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
         }
-
-        OrderGoodsService::getInstance()->delete($order->id);
         $order->delete();
     }
 }

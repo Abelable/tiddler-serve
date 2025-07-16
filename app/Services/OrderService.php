@@ -692,7 +692,8 @@ class OrderService extends BaseService
         });
 
         // 佣金记录变更为待提现
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::GOODS, $role);
+        CommissionService::getInstance()
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::GOODS, $role);
 
         // 收益记录变更为待提现
         ShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);

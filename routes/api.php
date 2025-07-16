@@ -319,6 +319,7 @@ Route::prefix('scenic')->group(function () {
         Route::post('pay_params', 'ScenicOrderController@payParams');
         Route::get('total', 'ScenicOrderController@total');
         Route::get('list', 'ScenicOrderController@list');
+        Route::get('search', 'ScenicOrderController@search');
         Route::get('detail', 'ScenicOrderController@detail');
         Route::get('verify_code', 'ScenicOrderController@verifyCode');
         Route::post('refund', 'ScenicOrderController@refund');
@@ -434,7 +435,9 @@ Route::prefix('hotel')->group(function () {
         Route::get('payment_amount', 'HotelOrderController@paymentAmount');
         Route::post('submit', 'HotelOrderController@submit');
         Route::post('pay_params', 'HotelOrderController@payParams');
+        Route::get('total', 'HotelOrderController@total');
         Route::get('list', 'HotelOrderController@list');
+        Route::get('search', 'HotelOrderController@search');
         Route::get('detail', 'HotelOrderController@detail');
         Route::get('verify_code', 'HotelOrderController@verifyCode');
         Route::post('refund', 'HotelOrderController@refund');

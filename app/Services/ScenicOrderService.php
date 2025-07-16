@@ -176,6 +176,7 @@ class ScenicOrderService extends BaseService
     )
     {
         $orderSn = $this->generateOrderSn();
+
         $order = ScenicOrder::new();
         $order->order_sn = $orderSn;
         $order->status = ScenicOrderStatus::CREATED;
@@ -314,6 +315,9 @@ class ScenicOrderService extends BaseService
         CommissionService::getInstance()
             ->deleteUnpaidListByOrderIds([$order->id], ProductType::SCENIC);
 
+        // 删除收益记录
+        ScenicShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 0);
+
         return $order;
     }
 
@@ -376,6 +380,7 @@ class ScenicOrderService extends BaseService
         $orderIds = $orderList->pluck('id')->toArray();
         CommissionService::getInstance()
             ->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
+
         // 收益记录变更为待提现
         ScenicShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);
 
@@ -459,7 +464,7 @@ class ScenicOrderService extends BaseService
                     $refundParams = [
                         'transaction_id' => $order->pay_id,
                         'out_refund_no' => time(),
-                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'total_fee' => bcmul($order->payment_amount, 100),
                         'refund_fee' => bcmul($order->refund_amount, 100),
                         'refund_desc' => '景点门票退款',
                         'type' => 'miniapp'
@@ -478,12 +483,20 @@ class ScenicOrderService extends BaseService
 
                 // 退还余额
                 if ($order->deduction_balance != 0) {
-                    AccountService::getInstance()
-                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::SCENIC);
+                    AccountService::getInstance()->updateBalance(
+                        $order->user_id,
+                        AccountChangeType::REFUND,
+                        $order->deduction_balance,
+                        $order->order_sn,
+                        ProductType::SCENIC
+                    );
                 }
 
                 // 删除佣金记录
                 CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::SCENIC);
+
+                // 删除店铺收益
+                ScenicShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
 
                 // todo 通知商家
             } catch (GatewayException $exception) {
@@ -502,7 +515,6 @@ class ScenicOrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
         }
 
-        ScenicOrderTicketService::getInstance()->delete($order->id);
         $order->delete();
     }
 }

@@ -65,16 +65,16 @@ class ScenicOrderTicketService extends BaseService
             ->get($columns);
     }
 
-    public function delete($orderId)
-    {
-        return ScenicOrderTicket::query()->where('order_id', $orderId)->delete();
-    }
-
     public function searchList($userId, $keyword, $columns = ['*'])
     {
         return ScenicOrderTicket::query()
             ->where('user_id', $userId)
             ->where('name', 'like', "%{$keyword}%")
             ->get($columns);
+    }
+
+    public function delete($orderId)
+    {
+        return ScenicOrderTicket::query()->where('order_id', $orderId)->delete();
     }
 }

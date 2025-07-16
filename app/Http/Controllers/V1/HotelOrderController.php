@@ -7,18 +7,20 @@ use App\Models\HotelOrder;
 use App\Models\HotelOrderRoom;
 use App\Services\AccountService;
 use App\Services\CommissionService;
-use App\Services\HotelManagerService;
 use App\Services\HotelOrderRoomService;
 use App\Services\HotelOrderService;
 use App\Services\HotelOrderVerifyService;
 use App\Services\HotelRoomService;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
+use App\Services\HotelShopIncomeService;
 use App\Services\HotelShopService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\HotelOrderStatus;
+use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -77,30 +79,60 @@ class HotelOrderController extends Controller
             }
         }
 
+        $promoterInfo = $this->user()->promoterInfo;
         $userId = $this->userId();
-        $userLevel = $this->user()->promoterInfo->level ?: 0;
+        $userLevel = $promoterInfo ? $promoterInfo->level : 0;
         $superiorId = RelationService::getInstance()->getSuperiorId($userId);
         $superiorLevel = PromoterService::getInstance()->getPromoterLevel($superiorId);
         $upperSuperiorId = RelationService::getInstance()->getSuperiorId($superiorId);
         $upperSuperiorLevel = PromoterService::getInstance()->getPromoterLevel($upperSuperiorId);
 
         $room = HotelRoomService::getInstance()->getRoomById($input->roomId);
+        $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
         $shop = HotelShopService::getInstance()->getShopById($room->shop_id);
 
         $datePriceList = HotelOrderService::getInstance()->getDatePriceList($input->roomId, $input->checkInDate, $input->checkOutDate);
-        $paymentAmount = (float)bcmul($datePriceList->pluck('price')->sum(), $input->num, 2);
         $averagePrice = round($datePriceList->avg('price'), 2);
+        $totalPrice = (float)bcmul($datePriceList->pluck('price')->sum(), $input->num, 2);
+        $paymentAmount = $totalPrice;
 
-        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $shop, $room, $averagePrice, $input) {
-            $order = HotelOrderService::getInstance()->createOrder($this->userId(), $input, $shop, $paymentAmount);
+        // 余额抵扣
+        $deductionBalance = 0;
+        if ($input->useBalance == 1) {
+            $account = AccountService::getInstance()->getUserAccount($userId);
+            $deductionBalance = min($paymentAmount, $account->balance);
+            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
+        }
 
-            // 生成核销码
-            HotelOrderVerifyService::getInstance()->createVerifyCode($order->id, $room->hotel_id);
+        $orderId = DB::transaction(function () use (
+            $hotel,
+            $totalPrice,
+            $deductionBalance,
+            $upperSuperiorLevel,
+            $upperSuperiorId,
+            $superiorLevel,
+            $superiorId,
+            $userLevel,
+            $userId,
+            $paymentAmount,
+            $shop,
+            $room,
+            $averagePrice,
+            $input
+        ) {
+            $order = HotelOrderService::getInstance()->createOrder(
+                $userId,
+                $input,
+                $shop,
+                $totalPrice,
+                $deductionBalance,
+                $paymentAmount
+            );
 
             // 生成订单房间快照
             $type = HotelRoomTypeService::getInstance()->getTypeById($room->type_id, ['*'], false);
-            $hotel = HotelService::getInstance()->getHotelById($room->hotel_id);
             HotelOrderRoomService::getInstance()->createOrderRoom(
+                $userId,
                 $order->id,
                 $hotel,
                 $type,
@@ -109,9 +141,37 @@ class HotelOrderController extends Controller
                 $averagePrice
             );
 
+            // 生成核销码
+            HotelOrderVerifyService::getInstance()->createVerifyCode($order->id, $room->hotel_id);
+
             // 生成佣金记录
-            CommissionService::getInstance()
-                ->createHotelCommission($order->id, $order->order_sn, $room, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+            CommissionService::getInstance()->createHotelCommission(
+                $order->id,
+                $order->order_sn,
+                $room,
+                $paymentAmount,
+                $userId,
+                $userLevel,
+                $superiorId,
+                $superiorLevel,
+                $upperSuperiorId,
+                $upperSuperiorLevel
+            );
+
+            // 生成店铺收益
+            HotelShopIncomeService::getInstance()
+                ->createIncome($shop->id, $order->id, $order->order_sn, $room, $paymentAmount);
+
+            if ($input->useBalance == 1) {
+                // 更新余额
+                AccountService::getInstance()->updateBalance(
+                    $userId,
+                    AccountChangeType::PURCHASE,
+                    -$deductionBalance,
+                    $order->order_sn,
+                    ProductType::HOTEL
+                );
+            }
 
             // 增加酒店、房间销量
             HotelService::getInstance()->increaseSalesVolume($room->hotel_id, $input->num);
@@ -132,6 +192,17 @@ class HotelOrderController extends Controller
         return $this->success($payParams);
     }
 
+    public function total()
+    {
+        return $this->success([
+            HotelOrderService::getInstance()->getTotal($this->userId(), $this->statusList(1)),
+            HotelOrderService::getInstance()->getTotal($this->userId(), $this->statusList(2)),
+            HotelOrderService::getInstance()->getTotal($this->userId(), $this->statusList(3)),
+            HotelOrderService::getInstance()->getTotal($this->userId(), $this->statusList(4)),
+            HotelOrderService::getInstance()->getTotal($this->userId(), [HotelOrderStatus::REFUNDING]),
+        ]);
+    }
+
     public function list()
     {
         /** @var PageInput $input */
@@ -140,23 +211,22 @@ class HotelOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = HotelOrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
-        $list = $this->orderList($page);
+        $orderList = collect($page->items());
+        $list = $this->handelOrderList($orderList);
 
         return $this->success($this->paginate($page, $list));
     }
 
-    public function shopList()
+    public function search()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $status = $this->verifyRequiredInteger('status');
-        $shopId = $this->verifyId('shopId');
+        $keywords = $this->verifyRequiredString('keywords');
 
-        $statusList = $this->statusList($status);
-        $page = HotelOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $list = $this->orderList($page);
+        $orderGoodsList = HotelOrderRoomService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderList = HotelOrderService::getInstance()->getOrderListByIds($orderIds);
+        $list = $this->handleOrderList($orderList);
 
-        return $this->success($this->paginate($page, $list));
+        return $this->success($list);
     }
 
     private function statusList($status)
@@ -193,9 +263,8 @@ class HotelOrderController extends Controller
         return $statusList;
     }
 
-    private function orderList($page)
+    private function handelOrderList($orderList)
     {
-        $orderList = collect($page->items());
         $orderIds = $orderList->pluck('id')->toArray();
         $roomList = HotelOrderRoomService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
         return $orderList->map(function (HotelOrder $order) use ($roomList) {
@@ -218,70 +287,6 @@ class HotelOrderController extends Controller
                 'orderSn' => $order->order_sn
             ];
         });
-    }
-
-    public function cancel()
-    {
-        $id = $this->verifyRequiredId('id');
-        HotelOrderService::getInstance()->userCancel($this->userId(), $id);
-        return $this->success();
-    }
-
-    public function verifyCode()
-    {
-        $orderId = $this->verifyRequiredId('orderId');
-        $hotelId = $this->verifyRequiredId('hotelId');
-
-        $verifyCodeInfo = HotelOrderVerifyService::getInstance()->getVerifyCodeInfo($orderId, $hotelId);
-        if (is_null($verifyCodeInfo)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
-        }
-
-        return $this->success($verifyCodeInfo->code);
-    }
-
-    public function verify()
-    {
-        $code = $this->verifyRequiredString('code');
-
-        $verifyCodeInfo = HotelOrderVerifyService::getInstance()->getByCode($code);
-        if (is_null($verifyCodeInfo)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
-        }
-
-        $order = HotelOrderService::getInstance()->getPendingSettleInOrderById($verifyCodeInfo->order_id);
-        if (is_null($order)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
-        }
-
-        $managerIds = HotelManagerService::getInstance()
-            ->getListByHotelId($verifyCodeInfo->hotel_id)->pluck('user_id')->toArray();
-        if (!in_array($this->userId(), $managerIds)) {
-            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前酒店核销员，无法核销');
-        }
-
-        DB::transaction(function () use ($verifyCodeInfo, $order) {
-            HotelOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
-            HotelOrderService::getInstance()->userConfirm($order->user_id, $order->id);
-        });
-
-        return $this->success();
-    }
-
-    public function delete()
-    {
-        $id = $this->verifyRequiredId('id');
-        DB::transaction(function () use ($id) {
-            HotelOrderService::getInstance()->delete($this->userId(), $id);
-        });
-        return $this->success();
-    }
-
-    public function refund()
-    {
-        $id = $this->verifyRequiredId('id');
-        HotelOrderService::getInstance()->userRefund($this->userId(), $id);
-        return $this->success();
     }
 
     public function detail()
@@ -311,5 +316,44 @@ class HotelOrderController extends Controller
         $room->facility_list = json_decode($room->facility_list);
         $order['roomInfo'] = $room;
         return $this->success($order);
+    }
+
+    public function cancel()
+    {
+        $id = $this->verifyRequiredId('id');
+        HotelOrderService::getInstance()->userCancel($this->userId(), $id);
+        return $this->success();
+    }
+
+    public function verifyCode()
+    {
+        $orderId = $this->verifyRequiredId('orderId');
+        $hotelId = $this->verifyRequiredId('hotelId');
+
+        $verifyCodeInfo = HotelOrderVerifyService::getInstance()->getVerifyCodeInfo($orderId, $hotelId);
+        if (is_null($verifyCodeInfo)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
+        }
+
+        return $this->success($verifyCodeInfo->code);
+    }
+
+    public function delete()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        DB::transaction(function () use ($id) {
+            HotelOrderService::getInstance()->delete($this->userId(), $id);
+            HotelOrderRoomService::getInstance()->delete($id);
+        });
+
+        return $this->success();
+    }
+
+    public function refund()
+    {
+        $id = $this->verifyRequiredId('id');
+        HotelOrderService::getInstance()->userRefund($this->userId(), $id);
+        return $this->success();
     }
 }

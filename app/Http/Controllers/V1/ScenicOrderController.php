@@ -132,8 +132,18 @@ class ScenicOrderController extends Controller
             }
 
             // 生成佣金记录
-            CommissionService::getInstance()
-                ->createScenicCommission($order->id, $order->order_sn, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+            CommissionService::getInstance()->createScenicCommission(
+                $order->id,
+                $order->order_sn,
+                $ticket,
+                $paymentAmount,
+                $userId,
+                $userLevel,
+                $superiorId,
+                $superiorLevel,
+                $upperSuperiorId,
+                $upperSuperiorLevel
+            );
 
             // 生成店铺收益
             ScenicShopIncomeService::getInstance()
@@ -141,8 +151,13 @@ class ScenicOrderController extends Controller
 
             // 更新余额
             if ($input->useBalance == 1) {
-                AccountService::getInstance()
-                    ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $order->order_sn, ProductType::SCENIC);
+                AccountService::getInstance()->updateBalance(
+                    $userId,
+                    AccountChangeType::PURCHASE,
+                    -$deductionBalance,
+                    $order->order_sn,
+                    ProductType::SCENIC
+                );
             }
 
             // 增加景点、门票销量
@@ -344,9 +359,12 @@ class ScenicOrderController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
+
         DB::transaction(function () use ($id) {
             ScenicOrderService::getInstance()->delete($this->userId(), $id);
+            ScenicOrderTicketService::getInstance()->delete($id);
         });
+
         return $this->success();
     }
 

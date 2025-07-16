@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Jobs\HotelShopIncomeConfirmJob;
 use App\Models\HotelRoom;
 use App\Models\HotelShopIncome;
 use App\Utils\CodeResponse;
@@ -134,17 +133,12 @@ class HotelShopIncomeService extends BaseService
             ->update(['status' => 1]);
     }
 
-    public function updateListToConfirmStatus($orderIds, $role = 'user')
+    public function updateListToConfirmStatus($orderIds)
     {
         $incomeList = $this->getPaidListByOrderIds($orderIds);
-        return $incomeList->map(function (HotelShopIncome $income) use ($role) {
-            if ($income->cancellable == 1 && $role == 'user') {
-                // todo 确认酒店房间售后问题
-                dispatch(new HotelShopIncomeConfirmJob($income->id));
-            } else {
-                $income->status = 2;
-                $income->save();
-            }
+        return $incomeList->map(function (HotelShopIncome $income) {
+            $income->status = 2;
+            $income->save();
             return $income;
         });
     }

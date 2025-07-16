@@ -11,6 +11,7 @@ use App\Utils\Inputs\HotelOrderInput;
 class HotelOrderRoomService extends BaseService
 {
     public function createOrderRoom(
+        $userId,
         $orderId,
         Hotel $hotel,
         HotelRoomType $typeInfo,
@@ -20,24 +21,30 @@ class HotelOrderRoomService extends BaseService
     )
     {
         $room = HotelOrderRoom::new();
+        $room->user_id = $userId;
         $room->order_id = $orderId;
         $room->hotel_id = $hotel->id;
         $room->hotel_name = $hotel->name;
+        $room->type_id = $typeInfo->id;
+        $room->type_name = $typeInfo->name;
         $room->room_id = $roomInfo->id;
+        $room->check_in_date = $input->checkInDate;
+        $room->check_out_date = $input->checkOutDate;
+        $room->price = $price;
+        $room->sales_commission_rate = $roomInfo->sales_commission_rate;
+        $room->promotion_commission_rate = $roomInfo->promotion_commission_rate;
+        $room->promotion_commission_upper_limit = $roomInfo->promotion_commission_upper_limit;
+        $room->superior_promotion_commission_rate = $roomInfo->superior_promotion_commission_rate;
+        $room->superior_promotion_commission_upper_limit = $roomInfo->superior_promotion_commission_upper_limit;
+        $room->number = $input->num;
         $room->breakfast_num = $roomInfo->breakfast_num;
         $room->guest_num = $roomInfo->guest_num;
         $room->cancellable = $roomInfo->cancellable;
-        $room->type_id = $typeInfo->id;
-        $room->type_name = $typeInfo->name;
         $room->image_list = $typeInfo->image_list;
         $room->bed_desc = $typeInfo->bed_desc;
         $room->area_size = $typeInfo->area_size;
         $room->floor_desc = $typeInfo->floor_desc;
         $room->facility_list = $typeInfo->facility_list;
-        $room->check_in_date = $input->checkInDate;
-        $room->check_out_date = $input->checkOutDate;
-        $room->number = $input->num;
-        $room->price = $price;
         $room->save();
     }
 
@@ -56,6 +63,14 @@ class HotelOrderRoomService extends BaseService
         return HotelOrderRoom::query()
             ->whereIn('order_id', $orderIds)
             ->whereIn('room_id', $roomIds)
+            ->get($columns);
+    }
+
+    public function searchList($userId, $keyword, $columns = ['*'])
+    {
+        return HotelOrderRoom::query()
+            ->where('user_id', $userId)
+            ->where('name', 'like', "%{$keyword}%")
             ->get($columns);
     }
 
