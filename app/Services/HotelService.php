@@ -270,12 +270,9 @@ class HotelService extends BaseService
         return Hotel::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function increaseSalesVolume($hotelId, $num)
+    public function increaseSalesVolume($id, $num)
     {
-        $hotel = $this->getHotelById($hotelId);
-        $hotel->sales_volume = $hotel->sales_volume + $num;
-        $hotel->save();
-        return $hotel;
+        return Hotel::query()->where('id', $id)->increment('sales_volume', $num);
     }
 
     public function updateViews($id, $views)
