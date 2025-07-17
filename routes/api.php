@@ -481,18 +481,37 @@ Route::prefix('catering')->group(function () {
         Route::post('delete', 'CateringEvaluationController@delete');
     });
 
-    Route::prefix('provider')->group(function () {
-        Route::post('settle_in', 'CateringProviderController@settleIn');
-        Route::get('status', 'CateringProviderController@statusInfo');
-        Route::post('pay_deposit', 'CateringProviderController@payDeposit');
-        Route::post('delete', 'CateringProviderController@deleteProvider');
+    Route::prefix('merchant')->group(function () {
+        Route::post('settle_in', 'CateringMerchantController@settleIn');
+        Route::get('status', 'CateringMerchantController@statusInfo');
+        Route::post('info', 'CateringMerchantController@info');
+        Route::post('delete', 'CateringMerchantController@deleteProvider');
+    });
+
+    Route::prefix('shop')->group(function () {
+        Route::get('info', 'CateringShopController@shopInfo');
+        Route::post('update_info', 'CateringShopController@updateShopInfo');
+
+        Route::prefix('deposit')->group(function () {
+            Route::post('pay_params', 'CateringShopDepositController@payParams');
+            Route::get('info', 'CateringShopDepositController@depositInfo');
+            Route::get('log_list', 'CateringShopDepositController@changeLogList');
+        });
+
+        Route::prefix('manager')->group(function () {
+            Route::get('list', 'CateringShopManagerController@list');
+            Route::get('detail', 'CateringShopManagerController@detail');
+            Route::post('add', 'CateringShopManagerController@add');
+            Route::post('edit', 'CateringShopManagerController@edit');
+            Route::post('delete', 'CateringShopManagerController@delete');
+        });
 
         Route::prefix('restaurant')->group(function () {
-            Route::get('totals', 'ProviderRestaurantController@listTotals');
-            Route::get('list', 'ProviderRestaurantController@list');
-            Route::post('apply', 'ProviderRestaurantController@apply');
-            Route::post('delete', 'ProviderRestaurantController@delete');
-            Route::get('options', 'ProviderRestaurantController@options');
+            Route::get('totals', 'ShopRestaurantController@listTotals');
+            Route::get('list', 'ShopRestaurantController@list');
+            Route::post('apply', 'ShopRestaurantController@apply');
+            Route::post('delete', 'ShopRestaurantController@delete');
+            Route::get('options', 'ShopRestaurantController@options');
         });
 
         Route::prefix('set_meal')->group(function () {
