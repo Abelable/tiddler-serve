@@ -786,8 +786,13 @@ class OrderService extends BaseService
 
                 // 退还余额
                 if ($order->deduction_balance != 0) {
-                    AccountService::getInstance()
-                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
+                    AccountService::getInstance()->updateBalance(
+                        $order->user_id,
+                        AccountChangeType::REFUND,
+                        $order->deduction_balance,
+                        $order->order_sn,
+                        ProductType::GOODS
+                    );
                 }
 
                 // 删除佣金记录
@@ -872,8 +877,13 @@ class OrderService extends BaseService
 
             // 退还余额
             if ($order->deduction_balance != 0) {
-                AccountService::getInstance()
-                    ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::GOODS);
+                AccountService::getInstance()->updateBalance(
+                    $order->user_id,
+                    AccountChangeType::REFUND,
+                    $order->deduction_balance,
+                    $order->order_sn,
+                    ProductType::GOODS
+                );
             }
 
             // 删除佣金记录

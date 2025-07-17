@@ -7,10 +7,11 @@ use App\Models\User;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
-use App\Utils\Enums\SetMealOrderEnums;
+use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\WxMpServe;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -45,6 +46,23 @@ class SetMealOrderService extends BaseService
         return SetMealOrder::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function getShopDateQuery($shopId, $dateDesc = 'today')
+    {
+        switch ($dateDesc) {
+            case 'today':
+                $date = Carbon::today();
+                break;
+            case 'yesterday':
+                $date = Carbon::yesterday();
+                break;
+        }
+
+        return SetMealOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereDate('created_at', $date)
+            ->whereIn('status', [201, 301, 401, 402, 403, 501, 502]);
+    }
+
     public function getUserOrderById($userId, $id, $columns = ['*'])
     {
         return SetMealOrder::query()->where('user_id', $userId)->find($id, $columns);
@@ -52,7 +70,10 @@ class SetMealOrderService extends BaseService
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
     {
-        return SetMealOrder::query()->where('user_id', $userId)->whereIn('id', $ids)->get($columns);
+        return SetMealOrder::query()
+            ->where('user_id', $userId)
+            ->whereIn('id', $ids)
+            ->get($columns);
     }
 
     public function getOrderListByIds(array $ids, $columns = ['*'])
@@ -65,7 +86,7 @@ class SetMealOrderService extends BaseService
         return SetMealOrder::query()
             ->where('user_id', $userId)
             ->where('id', $orderId)
-            ->where('status', SetMealOrderEnums::STATUS_CREATE)
+            ->where('status', SetMealOrderStatus::CREATED)
             ->first($columns);
     }
 
@@ -73,20 +94,22 @@ class SetMealOrderService extends BaseService
     {
         return SetMealOrder::query()
             ->where('order_sn', $orderSn)
-            ->where('status', SetMealOrderEnums::STATUS_CREATE)
+            ->where('status', SetMealOrderStatus::CREATED)
             ->first($columns);
     }
 
     public function getPaidOrderById($id, $columns = ['*'])
     {
-        return SetMealOrder::query()->where('status', SetMealOrderEnums::STATUS_PAY)->find($id, $columns);
+        return SetMealOrder::query()
+            ->where('status', SetMealOrderStatus::PAID)
+            ->find($id, $columns);
     }
 
     // todo 核销有效期
     public function getTimeoutUnConfirmOrders($columns = ['*'])
     {
         return SetMealOrder::query()
-            ->where('status', SetMealOrderEnums::STATUS_PAY)
+            ->where('status', SetMealOrderStatus::PAID)
             ->where('pay_time', '<=', now()->subDays(30))
             ->where('pay_time', '>', now()->subDays(45))
             ->get($columns);
@@ -95,7 +118,11 @@ class SetMealOrderService extends BaseService
     public function getTimeoutUnFinishedOrders($columns = ['*'])
     {
         return SetMealOrder::query()
-            ->whereIn('status', [SetMealOrderEnums::STATUS_CONFIRM, SetMealOrderEnums::STATUS_AUTO_CONFIRM, SetMealOrderEnums::STATUS_ADMIN_CONFIRM])
+            ->whereIn('status', [
+                SetMealOrderStatus::CONFIRMED,
+                SetMealOrderStatus::AUTO_CONFIRMED,
+                SetMealOrderStatus::ADMIN_CONFIRMED
+            ])
             ->where('confirm_time', '<=', now()->subDays(15))
             ->where('confirm_time', '>', now()->subDays(30))
             ->get($columns);
@@ -130,22 +157,23 @@ class SetMealOrderService extends BaseService
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
             // 更新余额
-            AccountService::getInstance()
-                ->updateBalance($user->id, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::SET_MEAL);
+            AccountService::getInstance()->updateBalance(
+                $user->id,
+                AccountChangeType::PURCHASE,
+                -$deductionBalance,
+                $orderSn,
+                ProductType::SET_MEAL
+            );
         }
 
         $order = SetMealOrder::new();
         $order->order_sn = $orderSn;
-        $order->status = SetMealOrderEnums::STATUS_CREATE;
+        $order->status = SetMealOrderStatus::CREATED;
         $order->user_id = $user->id;
         $order->consignee = $user->nickname;
         $order->mobile = $user->mobile;
-        $order->provider_id = $providerId;
-        $order->restaurant_id = $input->restaurantId;
-        $order->restaurant_name = $input->restaurantName;
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
-        $order->total_payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
         $order->save();
 
@@ -189,7 +217,7 @@ class SetMealOrderService extends BaseService
 
         $order->pay_id = $payId;
         $order->pay_time = now()->format('Y-m-d\TH:i:s');
-        $order->status = SetMealOrderEnums::STATUS_PAY;
+        $order->status = SetMealOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -199,7 +227,8 @@ class SetMealOrderService extends BaseService
         WxMpServe::new()->verify($openid, $order->pay_id);
 
         // 佣金记录状态更新为：已支付待结算
-        CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::SET_MEAL);
+        CommissionService::getInstance()
+            ->updateListToOrderPaidStatus([$order->id], ProductType::SET_MEAL);
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
@@ -227,18 +256,18 @@ class SetMealOrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if ($order->status != SetMealOrderEnums::STATUS_CREATE) {
+        if ($order->status != SetMealOrderStatus::CREATED) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
         }
         switch ($role) {
             case 'system':
-                $order->status = SetMealOrderEnums::STATUS_AUTO_CANCEL;
+                $order->status = SetMealOrderStatus::AUTO_CANCELED;
                 break;
             case 'admin':
-                $order->status = SetMealOrderEnums::STATUS_ADMIN_CANCEL;
+                $order->status = SetMealOrderStatus::ADMIN_CANCELED;
                 break;
             case 'user':
-                $order->status = SetMealOrderEnums::STATUS_CANCEL;
+                $order->status = SetMealOrderStatus::CANCELED;
                 break;
         }
         if ($order->cas() == 0) {
@@ -246,7 +275,8 @@ class SetMealOrderService extends BaseService
         }
 
         // 删除佣金记录
-        CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::SET_MEAL);
+        CommissionService::getInstance()
+            ->deleteUnpaidListByOrderIds([$order->id], ProductType::SET_MEAL);
 
         return $order;
     }
@@ -289,13 +319,14 @@ class SetMealOrderService extends BaseService
             }
             switch ($role) {
                 case 'system':
-                    $order->status = SetMealOrderEnums::STATUS_AUTO_CONFIRM;
+                    $order->status = SetMealOrderStatus::AUTO_CONFIRMED;
                     break;
                 case 'admin':
-                    $order->status = SetMealOrderEnums::STATUS_ADMIN_CONFIRM;
+                    $order->status = SetMealOrderStatus::ADMIN_CONFIRMED;
+
                     break;
                 case 'user':
-                    $order->status = SetMealOrderEnums::STATUS_CONFIRM;
+                    $order->status = SetMealOrderStatus::CONFIRMED;
                     break;
             }
             $order->confirm_time = now()->format('Y-m-d\TH:i:s');
@@ -308,7 +339,8 @@ class SetMealOrderService extends BaseService
 
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
-        CommissionService::getInstance()->updateListToOrderConfirmStatus($orderIds, ProductType::SET_MEAL, $role);
+        CommissionService::getInstance()
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::SET_MEAL, $role);
 
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
@@ -323,7 +355,7 @@ class SetMealOrderService extends BaseService
                 if (!$order->canFinishHandle()) {
                     $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
                 }
-                $order->status = SetMealOrderEnums::STATUS_AUTO_FINISHED;
+                $order->status = SetMealOrderStatus::AUTO_FINISHED;
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -342,7 +374,7 @@ class SetMealOrderService extends BaseService
         if (!$order->canFinishHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能设置为完成状态');
         }
-        $order->status = SetMealOrderEnums::STATUS_FINISHED;
+        $order->status = SetMealOrderStatus::FINISHED;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -381,7 +413,7 @@ class SetMealOrderService extends BaseService
                     $refundParams = [
                         'transaction_id' => $order->pay_id,
                         'out_refund_no' => time(),
-                        'total_fee' => bcmul($order->total_payment_amount, 100),
+                        'total_fee' => bcmul($order->payment_amount, 100),
                         'refund_fee' => bcmul($order->refund_amount, 100),
                         'refund_desc' => '餐饮套餐退款',
                         'type' => 'miniapp'
@@ -392,7 +424,7 @@ class SetMealOrderService extends BaseService
                     Log::info('set_meal_wx_refund', $result->toArray());
                 }
 
-                $order->status = SetMealOrderEnums::STATUS_REFUND_CONFIRM;
+                $order->status = SetMealOrderStatus::REFUNDED;
                 $order->refund_time = now()->format('Y-m-d\TH:i:s');
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
@@ -400,12 +432,18 @@ class SetMealOrderService extends BaseService
 
                 // 退还余额
                 if ($order->deduction_balance != 0) {
-                    AccountService::getInstance()
-                        ->updateBalance($order->user_id, AccountChangeType::REFUND, $order->deduction_balance, $order->order_sn, ProductType::SET_MEAL);
+                    AccountService::getInstance()->updateBalance(
+                        $order->user_id,
+                        AccountChangeType::REFUND,
+                        $order->deduction_balance,
+                        $order->order_sn,
+                        ProductType::SET_MEAL
+                    );
                 }
 
                 // 删除佣金记录
-                CommissionService::getInstance()->deletePaidListByOrderIds([$order->id], ProductType::SET_MEAL);
+                CommissionService::getInstance()
+                    ->deletePaidListByOrderIds([$order->id], ProductType::SET_MEAL);
 
                 // todo 通知商家
             } catch (GatewayException $exception) {

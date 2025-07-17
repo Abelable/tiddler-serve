@@ -2,7 +2,7 @@
 
 namespace App\Utils\Traits;
 
-use App\Utils\Enums\SetMealOrderEnums;
+use App\Utils\Enums\SetMealOrderStatus;
 use Illuminate\Support\Str;
 
 /**
@@ -11,10 +11,11 @@ use Illuminate\Support\Str;
  * @method bool canDeleteHandle()
  * @method bool canPayHandle()
  * @method bool canCommentHandle()
+ * @method bool canApproveHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
- * @method bool canRebuyHandle()
- * @method bool canAftersaleHandle()
+ * @method bool canReBuyHandle()
+ * @method bool canAfterSaleHandle()
  * @method bool canAgreeRefundHandle()
  * @method bool canFinishHandle()
  * @method bool isPayStatus()
@@ -46,7 +47,7 @@ trait SetMealOrderStatusTrait
                 ->replaceFirst('is', '')
                 ->replaceLast('Status', '')
                 ->snake()->upper()->prepend('STATUS');
-            $status = (new \ReflectionClass(SetMealOrderEnums::class))->getConstant($key);
+            $status = (new \ReflectionClass(SetMealOrderStatus::class))->getConstant($key);
             return $this->status == $status;
         }
 
@@ -54,47 +55,52 @@ trait SetMealOrderStatusTrait
     }
 
     private $canHandleMap = [
-        'cancel' => [SetMealOrderEnums::STATUS_CREATE],
-        'pay' => [SetMealOrderEnums::STATUS_CREATE],
-        'confirm' => [SetMealOrderEnums::STATUS_PAY],
-        'refund' => [SetMealOrderEnums::STATUS_PAY],
-        // 同意退款
-        'agreerefund' => [SetMealOrderEnums::STATUS_REFUND],
-        'comment' => [
-            SetMealOrderEnums::STATUS_CONFIRM,
-            SetMealOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 售后
-        'aftersale' => [
-            SetMealOrderEnums::STATUS_CONFIRM,
-            SetMealOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 回购
-        'rebuy' => [
-            SetMealOrderEnums::STATUS_CONFIRM,
-            SetMealOrderEnums::STATUS_AUTO_CONFIRM
-        ],
+        'cancel' => [SetMealOrderStatus::CREATED],
+        'pay' => [SetMealOrderStatus::CREATED],
         'delete' => [
-            SetMealOrderEnums::STATUS_CANCEL,
-            SetMealOrderEnums::STATUS_AUTO_CANCEL,
-            SetMealOrderEnums::STATUS_ADMIN_CANCEL,
-            SetMealOrderEnums::STATUS_REFUND_CONFIRM,
-            SetMealOrderEnums::STATUS_CONFIRM,
-            SetMealOrderEnums::STATUS_AUTO_CONFIRM
+            SetMealOrderStatus::CANCELED,
+            SetMealOrderStatus::AUTO_CANCELED,
+            SetMealOrderStatus::ADMIN_CANCELED,
+        ],
+        'refund' => [SetMealOrderStatus::PAID],
+        'agreeRefund' => [
+            SetMealOrderStatus::REFUNDING
+        ],
+        'approve' => [SetMealOrderStatus::PAID],
+        'confirm' => [SetMealOrderStatus::MERCHANT_APPROVED],
+        'comment' => [
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED
         ],
         'finish' => [
-            SetMealOrderEnums::STATUS_CONFIRM,
-            SetMealOrderEnums::STATUS_AUTO_CONFIRM,
-        ]
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED
+        ],
+        'afterSale' => [
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED,
+            SetMealOrderStatus::FINISHED,
+            SetMealOrderStatus::AUTO_FINISHED,
+        ],
+        'reBuy' => [
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED,
+            SetMealOrderStatus::FINISHED,
+            SetMealOrderStatus::AUTO_FINISHED,
+        ],
     ];
 
-    public function isHadPaid()
+    public function isPaid()
     {
         return !in_array($this->status, [
-            SetMealOrderEnums::STATUS_CREATE,
-            SetMealOrderEnums::STATUS_CANCEL,
-            SetMealOrderEnums::STATUS_AUTO_CANCEL,
-            SetMealOrderEnums::STATUS_ADMIN_CANCEL,
+            SetMealOrderStatus::CREATED,
+            SetMealOrderStatus::CANCELED,
+            SetMealOrderStatus::AUTO_CANCELED,
+            SetMealOrderStatus::ADMIN_CANCELED,
         ]);
     }
 
@@ -102,14 +108,16 @@ trait SetMealOrderStatusTrait
     {
         return [
             'cancel' => $this->canCancelHandle(),
-            'delete' => $this->canDeleteHandle(),
             'pay' => $this->canPayHandle(),
-            'comment' => $this->canCommentHandle(),
-            'confirm' => $this->canConfirmHandle(),
+            'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
-            'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle(),
+            'agreeRefund' => $this->canAgreeRefundHandle(),
+            'approve' => $this->canApproveHandle(),
+            'confirm' => $this->canConfirmHandle(),
+            'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
+            'afterSale' => $this->canAftersaleHandle(),
+            'reBuy' => $this->canRebuyHandle(),
         ];
     }
 }

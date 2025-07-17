@@ -16,7 +16,7 @@ use App\Services\OrderSetMealService;
 use App\Services\SetMealService;
 use App\Services\SetMealVerifyService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\SetMealOrderEnums;
+use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -144,16 +144,16 @@ class SetMealOrderController extends Controller
     private function statusList($status) {
         switch ($status) {
             case 1:
-                $statusList = [SetMealOrderEnums::STATUS_CREATE];
+                $statusList = [SetMealOrderStatus::CREATED];
                 break;
             case 2:
-                $statusList = [SetMealOrderEnums::STATUS_PAY];
+                $statusList = [SetMealOrderStatus::PAID];
                 break;
             case 3:
-                $statusList = [SetMealOrderEnums::STATUS_CONFIRM, SetMealOrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [SetMealOrderStatus::CONFIRMED, SetMealOrderStatus::AUTO_CONFIRMED];
                 break;
             case 4:
-                $statusList = [SetMealOrderEnums::STATUS_REFUND, SetMealOrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [SetMealOrderStatus::REFUNDING, SetMealOrderStatus::REFUNDED];
                 break;
             default:
                 $statusList = [];
@@ -178,9 +178,7 @@ class SetMealOrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => SetMealOrderEnums::STATUS_TEXT_MAP[$order->status],
-                'restaurantId' => $order->restaurant_id,
-                'restaurantName' => $order->restaurant_name,
+                'statusDesc' => SetMealOrderStatus::TEXT_MAP[$order->status],
                 'setMealInfo' => $setMeal,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,

@@ -2,27 +2,34 @@
 
 namespace App\Services;
 
-use App\Models\HotelRoom;
-use App\Models\HotelShopIncome;
+use App\Models\CateringShopIncome;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
-class HotelShopIncomeService extends BaseService
+class CateringShopIncomeService extends BaseService
 {
-    public function createIncome($shopId, $orderId, $orderSn, HotelRoom $room, $paymentAmount)
+    public function createIncome(
+        $shopId,
+        $orderId,
+        $orderSn,
+        $productType,
+        $productId,
+        $salesCommissionRate,
+        $paymentAmount
+    )
     {
-        $salesCommissionRate = bcdiv($room->sales_commission_rate, 100, 4);
-        $incomeRate = bcsub('1', $salesCommissionRate, 4);
+        $incomeRate = bcsub('1', bcdiv($salesCommissionRate, 100, 4), 4);
         $incomeAmount = bcmul($paymentAmount, $incomeRate, 2);
 
-        $income = HotelShopIncome::new();
+        $income = CateringShopIncome::new();
         $income->shop_id = $shopId;
         $income->order_id = $orderId;
         $income->order_sn = $orderSn;
-        $income->room_id = $room->id;
+        $income->product_type = $productType;
+        $income->product_id = $productId;
         $income->payment_amount = $paymentAmount;
-        $income->sales_commission_rate = $room->sales_commission_rate;
+        $income->sales_commission_rate = $salesCommissionRate;
         $income->income_amount = $incomeAmount;
         $income->save();
 
@@ -39,7 +46,7 @@ class HotelShopIncomeService extends BaseService
 
     public function getShopIncomeQueryByTimeType($shopId, $timeType, $startTime = null)
     {
-        $query = HotelShopIncome::query()->where('shop_id', $shopId);
+        $query = CateringShopIncome::query()->where('shop_id', $shopId);
 
         switch ($timeType) {
             case 1:
@@ -92,7 +99,7 @@ class HotelShopIncomeService extends BaseService
     public function applyWithdrawal($shopId, $withdrawalId)
     {
         $incomeList = $this->getWithdrawingList($shopId);
-        /** @var HotelShopIncome $income */
+        /** @var CateringShopIncome $income */
         foreach ($incomeList as $income) {
             $income->withdrawal_id = $withdrawalId;
             $income->status = 3;
@@ -103,7 +110,7 @@ class HotelShopIncomeService extends BaseService
     public function finishWithdrawal($shopId, $withdrawalId)
     {
         $incomeList = $this->getWithdrawingList($shopId);
-        /** @var HotelShopIncome $income */
+        /** @var CateringShopIncome $income */
         foreach ($incomeList as $income) {
             $income->withdrawal_id = $withdrawalId;
             $income->status = 4;
@@ -121,12 +128,12 @@ class HotelShopIncomeService extends BaseService
 
     public function getShopIncomeQuery($shopId, array $statusList)
     {
-        return HotelShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
+        return CateringShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
 
     public function updateListToPaidStatus(array $orderIds)
     {
-        return HotelShopIncome::query()
+        return CateringShopIncome::query()
             ->whereIn('order_id', $orderIds)
             ->where('status', 0)
             ->update(['status' => 1]);
@@ -135,7 +142,7 @@ class HotelShopIncomeService extends BaseService
     public function updateListToConfirmStatus($orderIds)
     {
         $incomeList = $this->getPaidListByOrderIds($orderIds);
-        return $incomeList->map(function (HotelShopIncome $income) {
+        return $incomeList->map(function (CateringShopIncome $income) {
             $income->status = 2;
             $income->save();
             return $income;
@@ -155,7 +162,7 @@ class HotelShopIncomeService extends BaseService
 
     public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
     {
-        return HotelShopIncome::query()
+        return CateringShopIncome::query()
             ->whereIn('order_id', $orderIds)
             ->where('status', 1)
             ->get($columns);
@@ -163,22 +170,23 @@ class HotelShopIncomeService extends BaseService
 
     public function getPaidIncomeById($id, $columns = ['*'])
     {
-        return HotelShopIncome::query()->where('status', 1)->find($id, $columns);
+        return CateringShopIncome::query()->where('status', 1)->find($id, $columns);
     }
 
     public function deleteListByOrderIds(array $orderId, $status)
     {
-        return HotelShopIncome::query()
+        return CateringShopIncome::query()
             ->where('order_id', $orderId)
             ->where('status', $status)
             ->delete();
     }
 
-    public function deleteIncome($orderId, $roomId, $status)
+    public function deleteIncome($orderId, $productType, $productId, $status)
     {
-        return HotelShopIncome::query()
+        return CateringShopIncome::query()
             ->where('order_id', $orderId)
-            ->where('ticket_id', $roomId)
+            ->where('product_type', $productType)
+            ->where('product_id', $productId)
             ->where('status', $status)
             ->delete();
     }

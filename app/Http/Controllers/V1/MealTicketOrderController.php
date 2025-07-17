@@ -16,7 +16,7 @@ use App\Services\RelationService;
 use App\Services\RestaurantManagerService;
 use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\MealTicketOrderEnums;
+use App\Utils\Enums\MealTicketOrderStatus;
 use App\Utils\Inputs\MealTicketOrderInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -83,7 +83,17 @@ class MealTicketOrderController extends Controller
         $ticket = MealTicketService::getInstance()->getTicketById($input->ticketId);
         $paymentAmount = (float)bcmul($ticket->price, $input->num, 2);
 
-        $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $ticket, $input) {
+        $orderId = DB::transaction(function () use (
+            $upperSuperiorLevel,
+            $upperSuperiorId,
+            $superiorLevel,
+            $superiorId,
+            $userLevel,
+            $userId,
+            $paymentAmount,
+            $ticket,
+            $input
+        ) {
             $order = MealTicketOrderService::getInstance()->createOrder($this->user(), $input, $ticket->provider_id, $paymentAmount);
 
             // 生成核销码
@@ -93,8 +103,18 @@ class MealTicketOrderController extends Controller
             OrderMealTicketService::getInstance()->createOrderTicket($order->id, $input->num, $ticket);
 
             // 生成佣金记录
-            CommissionService::getInstance()
-                ->createMealTicketCommission($order->id, $order->order_sn, $ticket, $paymentAmount, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel);
+            CommissionService::getInstance()->createMealTicketCommission(
+                $order->id,
+                $order->order_sn,
+                $ticket,
+                $paymentAmount,
+                $userId,
+                $userLevel,
+                $superiorId,
+                $superiorLevel,
+                $upperSuperiorId,
+                $upperSuperiorLevel
+            );
 
             // 增加餐馆、代金券销量
             RestaurantService::getInstance()->increaseSalesVolume($input->restaurantId, $input->num);
@@ -110,7 +130,8 @@ class MealTicketOrderController extends Controller
     public function payParams()
     {
         $orderId = $this->verifyRequiredInteger('orderId');
-        $order = MealTicketOrderService::getInstance()->createWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $order = MealTicketOrderService::getInstance()
+            ->createWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }
@@ -135,7 +156,8 @@ class MealTicketOrderController extends Controller
         $status = $this->verifyRequiredInteger('status');
 
         $statusList = $this->statusList($status);
-        $page = MealTicketOrderService::getInstance()->getProviderOrderList($this->user()->cateringProvider->id, $statusList, $input);
+        $page = MealTicketOrderService::getInstance()
+            ->getProviderOrderList($this->user()->cateringProvider->id, $statusList, $input);
         $list = $this->orderList($page);
 
         return $this->success($this->paginate($page, $list));
@@ -144,16 +166,16 @@ class MealTicketOrderController extends Controller
     private function statusList($status) {
         switch ($status) {
             case 1:
-                $statusList = [MealTicketOrderEnums::STATUS_CREATE];
+                $statusList = [MealTicketOrderStatus::CREATED];
                 break;
             case 2:
-                $statusList = [MealTicketOrderEnums::STATUS_PAY];
+                $statusList = [MealTicketOrderStatus::PAID];
                 break;
             case 3:
-                $statusList = [MealTicketOrderEnums::STATUS_CONFIRM, MealTicketOrderEnums::STATUS_AUTO_CONFIRM];
+                $statusList = [MealTicketOrderStatus::CONFIRMED, MealTicketOrderStatus::AUTO_CONFIRMED];
                 break;
             case 4:
-                $statusList = [MealTicketOrderEnums::STATUS_REFUND, MealTicketOrderEnums::STATUS_REFUND_CONFIRM];
+                $statusList = [MealTicketOrderStatus::REFUNDING, MealTicketOrderStatus::REFUNDED];
                 break;
             default:
                 $statusList = [];
@@ -178,9 +200,7 @@ class MealTicketOrderController extends Controller
             return [
                 'id' => $order->id,
                 'status' => $order->status,
-                'statusDesc' => MealTicketOrderEnums::STATUS_TEXT_MAP[$order->status],
-                'restaurantId' => $order->restaurant_id,
-                'restaurantName' => $order->restaurant_name,
+                'statusDesc' => MealTicketOrderStatus::TEXT_MAP[$order->status],
                 'ticketInfo' => $ticket,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,

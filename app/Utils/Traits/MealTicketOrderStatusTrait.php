@@ -2,7 +2,7 @@
 
 namespace App\Utils\Traits;
 
-use App\Utils\Enums\MealTicketOrderEnums;
+use App\Utils\Enums\MealTicketOrderStatus;
 use Illuminate\Support\Str;
 
 /**
@@ -11,10 +11,11 @@ use Illuminate\Support\Str;
  * @method bool canDeleteHandle()
  * @method bool canPayHandle()
  * @method bool canCommentHandle()
+ * @method bool canApproveHandle()
  * @method bool canConfirmHandle()
  * @method bool canRefundHandle()
- * @method bool canRebuyHandle()
- * @method bool canAftersaleHandle()
+ * @method bool canReBuyHandle()
+ * @method bool canAfterSaleHandle()
  * @method bool canAgreeRefundHandle()
  * @method bool canFinishHandle()
  * @method bool isPayStatus()
@@ -46,7 +47,7 @@ trait MealTicketOrderStatusTrait
                 ->replaceFirst('is', '')
                 ->replaceLast('Status', '')
                 ->snake()->upper()->prepend('STATUS');
-            $status = (new \ReflectionClass(MealTicketOrderEnums::class))->getConstant($key);
+            $status = (new \ReflectionClass(MealTicketOrderStatus::class))->getConstant($key);
             return $this->status == $status;
         }
 
@@ -54,47 +55,52 @@ trait MealTicketOrderStatusTrait
     }
 
     private $canHandleMap = [
-        'cancel' => [MealTicketOrderEnums::STATUS_CREATE],
-        'pay' => [MealTicketOrderEnums::STATUS_CREATE],
-        'confirm' => [MealTicketOrderEnums::STATUS_PAY],
-        'refund' => [MealTicketOrderEnums::STATUS_PAY],
-        // 同意退款
-        'agreerefund' => [MealTicketOrderEnums::STATUS_REFUND],
-        'comment' => [
-            MealTicketOrderEnums::STATUS_CONFIRM,
-            MealTicketOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 售后
-        'aftersale' => [
-            MealTicketOrderEnums::STATUS_CONFIRM,
-            MealTicketOrderEnums::STATUS_AUTO_CONFIRM
-        ],
-        // 回购
-        'rebuy' => [
-            MealTicketOrderEnums::STATUS_CONFIRM,
-            MealTicketOrderEnums::STATUS_AUTO_CONFIRM
-        ],
+        'cancel' => [MealTicketOrderStatus::CREATED],
+        'pay' => [MealTicketOrderStatus::CREATED],
         'delete' => [
-            MealTicketOrderEnums::STATUS_CANCEL,
-            MealTicketOrderEnums::STATUS_AUTO_CANCEL,
-            MealTicketOrderEnums::STATUS_ADMIN_CANCEL,
-            MealTicketOrderEnums::STATUS_REFUND_CONFIRM,
-            MealTicketOrderEnums::STATUS_CONFIRM,
-            MealTicketOrderEnums::STATUS_AUTO_CONFIRM
+            MealTicketOrderStatus::CANCELED,
+            MealTicketOrderStatus::AUTO_CANCELED,
+            MealTicketOrderStatus::ADMIN_CANCELED,
+        ],
+        'refund' => [MealTicketOrderStatus::PAID],
+        'agreeRefund' => [
+            MealTicketOrderStatus::REFUNDING
+        ],
+        'approve' => [MealTicketOrderStatus::PAID],
+        'confirm' => [MealTicketOrderStatus::MERCHANT_APPROVED],
+        'comment' => [
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED
         ],
         'finish' => [
-            MealTicketOrderEnums::STATUS_CONFIRM,
-            MealTicketOrderEnums::STATUS_AUTO_CONFIRM,
-        ]
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED
+        ],
+        'afterSale' => [
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED,
+            MealTicketOrderStatus::FINISHED,
+            MealTicketOrderStatus::AUTO_FINISHED,
+        ],
+        'reBuy' => [
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED,
+            MealTicketOrderStatus::FINISHED,
+            MealTicketOrderStatus::AUTO_FINISHED,
+        ],
     ];
 
-    public function isHadPaid()
+    public function isPaid()
     {
         return !in_array($this->status, [
-            MealTicketOrderEnums::STATUS_CREATE,
-            MealTicketOrderEnums::STATUS_CANCEL,
-            MealTicketOrderEnums::STATUS_AUTO_CANCEL,
-            MealTicketOrderEnums::STATUS_ADMIN_CANCEL,
+            MealTicketOrderStatus::CREATED,
+            MealTicketOrderStatus::CANCELED,
+            MealTicketOrderStatus::AUTO_CANCELED,
+            MealTicketOrderStatus::ADMIN_CANCELED,
         ]);
     }
 
@@ -102,14 +108,16 @@ trait MealTicketOrderStatusTrait
     {
         return [
             'cancel' => $this->canCancelHandle(),
-            'delete' => $this->canDeleteHandle(),
             'pay' => $this->canPayHandle(),
-            'comment' => $this->canCommentHandle(),
-            'confirm' => $this->canConfirmHandle(),
+            'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
-            'aftersale' => $this->canAftersaleHandle(),
-            'rebuy' => $this->canRebuyHandle(),
+            'agreeRefund' => $this->canAgreeRefundHandle(),
+            'approve' => $this->canApproveHandle(),
+            'confirm' => $this->canConfirmHandle(),
+            'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
+            'afterSale' => $this->canAftersaleHandle(),
+            'reBuy' => $this->canRebuyHandle(),
         ];
     }
 }

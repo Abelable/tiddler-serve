@@ -3,38 +3,48 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelShopIncome;
-use App\Services\HotelOrderRoomService;
-use App\Services\HotelOrderService;
+use App\Models\CateringShopIncome;
+use App\Services\CateringOrderRoomService;
+use App\Services\CateringOrderService;
+use App\Services\MealTicketOrderService;
 use App\Services\ProductHistoryService;
-use App\Services\HotelShopIncomeService;
-use App\Services\ShopHotelService;
+use App\Services\CateringShopIncomeService;
+use App\Services\SetMealOrderService;
+use App\Services\ShopRestaurantService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
-class HotelShopIncomeController extends Controller
+class CateringShopIncomeController extends Controller
 {
     public function dataOverview()
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $totalIncome = HotelShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
+        $totalIncome = CateringShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
-        $todayOrderQuery = HotelOrderService::getInstance()->getShopDateQuery($shopId);
-        $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
-        $todayOrderCount = (clone $todayOrderQuery)->count();
+        $mealTicketTodayOrderQuery = MealTicketOrderService::getInstance()->getShopDateQuery($shopId);
+        $mealTicketTodaySalesVolume = (clone $mealTicketTodayOrderQuery)->sum('payment_amount');
+        $mealTicketTodayOrderCount = (clone $mealTicketTodayOrderQuery)->count();
 
-        $yesterdayOrderQuery = HotelOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
-        $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
-        $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
+        $mealTicketYesterdayOrderQuery = MealTicketOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $mealTicketYesterdaySalesVolume = (clone $mealTicketYesterdayOrderQuery)->sum('payment_amount');
+        $mealTicketYesterdayOrderCount = (clone $mealTicketYesterdayOrderQuery)->count();
 
-        $hotelIds = ShopHotelService::getInstance()
-            ->getHotelList($shopId, [1])->pluck('hotel_id')->toArray();
+        $setMealTodayOrderQuery = SetMealOrderService::getInstance()->getShopDateQuery($shopId);
+        $setMealTodaySalesVolume = (clone $setMealTodayOrderQuery)->sum('payment_amount');
+        $todayOrderCount = (clone $setMealTodayOrderQuery)->count();
+
+        $setMealYesterdayOrderQuery = SetMealOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $setMealYesterdaySalesVolume = (clone $setMealYesterdayOrderQuery)->sum('payment_amount');
+        $setMealYesterdayOrderCount = (clone $setMealYesterdayOrderQuery)->count();
+
+        $restaurantIds = ShopRestaurantService::getInstance()
+            ->getRestaurantList($shopId, [1])->pluck('restaurant_id')->toArray();
         $todayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::HOTEL, $hotelIds);
+            ->getHistoryDateCount(ProductType::RESTAURANT, $restaurantIds);
         $yesterdayVisitorCount = ProductHistoryService::getInstance()
-            ->getHistoryDateCount(ProductType::HOTEL, $hotelIds, 'yesterday');
+            ->getHistoryDateCount(ProductType::RESTAURANT, $restaurantIds, 'yesterday');
 
         return $this->success([
             'totalIncome' => $totalIncome,
@@ -51,13 +61,13 @@ class HotelShopIncomeController extends Controller
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $cashAmount = HotelShopIncomeService::getInstance()
+        $cashAmount = CateringShopIncomeService::getInstance()
             ->getShopIncomeQuery($shopId, [2])
             ->whereMonth('created_at', '!=', Carbon::now()->month)
             ->sum('income_amount');
-        $pendingAmount = HotelShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
-        $withdrawingAmount = HotelShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
-        $settledAmount = HotelShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
+        $pendingAmount = CateringShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
+        $withdrawingAmount = CateringShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
+        $settledAmount = CateringShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
 
         return $this->success([
             'cashAmount' => $cashAmount,
@@ -72,7 +82,7 @@ class HotelShopIncomeController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $timeType = $this->verifyRequiredInteger('timeType');
 
-        $query = HotelShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
+        $query = CateringShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
@@ -95,21 +105,21 @@ class HotelShopIncomeController extends Controller
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
 
-        $page = HotelShopIncomeService::getInstance()
+        $page = CateringShopIncomeService::getInstance()
             ->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
         $incomeList = collect($page->items());
 
         $orderIds = $incomeList->pluck('order_id')->toArray();
         $roomIds = $incomeList->pluck('room_id')->toArray();
         $roomMap = [];
-        $roomList = HotelOrderRoomService::getInstance()->getListByOrderIdsAndRoomIds($orderIds, $roomIds);
+        $roomList = CateringOrderRoomService::getInstance()->getListByOrderIdsAndRoomIds($orderIds, $roomIds);
         foreach ($roomList as $room) {
             $room->image_list = json_decode($room->image_list);
             $room->facility_list = json_decode($room->facility_list);
             $roomMap[$room->order_id][$room->room_id] = $room;
         }
 
-        $list = $incomeList->map(function (HotelShopIncome $income) use ($roomMap) {
+        $list = $incomeList->map(function (CateringShopIncome $income) use ($roomMap) {
             $roomInfo = $roomMap[$income->order_id][$income->room_id] ?? null;
             $income['roomInfo'] = $roomInfo;
             unset($income['room_id']);

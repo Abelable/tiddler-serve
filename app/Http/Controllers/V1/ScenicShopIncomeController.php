@@ -30,7 +30,7 @@ class ScenicShopIncomeController extends Controller
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
         $scenicIds = ShopScenicSpotService::getInstance()
-            ->getScenicList($shopId, [1])->pluck('id')->toArray();
+            ->getScenicList($shopId, [1])->pluck('scenic_id')->toArray();
         $todayVisitorCount = ProductHistoryService::getInstance()
             ->getHistoryDateCount(ProductType::SCENIC, $scenicIds);
         $yesterdayVisitorCount = ProductHistoryService::getInstance()

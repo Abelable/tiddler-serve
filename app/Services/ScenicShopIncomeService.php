@@ -21,7 +21,6 @@ class ScenicShopIncomeService extends BaseService
         $income->order_id = $orderId;
         $income->order_sn = $orderSn;
         $income->ticket_id = $ticket->id;
-        $income->refund_status = $ticket->refund_status;
         $income->payment_amount = $paymentAmount;
         $income->sales_commission_rate = $ticket->sales_commission_rate;
         $income->income_amount = $incomeAmount;

@@ -535,6 +535,18 @@ Route::prefix('catering')->group(function () {
             Route::post('down', 'MealTicketController@down');
             Route::post('delete', 'MealTicketController@delete');
         });
+
+        Route::prefix('income')->group(function () {
+            Route::get('data_overview', 'CateringShopIncomeController@dataOverview');
+            Route::get('sum', 'CateringShopIncomeController@sum');
+            Route::get('time_data', 'CateringShopIncomeController@timeData');
+            Route::post('order_list', 'CateringShopIncomeController@incomeOrderList');
+
+            Route::prefix('withdraw')->group(function () {
+                Route::post('submit', 'CateringShopWithdrawalController@submit');
+                Route::get('record_list', 'CateringShopWithdrawalController@recordList');
+            });
+        });
     });
 
     Route::prefix('set_meal')->group(function () {
