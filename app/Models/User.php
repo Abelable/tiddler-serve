@@ -29,7 +29,10 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\AuthInfo|null $authInfo
- * @property-read \App\Models\CateringProvider|null $cateringProvider
+ * @property-read \App\Models\CateringMerchant|null $cateringMerchant
+ * @property-read \App\Models\CateringShop|null $cateringShop
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CateringShopManager[] $cateringShopManagerList
+ * @property-read int|null $catering_shop_manager_list_count
  * @property-read \App\Models\HotelMerchant|null $hotelMerchant
  * @property-read \App\Models\HotelShop|null $hotelShop
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelShopManager[] $hotelShopManagerList
@@ -155,6 +158,21 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
         return $this->hasMany(HotelShopManager::class, 'user_id');
     }
 
+    public function cateringMerchant()
+    {
+        return $this->hasOne(CateringMerchant::class, 'user_id')->where('status', 2);
+    }
+
+    public function cateringShop()
+    {
+        return $this->hasOne(CateringShop::class, 'user_id')->where('status', 1);
+    }
+
+    public function cateringShopManagerList()
+    {
+        return $this->hasMany(CateringShopManager::class, 'user_id');
+    }
+
     public function merchant()
     {
         return $this->hasOne(Merchant::class, 'user_id')->where('status', 2);
@@ -168,11 +186,6 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
     public function shopManagerList()
     {
         return $this->hasMany(ShopManager::class, 'user_id');
-    }
-
-    public function cateringProvider()
-    {
-        return $this->hasOne(CateringProvider::class, 'user_id')->where('status', 2);
     }
 
     public function authInfo()
