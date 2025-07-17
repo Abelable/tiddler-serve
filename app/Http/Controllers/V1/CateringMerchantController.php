@@ -77,7 +77,7 @@ class CateringMerchantController extends Controller
     {
         $merchant = CateringMerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '酒店服务商信息不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '餐饮服务商信息不存在');
         }
         $merchant->delete();
         return $this->success();

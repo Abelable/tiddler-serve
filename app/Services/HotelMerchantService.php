@@ -49,7 +49,9 @@ class HotelMerchantService extends BaseService
         if (!empty($input->mobile)) {
             $query = $query->where('mobile', $input->mobile);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getMerchantByUserId($userId, $columns = ['*'])
