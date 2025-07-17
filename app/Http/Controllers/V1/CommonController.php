@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\CateringMerchantService;
+use App\Services\CateringShopDepositPaymentLogService;
+use App\Services\CateringShopDepositService;
+use App\Services\CateringShopService;
 use App\Services\HotelOrderService;
 use App\Services\HotelMerchantService;
 use App\Services\HotelShopDepositPaymentLogService;

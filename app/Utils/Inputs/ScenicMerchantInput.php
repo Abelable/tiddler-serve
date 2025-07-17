@@ -19,7 +19,7 @@ class ScenicMerchantInput extends BaseInput
     public $bankCardOwnerName;
     public $bankCardNumber;
     public $bankName;
-    public $shopType;
+    public $categoryId;
     public $deposit;
     public $shopBg;
     public $shopLogo;

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\HotelShopInput;
+use App\Utils\Inputs\ShopInput;
 
 class HotelShopController extends Controller
 {
@@ -26,8 +26,8 @@ class HotelShopController extends Controller
 
     public function updateShopInfo()
     {
-        /** @var HotelShopInput $input */
-        $input = HotelShopInput::new();
+        /** @var ShopInput $input */
+        $input = ShopInput::new();
 
         $shop = HotelShopService::getInstance()->getShopByUserId($this->userId());
         if (is_null($shop)) {

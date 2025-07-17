@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\ScenicShopService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicShopInput;
+use App\Utils\Inputs\ShopInput;
 
 class ScenicShopController extends Controller
 {
@@ -26,8 +26,8 @@ class ScenicShopController extends Controller
 
     public function updateShopInfo()
     {
-        /** @var ScenicShopInput $input */
-        $input = ScenicShopInput::new();
+        /** @var ShopInput $input */
+        $input = ShopInput::new();
 
         $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
         if (is_null($shop)) {

@@ -7,13 +7,13 @@ use App\Utils\Inputs\PageInput;
 class ShopPageInput extends PageInput
 {
     public $name;
-    public $categoryId;
+    public $type;
 
     public function rules()
     {
-        return array_merge([
+        return array_merge(parent::rules(), [
             'name' => 'string',
-            'categoryId' => 'integer|digits_between:1,20'
-        ], parent::rules());
+            'type' => 'integer'
+        ]);
     }
 }

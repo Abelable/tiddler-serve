@@ -6,7 +6,7 @@ use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\ScenicMerchantInput;
-use App\Utils\Inputs\ScenicShopInput;
+use App\Utils\Inputs\ShopInput;
 
 class ScenicShopService extends BaseService
 {
@@ -26,7 +26,7 @@ class ScenicShopService extends BaseService
         return $shop;
     }
 
-    public function updateShop(ScenicShop $shop, ScenicShopInput $input)
+    public function updateShop(ScenicShop $shop, ShopInput $input)
     {
         $shop->bg = $input->bg ?? '';
         $shop->logo = $input->logo;
@@ -41,8 +41,8 @@ class ScenicShopService extends BaseService
         if (!empty($input->name)) {
             $query = $query->where('name', $input->name);
         }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }

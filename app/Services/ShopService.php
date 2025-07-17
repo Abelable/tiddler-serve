@@ -47,8 +47,8 @@ class ShopService extends BaseService
         if (!empty($input->name)) {
             $query = $query->where('name', $input->name);
         }
-        if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }

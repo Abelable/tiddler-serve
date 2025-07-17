@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\HotelShop;
+use App\Models\CateringShop;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
-use App\Utils\Inputs\HotelMerchantInput;
+use App\Utils\Inputs\CateringMerchantInput;
 use App\Utils\Inputs\ShopInput;
 
-class HotelShopService extends BaseService
+class CateringShopService extends BaseService
 {
-    public function createShop(int $userId, int $merchantId, HotelMerchantInput $input)
+    public function createShop(int $userId, int $merchantId, CateringMerchantInput $input)
     {
-        $shop = HotelShop::new();
+        $shop = CateringShop::new();
         $shop->user_id = $userId;
         $shop->merchant_id = $merchantId;
         $shop->type = $input->shopType;
@@ -26,7 +26,7 @@ class HotelShopService extends BaseService
         return $shop;
     }
 
-    public function updateShop(HotelShop $shop, ShopInput $input)
+    public function updateShop(CateringShop $shop, ShopInput $input)
     {
         $shop->bg = $input->bg ?? '';
         $shop->logo = $input->logo;
@@ -37,7 +37,7 @@ class HotelShopService extends BaseService
 
     public function getShopList(ShopPageInput $input, $columns = ['*'])
     {
-        $query = HotelShop::query();
+        $query = CateringShop::query();
         if (!empty($input->name)) {
             $query = $query->where('name', $input->name);
         }
@@ -51,27 +51,27 @@ class HotelShopService extends BaseService
 
     public function getShopById(int $id, $columns = ['*'])
     {
-        return HotelShop::query()->find($id, $columns);
+        return CateringShop::query()->find($id, $columns);
     }
 
     public function getShopByMerchantId(int $merchantId, $columns = ['*'])
     {
-        return HotelShop::query()->where('merchant_id', $merchantId)->first($columns);
+        return CateringShop::query()->where('merchant_id', $merchantId)->first($columns);
     }
 
     public function getShopListByIds(array $ids, $columns = ['*'])
     {
-        return HotelShop::query()->whereIn('id', $ids)->get($columns);
+        return CateringShop::query()->whereIn('id', $ids)->get($columns);
     }
 
     public function getUserShopByShopId($userId, $shopId, $columns = ['*'])
     {
-        return HotelShop::query()->where('user_id', $userId)->find($shopId, $columns);
+        return CateringShop::query()->where('user_id', $userId)->find($shopId, $columns);
     }
 
     public function getShopByUserId(int $userId, $columns = ['*'])
     {
-        return HotelShop::query()->where('user_id', $userId)->first($columns);
+        return CateringShop::query()->where('user_id', $userId)->first($columns);
     }
 
     public function createWxPayOrder($shopId, $userId, string $openid)
@@ -87,7 +87,7 @@ class HotelShopService extends BaseService
         return [
             'out_trade_no' => time(),
             'body' => '店铺保证金',
-            'attach' => 'hotel_shop_id:' . $shopId,
+            'attach' => 'catering_shop_id:' . $shopId,
             'total_fee' => bcmul($shop->deposit, 100),
             'openid' => $openid
         ];
