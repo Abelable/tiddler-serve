@@ -15,7 +15,8 @@ class CreateHotelShopsTable extends Migration
     {
         Schema::create('hotel_shops', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)
+            $table->integer('status')
+                ->default(0)
                 ->comment('状态：0-未支付保证金，1-已支付保证金');
             $table->integer('user_id')->comment('用户id');
             $table->integer('merchant_id')->comment('服务商id');

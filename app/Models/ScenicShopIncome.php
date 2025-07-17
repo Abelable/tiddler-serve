@@ -12,7 +12,6 @@ namespace App\Models;
  * @property int $order_id 订单id
  * @property string $order_sn 订单编号
  * @property int $ticket_id 门票id
- * @property int $refund_status 退票状态：1-随时可退，2-有条件退，3-不可退
  * @property float $payment_amount 支付金额
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $income_amount 收入金额
@@ -30,7 +29,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereOrderSn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome wherePaymentAmount($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShopIncome whereStatus($value)

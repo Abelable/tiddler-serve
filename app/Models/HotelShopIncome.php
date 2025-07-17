@@ -12,7 +12,6 @@ namespace App\Models;
  * @property int $order_id 订单id
  * @property string $order_sn 订单编号
  * @property int $room_id 房间id
- * @property int $cancellable 免费取消：0-不可取消，1-可免费取消
  * @property float $payment_amount 支付金额
  * @property float $sales_commission_rate 销售佣金比例
  * @property float $income_amount 收入金额
@@ -23,7 +22,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelShopIncome onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome query()
- * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome whereCancellable($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopIncome whereId($value)

@@ -21,7 +21,6 @@ class CreateScenicShopIncomesTable extends Migration
             $table->integer('order_id')->comment('订单id');
             $table->string('order_sn')->comment('订单编号');
             $table->integer('ticket_id')->comment('门票id');
-            $table->integer('refund_status')->default(0)->comment('退票状态：1-随时可退，2-有条件退，3-不可退');
             $table->float('payment_amount')->comment('支付金额');
             $table->float('sales_commission_rate')->comment('销售佣金比例');
             $table->float('income_amount')->comment('收入金额');
