@@ -4,7 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\CateringEvaluation;
-use App\Services\CateringEvaluationService;
+use App\Services\Mall\Catering\CateringEvaluationService;
 use App\Services\MealTicketOrderService;
 use App\Services\RestaurantService;
 use App\Services\SetMealOrderService;

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Catering;
 
 use App\Models\CateringShopDeposit;
+use App\Services\BaseService;
 
 class CateringShopDepositService extends BaseService
 {

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Catering;
 
 use App\Models\CateringEvaluation;
+use App\Services\BaseService;
 use App\Utils\Inputs\CateringEvaluationInput;
 use App\Utils\Inputs\PageInput;
 

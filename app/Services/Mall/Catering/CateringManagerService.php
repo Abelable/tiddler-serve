@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Catering;
 
 use App\Models\CateringManager;
+use App\Services\BaseService;
 
 class CateringManagerService extends BaseService
 {

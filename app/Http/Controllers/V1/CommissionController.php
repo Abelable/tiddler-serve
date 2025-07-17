@@ -129,6 +129,16 @@ class CommissionController extends Controller
             $hotelRoomMap[$hotelRoom->order_id][$hotelRoom->room_id] = $hotelRoom;
         }
 
+        $mealTicketMap = [];
+        $mealTicketList = OrderMealTicketService::getInstance()
+            ->getListByOrderIdsAndMealTicketIds($orderIdsByType[ProductType::MEAL_TICKET] ?? [], $productIdsByType[ProductType::MEAL_TICKET] ?? []);
+        foreach ($mealTicketList as $mealTicket) {
+            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
+                'id' => $mealTicket->ticket_id,
+                'price' => $mealTicket->price,
+                'number' => $mealTicket->number,
+            ];
+        }
 
         $setMealMap = [];
         $setMealList = OrderSetMealService::getInstance()
@@ -140,17 +150,6 @@ class CommissionController extends Controller
                 'name' => $setMeal->name,
                 'price' => $setMeal->price,
                 'number' => $setMeal->number,
-            ];
-        }
-
-        $mealTicketMap = [];
-        $mealTicketList = OrderMealTicketService::getInstance()
-            ->getListByOrderIdsAndMealTicketIds($orderIdsByType[ProductType::MEAL_TICKET] ?? [], $productIdsByType[ProductType::MEAL_TICKET] ?? []);
-        foreach ($mealTicketList as $mealTicket) {
-            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
-                'id' => $mealTicket->ticket_id,
-                'price' => $mealTicket->price,
-                'number' => $mealTicket->number,
             ];
         }
 
@@ -180,11 +179,11 @@ class CommissionController extends Controller
                 case ProductType::HOTEL:
                     $product = $hotelRoomMap[$orderId][$productId] ?? null;
                     break;
-                case ProductType::SET_MEAL:
-                    $product = $setMealMap[$orderId][$productId] ?? null;
-                    break;
                 case ProductType::MEAL_TICKET:
                     $product = $mealTicketMap[$orderId][$productId] ?? null;
+                    break;
+                case ProductType::SET_MEAL:
+                    $product = $setMealMap[$orderId][$productId] ?? null;
                     break;
                 case ProductType::GOODS:
                     $product = $goodsMap[$orderId][$productId] ?? null;

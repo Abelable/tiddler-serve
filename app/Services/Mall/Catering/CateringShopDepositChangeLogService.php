@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Catering;
 
 use App\Models\CateringShopDepositChangeLog;
+use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 
 class CateringShopDepositChangeLogService extends BaseService

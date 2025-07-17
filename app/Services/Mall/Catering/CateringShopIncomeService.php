@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Catering;
 
 use App\Models\CateringShopIncome;
+use App\Services\BaseService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;

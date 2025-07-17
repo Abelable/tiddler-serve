@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\CateringShopService;
+use App\Services\Mall\Catering\CateringShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ShopInput;
 

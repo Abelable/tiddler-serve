@@ -4,11 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\CateringShopIncome;
-use App\Services\CateringOrderRoomService;
-use App\Services\CateringOrderService;
+use App\Services\OrderMealTicketService;
+use App\Services\Mall\Catering\CateringShopIncomeService;
 use App\Services\MealTicketOrderService;
+use App\Services\OrderSetMealService;
 use App\Services\ProductHistoryService;
-use App\Services\CateringShopIncomeService;
 use App\Services\SetMealOrderService;
 use App\Services\ShopRestaurantService;
 use App\Utils\Enums\ProductType;
@@ -27,15 +27,17 @@ class CateringShopIncomeController extends Controller
         $mealTicketTodaySalesVolume = (clone $mealTicketTodayOrderQuery)->sum('payment_amount');
         $mealTicketTodayOrderCount = (clone $mealTicketTodayOrderQuery)->count();
 
-        $mealTicketYesterdayOrderQuery = MealTicketOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $mealTicketYesterdayOrderQuery = MealTicketOrderService::getInstance()
+            ->getShopDateQuery($shopId, 'yesterday');
         $mealTicketYesterdaySalesVolume = (clone $mealTicketYesterdayOrderQuery)->sum('payment_amount');
         $mealTicketYesterdayOrderCount = (clone $mealTicketYesterdayOrderQuery)->count();
 
         $setMealTodayOrderQuery = SetMealOrderService::getInstance()->getShopDateQuery($shopId);
         $setMealTodaySalesVolume = (clone $setMealTodayOrderQuery)->sum('payment_amount');
-        $todayOrderCount = (clone $setMealTodayOrderQuery)->count();
+        $setMealTodayOrderCount = (clone $setMealTodayOrderQuery)->count();
 
-        $setMealYesterdayOrderQuery = SetMealOrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
+        $setMealYesterdayOrderQuery = SetMealOrderService::getInstance()
+            ->getShopDateQuery($shopId, 'yesterday');
         $setMealYesterdaySalesVolume = (clone $setMealYesterdayOrderQuery)->sum('payment_amount');
         $setMealYesterdayOrderCount = (clone $setMealYesterdayOrderQuery)->count();
 
@@ -48,11 +50,11 @@ class CateringShopIncomeController extends Controller
 
         return $this->success([
             'totalIncome' => $totalIncome,
-            'todaySalesVolume' => $todaySalesVolume,
-            'todayOrderCount' => $todayOrderCount,
+            'todaySalesVolume' => $mealTicketTodaySalesVolume + $setMealTodaySalesVolume,
+            'todayOrderCount' => $mealTicketTodayOrderCount + $setMealTodayOrderCount,
             'todayVisitorCount' => $todayVisitorCount,
-            'yesterdaySalesVolume' => $yesterdaySalesVolume,
-            'yesterdayOrderCount' => $yesterdayOrderCount,
+            'yesterdaySalesVolume' => $mealTicketYesterdaySalesVolume + $setMealYesterdaySalesVolume,
+            'yesterdayOrderCount' => $mealTicketYesterdayOrderCount + $setMealYesterdayOrderCount,
             'yesterdayVisitorCount' => $yesterdayVisitorCount,
         ]);
     }
@@ -82,9 +84,13 @@ class CateringShopIncomeController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $timeType = $this->verifyRequiredInteger('timeType');
 
-        $query = CateringShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
+        $query = CateringShopIncomeService::getInstance()
+            ->getShopIncomeQueryByTimeType($shopId, $timeType);
 
-        $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
+        $orderCount = (clone $query)
+            ->whereIn('status', [1, 2, 3, 4])
+            ->distinct('order_id')
+            ->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
         $pendingAmount = (clone $query)->where('status', 1)->sum('income_amount');
         $settledAmount = (clone $query)->whereIn('status', [2, 3, 4])->sum('income_amount');
@@ -109,20 +115,51 @@ class CateringShopIncomeController extends Controller
             ->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
         $incomeList = collect($page->items());
 
-        $orderIds = $incomeList->pluck('order_id')->toArray();
-        $roomIds = $incomeList->pluck('room_id')->toArray();
-        $roomMap = [];
-        $roomList = CateringOrderRoomService::getInstance()->getListByOrderIdsAndRoomIds($orderIds, $roomIds);
-        foreach ($roomList as $room) {
-            $room->image_list = json_decode($room->image_list);
-            $room->facility_list = json_decode($room->facility_list);
-            $roomMap[$room->order_id][$room->room_id] = $room;
+        $orderIdsByType = $incomeList->groupBy('product_type')->map(function ($group) {
+            return $group->pluck('order_id')->unique()->toArray();
+        });
+        $productIdsByType = $incomeList->groupBy('product_type')->map(function ($group) {
+            return $group->pluck('product_id')->unique()->toArray();
+        });
+
+        $mealTicketMap = [];
+        $mealTicketList = OrderMealTicketService::getInstance()->getListByOrderIdsAndMealTicketIds(
+            $orderIdsByType[ProductType::MEAL_TICKET] ?? [],
+            $productIdsByType[ProductType::MEAL_TICKET] ?? []
+        );
+        foreach ($mealTicketList as $mealTicket) {
+            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
+                'id' => $mealTicket->ticket_id,
+                'price' => $mealTicket->price,
+                'number' => $mealTicket->number,
+            ];
         }
 
-        $list = $incomeList->map(function (CateringShopIncome $income) use ($roomMap) {
-            $roomInfo = $roomMap[$income->order_id][$income->room_id] ?? null;
-            $income['roomInfo'] = $roomInfo;
-            unset($income['room_id']);
+        $setMealMap = [];
+        $setMealList = OrderSetMealService::getInstance()->getListByOrderIdsAndSetMealIds(
+            $orderIdsByType[ProductType::SET_MEAL] ?? [],
+            $productIdsByType[ProductType::SET_MEAL] ?? []
+        );
+        foreach ($setMealList as $setMeal) {
+            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = [
+                'id' => $setMeal->set_meal_id,
+                'cover' => $setMeal->cover,
+                'name' => $setMeal->name,
+                'price' => $setMeal->price,
+                'number' => $setMeal->number,
+            ];
+        }
+
+        $list = $incomeList->map(function (CateringShopIncome $income) use ($mealTicketMap, $setMealMap) {
+            $orderId = $income->order_id;
+            $productId = $income->product_id;
+            $product = $income->product_type == ProductType::MEAL_TICKET
+                ? $mealTicketMap[$orderId][$productId]
+                : $setMealMap[$orderId][$productId];
+
+            $income['product'] = $product;
+            unset($income['product_id']);
+
             return $income;
         });
 

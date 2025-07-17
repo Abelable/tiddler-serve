@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\CateringMerchantService;
-use App\Services\CateringShopDepositPaymentLogService;
-use App\Services\CateringShopDepositService;
-use App\Services\CateringShopService;
+use App\Services\Mall\Catering\CateringMerchantService;
+use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
+use App\Services\Mall\Catering\CateringShopDepositService;
+use App\Services\Mall\Catering\CateringShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringMerchantInput;
 use Illuminate\Support\Facades\DB;

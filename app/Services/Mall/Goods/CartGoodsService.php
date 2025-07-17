@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mall\Goods;
 
 use App\Models\CartGoods;
+use App\Services\BaseService;
+use App\Services\GiftGoodsService;
+use App\Services\GoodsService;
+use App\Services\OrderGoodsService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\CartGoodsInput;
 use App\Utils\Inputs\CartGoodsEditInput;
+use App\Utils\Inputs\CartGoodsInput;
 
 class CartGoodsService extends BaseService
 {
