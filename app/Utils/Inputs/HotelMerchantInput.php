@@ -32,7 +32,7 @@ class HotelMerchantInput extends BaseInput
             'regionDesc' => 'required|string',
             'regionCodeList' => 'required|string',
             'addressDetail' => 'required|string',
-            'businessLicensePhoto' => 'required_if:type,2',
+            'businessLicensePhoto' => 'required|string',
             'name' => 'required|string',
             'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
             'email' => 'required|email',

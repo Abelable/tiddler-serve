@@ -2,27 +2,30 @@
 
 namespace App\Services;
 
-use App\Models\ScenicMerchant;
-use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicMerchantInput;
+use App\Models\CateringMerchant;
+use App\Utils\Inputs\CateringMerchantInput;
 use App\Utils\Inputs\MerchantPageInput;
 
-class ScenicMerchantService extends BaseService
+class CateringMerchantService extends BaseService
 {
-    public function createMerchant(ScenicMerchantInput $input, $userId)
+    public function createMerchant(CateringMerchantInput $input, $userId)
     {
-        $merchant = ScenicMerchant::new();
+        $merchant = CateringMerchant::new();
         $merchant->user_id = $userId;
-        return $this->updateMerchant($merchant, $input);
+       return $this->updateMerchant($merchant, $input);
     }
 
-    public function updateMerchant(ScenicMerchant $merchant, ScenicMerchantInput $input)
+    public function updateMerchant(CateringMerchant $merchant, CateringMerchantInput $input)
     {
-        $merchant->company_name = $input->companyName;
-        $merchant->business_license_photo = $input->businessLicensePhoto;
+        $merchant->type = $input->type;
+        if ($input->type == 2) {
+            $merchant->company_name = $input->companyName;
+        }
         $merchant->region_desc = $input->regionDesc;
         $merchant->region_code_list = $input->regionCodeList;
         $merchant->address_detail = $input->addressDetail;
+        $merchant->business_license_photo = $input->businessLicensePhoto;
+        $merchant->hygienic_license_photo = $input->hygienicLicensePhoto;
         $merchant->name = $input->name;
         $merchant->mobile = $input->mobile;
         $merchant->email = $input->email;
@@ -40,7 +43,7 @@ class ScenicMerchantService extends BaseService
 
     public function getMerchantList(MerchantPageInput $input, $columns = ['*'])
     {
-        $query = ScenicMerchant::query();
+        $query = CateringMerchant::query();
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
@@ -55,17 +58,17 @@ class ScenicMerchantService extends BaseService
 
     public function getMerchantByUserId($userId, $columns = ['*'])
     {
-        return ScenicMerchant::query()->where('user_id', $userId)->first($columns);
+        return CateringMerchant::query()->where('user_id', $userId)->first($columns);
     }
 
     public function getMerchantById($id, $columns = ['*'])
     {
-        return ScenicMerchant::query()->find($id, $columns);
+        return CateringMerchant::query()->find($id, $columns);
     }
 
     public function getMerchantListByIds(array $ids, $columns = ['*'])
     {
-        return ScenicMerchant::query()->whereIn('id', $ids)->get($columns);
+        return CateringMerchant::query()->whereIn('id', $ids)->get($columns);
     }
 
     public function paySuccess(int $merchantId)
@@ -73,9 +76,6 @@ class ScenicMerchantService extends BaseService
         $merchant = $this->getMerchantById($merchantId);
         if (is_null($merchant)) {
             $this->throwBadArgumentValue();
-        }
-        if ($merchant->status != 1) {
-            $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
         }
         $merchant->status = 2;
         $merchant->save();

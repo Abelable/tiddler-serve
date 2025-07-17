@@ -2,7 +2,7 @@
 
 namespace App\Utils\Inputs;
 
-class CateringProviderInput extends BaseInput
+class CateringMerchantInput extends BaseInput
 {
     public $type;
     public $companyName;
@@ -17,6 +17,15 @@ class CateringProviderInput extends BaseInput
     public $idCardNumber;
     public $idCardFrontPhoto;
     public $idCardBackPhoto;
+    public $holdIdCardPhoto;
+    public $bankCardOwnerName;
+    public $bankCardNumber;
+    public $bankName;
+    public $shopType;
+    public $deposit;
+    public $shopBg;
+    public $shopLogo;
+    public $shopName;
 
     public function rules()
     {
@@ -34,6 +43,15 @@ class CateringProviderInput extends BaseInput
             'idCardNumber' => 'required|string',
             'idCardFrontPhoto' => 'required|string',
             'idCardBackPhoto' => 'required|string',
+            'holdIdCardPhoto' => 'required|string',
+            'bankCardOwnerName' => 'required|string',
+            'bankCardNumber' => 'required|string',
+            'bankName' => 'required|string',
+            'shopType' => 'required|integer|in:1,2,3',
+            'deposit' => 'required|numeric',
+            'shopBg' => 'string',
+            'shopLogo' => 'required|string',
+            'shopName' => 'required|string',
         ];
     }
 }

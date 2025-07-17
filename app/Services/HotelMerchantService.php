@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\HotelMerchant;
 use App\Utils\Inputs\HotelMerchantInput;
-use App\Utils\Inputs\HotelMerchantPageInput;
+use App\Utils\Inputs\MerchantPageInput;
 
 class HotelMerchantService extends BaseService
 {
@@ -37,7 +37,7 @@ class HotelMerchantService extends BaseService
         return $merchant;
     }
 
-    public function getMerchantList(HotelMerchantPageInput $input, $columns = ['*'])
+    public function getMerchantList(MerchantPageInput $input, $columns = ['*'])
     {
         $query = HotelMerchant::query();
         if (!is_null($input->status)) {

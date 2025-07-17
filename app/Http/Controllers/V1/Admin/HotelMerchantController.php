@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\HotelMerchant;
 use App\Services\HotelMerchantService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\HotelMerchantPageInput;
+use App\Utils\Inputs\MerchantPageInput;
 
 class HotelMerchantController extends Controller
 {
@@ -14,8 +14,8 @@ class HotelMerchantController extends Controller
 
     public function list()
     {
-        /** @var HotelMerchantPageInput $input */
-        $input = HotelMerchantPageInput::new();
+        /** @var MerchantPageInput $input */
+        $input = MerchantPageInput::new();
 
         $page = HotelMerchantService::getInstance()->getMerchantList($input);
 

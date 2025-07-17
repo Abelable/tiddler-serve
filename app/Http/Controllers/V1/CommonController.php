@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\CateringProviderOrderService;
-use App\Services\CateringProviderService;
 use App\Services\HotelOrderService;
 use App\Services\HotelMerchantService;
 use App\Services\HotelShopDepositPaymentLogService;
@@ -16,7 +14,6 @@ use App\Services\ScenicShopDepositPaymentLogService;
 use App\Services\ScenicShopDepositService;
 use App\Services\ShopDepositPaymentLogService;
 use App\Services\OrderService;
-use App\Services\RestaurantService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopService;
@@ -110,29 +107,13 @@ class CommonController extends Controller
             });
         }
 
-        if (strpos($data['attach'], 'shop_id') !== false) {
-            Log::info('shop_wx_pay_notify', $data);
+        if (strpos($data['attach'], 'catering_shop_id') !== false) {
+            Log::info('catering_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                MerchantService::getInstance()->paySuccess($log->merchant_id);
-                ShopService::getInstance()->paySuccess($log->shop_id);
-                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-            });
-        }
-
-        if (strpos($data['attach'], 'order_sn_list') !== false) {
-            Log::info('order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                OrderService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
-        if (strpos($data['attach'], 'catering_provider_order_sn') !== false) {
-            Log::info('catering_provider_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = CateringProviderOrderService::getInstance()->wxPaySuccess($data);
-                CateringProviderService::getInstance()->paySuccess($order->provider_id);
-                RestaurantService::getInstance()->paySuccess($order->provider_id);
+                $log = CateringShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                CateringMerchantService::getInstance()->paySuccess($log->merchant_id);
+                CateringShopService::getInstance()->paySuccess($log->shop_id);
+                CateringShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
             });
         }
 
@@ -147,6 +128,23 @@ class CommonController extends Controller
             Log::info('set_meal_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
                 SetMealOrderService::getInstance()->wxPaySuccess($data);
+            });
+        }
+
+        if (strpos($data['attach'], 'shop_id') !== false) {
+            Log::info('shop_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
+                MerchantService::getInstance()->paySuccess($log->merchant_id);
+                ShopService::getInstance()->paySuccess($log->shop_id);
+                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+            });
+        }
+
+        if (strpos($data['attach'], 'order_sn_list') !== false) {
+            Log::info('order_wx_pay_notify', $data);
+            DB::transaction(function () use ($data) {
+                OrderService::getInstance()->wxPaySuccess($data);
             });
         }
 

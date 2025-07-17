@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ScenicMerchant;
 use App\Services\ScenicMerchantService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ScenicMerchantListInput;
+use App\Utils\Inputs\MerchantPageInput;
 
 class ScenicMerchantController extends Controller
 {
@@ -14,8 +14,8 @@ class ScenicMerchantController extends Controller
 
     public function list()
     {
-        /** @var ScenicMerchantListInput $input */
-        $input = ScenicMerchantListInput::new();
+        /** @var MerchantPageInput $input */
+        $input = MerchantPageInput::new();
 
         $page = ScenicMerchantService::getInstance()->getMerchantList($input);
 
