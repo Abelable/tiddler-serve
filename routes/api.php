@@ -484,7 +484,7 @@ Route::prefix('catering')->group(function () {
     Route::prefix('merchant')->group(function () {
         Route::post('settle_in', 'CateringMerchantController@settleIn');
         Route::get('status', 'CateringMerchantController@status');
-        Route::post('info', 'CateringMerchantController@info');
+        Route::get('info', 'CateringMerchantController@info');
         Route::post('delete', 'CateringMerchantController@delete');
     });
 
