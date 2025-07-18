@@ -105,6 +105,16 @@ class RestaurantService extends BaseService
         return Restaurant::query()->whereNotIn('id', $ids)->orderBy('id', 'asc')->get($columns);
     }
 
+    public function getSelectableOptions($hotelIds, $keywords = '', $columns = ['*'])
+    {
+        $query = Restaurant::query()->whereNotIn('id', $hotelIds);
+        if (!empty($keywords)) {
+            $query = $query->where('name', 'like', '%' . $keywords . '%');
+        }
+        return $query->get($columns);
+    }
+
+
     public function createRestaurant(RestaurantInput $input) {
         $restaurant = Restaurant::new();
         return $this->updateRestaurant($restaurant, $input);

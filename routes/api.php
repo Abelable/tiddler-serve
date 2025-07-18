@@ -221,6 +221,7 @@ Route::prefix('scenic')->group(function () {
     Route::get('options', 'ScenicController@options');
     Route::post('add', 'ScenicController@add');
     Route::post('edit', 'ScenicController@edit');
+    Route::post('delete', 'ScenicController@delete');
     Route::get('shop_options', 'ScenicController@shopOptions');
 
     Route::prefix('question')->group(function () {
@@ -338,6 +339,7 @@ Route::prefix('hotel')->group(function () {
     Route::get('options', 'HotelController@options');
     Route::post('add', 'HotelController@add');
     Route::post('edit', 'HotelController@edit');
+    Route::post('delete', 'HotelController@delete');
     Route::get('shop_options', 'HotelController@shopOptions');
 
     Route::prefix('question')->group(function () {
@@ -457,7 +459,7 @@ Route::prefix('catering')->group(function () {
         Route::post('add', 'RestaurantController@add');
         Route::post('edit', 'RestaurantController@edit');
         Route::post('delete', 'RestaurantController@delete');
-        Route::get('user_options', 'RestaurantController@userOptions');
+        Route::get('shop_options', 'RestaurantController@shopOptions');
     });
 
     Route::prefix('question')->group(function () {

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
 class HotelController extends Controller
 {
-    protected $only = ['mediaRelativeList', 'add', 'edit', 'providerOptions'];
+    protected $only = ['add', 'edit', 'delete', 'shopOptions'];
 
     public function categoryOptions()
     {
@@ -113,18 +113,17 @@ class HotelController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '已存在相同名称酒店');
         }
 
-        $hotel = Hotel::new();
-        HotelService::getInstance()->updateHotel($hotel, $input);
+        HotelService::getInstance()->createHotel($input);
 
         return $this->success();
     }
 
     public function edit()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $id = $this->verifyRequiredId('id');
         /** @var HotelInput $input */
         $input = HotelInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
 
         $shopHotel = ShopHotelService::getInstance()->getByHotelId($shopId, $id);
         if (is_null($shopHotel)) {
@@ -133,6 +132,22 @@ class HotelController extends Controller
 
         $hotel = HotelService::getInstance()->getHotelById($id);
         HotelService::getInstance()->updateHotel($hotel, $input);
+
+        return $this->success();
+    }
+
+    public function delete()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
+
+        $shopHotel = ShopHotelService::getInstance()->getByHotelId($shopId, $id);
+        if (is_null($shopHotel)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家酒店，不可删除');
+        }
+
+        $restaurant = HotelService::getInstance()->getHotelById($id);
+        $restaurant->delete();
 
         return $this->success();
     }
@@ -146,7 +161,8 @@ class HotelController extends Controller
             ->getShopHotelOptions($shopId)
             ->pluck('hotel_id')
             ->toArray();
-        $options = HotelService::getInstance()->getSelectableOptions($hotelIds, $keywords, ['id', 'name']);
+        $options = HotelService::getInstance()
+            ->getSelectableOptions($hotelIds, $keywords, ['id', 'name']);
 
         return $this->success($options);
     }

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
 class ScenicController extends Controller
 {
-    protected $only = ['mediaRelativeList', 'add', 'edit', 'shopOptions'];
+    protected $only = ['add', 'edit', 'delete', 'shopOptions'];
 
     public function categoryOptions()
     {
@@ -137,6 +137,22 @@ class ScenicController extends Controller
 
         $scenic = ScenicService::getInstance()->getScenicById($id);
         ScenicService::getInstance()->updateScenic($scenic, $input);
+
+        return $this->success();
+    }
+
+    public function delete()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
+
+        $shopScenicSpot = ShopScenicSpotService::getInstance()->getByScenicId($shopId, $id);
+        if (is_null($shopScenicSpot)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家景点，不可删除');
+        }
+
+        $restaurant = ScenicService::getInstance()->getScenicById($id);
+        $restaurant->delete();
 
         return $this->success();
     }
