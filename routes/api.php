@@ -1015,18 +1015,22 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     });
 
     Route::prefix('catering')->group(function () {
-        Route::prefix('provider')->group(function () {
-            Route::post('list', 'CateringProviderController@list');
-            Route::get('detail', 'CateringProviderController@detail');
-            Route::post('approve', 'CateringProviderController@approve');
-            Route::post('reject', 'CateringProviderController@reject');
-            Route::post('order_list', 'CateringProviderController@orderList');
+        Route::prefix('merchant')->group(function () {
+            Route::post('list', 'CateringMerchantController@list');
+            Route::get('detail', 'CateringMerchantController@detail');
+            Route::post('approve', 'CateringMerchantController@approve');
+            Route::post('reject', 'CateringMerchantController@reject');
+        });
+
+        Route::prefix('shop')->group(function () {
+            Route::post('list', 'CateringShopController@list');
+            Route::get('detail', 'CateringShopController@detail');
 
             Route::prefix('restaurant')->group(function () {
-                Route::post('list', 'ProviderRestaurantController@list');
-                Route::post('approve', 'ProviderRestaurantController@approveApply');
-                Route::post('reject', 'ProviderRestaurantController@rejectApply');
-                Route::post('delete', 'ProviderRestaurantController@deleteApply');
+                Route::post('list', 'ShopRestaurantController@list');
+                Route::post('approve', 'ShopRestaurantController@approve');
+                Route::post('reject', 'ShopRestaurantController@reject');
+                Route::post('delete', 'ShopRestaurantController@delete');
             });
         });
 

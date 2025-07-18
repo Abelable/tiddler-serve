@@ -29,6 +29,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\CateringShopDepositPaymentLog|null $depositInfo
  * @method static \Illuminate\Database\Eloquent\Builder|CateringMerchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringMerchant newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringMerchant onlyTrashed()
@@ -63,4 +64,10 @@ namespace App\Models;
  */
 class CateringMerchant extends BaseModel
 {
+    public function depositInfo()
+    {
+        return $this
+            ->hasOne(CateringShopDepositPaymentLog::class, 'merchant_id')
+            ->where('status', 1);
+    }
 }
