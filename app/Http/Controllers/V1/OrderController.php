@@ -14,6 +14,7 @@ use App\Services\AddressService;
 use App\Services\CommissionService;
 use App\Services\CouponService;
 use App\Services\FreightTemplateService;
+use App\Services\GoodsPickupAddressService;
 use App\Services\Mall\Goods\CartGoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderPackageService;
@@ -35,6 +36,22 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class OrderController extends Controller
 {
+    public function pickupAddressList()
+    {
+        $cartGoodsId = $this->verifyRequiredId('cartGoodsId');
+        $goodsId = CartGoodsService::getInstance()->getCartGoodsById($cartGoodsId)->goods_id;
+        $pickupAddressIds = GoodsPickupAddressService::getInstance()
+            ->getListByGoodsId($goodsId)
+            ->pluck('pickup_address_id')
+            ->toArray();
+
+        $columns = ['id', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
+        $pickupAddressList = ShopPickupAddressService::getInstance()
+            ->getListByIds($pickupAddressIds, $columns);
+
+        return $this->success($pickupAddressList);
+    }
+
     public function preOrderInfo()
     {
         $cartGoodsIds = $this->verifyArrayNotEmpty('cartGoodsIds');

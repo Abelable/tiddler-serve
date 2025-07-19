@@ -6,10 +6,9 @@ namespace App\Models;
  * App\Models\MealTicket
  *
  * @property int $id
- * @property int $user_id 用户id
- * @property int $provider_id 供应商id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
+ * @property int $shop_id 店铺id
  * @property float $price 代金券价格
  * @property float $original_price 抵扣原价
  * @property float $sales_commission_rate 销售佣金比例%
@@ -50,16 +49,15 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket wherePromotionCommissionUpperLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSalesVolume($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSuperiorPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUseRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUseTimeList($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereValidityDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereValidityEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicket whereValidityStartTime($value)

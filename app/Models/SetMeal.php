@@ -6,10 +6,9 @@ namespace App\Models;
  * App\Models\SetMeal
  *
  * @property int $id
- * @property int $user_id 用户id
- * @property int $provider_id 供应商id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
  * @property string $failure_reason 审核失败原因
+ * @property int $shop_id 店铺id
  * @property string $cover 套餐图片
  * @property string $name 套餐名称
  * @property float $price 套餐价格
@@ -50,16 +49,15 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal wherePromotionCommissionUpperLimit($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereProviderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSalesVolume($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSuperiorPromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereUseRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereUseTimeList($value)
- * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereValidityDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereValidityEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal whereValidityStartTime($value)

@@ -18,15 +18,17 @@ class MealTicketService extends BaseService
         }
         if (!empty($input->restaurantId)) {
             $query = $query->whereIn('id', function ($subQuery) use ($input) {
-                $subQuery->select('ticket_id')
-                    ->from('restaurant_ticket')
+                $subQuery->select('meal_ticket_id')
+                    ->from('meal_ticket_restaurant')
                     ->where('restaurant_id', $input->restaurantId);
             });
         }
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getListByIds(array $ids, $columns=['*'])
@@ -34,15 +36,15 @@ class MealTicketService extends BaseService
         return MealTicket::query()->where('status', 1)->whereIn('id', $ids)->get($columns);
     }
 
-    public function getListTotal($userId, $status)
+    public function getListTotal($shopId, $status)
     {
-        return MealTicket::query()->where('user_id', $userId)->where('status', $status)->count();
+        return MealTicket::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 
-    public function getTicketListByStatus($userId, StatusPageInput $input, $columns=['*'])
+    public function getTicketListByStatus($shopId, StatusPageInput $input, $columns=['*'])
     {
         return MealTicket::query()
-            ->where('user_id', $userId)
+            ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -53,16 +55,15 @@ class MealTicketService extends BaseService
         return MealTicket::query()->find($id, $columns);
     }
 
-    public function getUserTicket($userId, $id, $columns=['*'])
+    public function getShopTicket($shopId, $id, $columns=['*'])
     {
-        return MealTicket::query()->where('user_id', $userId)->find($id, $columns);
+        return MealTicket::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
-    public function createTicket($userId, $providerId, MealTicketInput $input)
+    public function createTicket($shopId, MealTicketInput $input)
     {
         $ticket = MealTicket::new();
-        $ticket->user_id = $userId;
-        $ticket->provider_id = $providerId;
+        $ticket->shop_id = $shopId;
 
         return $this->updateTicket($ticket, $input);
     }
@@ -96,9 +97,9 @@ class MealTicketService extends BaseService
         return $ticket;
     }
 
-    public function deleteTicket($userId, $id)
+    public function deleteTicket($shopId, $id)
     {
-        $ticket = $this->getUserTicket($userId, $id);
+        $ticket = $this->getShopTicket($shopId, $id);
         if (is_null($ticket)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '代金券不存在');
         }

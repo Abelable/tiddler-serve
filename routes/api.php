@@ -115,16 +115,15 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('goods')->group(function () {
-        Route::get('category_options', 'GoodsController@shopCategoryOptions');
-        Route::get('totals', 'GoodsController@shopGoodsListTotals');
-        Route::get('list', 'GoodsController@shopGoodsList');
-        Route::get('on_sale_list', 'GoodsController@shopOnSaleGoodsList');
-        Route::get('info', 'GoodsController@goodsInfo');
-        Route::post('add', 'GoodsController@add');
-        Route::post('edit', 'GoodsController@edit');
-        Route::post('up', 'GoodsController@up');
-        Route::post('down', 'GoodsController@down');
-        Route::post('delete', 'GoodsController@delete');
+        Route::get('category_options', 'ShopGoodsController@categoryOptions');
+        Route::get('totals', 'ShopGoodsController@totals');
+        Route::get('list', 'ShopGoodsController@list');
+        Route::get('detail', 'ShopGoodsController@detail');
+        Route::post('add', 'ShopGoodsController@add');
+        Route::post('edit', 'ShopGoodsController@edit');
+        Route::post('up', 'ShopGoodsController@up');
+        Route::post('down', 'ShopGoodsController@down');
+        Route::post('delete', 'ShopGoodsController@delete');
     });
 
     Route::prefix('order')->group(function () {
@@ -152,12 +151,12 @@ Route::prefix('shop')->group(function () {
 Route::prefix('goods')->group(function () {
     Route::get('category_options', 'GoodsController@categoryOptions');
     Route::get('list', 'GoodsController@list');
-    Route::get('purchased_list', 'GoodsController@getPurchasedList');
-    Route::post('recommend_list', 'GoodsController@recommendList');
     Route::get('search', 'GoodsController@search');
-    Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
     Route::get('detail', 'GoodsController@detail');
-    Route::get('pickup_address_list', 'GoodsController@getPickupAddressList');
+    Route::get('shop_list', 'ShopGoodsController@shopList');
+    Route::get('purchased_list', 'GoodsController@purchasedList');
+    Route::post('recommend_list', 'GoodsController@recommendList');
+    Route::post('media_relative_list', 'GoodsController@mediaRelativeList');
 
     Route::prefix('evaluation')->group(function () {
         Route::get('summary', 'GoodsEvaluationController@summary');
@@ -191,6 +190,7 @@ Route::prefix('address')->group(function () {
 });
 
 Route::prefix('order')->group(function () {
+    Route::get('pickup_address_list', 'OrderController@pickupAddressList');
     Route::post('pre_order_info', 'OrderController@preOrderInfo');
     Route::post('submit', 'OrderController@submit');
     Route::post('pay_params', 'OrderController@payParams');
@@ -277,13 +277,13 @@ Route::prefix('scenic')->group(function () {
         });
 
         Route::prefix('ticket')->group(function () {
-            Route::get('totals', 'ScenicTicketController@totals');
-            Route::get('list', 'ScenicTicketController@shopList');
-            Route::post('add', 'ScenicTicketController@add');
-            Route::post('edit', 'ScenicTicketController@edit');
-            Route::post('up', 'ScenicTicketController@up');
-            Route::post('down', 'ScenicTicketController@down');
-            Route::post('delete', 'ScenicTicketController@delete');
+            Route::get('totals', 'ShopScenicTicketController@totals');
+            Route::get('list', 'ShopScenicTicketController@list');
+            Route::post('add', 'ShopScenicTicketController@add');
+            Route::post('edit', 'ShopScenicTicketController@edit');
+            Route::post('up', 'ShopScenicTicketController@up');
+            Route::post('down', 'ShopScenicTicketController@down');
+            Route::post('delete', 'ShopScenicTicketController@delete');
         });
 
         Route::prefix('order')->group(function () {
@@ -395,14 +395,13 @@ Route::prefix('hotel')->group(function () {
         });
 
         Route::prefix('room')->group(function () {
-            Route::get('totals', 'HotelRoomController@totals');
-            Route::get('list', 'HotelRoomController@shopList');
-            Route::get('detail', 'HotelRoomController@detail');
-            Route::post('add', 'HotelRoomController@add');
-            Route::post('edit', 'HotelRoomController@edit');
-            Route::post('up', 'HotelRoomController@up');
-            Route::post('down', 'HotelRoomController@down');
-            Route::post('delete', 'HotelRoomController@delete');
+            Route::get('totals', 'ShopHotelRoomController@totals');
+            Route::get('list', 'ShopHotelRoomController@list');
+            Route::post('add', 'ShopHotelRoomController@add');
+            Route::post('edit', 'ShopHotelRoomController@edit');
+            Route::post('up', 'ShopHotelRoomController@up');
+            Route::post('down', 'ShopHotelRoomController@down');
+            Route::post('delete', 'ShopHotelRoomController@delete');
         });
 
         Route::prefix('order')->group(function () {
@@ -516,6 +515,16 @@ Route::prefix('catering')->group(function () {
             Route::get('options', 'ShopRestaurantController@options');
         });
 
+        Route::prefix('meal_ticket')->group(function () {
+            Route::get('totals', 'ShopMealTicketController@totals');
+            Route::get('list', 'ShopMealTicketController@list');
+            Route::post('add', 'ShopMealTicketController@add');
+            Route::post('edit', 'ShopMealTicketController@edit');
+            Route::post('up', 'ShopMealTicketController@up');
+            Route::post('down', 'ShopMealTicketController@down');
+            Route::post('delete', 'ShopMealTicketController@delete');
+        });
+
         Route::prefix('set_meal')->group(function () {
             Route::get('totals', 'SetMealController@totals');
             Route::get('list', 'SetMealController@userList');
@@ -525,17 +534,6 @@ Route::prefix('catering')->group(function () {
             Route::post('up', 'SetMealController@up');
             Route::post('down', 'SetMealController@down');
             Route::post('delete', 'SetMealController@delete');
-        });
-
-        Route::prefix('meal_ticket')->group(function () {
-            Route::get('totals', 'MealTicketController@totals');
-            Route::get('list', 'MealTicketController@userList');
-            Route::get('detail', 'MealTicketController@detail');
-            Route::post('add', 'MealTicketController@add');
-            Route::post('edit', 'MealTicketController@edit');
-            Route::post('up', 'MealTicketController@up');
-            Route::post('down', 'MealTicketController@down');
-            Route::post('delete', 'MealTicketController@delete');
         });
 
         Route::prefix('income')->group(function () {
