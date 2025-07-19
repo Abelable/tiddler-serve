@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\SetMealVerifyCode;
-use App\Models\SetMealVerifyLog;
+use App\Models\Catering\SetMealVerifyCode;
+use App\Models\Catering\SetMealVerifyLog;
 
 class SetMealVerifyService extends BaseService
 {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Catering\SetMealRestaurant;
 use Laravel\Scout\Searchable;
 
 /**

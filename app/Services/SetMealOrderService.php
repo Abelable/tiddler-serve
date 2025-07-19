@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\SetMealOrder;
+use App\Models\Catering\SetMealOrder;
 use App\Models\User;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Enums\SetMealOrderStatus;
-use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\WxMpServe;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;

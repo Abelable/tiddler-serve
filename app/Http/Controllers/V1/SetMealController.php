@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\SetMeal;
-use App\Services\SetMealService;
+use App\Models\Catering\SetMeal;
 use App\Services\SetMealRestaurantService;
+use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 
 class SetMealController extends Controller

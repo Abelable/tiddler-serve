@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\SetMeal;
+use App\Models\Catering\SetMeal;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\SetMealListInput;
 use App\Utils\Inputs\SetMealInput;

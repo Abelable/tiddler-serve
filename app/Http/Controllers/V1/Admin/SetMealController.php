@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SetMeal;
-use App\Services\CateringProviderService;
+use App\Models\Catering\SetMeal;
+use App\Services\Mall\Catering\CateringMerchantService;
+use App\Services\Mall\Catering\CateringShopService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\SetMealListInput;
@@ -34,12 +35,18 @@ class SetMealController extends Controller
         }
         $setMeal['restaurantIds'] = $setMeal->restaurantIds();
 
-        $provider = CateringProviderService::getInstance()->getProviderById($setMeal->provider_id);
-        if (is_null($provider)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
+        $shop = CateringShopService::getInstance()->getShopById($setMeal->shop_id);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮商家店铺不存在');
         }
-
-        $setMeal['provider_info'] = $provider;
+        $merchant = CateringMerchantService::getInstance()->getMerchantById($shop->merchant_id);
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮商家不存在');
+        }
+        $setMeal['shop_info'] = $shop;
+        $setMeal['merchant_info'] = $merchant;
+        unset($shop->merchant_id);
+        unset($setMeal->shop_id);
 
         return $this->success($setMeal);
     }

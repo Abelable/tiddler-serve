@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\SetMealRestaurant;
+use App\Models\Catering\SetMealRestaurant;
 
 class SetMealRestaurantService extends BaseService
 {

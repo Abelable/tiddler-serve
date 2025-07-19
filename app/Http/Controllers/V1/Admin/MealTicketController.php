@@ -4,7 +4,8 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MealTicket;
-use App\Services\CateringProviderService;
+use App\Services\Mall\Catering\CateringMerchantService;
+use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\MealTicketListInput;
@@ -34,12 +35,18 @@ class MealTicketController extends Controller
         }
         $ticket['restaurantIds'] = $ticket->restaurantIds();
 
-        $provider = CateringProviderService::getInstance()->getProviderById($ticket->provider_id);
-        if (is_null($provider)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前服务商不存在');
+        $shop = CateringShopService::getInstance()->getShopById($ticket->shop_id);
+        if (is_null($shop)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮商家店铺不存在');
         }
-
-        $ticket['provider_info'] = $provider;
+        $merchant = CateringMerchantService::getInstance()->getMerchantById($shop->merchant_id);
+        if (is_null($merchant)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮商家不存在');
+        }
+        $ticket['shop_info'] = $shop;
+        $ticket['merchant_info'] = $merchant;
+        unset($shop->merchant_id);
+        unset($ticket->shop_id);
 
         return $this->success($ticket);
     }

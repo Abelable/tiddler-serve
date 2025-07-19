@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
 
+use App\Models\BaseModel;
 use App\Utils\Traits\SetMealOrderStatusTrait;
 
 /**
- * App\Models\SetMealOrder
+ * App\Models\Catering\SetMealOrder
  *
  * @property int $id
  * @property string $order_sn 订单编号
