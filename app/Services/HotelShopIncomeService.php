@@ -166,10 +166,10 @@ class HotelShopIncomeService extends BaseService
         return HotelShopIncome::query()->where('status', 1)->find($id, $columns);
     }
 
-    public function deleteListByOrderIds(array $orderId, $status)
+    public function deleteListByOrderIds(array $orderIds, $status)
     {
         return HotelShopIncome::query()
-            ->where('order_id', $orderId)
+            ->whereIn('order_id', $orderIds)
             ->where('status', $status)
             ->delete();
     }

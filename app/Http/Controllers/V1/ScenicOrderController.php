@@ -336,13 +336,6 @@ class ScenicOrderController extends Controller
         return $this->success($order);
     }
 
-    public function cancel()
-    {
-        $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->userCancel($this->userId(), $id);
-        return $this->success();
-    }
-
     public function verifyCode()
     {
         $orderId = $this->verifyRequiredId('orderId');
@@ -356,6 +349,20 @@ class ScenicOrderController extends Controller
         return $this->success($verifyCodeInfo->code);
     }
 
+    public function cancel()
+    {
+        $id = $this->verifyRequiredId('id');
+        ScenicOrderService::getInstance()->userCancel($this->userId(), $id);
+        return $this->success();
+    }
+
+    public function refund()
+    {
+        $id = $this->verifyRequiredId('id');
+        ScenicOrderService::getInstance()->userRefund($this->userId(), $id);
+        return $this->success();
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
@@ -365,13 +372,6 @@ class ScenicOrderController extends Controller
             ScenicOrderTicketService::getInstance()->delete($id);
         });
 
-        return $this->success();
-    }
-
-    public function refund()
-    {
-        $id = $this->verifyRequiredId('id');
-        ScenicOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
     }
 }

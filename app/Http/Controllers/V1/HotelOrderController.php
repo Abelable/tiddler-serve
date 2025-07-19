@@ -187,7 +187,8 @@ class HotelOrderController extends Controller
     public function payParams()
     {
         $orderId = $this->verifyRequiredInteger('orderId');
-        $order = HotelOrderService::getInstance()->createWxPayOrder($this->userId(), $orderId, $this->user()->openid);
+        $order = HotelOrderService::getInstance()
+            ->createWxPayOrder($this->userId(), $orderId, $this->user()->openid);
         $payParams = Pay::wechat()->miniapp($order);
         return $this->success($payParams);
     }
@@ -306,6 +307,7 @@ class HotelOrderController extends Controller
             'total_price',
             'payment_amount',
             'pay_time',
+            'approve_time',
             'confirm_time',
             'created_at',
             'updated_at',
@@ -324,13 +326,6 @@ class HotelOrderController extends Controller
         return $this->success($order);
     }
 
-    public function cancel()
-    {
-        $id = $this->verifyRequiredId('id');
-        HotelOrderService::getInstance()->userCancel($this->userId(), $id);
-        return $this->success();
-    }
-
     public function verifyCode()
     {
         $orderId = $this->verifyRequiredId('orderId');
@@ -344,6 +339,20 @@ class HotelOrderController extends Controller
         return $this->success($verifyCodeInfo->code);
     }
 
+    public function cancel()
+    {
+        $id = $this->verifyRequiredId('id');
+        HotelOrderService::getInstance()->userCancel($this->userId(), $id);
+        return $this->success();
+    }
+
+    public function refund()
+    {
+        $id = $this->verifyRequiredId('id');
+        HotelOrderService::getInstance()->userRefund($this->userId(), $id);
+        return $this->success();
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
@@ -353,13 +362,6 @@ class HotelOrderController extends Controller
             HotelOrderRoomService::getInstance()->delete($id);
         });
 
-        return $this->success();
-    }
-
-    public function refund()
-    {
-        $id = $this->verifyRequiredId('id');
-        HotelOrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
     }
 }

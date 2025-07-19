@@ -523,6 +523,15 @@ Route::prefix('catering')->group(function () {
             Route::post('up', 'ShopMealTicketController@up');
             Route::post('down', 'ShopMealTicketController@down');
             Route::post('delete', 'ShopMealTicketController@delete');
+
+            Route::prefix('order')->group(function () {
+                Route::get('total', 'ShopMealTicketOrderController@total');
+                Route::get('list', 'ShopMealTicketOrderController@list');
+                Route::get('detail', 'ShopMealTicketOrderController@detail');
+                Route::post('approve', 'ShopMealTicketOrderController@approve');
+                Route::post('refund', 'ShopMealTicketOrderController@refund');
+                Route::post('verify', 'ShopMealTicketOrderController@verify');
+            });
         });
 
         Route::prefix('set_meal')->group(function () {
@@ -533,6 +542,15 @@ Route::prefix('catering')->group(function () {
             Route::post('up', 'SetMealController@up');
             Route::post('down', 'SetMealController@down');
             Route::post('delete', 'SetMealController@delete');
+
+            Route::prefix('order')->group(function () {
+                Route::get('total', 'ShopSetMealOrderController@total');
+                Route::get('list', 'ShopSetMealOrderController@list');
+                Route::get('detail', 'ShopSetMealOrderController@detail');
+                Route::post('approve', 'ShopSetMealOrderController@approve');
+                Route::post('refund', 'ShopSetMealOrderController@refund');
+                Route::post('verify', 'ShopSetMealOrderController@verify');
+            });
         });
 
         Route::prefix('income')->group(function () {
@@ -556,11 +574,11 @@ Route::prefix('catering')->group(function () {
             Route::get('payment_amount', 'MealTicketOrderController@paymentAmount');
             Route::post('submit', 'MealTicketOrderController@submit');
             Route::post('pay_params', 'MealTicketOrderController@payParams');
+            Route::get('total', 'MealTicketOrderController@total');
             Route::get('list', 'MealTicketOrderController@list');
-            Route::get('provider_list', 'MealTicketOrderController@providerList');
+            Route::get('search', 'MealTicketOrderController@search');
             Route::get('detail', 'MealTicketOrderController@detail');
             Route::get('verify_code', 'MealTicketOrderController@verifyCode');
-            Route::post('verify', 'MealTicketOrderController@verify');
             Route::post('refund', 'MealTicketOrderController@refund');
             Route::post('cancel', 'MealTicketOrderController@cancel');
             Route::post('delete', 'MealTicketOrderController@delete');
@@ -575,11 +593,11 @@ Route::prefix('catering')->group(function () {
             Route::get('payment_amount', 'SetMealOrderController@paymentAmount');
             Route::post('submit', 'SetMealOrderController@submit');
             Route::post('pay_params', 'SetMealOrderController@payParams');
+            Route::get('total', 'SetMealOrderController@total');
             Route::get('list', 'SetMealOrderController@list');
-            Route::get('provider_list', 'SetMealOrderController@providerList');
+            Route::get('search', 'SetMealOrderController@search');
             Route::get('detail', 'SetMealOrderController@detail');
             Route::get('verify_code', 'SetMealOrderController@verifyCode');
-            Route::post('verify', 'SetMealOrderController@verify');
             Route::post('refund', 'SetMealOrderController@refund');
             Route::post('cancel', 'SetMealOrderController@cancel');
             Route::post('delete', 'SetMealOrderController@delete');

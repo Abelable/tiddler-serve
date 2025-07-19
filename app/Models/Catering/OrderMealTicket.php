@@ -8,11 +8,19 @@ use App\Models\BaseModel;
  * App\Models\Catering\OrderMealTicket
  *
  * @property int $id
+ * @property int $user_id 用户id
  * @property int $order_id 订单id
- * @property int $number 代金券数量
- * @property int $ticket_id 代金券id
- * @property float $price 代金券售价
- * @property float $original_price 代金券抵扣价格
+ * @property int $restaurant_id 餐饮门店id
+ * @property string $restaurant_name 餐饮门店名称
+ * @property int $ticket_id 餐券id
+ * @property int $number 餐券数量
+ * @property float $price 餐券售价
+ * @property float $original_price 餐券抵扣价格
+ * @property float $sales_commission_rate 销售佣金比例
+ * @property float $promotion_commission_rate 推广佣金比例%
+ * @property float $promotion_commission_upper_limit 推广佣金上限
+ * @property float $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property int $validity_days 有效天数
  * @property string $validity_start_time 范围有效期开始时间
  * @property string $validity_end_time 范围有效期结束时间
@@ -44,10 +52,18 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereOverlayUsageLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePerTableUsageLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePromotionCommissionUpperLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereRestaurantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereRestaurantName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereSalesCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereSuperiorPromotionCommissionRate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereUseRules($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereUseTimeList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereValidityDays($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereValidityEndTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereValidityStartTime($value)

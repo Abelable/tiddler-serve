@@ -140,9 +140,9 @@ class CateringShopIncomeService extends BaseService
             ->update(['status' => 1]);
     }
 
-    public function updateListToConfirmStatus($orderIds)
+    public function updateListToConfirmStatus($orderIds, $productType)
     {
-        $incomeList = $this->getPaidListByOrderIds($orderIds);
+        $incomeList = $this->getPaidListByOrderIds($orderIds, $productType);
         return $incomeList->map(function (CateringShopIncome $income) {
             $income->status = 2;
             $income->save();
@@ -161,9 +161,10 @@ class CateringShopIncomeService extends BaseService
         return $income;
     }
 
-    public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
+    public function getPaidListByOrderIds(array $orderIds, $productType, $columns = ['*'])
     {
         return CateringShopIncome::query()
+            ->where('product_type', $productType)
             ->whereIn('order_id', $orderIds)
             ->where('status', 1)
             ->get($columns);
@@ -174,10 +175,11 @@ class CateringShopIncomeService extends BaseService
         return CateringShopIncome::query()->where('status', 1)->find($id, $columns);
     }
 
-    public function deleteListByOrderIds(array $orderId, $status)
+    public function deleteListByOrderIds(array $orderIds, $productType, $status)
     {
         return CateringShopIncome::query()
-            ->where('order_id', $orderId)
+            ->where('product_type', $productType)
+            ->whereIn('order_id', $orderIds)
             ->where('status', $status)
             ->delete();
     }
@@ -185,9 +187,9 @@ class CateringShopIncomeService extends BaseService
     public function deleteIncome($orderId, $productType, $productId, $status)
     {
         return CateringShopIncome::query()
-            ->where('order_id', $orderId)
             ->where('product_type', $productType)
             ->where('product_id', $productId)
+            ->where('order_id', $orderId)
             ->where('status', $status)
             ->delete();
     }

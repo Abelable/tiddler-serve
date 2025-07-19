@@ -413,8 +413,9 @@ class HotelOrderService extends BaseService
             return $order;
         });
 
-        // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
+
+        // 佣金记录变更为待提现
         CommissionService::getInstance()
             ->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL, $role);
 
