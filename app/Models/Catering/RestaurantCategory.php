@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
- * App\Models\RestaurantCategory
+ * App\Models\Catering\RestaurantCategory
  *
  * @property int $id
  * @property string $name 餐馆分类名称

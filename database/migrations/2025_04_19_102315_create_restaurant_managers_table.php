@@ -15,8 +15,8 @@ class CreateRestaurantManagersTable extends Migration
     {
         Schema::create('restaurant_managers', function (Blueprint $table) {
             $table->id();
-            $table->integer('restaurant_id')->comment('餐馆id');
-            $table->integer('user_id')->comment('用户id');
+            $table->integer('restaurant_id')->comment('餐饮门店id');
+            $table->integer('manager_id')->comment('管理员id');
             $table->timestamps();
             $table->softDeletes();
         });

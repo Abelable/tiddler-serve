@@ -2,14 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\RestaurantCategory;
+use App\Models\Catering\RestaurantCategory;
 use App\Utils\Inputs\PageInput;
 
 class RestaurantCategoryService extends BaseService
 {
     public function getCategoryList(PageInput $input, $columns = ['*'])
     {
-        return RestaurantCategory::query()->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return RestaurantCategory::query()
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getCategoryById($id, $columns = ['*'])

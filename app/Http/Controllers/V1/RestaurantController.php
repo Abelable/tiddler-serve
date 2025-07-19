@@ -4,9 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catering\MealTicket;
+use App\Models\Catering\Restaurant;
+use App\Models\Catering\RestaurantCategory;
 use App\Models\Catering\SetMeal;
-use App\Models\Restaurant;
-use App\Models\RestaurantCategory;
 use App\Services\MealTicketService;
 use App\Services\ProductHistoryService;
 use App\Services\RestaurantCategoryService;
@@ -162,7 +162,7 @@ class RestaurantController extends Controller
         $shopRestaurant = ShopRestaurantService::getInstance()
             ->getByRestaurantId($shopId, $id);
         if (is_null($shopRestaurant)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家门店，不可编辑');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家餐饮门店，不可编辑');
         }
 
         $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
@@ -179,7 +179,7 @@ class RestaurantController extends Controller
         $shopRestaurant = ShopRestaurantService::getInstance()
             ->getByRestaurantId($shopId, $id);
         if (is_null($shopRestaurant)) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家门店，不可删除');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '非自家餐饮门店，不可删除');
         }
 
         $restaurant = RestaurantService::getInstance()->getRestaurantById($id);

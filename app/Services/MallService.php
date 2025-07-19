@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Catering\Restaurant;
 use App\Models\Goods;
 use App\Models\Hotel;
-use App\Models\Restaurant;
 use App\Models\ScenicSpot;
 use App\Utils\Inputs\PageInput;
 

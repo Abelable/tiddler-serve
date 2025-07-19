@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\RestaurantCategory;
+use App\Models\Catering\RestaurantCategory;
 use App\Services\RestaurantCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -14,6 +14,7 @@ class RestaurantCategoryController extends Controller
 
     public function list()
     {
+        /** @var PageInput $input */
         $input = PageInput::new();
         $list = RestaurantCategoryService::getInstance()->getCategoryList($input);
         return $this->successPaginate($list);

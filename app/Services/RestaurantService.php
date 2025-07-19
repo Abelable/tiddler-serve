@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Restaurant;
+use App\Models\Catering\Restaurant;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\CommonPageInput;

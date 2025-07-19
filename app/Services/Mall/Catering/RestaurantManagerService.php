@@ -2,14 +2,14 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\Catering\CateringManager;
+use App\Models\Catering\RestaurantManager;
 use App\Services\BaseService;
 
-class CateringManagerService extends BaseService
+class RestaurantManagerService extends BaseService
 {
     public function createManager($restaurantId, $managerId)
     {
-        $address = CateringManager::new();
+        $address = RestaurantManager::new();
         $address->restaurant_id = $restaurantId;
         $address->manager_id = $managerId;
         $address->save();
@@ -18,16 +18,16 @@ class CateringManagerService extends BaseService
 
     public function getListByRestaurantId($restaurantId, $columns = ['*'])
     {
-        return CateringManager::query()->where('restaurant_id', $restaurantId)->get($columns);
+        return RestaurantManager::query()->where('restaurant_id', $restaurantId)->get($columns);
     }
 
     public function getListByManagerId($managerId, $columns = ['*'])
     {
-        return CateringManager::query()->where('manager_id', $managerId)->get($columns);
+        return RestaurantManager::query()->where('manager_id', $managerId)->get($columns);
     }
 
     public function deleteManager($restaurantId)
     {
-        CateringManager::query()->where('restaurant_id', $restaurantId)->delete();
+        RestaurantManager::query()->where('restaurant_id', $restaurantId)->delete();
     }
 }

@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Restaurant;
-use App\Services\RestaurantCategoryService;
+use App\Models\Catering\Restaurant;
 use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;

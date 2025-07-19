@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Catering\CateringShopManager;
 use App\Models\User;
-use App\Services\Mall\Catering\CateringManagerService;
+use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -48,7 +48,7 @@ class CateringShopManagerController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '管理员不存在');
         }
 
-        $restaurantIds = CateringManagerService::getInstance()
+        $restaurantIds = RestaurantManagerService::getInstance()
             ->getListByManagerId($manager->id)->pluck('restaurant_id')->toArray();
         $manager['restaurantIds'] = $restaurantIds;
 
@@ -65,7 +65,7 @@ class CateringShopManagerController extends Controller
         DB::transaction(function () use ($shopId, $userId, $roleId, $restaurantIds) {
             $manager = CateringShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
             foreach ($restaurantIds as $restaurantId) {
-                CateringManagerService::getInstance()->createManager($restaurantId, $manager->id);
+                RestaurantManagerService::getInstance()->createManager($restaurantId, $manager->id);
             }
         });
 
@@ -87,9 +87,9 @@ class CateringShopManagerController extends Controller
         DB::transaction(function () use ($manager, $roleId, $restaurantIds) {
             CateringShopManagerService::getInstance()->updateManager($manager, $roleId);
 
-            CateringManagerService::getInstance()->deleteManager($manager->id);
+            RestaurantManagerService::getInstance()->deleteManager($manager->id);
             foreach ($restaurantIds as $restaurantId) {
-                CateringManagerService::getInstance()->createManager($restaurantId, $manager->id);
+                RestaurantManagerService::getInstance()->createManager($restaurantId, $manager->id);
             }
         });
 

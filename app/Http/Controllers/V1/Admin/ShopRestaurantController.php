@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Catering\CateringMerchant;
 use App\Models\Catering\CateringShop;
-use App\Models\Restaurant;
+use App\Models\Catering\Restaurant;
 use App\Models\ShopRestaurant;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;

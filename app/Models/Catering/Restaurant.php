@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
 
-use App\Models\Catering\MealTicketRestaurant;
-use App\Models\Catering\SetMealRestaurant;
+use App\Models\BaseModel;
 use Laravel\Scout\Searchable;
 
 /**
- * App\Models\Restaurant
+ * App\Models\Catering\Restaurant
  *
  * @property int $id
  * @property int $category_id 餐馆分类id

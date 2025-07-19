@@ -7,13 +7,14 @@ use App\Models\Catering\MealTicketOrder;
 use App\Models\Catering\OrderMealTicket;
 use App\Services\AccountService;
 use App\Services\CommissionService;
+use App\Services\Mall\Catering\CateringShopManagerService;
+use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\MealTicketOrderService;
 use App\Services\MealTicketService;
 use App\Services\MealTicketVerifyService;
 use App\Services\OrderMealTicketService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
-use App\Services\RestaurantManagerService;
 use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderStatus;
@@ -245,8 +246,12 @@ class MealTicketOrderController extends Controller
         }
 
         $managerIds = RestaurantManagerService::getInstance()
-            ->getManagerList($verifyCodeInfo->restaurant_id)->pluck('user_id')->toArray();
-        if (!in_array($this->userId(), $managerIds)) {
+            ->getListByRestaurantId($verifyCodeInfo->restaurant_id)
+            ->pluck('manager_id')
+            ->toArray();
+        $managerUserIds = array_unique(CateringShopManagerService::getInstance()
+            ->getListByIds($managerIds)->pluck('user_id')->toArray());
+        if ($order->shop_id != $this->user()->cateringShop->id && !in_array($this->userId(), $managerUserIds)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前餐馆核销员，无法核销');
         }
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Catering\Restaurant;
 use App\Models\Goods;
 use App\Models\Hotel;
-use App\Models\Restaurant;
 use App\Models\ScenicSpot;
 use App\Services\GiftGoodsService;
 use App\Services\GoodsService;
