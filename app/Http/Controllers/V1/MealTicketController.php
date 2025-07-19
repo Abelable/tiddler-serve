@@ -10,7 +10,7 @@ use App\Utils\CodeResponse;
 
 class MealTicketController extends Controller
 {
-    protected $only = ['list', 'detail'];
+    protected $only = [];
 
     public function list()
     {

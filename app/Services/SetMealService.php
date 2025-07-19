@@ -34,15 +34,15 @@ class SetMealService extends BaseService
         return SetMeal::query()->where('status', 1)->whereIn('id', $ids)->get($columns);
     }
 
-    public function getListTotal($userId, $status)
+    public function getListTotal($shopId, $status)
     {
-        return SetMeal::query()->where('user_id', $userId)->where('status', $status)->count();
+        return SetMeal::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 
-    public function getSetMealListByStatus($userId, StatusPageInput $input, $columns=['*'])
+    public function getSetMealListByStatus($shopId, StatusPageInput $input, $columns=['*'])
     {
         return SetMeal::query()
-            ->where('user_id', $userId)
+            ->where('shop_id', $shopId)
             ->where('status', $input->status)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -53,16 +53,15 @@ class SetMealService extends BaseService
         return SetMeal::query()->find($id, $columns);
     }
 
-    public function getUserSetMeal($userId, $id, $columns=['*'])
+    public function getShopSetMeal($shopId, $id, $columns=['*'])
     {
-        return SetMeal::query()->where('user_id', $userId)->find($id, $columns);
+        return SetMeal::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
-    public function createSetMeal($userId, $providerId, SetMealInput $input)
+    public function createSetMeal($shopId, SetMealInput $input)
     {
         $setMeal = SetMeal::new();
-        $setMeal->user_id = $userId;
-        $setMeal->provider_id = $providerId;
+        $setMeal->shop_id = $shopId;
 
         return $this->updateSetMeal($setMeal, $input);
     }
@@ -96,9 +95,9 @@ class SetMealService extends BaseService
         return $setMeal;
     }
 
-    public function deleteSetMeal($userId, $id)
+    public function deleteSetMeal($shopId, $id)
     {
-        $setMeal = $this->getUserSetMeal($userId, $id);
+        $setMeal = $this->getShopSetMeal($shopId, $id);
         if (is_null($setMeal)) {
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '套餐不存在');
         }

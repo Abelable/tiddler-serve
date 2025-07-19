@@ -52,7 +52,7 @@ class ShopMealTicketController extends Controller
             ->getManagerList($shopId)->pluck('user_id')->toArray();
         if ($shopId != $this->user()->cateringShop->id && !in_array($this->userId(), $shopManagerIds)) {
             return $this
-                ->fail(CodeResponse::FORBIDDEN, '您不是当前餐饮门店商家或管理员，无权限添加酒店房间');
+                ->fail(CodeResponse::FORBIDDEN, '您不是当前餐饮门店商家或管理员，无权限添加餐券');
         }
 
         DB::transaction(function () use ($shopId, $input) {
