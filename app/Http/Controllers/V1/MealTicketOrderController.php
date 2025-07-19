@@ -95,7 +95,7 @@ class MealTicketOrderController extends Controller
             $ticket,
             $input
         ) {
-            $order = MealTicketOrderService::getInstance()->createOrder($this->user(), $input, $ticket->provider_id, $paymentAmount);
+            $order = MealTicketOrderService::getInstance()->createOrder($this->user(), $input, $ticket->shop_id, $paymentAmount);
 
             // 生成核销码
             MealTicketVerifyService::getInstance()->createVerifyCode($order->id, $input->restaurantId);

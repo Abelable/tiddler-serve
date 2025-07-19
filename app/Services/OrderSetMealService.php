@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Catering\OrderSetMeal;
 use App\Models\Catering\SetMeal;
-use App\Models\OrderSetMeal;
 
 class OrderSetMealService extends BaseService
 {

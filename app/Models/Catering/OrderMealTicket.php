@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\OrderMealTicket
+ * App\Models\Catering\OrderMealTicket
  *
  * @property int $id
  * @property int $order_id 订单id

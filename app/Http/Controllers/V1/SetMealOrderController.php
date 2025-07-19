@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Catering\OrderSetMeal;
 use App\Models\Catering\SetMealOrder;
-use App\Models\OrderSetMeal;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\Mall\Catering\CateringShopManagerService;
@@ -85,7 +85,7 @@ class SetMealOrderController extends Controller
         $paymentAmount = (float)bcmul($setMeal->price, $input->num, 2);
 
         $orderId = DB::transaction(function () use ($upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $userId, $paymentAmount, $setMeal, $input) {
-            $order = SetMealOrderService::getInstance()->createOrder($this->user(), $input, $setMeal->provider_id, $paymentAmount);
+            $order = SetMealOrderService::getInstance()->createOrder($this->user(), $input, $setMeal->shop_id, $paymentAmount);
 
             // 生成核销码
             SetMealVerifyService::getInstance()->createVerifyCode($order->id, $input->restaurantId);
