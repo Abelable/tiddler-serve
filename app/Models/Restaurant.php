@@ -79,13 +79,19 @@ class Restaurant extends BaseModel
         return $this->only('id', 'name');
     }
 
-    public function ticketIds(): array
+    public function mealTicketIds(): array
     {
-        return $this->hasMany(RestaurantTicket::class, 'restaurant_id')->pluck('ticket_id')->toArray();
+        return $this
+            ->hasMany(MealTicketRestaurant::class, 'restaurant_id')
+            ->pluck('meal_ticket_id')
+            ->toArray();
     }
 
     public function setMealIds(): array
     {
-        return $this->hasMany(RestaurantSetMeal::class, 'restaurant_id')->pluck('set_meal_id')->toArray();
+        return $this
+            ->hasMany(SetMealRestaurant::class, 'restaurant_id')
+            ->pluck('set_meal_id')
+            ->toArray();
     }
 }

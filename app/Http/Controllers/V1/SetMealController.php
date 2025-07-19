@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\SetMeal;
 use App\Services\SetMealService;
-use App\Services\RestaurantSetMealService;
+use App\Services\SetMealRestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\SetMealInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -19,7 +19,7 @@ class SetMealController extends Controller
     {
         $restaurantId = $this->verifyRequiredId('restaurantId');
 
-        $setMealIds = RestaurantSetMealService::getInstance()->getListByRestaurantId($restaurantId)->pluck('set_meal_id')->toArray();
+        $setMealIds = SetMealRestaurantService::getInstance()->getListByRestaurantId($restaurantId)->pluck('set_meal_id')->toArray();
         $setMealList = SetMealService::getInstance()->getListByIds($setMealIds, [
             'cover',
             'name',
@@ -101,7 +101,7 @@ class SetMealController extends Controller
 
         DB::transaction(function () use ($providerId, $input) {
             $setMeal = SetMealService::getInstance()->createSetMeal($this->userId(), $providerId, $input);
-            RestaurantSetMealService::getInstance()->createRestaurantSetMeals($setMeal->id, $input->restaurantIds);
+            SetMealRestaurantService::getInstance()->create($setMeal->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -120,7 +120,7 @@ class SetMealController extends Controller
 
         DB::transaction(function () use ($input, $setMeal) {
             SetMealService::getInstance()->updateSetMeal($setMeal, $input);
-            RestaurantSetMealService::getInstance()->updateRestaurantSetMeals($setMeal->id, $input->restaurantIds);
+            SetMealRestaurantService::getInstance()->update($setMeal->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -166,7 +166,7 @@ class SetMealController extends Controller
 
         DB::transaction(function () use ($id) {
             SetMealService::getInstance()->deleteSetMeal($this->userId(), $id);
-            RestaurantSetMealService::getInstance()->deleteBySetMealId($id);
+            SetMealRestaurantService::getInstance()->deleteBySetMealId($id);
         });
 
         return $this->success();

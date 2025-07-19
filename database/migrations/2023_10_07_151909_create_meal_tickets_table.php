@@ -15,10 +15,9 @@ class CreateMealTicketsTable extends Migration
     {
         Schema::create('meal_tickets', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('provider_id')->comment('供应商id');
             $table->integer('status')->default(0)->comment('申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
+            $table->integer('shop_id')->comment('店铺id');
             $table->float('price')->comment('代金券价格');
             $table->float('original_price')->comment('抵扣原价');
             $table->float('sales_commission_rate')->default(0)->comment('销售佣金比例%');

@@ -71,6 +71,9 @@ class MealTicket extends BaseModel
 {
     public function restaurantIds(): array
     {
-        return $this->hasMany(RestaurantTicket::class, 'ticket_id')->pluck('restaurant_id')->toArray();
+        return $this
+            ->hasMany(MealTicketRestaurant::class, 'ticket_id')
+            ->pluck('restaurant_id')
+            ->toArray();
     }
 }

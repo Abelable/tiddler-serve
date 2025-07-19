@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRestaurantSetMealsTable extends Migration
+class CreateSetMealRestaurantsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateRestaurantSetMealsTable extends Migration
      */
     public function up()
     {
-        Schema::create('restaurant_set_meals', function (Blueprint $table) {
+        Schema::create('set_meal_restaurants', function (Blueprint $table) {
             $table->id();
+            $table->integer('set_meal_id')->comment('餐券id');
             $table->integer('restaurant_id')->comment('餐饮门店id');
-            $table->integer('set_meal_id')->comment('套餐id');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +29,6 @@ class CreateRestaurantSetMealsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('restaurant_set_meals');
+        Schema::dropIfExists('set_meal_restaurants');
     }
 }

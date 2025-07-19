@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\MealTicket;
 use App\Services\MealTicketService;
-use App\Services\RestaurantTicketService;
+use App\Services\MealTicketRestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MealTicketInput;
 use App\Utils\Inputs\StatusPageInput;
@@ -19,7 +19,7 @@ class MealTicketController extends Controller
     {
         $restaurantId = $this->verifyRequiredId('restaurantId');
 
-        $ticketIds = RestaurantTicketService::getInstance()->getListByRestaurantId($restaurantId)->pluck('ticket_id')->toArray();
+        $ticketIds = MealTicketRestaurantService::getInstance()->getListByRestaurantId($restaurantId)->pluck('ticket_id')->toArray();
         $ticketList = MealTicketService::getInstance()->getListByIds($ticketIds, [
             'price',
             'original_price',
@@ -101,7 +101,7 @@ class MealTicketController extends Controller
 
         DB::transaction(function () use ($providerId, $input) {
             $ticket = MealTicketService::getInstance()->createTicket($this->userId(), $providerId, $input);
-            RestaurantTicketService::getInstance()->createRestaurantTickets($ticket->id, $input->restaurantIds);
+            MealTicketRestaurantService::getInstance()->create($ticket->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -120,7 +120,7 @@ class MealTicketController extends Controller
 
         DB::transaction(function () use ($input, $ticket) {
             MealTicketService::getInstance()->updateTicket($ticket, $input);
-            RestaurantTicketService::getInstance()->updateRestaurantTickets($ticket->id, $input->restaurantIds);
+            MealTicketRestaurantService::getInstance()->update($ticket->id, $input->restaurantIds);
         });
 
         return $this->success();
@@ -166,7 +166,7 @@ class MealTicketController extends Controller
 
         DB::transaction(function () use ($id) {
             MealTicketService::getInstance()->deleteTicket($this->userId(), $id);
-            RestaurantTicketService::getInstance()->deleteByTicketId($id);
+            MealTicketRestaurantService::getInstance()->deleteByTicketId($id);
         });
 
         return $this->success();

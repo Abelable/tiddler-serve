@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRestaurantTicketsTable extends Migration
+class CreateMealTicketRestaurantsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateRestaurantTicketsTable extends Migration
      */
     public function up()
     {
-        Schema::create('restaurant_tickets', function (Blueprint $table) {
+        Schema::create('meal_ticket_restaurants', function (Blueprint $table) {
             $table->id();
+            $table->integer('meal_ticket_id')->comment('餐券id');
             $table->integer('restaurant_id')->comment('餐饮门店id');
-            $table->integer('ticket_id')->comment('优惠券id');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +29,6 @@ class CreateRestaurantTicketsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('restaurant_tickets');
+        Schema::dropIfExists('meal_ticket_restaurants');
     }
 }
