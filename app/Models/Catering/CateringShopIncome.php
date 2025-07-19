@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShopIncome
+ * App\Models\Catering\CateringShopIncome
  *
  * @property int $id
  * @property int $withdrawal_id 提现记录id

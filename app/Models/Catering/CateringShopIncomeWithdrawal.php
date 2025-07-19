@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShopIncomeWithdrawal
+ * App\Models\Catering\CateringShopIncomeWithdrawal
  *
  * @property int $id
  * @property int $status 状态：0-待审核；1-提现成功; 2-提现失败;

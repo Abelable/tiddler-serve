@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringManager
+ * App\Models\Catering\CateringManager
  *
  * @property int $id
  * @property int $restaurant_id 餐饮门店id

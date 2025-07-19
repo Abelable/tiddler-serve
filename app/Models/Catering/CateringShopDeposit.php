@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShopDeposit
+ * App\Models\Catering\CateringShopDeposit
  *
  * @property int $id
  * @property int $status 账户状态：1-正常，2-异常

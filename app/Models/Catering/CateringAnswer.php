@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 use App\Models\User;
 
 /**
- * App\Models\CateringAnswer
+ * App\Models\Catering\CateringAnswer
  *
  * @property int $id
  * @property int $user_id 用户id
@@ -16,7 +16,7 @@ use App\Models\User;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\User|null $userInfo
+ * @property-read User|null $userInfo
  * @method static \Illuminate\Database\Eloquent\Builder|CateringAnswer newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringAnswer newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringAnswer onlyTrashed()

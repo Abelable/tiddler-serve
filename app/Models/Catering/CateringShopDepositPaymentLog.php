@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShopDepositPaymentLog
+ * App\Models\Catering\CateringShopDepositPaymentLog
  *
  * @property int $id
  * @property int $status 状态：0-待支付，1-支付成功

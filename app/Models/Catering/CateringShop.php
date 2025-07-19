@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShop
+ * App\Models\Catering\CateringShop
  *
  * @property int $id
  * @property int $status 状态：0-未支付保证金，1-已支付保证金

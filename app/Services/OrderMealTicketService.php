@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\OrderMealTicket;
+use App\Models\Catering\OrderMealTicket;
 use App\Models\MealTicket;
 
 class OrderMealTicketService extends BaseService

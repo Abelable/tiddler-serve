@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringShopDepositChangeLog
+ * App\Models\Catering\CateringShopDepositChangeLog
  *
  * @property int $id
  * @property int $shop_id 店铺id

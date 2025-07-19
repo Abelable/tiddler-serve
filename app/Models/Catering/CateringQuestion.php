@@ -5,7 +5,7 @@ namespace App\Models\Catering;
 use App\Models\BaseModel;
 
 /**
- * App\Models\CateringQuestion
+ * App\Models\Catering\CateringQuestion
  *
  * @property int $id
  * @property int $user_id 用户id
