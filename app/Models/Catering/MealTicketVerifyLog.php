@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
- * App\Models\MealTicketVerifyLog
+ * App\Models\Catering\MealTicketVerifyLog
  *
  * @property int $id
  * @property int $order_id 订单id

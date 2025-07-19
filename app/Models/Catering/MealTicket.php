@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
- * App\Models\MealTicket
+ * App\Models\Catering\MealTicket
  *
  * @property int $id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架

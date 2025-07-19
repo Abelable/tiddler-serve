@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\MealTicket;
-use App\Services\MealTicketService;
+use App\Models\Catering\MealTicket;
 use App\Services\MealTicketRestaurantService;
+use App\Services\MealTicketService;
 use App\Utils\CodeResponse;
 
 class MealTicketController extends Controller
@@ -16,7 +16,10 @@ class MealTicketController extends Controller
     {
         $restaurantId = $this->verifyRequiredId('restaurantId');
 
-        $ticketIds = MealTicketRestaurantService::getInstance()->getListByRestaurantId($restaurantId)->pluck('ticket_id')->toArray();
+        $ticketIds = MealTicketRestaurantService::getInstance()
+            ->getListByRestaurantId($restaurantId)
+            ->pluck('ticket_id')
+            ->toArray();
         $ticketList = MealTicketService::getInstance()->getListByIds($ticketIds, [
             'price',
             'original_price',

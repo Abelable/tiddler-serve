@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\MealTicket;
+use App\Models\Catering\MealTicket;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\MealTicketListInput;
 use App\Utils\Inputs\MealTicketInput;

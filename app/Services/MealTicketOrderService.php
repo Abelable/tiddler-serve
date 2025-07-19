@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\MealTicketOrder;
+use App\Models\Catering\MealTicketOrder;
 use App\Models\User;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;

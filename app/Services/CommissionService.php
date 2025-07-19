@@ -4,11 +4,11 @@ namespace App\Services;
 
 use App\Jobs\CommissionConfirmJob;
 use App\Models\CartGoods;
+use App\Models\Catering\MealTicket;
 use App\Models\Catering\SetMeal;
 use App\Models\Commission;
 use App\Models\Coupon;
 use App\Models\HotelRoom;
-use App\Models\MealTicket;
 use App\Models\ScenicTicket;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\CommissionScene;

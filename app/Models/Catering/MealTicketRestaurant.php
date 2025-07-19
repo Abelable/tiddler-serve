@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
- * App\Models\MealTicketRestaurant
+ * App\Models\Catering\MealTicketRestaurant
  *
  * @property int $id
  * @property int $meal_ticket_id 餐券id

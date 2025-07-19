@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
- * App\Models\MealTicketVerifyCode
+ * App\Models\Catering\MealTicketVerifyCode
  *
  * @property int $id
  * @property int $status 核销状态：0-待核销，1-已核销, 2-已失效

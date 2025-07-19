@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Catering\MealTicketOrder;
 use App\Models\Catering\OrderMealTicket;
-use App\Models\MealTicketOrder;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\MealTicketOrderService;
