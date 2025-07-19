@@ -638,8 +638,8 @@ class CommissionService extends BaseService
     public function updateListToOrderConfirmStatus($orderIds, $productType, $role = 'user')
     {
         $commissionList = $this->getPaidListByOrderIds($orderIds, $productType);
-        return $commissionList->map(function (Commission $commission) use ($role) {
-            if ($commission->refund_status == 1 && $role == 'user') {
+        return $commissionList->map(function (Commission $commission) use ($productType, $role) {
+            if ($productType == ProductType::GOODS && $commission->refund_status == 1 && $role == 'user') {
                 // 7天无理由商品：确认收货7天后更新佣金状态
                 dispatch(new CommissionConfirmJob($commission->id));
             } else {

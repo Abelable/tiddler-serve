@@ -243,7 +243,8 @@ class MealTicketOrderService extends BaseService
             ->updateListToOrderPaidStatus([$order->id], ProductType::MEAL_TICKET);
 
         // 收益记录状态更新为：已支付待结算
-        CateringShopIncomeService::getInstance()->updateListToPaidStatus([$order->id]);
+        CateringShopIncomeService::getInstance()
+            ->updateListToPaidStatus([$order->id], ProductType::MEAL_TICKET);
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家

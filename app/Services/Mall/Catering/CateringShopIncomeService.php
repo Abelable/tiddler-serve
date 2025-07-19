@@ -132,9 +132,10 @@ class CateringShopIncomeService extends BaseService
         return CateringShopIncome::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
     }
 
-    public function updateListToPaidStatus(array $orderIds)
+    public function updateListToPaidStatus(array $orderIds, $productType)
     {
         return CateringShopIncome::query()
+            ->where('product_type', $productType)
             ->whereIn('order_id', $orderIds)
             ->where('status', 0)
             ->update(['status' => 1]);

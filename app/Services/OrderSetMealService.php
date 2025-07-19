@@ -8,19 +8,30 @@ use App\Models\Catering\SetMeal;
 class OrderSetMealService extends BaseService
 {
     public function createOrderSetMeal(
+        $userId,
         $orderId,
+        $restaurantId,
+        $restaurantName,
         $number,
         SetMeal $setMealInfo
     )
     {
         $setMeal = OrderSetMeal::new();
+        $setMeal->user_id = $userId;
         $setMeal->order_id = $orderId;
-        $setMeal->number = $number;
+        $setMeal->restaurant_id = $restaurantId;
+        $setMeal->restaurant_name = $restaurantName;
         $setMeal->set_meal_id = $setMealInfo->id;
         $setMeal->cover = $setMealInfo->cover;
         $setMeal->name = $setMealInfo->name;
         $setMeal->price = $setMealInfo->price;
         $setMeal->original_price = $setMealInfo->original_price;
+        $setMeal->number = $number;
+        $setMeal->sales_commission_rate = $setMealInfo->sales_commission_rate;
+        $setMeal->promotion_commission_rate = $setMealInfo->promotion_commission_rate;
+        $setMeal->promotion_commission_upper_limit = $setMealInfo->promotion_commission_upper_limit;
+        $setMeal->superior_promotion_commission_rate = $setMealInfo->superior_promotion_commission_rate;
+        $setMeal->superior_promotion_commission_upper_limit = $setMealInfo->superior_promotion_commission_upper_limit;
         $setMeal->package_details = $setMealInfo->package_details;
         $setMeal->validity_days = $setMealInfo->validity_days;
         $setMeal->validity_start_time = $setMealInfo->validity_start_time;
@@ -48,6 +59,14 @@ class OrderSetMealService extends BaseService
         return OrderSetMeal::query()
             ->whereIn('order_id', $orderIds)
             ->whereIn('set_meal_id', $setMealIds)
+            ->get($columns);
+    }
+
+    public function searchList($userId, $keyword, $columns = ['*'])
+    {
+        return OrderSetMeal::query()
+            ->where('user_id', $userId)
+            ->where('name', 'like', "%{$keyword}%")
             ->get($columns);
     }
 

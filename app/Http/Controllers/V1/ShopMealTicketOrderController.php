@@ -5,28 +5,15 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Catering\MealTicketOrder;
 use App\Models\Catering\OrderMealTicket;
-use App\Services\AccountService;
-use App\Services\CommissionService;
-use App\Services\Mall\Catering\CateringShopIncomeService;
 use App\Services\Mall\Catering\CateringShopManagerService;
-use App\Services\Mall\Catering\CateringShopService;
 use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\MealTicketOrderService;
-use App\Services\MealTicketService;
 use App\Services\MealTicketVerifyService;
 use App\Services\OrderMealTicketService;
-use App\Services\PromoterService;
-use App\Services\RelationService;
-use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\MealTicketOrderStatus;
-use App\Utils\Enums\ProductType;
-use App\Utils\Inputs\MealTicketOrderInput;
 use App\Utils\Inputs\PageInput;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Yansongda\LaravelPay\Facades\Pay;
 
 class ShopMealTicketOrderController extends Controller
 {
@@ -127,10 +114,9 @@ class ShopMealTicketOrderController extends Controller
             'status',
             'consignee',
             'mobile',
-            'restaurant_id',
-            'restaurant_name',
             'payment_amount',
             'pay_time',
+            'approve_time',
             'confirm_time',
             'created_at',
             'updated_at',

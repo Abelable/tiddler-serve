@@ -208,7 +208,7 @@ class MealTicketOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = MealTicketOrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
-        $list = $this->handelOrderList(collect($page->items()));
+        $list = $this->handleOrderList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }
@@ -258,7 +258,7 @@ class MealTicketOrderController extends Controller
         return $statusList;
     }
 
-    private function handelOrderList($orderList)
+    private function handleOrderList($orderList)
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = OrderMealTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
@@ -292,11 +292,11 @@ class MealTicketOrderController extends Controller
             'id',
             'order_sn',
             'status',
-            'consignee',
-            'mobile',
             'shop_id',
             'shop_logo',
             'shop_name',
+            'consignee',
+            'mobile',
             'total_price',
             'payment_amount',
             'pay_time',

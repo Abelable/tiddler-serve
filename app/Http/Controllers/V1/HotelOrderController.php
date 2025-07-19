@@ -213,7 +213,7 @@ class HotelOrderController extends Controller
         $statusList = $this->statusList($status);
         $page = HotelOrderService::getInstance()->getOrderListByStatus($this->userId(), $statusList, $input);
         $orderList = collect($page->items());
-        $list = $this->handelOrderList($orderList);
+        $list = $this->handleOrderList($orderList);
 
         return $this->success($this->paginate($page, $list));
     }
@@ -264,7 +264,7 @@ class HotelOrderController extends Controller
         return $statusList;
     }
 
-    private function handelOrderList($orderList)
+    private function handleOrderList($orderList)
     {
         $orderIds = $orderList->pluck('id')->toArray();
         $roomList = HotelOrderRoomService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');

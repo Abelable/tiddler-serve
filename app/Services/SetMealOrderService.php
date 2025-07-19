@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Catering\CateringShop;
 use App\Models\Catering\SetMealOrder;
 use App\Models\User;
+use App\Services\Mall\Catering\CateringShopIncomeService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\SetMealOrderInput;
 use App\Utils\WxMpServe;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,22 @@ use Yansongda\Pay\Exceptions\GatewayException;
 
 class SetMealOrderService extends BaseService
 {
+    public function getTotal($userId, $statusList)
+    {
+        return SetMealOrder::query()
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
+    public function getShopTotal($shopId, $statusList)
+    {
+        return SetMealOrder::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
     public function getOrderListByStatus($userId, $statusList, PageInput $input, $columns = ['*'])
     {
         $query = SetMealOrder::query()->where('user_id', $userId);
@@ -30,9 +47,9 @@ class SetMealOrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getProviderOrderList($providerId, $statusList, PageInput $input, $columns = ['*'])
+    public function getShopOrderList($shopId, $statusList, PageInput $input, $columns = ['*'])
     {
-        $query = SetMealOrder::query()->where('provider_id', $providerId);
+        $query = SetMealOrder::query()->where('shop_id', $shopId);
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
@@ -66,6 +83,11 @@ class SetMealOrderService extends BaseService
     public function getUserOrderById($userId, $id, $columns = ['*'])
     {
         return SetMealOrder::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
+    public function getShopOrder($shopId, $id, $columns = ['*'])
+    {
+        return SetMealOrder::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
@@ -145,33 +167,26 @@ class SetMealOrderService extends BaseService
         return SetMealOrder::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder(User $user, SetMealOrderInput $input, $providerId, $paymentAmount)
+    public function createOrder(
+        User $user,
+        CateringShop $shop,
+        $totalPrice,
+        $deductionBalance,
+        $paymentAmount
+    )
     {
         $orderSn = $this->generateOrderSn();
-
-        // 余额抵扣
-        $deductionBalance = 0;
-        if ($input->useBalance == 1) {
-            $account = AccountService::getInstance()->getUserAccount($user->id);
-            $deductionBalance = min($paymentAmount, $account->balance);
-            $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
-
-            // 更新余额
-            AccountService::getInstance()->updateBalance(
-                $user->id,
-                AccountChangeType::PURCHASE,
-                -$deductionBalance,
-                $orderSn,
-                ProductType::SET_MEAL
-            );
-        }
 
         $order = SetMealOrder::new();
         $order->order_sn = $orderSn;
         $order->status = SetMealOrderStatus::CREATED;
+        $order->shop_id = $shop->id;
+        $order->shop_logo = $shop->logo;
+        $order->shop_name = $shop->name;
         $order->user_id = $user->id;
         $order->consignee = $user->nickname;
         $order->mobile = $user->mobile;
+        $order->total_price = $totalPrice;
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
@@ -193,8 +208,8 @@ class SetMealOrderService extends BaseService
 
         return [
             'out_trade_no' => time(),
-            'body' => 'set_meal_order_sn:' . $order->order_sn,
-            'attach' => $order->order_sn,
+            'body' => '订单编号：:' . $order->order_sn,
+            'attach' => 'set_meal_order_sn:' . $order->order_sn,
             'total_fee' => bcmul($order->payment_amount, 100),
             'openid' => $openid
         ];
@@ -202,7 +217,7 @@ class SetMealOrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSn = $data['attach'];
+        $orderSn = $data['attach'] ? str_replace('set_meal_order_sn:', '', $data['attach']): '';
         $payId = $data['transaction_id'] ?? '';
         $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
 
@@ -230,8 +245,31 @@ class SetMealOrderService extends BaseService
         CommissionService::getInstance()
             ->updateListToOrderPaidStatus([$order->id], ProductType::SET_MEAL);
 
+        // 收益记录状态更新为：已支付待结算
+        CateringShopIncomeService::getInstance()
+            ->updateListToPaidStatus([$order->id], ProductType::SET_MEAL);
+
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家
+
+        return $order;
+    }
+
+    public function approve($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        if (!$order->canApproveHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
+        }
+
+        $order->status = SetMealOrderStatus::MERCHANT_APPROVED;
+        $order->approve_time = now()->format('Y-m-d\TH:i:s');
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
 
         return $order;
     }
@@ -277,6 +315,10 @@ class SetMealOrderService extends BaseService
         // 删除佣金记录
         CommissionService::getInstance()
             ->deleteUnpaidListByOrderIds([$order->id], ProductType::SET_MEAL);
+
+        // 删除收益记录
+        CateringShopIncomeService::getInstance()
+            ->deleteListByOrderIds([$order->id], ProductType::SET_MEAL, 0);
 
         return $order;
     }
@@ -342,6 +384,10 @@ class SetMealOrderService extends BaseService
         CommissionService::getInstance()
             ->updateListToOrderConfirmStatus($orderIds, ProductType::SET_MEAL, $role);
 
+        // 收益记录变更为待提现
+        CateringShopIncomeService::getInstance()
+            ->updateListToConfirmStatus($orderIds, productType::SET_MEAL);
+
         // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
         return $orderList;
@@ -384,6 +430,15 @@ class SetMealOrderService extends BaseService
     public function userRefund($userId, $orderId)
     {
         $order = $this->getUserOrderById($userId, $orderId);
+        if (is_null($order)) {
+            $this->throwBadArgumentValue();
+        }
+        $this->refund($order);
+    }
+
+    public function shopRefund($shopId, $orderId)
+    {
+        $order = $this->getShopOrder($shopId, $orderId);
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
@@ -445,6 +500,10 @@ class SetMealOrderService extends BaseService
                 CommissionService::getInstance()
                     ->deletePaidListByOrderIds([$order->id], ProductType::SET_MEAL);
 
+                // 删除店铺收益
+                CateringShopIncomeService::getInstance()
+                    ->deleteListByOrderIds([$order->id], ProductType::SET_MEAL, 1);
+
                 // todo 通知商家
             } catch (GatewayException $exception) {
                 Log::error('wx_refund_fail', [$exception]);
@@ -461,8 +520,6 @@ class SetMealOrderService extends BaseService
         if (!$order->canDeleteHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能删除');
         }
-
-        OrderSetMealService::getInstance()->delete($order->id);
         $order->delete();
     }
 }
