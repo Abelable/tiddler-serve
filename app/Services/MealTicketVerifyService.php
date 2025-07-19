@@ -20,12 +20,18 @@ class MealTicketVerifyService extends BaseService
 
     public function getVerifyCodeInfo($orderId, $restaurantId,  $columns = ['*'])
     {
-        return MealTicketVerifyCode::query()->where('order_id', $orderId)->where('restaurant_id', $restaurantId)->first($columns);
+        return MealTicketVerifyCode::query()
+            ->where('order_id', $orderId)
+            ->where('restaurant_id', $restaurantId)
+            ->first($columns);
     }
 
     public function getByCode($code, $columns = ['*'])
     {
-        return MealTicketVerifyCode::query()->where('code', $code)->where('status', 0)->first($columns);
+        return MealTicketVerifyCode::query()
+            ->where('code', $code)
+            ->where('status', 0)
+            ->first($columns);
     }
 
     public function getById($id, $columns = ['*'])
@@ -35,7 +41,10 @@ class MealTicketVerifyService extends BaseService
 
     public function getPendingListByOrderId($orderId, $columns = ['*'])
     {
-        return MealTicketVerifyCode::query()->where('order_id', $orderId)->where('status', 0)->get($columns);
+        return MealTicketVerifyCode::query()
+            ->where('order_id', $orderId)
+            ->where('status', 0)
+            ->get($columns);
     }
 
     public function hasUnverifiedCodes($orderId)
