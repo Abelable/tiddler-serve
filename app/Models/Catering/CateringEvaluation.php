@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
  * App\Models\CateringEvaluation

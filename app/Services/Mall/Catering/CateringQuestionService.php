@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\CateringQuestion;
+use App\Models\Catering\CateringQuestion;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 

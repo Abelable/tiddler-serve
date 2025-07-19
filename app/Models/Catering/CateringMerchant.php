@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
  * App\Models\CateringMerchant
@@ -29,7 +31,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\CateringShopDepositPaymentLog|null $depositInfo
+ * @property-read \App\Models\Catering\CateringShopDepositPaymentLog|null $depositInfo
  * @method static \Illuminate\Database\Eloquent\Builder|CateringMerchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringMerchant newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringMerchant onlyTrashed()

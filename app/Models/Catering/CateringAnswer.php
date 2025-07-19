@@ -1,6 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
+use App\Models\User;
 
 /**
  * App\Models\CateringAnswer

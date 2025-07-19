@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\CateringShop;
+use App\Models\Catering\CateringShop;
 use App\Services\BaseService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;

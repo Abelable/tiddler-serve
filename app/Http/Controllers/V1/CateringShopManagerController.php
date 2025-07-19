@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\CateringShopManager;
+use App\Models\Catering\CateringShopManager;
 use App\Models\User;
 use App\Services\Mall\Catering\CateringManagerService;
 use App\Services\Mall\Catering\CateringShopManagerService;

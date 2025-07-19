@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\CateringShopDepositPaymentLog;
+use App\Models\Catering\CateringShopDepositPaymentLog;
 use App\Services\BaseService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;

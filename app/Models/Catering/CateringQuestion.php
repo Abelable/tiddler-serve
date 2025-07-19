@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Catering;
+
+use App\Models\BaseModel;
 
 /**
  * App\Models\CateringQuestion
@@ -13,7 +15,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CateringAnswer[] $answerList
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Catering\CateringAnswer[] $answerList
  * @property-read int|null $answer_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|CateringQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringQuestion newQuery()

@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Catering\CateringMerchant;
+use App\Models\Catering\CateringShop;
+use App\Models\Catering\CateringShopManager;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Scout\Searchable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * App\Models\User
@@ -29,9 +32,9 @@ use Illuminate\Notifications\Notifiable;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \App\Models\AuthInfo|null $authInfo
- * @property-read \App\Models\CateringMerchant|null $cateringMerchant
- * @property-read \App\Models\CateringShop|null $cateringShop
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\CateringShopManager[] $cateringShopManagerList
+ * @property-read \App\Models\Catering\CateringMerchant|null $cateringMerchant
+ * @property-read \App\Models\Catering\CateringShop|null $cateringShop
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Catering\CateringShopManager[] $cateringShopManagerList
  * @property-read int|null $catering_shop_manager_list_count
  * @property-read \App\Models\HotelMerchant|null $hotelMerchant
  * @property-read \App\Models\HotelShop|null $hotelShop
