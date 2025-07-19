@@ -6,7 +6,7 @@ use App\Models\ShopScenicSpot;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 
-class ShopScenicSpotService extends BaseService
+class ShopScenicService extends BaseService
 {
     public function getListTotal($shopId, $status)
     {

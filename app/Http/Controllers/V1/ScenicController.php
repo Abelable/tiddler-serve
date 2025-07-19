@@ -8,7 +8,7 @@ use App\Services\HotelService;
 use App\Services\ProductHistoryService;
 use App\Services\ScenicEvaluationService;
 use App\Services\ScenicQuestionService;
-use App\Services\ShopScenicSpotService;
+use App\Services\ShopScenicService;
 use App\Services\ScenicCategoryService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
@@ -130,7 +130,7 @@ class ScenicController extends Controller
         /** @var ScenicInput $input */
         $input = ScenicInput::new();
 
-        $shopScenicSpot = ShopScenicSpotService::getInstance()->getByScenicId($shopId, $id);
+        $shopScenicSpot = ShopScenicService::getInstance()->getByScenicId($shopId, $id);
         if (is_null($shopScenicSpot)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无该景点编辑权限');
         }
@@ -146,7 +146,7 @@ class ScenicController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $shopScenicSpot = ShopScenicSpotService::getInstance()->getByScenicId($shopId, $id);
+        $shopScenicSpot = ShopScenicService::getInstance()->getByScenicId($shopId, $id);
         if (is_null($shopScenicSpot)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '非自家景点，不可删除');
         }
@@ -162,7 +162,7 @@ class ScenicController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $keywords = $this->verifyString('keywords');
 
-        $scenicIds = ShopScenicSpotService::getInstance()
+        $scenicIds = ShopScenicService::getInstance()
             ->getShopScenicOptions($shopId)
             ->pluck('scenic_id')
             ->toArray();

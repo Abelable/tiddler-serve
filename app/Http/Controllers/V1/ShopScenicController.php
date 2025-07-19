@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ShopScenicSpot;
 use App\Models\ScenicSpot;
-use App\Services\ShopScenicSpotService;
+use App\Services\ShopScenicService;
 use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
@@ -17,9 +17,9 @@ class ShopScenicController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
 
         return $this->success([
-            ShopScenicSpotService::getInstance()->getListTotal($shopId, 1),
-            ShopScenicSpotService::getInstance()->getListTotal($shopId, 0),
-            ShopScenicSpotService::getInstance()->getListTotal($shopId, 2),
+            ShopScenicService::getInstance()->getListTotal($shopId, 1),
+            ShopScenicService::getInstance()->getListTotal($shopId, 0),
+            ShopScenicService::getInstance()->getListTotal($shopId, 2),
         ]);
     }
 
@@ -29,7 +29,7 @@ class ShopScenicController extends Controller
         $input = StatusPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
 
-        $page = ShopScenicSpotService::getInstance()
+        $page = ShopScenicService::getInstance()
             ->getScenicPage($shopId, $input, ['id', 'scenic_id', 'status', 'failure_reason', 'created_at', 'updated_at']);
         $shopScenicSpotList = collect($page->items());
 
@@ -62,7 +62,7 @@ class ShopScenicController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '暂无权限申请添加景点');
         }
 
-        ShopScenicSpotService::getInstance()->createScenicList($shopId, $scenicIds);
+        ShopScenicService::getInstance()->createScenicList($shopId, $scenicIds);
         return $this->success();
     }
 
@@ -71,7 +71,7 @@ class ShopScenicController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $id = $this->verifyRequiredId('id');
 
-        $spot = ShopScenicSpotService::getInstance()->getShopScenicById($shopId, $id);
+        $spot = ShopScenicService::getInstance()->getShopScenicById($shopId, $id);
         if (is_null($spot)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
@@ -85,7 +85,7 @@ class ShopScenicController extends Controller
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $scenicIds = ShopScenicSpotService::getInstance()
+        $scenicIds = ShopScenicService::getInstance()
             ->getShopScenicOptions($shopId)
             ->pluck('scenic_id')
             ->toArray();

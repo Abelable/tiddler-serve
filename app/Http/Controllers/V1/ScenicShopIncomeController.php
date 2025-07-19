@@ -8,7 +8,7 @@ use App\Services\ProductHistoryService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicShopIncomeService;
-use App\Services\ShopScenicSpotService;
+use App\Services\ShopScenicService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
@@ -29,7 +29,7 @@ class ScenicShopIncomeController extends Controller
         $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
-        $scenicIds = ShopScenicSpotService::getInstance()
+        $scenicIds = ShopScenicService::getInstance()
             ->getScenicList($shopId, [1])->pluck('scenic_id')->toArray();
         $todayVisitorCount = ProductHistoryService::getInstance()
             ->getHistoryDateCount(ProductType::SCENIC, $scenicIds);
