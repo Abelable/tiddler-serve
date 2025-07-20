@@ -8,6 +8,7 @@ use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\MealTicketListInput;
 
 class MealTicketController extends Controller
@@ -31,7 +32,7 @@ class MealTicketController extends Controller
         $id = $this->verifyRequiredId('id');
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
         }
         $ticket['restaurantIds'] = $ticket->restaurantIds();
 
@@ -51,15 +52,49 @@ class MealTicketController extends Controller
         return $this->success($ticket);
     }
 
-    public function approve()
+    public function editCommission()
     {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
         $id = $this->verifyRequiredId('id');
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
+        }
+
+        if ($input->promotionCommissionRate) {
+            $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        }
+        if ($input->promotionCommissionUpperLimit) {
+            $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        }
+        if ($input->superiorPromotionCommissionRate) {
+            $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        }
+        if ($input->superiorPromotionCommissionUpperLimit) {
+            $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        }
+        $ticket->save();
+
+        return $this->success();
+    }
+
+    public function approve()
+    {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
+        $id = $this->verifyRequiredId('id');
+
+        $ticket = MealTicketService::getInstance()->getTicketById($id);
+        if (is_null($ticket)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
         }
         $ticket->status = 1;
+        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
         $ticket->save();
 
         return $this->success();
@@ -72,7 +107,7 @@ class MealTicketController extends Controller
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
         }
         $ticket->status = 2;
         $ticket->failure_reason = $reason;
@@ -87,7 +122,7 @@ class MealTicketController extends Controller
 
         $ticket = MealTicketService::getInstance()->getTicketById($id);
         if (is_null($ticket)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前代金券不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
         }
         $ticket->delete();
 

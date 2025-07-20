@@ -86,7 +86,7 @@ class HotelRoomController extends Controller
 
         $room = HotelRoomService::getInstance()->getRoomById($id);
         if (is_null($room)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房价不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
 
         if ($input->promotionCommissionRate) {

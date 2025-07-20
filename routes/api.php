@@ -1070,20 +1070,22 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('options', 'RestaurantController@options');
         });
 
-        Route::prefix('set_meal')->group(function () {
-            Route::post('list', 'SetMealController@list');
-            Route::get('detail', 'SetMealController@detail');
-            Route::post('approve', 'SetMealController@approve');
-            Route::post('reject', 'SetMealController@reject');
-            Route::post('delete', 'SetMealController@delete');
-        });
-
         Route::prefix('meal_ticket')->group(function () {
             Route::post('list', 'MealTicketController@list');
             Route::get('detail', 'MealTicketController@detail');
+            Route::post('edit_commission', 'MealTicketController@editCommission');
             Route::post('approve', 'MealTicketController@approve');
             Route::post('reject', 'MealTicketController@reject');
             Route::post('delete', 'MealTicketController@delete');
+        });
+
+        Route::prefix('set_meal')->group(function () {
+            Route::post('list', 'SetMealController@list');
+            Route::get('detail', 'SetMealController@detail');
+            Route::post('edit_commission', 'SetMealController@editCommission');
+            Route::post('approve', 'SetMealController@approve');
+            Route::post('reject', 'SetMealController@reject');
+            Route::post('delete', 'SetMealController@delete');
         });
     });
 
