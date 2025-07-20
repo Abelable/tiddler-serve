@@ -535,13 +535,13 @@ Route::prefix('catering')->group(function () {
         });
 
         Route::prefix('set_meal')->group(function () {
-            Route::get('totals', 'SetMealController@totals');
-            Route::get('list', 'SetMealController@list');
-            Route::post('add', 'SetMealController@add');
-            Route::post('edit', 'SetMealController@edit');
-            Route::post('up', 'SetMealController@up');
-            Route::post('down', 'SetMealController@down');
-            Route::post('delete', 'SetMealController@delete');
+            Route::get('totals', 'ShopSetMealController@totals');
+            Route::get('list', 'ShopSetMealController@list');
+            Route::post('add', 'ShopSetMealController@add');
+            Route::post('edit', 'ShopSetMealController@edit');
+            Route::post('up', 'ShopSetMealController@up');
+            Route::post('down', 'ShopSetMealController@down');
+            Route::post('delete', 'ShopSetMealController@delete');
 
             Route::prefix('order')->group(function () {
                 Route::get('total', 'ShopSetMealOrderController@total');

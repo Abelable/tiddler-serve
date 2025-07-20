@@ -8,6 +8,7 @@ use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\SetMealService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\SetMealListInput;
 
 class SetMealController extends Controller
@@ -51,8 +52,38 @@ class SetMealController extends Controller
         return $this->success($setMeal);
     }
 
+    public function editCommission()
+    {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
+        $id = $this->verifyRequiredId('id');
+
+        $ticket = SetMealService::getInstance()->getSetMealById($id);
+        if (is_null($ticket)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
+        }
+
+        if ($input->promotionCommissionRate) {
+            $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+        }
+        if ($input->promotionCommissionUpperLimit) {
+            $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        }
+        if ($input->superiorPromotionCommissionRate) {
+            $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        }
+        if ($input->superiorPromotionCommissionUpperLimit) {
+            $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+        }
+        $ticket->save();
+
+        return $this->success();
+    }
+
     public function approve()
     {
+        /** @var CommissionInput $input */
+        $input = CommissionInput::new();
         $id = $this->verifyRequiredId('id');
 
         $setMeal = SetMealService::getInstance()->getSetMealById($id);
@@ -60,6 +91,10 @@ class SetMealController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮套餐不存在');
         }
         $setMeal->status = 1;
+        $setMeal->promotion_commission_rate = $input->promotionCommissionRate;
+        $setMeal->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+        $setMeal->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+        $setMeal->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
         $setMeal->save();
 
         return $this->success();
