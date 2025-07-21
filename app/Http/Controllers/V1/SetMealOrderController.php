@@ -314,7 +314,7 @@ class SetMealOrderController extends Controller
     public function verifyCode()
     {
         $orderId = $this->verifyRequiredId('orderId');
-        $restaurantId = $this->verifyRequiredId('hotelId');
+        $restaurantId = $this->verifyRequiredId('restaurantId');
 
         $verifyCodeInfo = SetMealVerifyService::getInstance()
             ->getVerifyCodeInfo($orderId, $restaurantId);
