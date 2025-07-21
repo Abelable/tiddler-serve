@@ -759,6 +759,7 @@ class CommissionService extends BaseService
         }
         return $query
             ->whereIn('status', $statusList)
+            ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 

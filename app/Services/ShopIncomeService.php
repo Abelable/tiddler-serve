@@ -44,6 +44,7 @@ class ShopIncomeService extends BaseService
         return $this
             ->getShopIncomeQueryByTimeType($shopId, $timeType)
             ->whereIn('status', $statusList)
+            ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
