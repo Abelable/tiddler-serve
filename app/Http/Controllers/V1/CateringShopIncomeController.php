@@ -128,11 +128,7 @@ class CateringShopIncomeController extends Controller
             $productIdsByType[ProductType::MEAL_TICKET] ?? []
         );
         foreach ($mealTicketList as $mealTicket) {
-            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
-                'id' => $mealTicket->ticket_id,
-                'price' => $mealTicket->price,
-                'number' => $mealTicket->number,
-            ];
+            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = $mealTicket;
         }
 
         $setMealMap = [];
@@ -141,13 +137,7 @@ class CateringShopIncomeController extends Controller
             $productIdsByType[ProductType::SET_MEAL] ?? []
         );
         foreach ($setMealList as $setMeal) {
-            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = [
-                'id' => $setMeal->set_meal_id,
-                'cover' => $setMeal->cover,
-                'name' => $setMeal->name,
-                'price' => $setMeal->price,
-                'number' => $setMeal->number,
-            ];
+            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = $setMeal;
         }
 
         $list = $incomeList->map(function (CateringShopIncome $income) use ($mealTicketMap, $setMealMap) {

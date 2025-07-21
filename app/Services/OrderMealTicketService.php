@@ -58,7 +58,7 @@ class OrderMealTicketService extends BaseService
     {
         return OrderMealTicket::query()
             ->whereIn('order_id', $orderIds)
-            ->whereIn('meal_ticket_id', $mealTicketIds)
+            ->whereIn('ticket_id', $mealTicketIds)
             ->get($columns);
     }
 
