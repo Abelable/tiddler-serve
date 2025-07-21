@@ -90,8 +90,13 @@ class CommissionController extends Controller
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
 
-        $page = CommissionService::getInstance()
-            ->getUserCommissionPageByTimeType($this->userId(), $timeType, $statusList, $input, $scene ?: null);
+        $page = CommissionService::getInstance()->getUserCommissionPageByTimeType(
+            $this->userId(),
+            $timeType,
+            $statusList,
+            $input,
+            $scene ?: null
+        );
         $commissionList = collect($page->items());
 
         $orderIdsByType = $commissionList->groupBy('product_type')->map(function ($group) {
@@ -102,8 +107,10 @@ class CommissionController extends Controller
         });
 
         $scenicTicketMap = [];
-        $scenicTicketList = ScenicOrderTicketService::getInstance()
-            ->getListByOrderIdsAndTicketIds($orderIdsByType[ProductType::SCENIC] ?? [], $productIdsByType[ProductType::SCENIC] ?? []);
+        $scenicTicketList = ScenicOrderTicketService::getInstance()->getListByOrderIdsAndTicketIds(
+            $orderIdsByType[ProductType::SCENIC] ?? [],
+            $productIdsByType[ProductType::SCENIC] ?? []
+        );
         foreach ($scenicTicketList as $scenicTicket) {
             $scenicTicketMap[$scenicTicket->order_id][$scenicTicket->ticket_id] = [
                 'id' => $scenicTicket->ticket_id,
@@ -121,8 +128,10 @@ class CommissionController extends Controller
         }
 
         $hotelRoomMap = [];
-        $hotelRoomList = HotelOrderRoomService::getInstance()
-            ->getListByOrderIdsAndRoomIds($orderIdsByType[ProductType::HOTEL] ?? [], $productIdsByType[ProductType::HOTEL] ?? []);
+        $hotelRoomList = HotelOrderRoomService::getInstance()->getListByOrderIdsAndRoomIds(
+            $orderIdsByType[ProductType::HOTEL] ?? [],
+            $productIdsByType[ProductType::HOTEL] ?? []
+        );
         foreach ($hotelRoomList as $hotelRoom) {
             $hotelRoom->image_list = json_decode($hotelRoom->image_list);
             $hotelRoom->facility_list = json_decode($hotelRoom->facility_list);
@@ -130,19 +139,19 @@ class CommissionController extends Controller
         }
 
         $mealTicketMap = [];
-        $mealTicketList = OrderMealTicketService::getInstance()
-            ->getListByOrderIdsAndMealTicketIds($orderIdsByType[ProductType::MEAL_TICKET] ?? [], $productIdsByType[ProductType::MEAL_TICKET] ?? []);
+        $mealTicketList = OrderMealTicketService::getInstance()->getListByOrderIdsAndMealTicketIds(
+            $orderIdsByType[ProductType::MEAL_TICKET] ?? [],
+            $productIdsByType[ProductType::MEAL_TICKET] ?? []
+        );
         foreach ($mealTicketList as $mealTicket) {
-            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = [
-                'id' => $mealTicket->ticket_id,
-                'price' => $mealTicket->price,
-                'number' => $mealTicket->number,
-            ];
+            $mealTicketMap[$mealTicket->order_id][$mealTicket->ticket_id] = $mealTicket;
         }
 
         $setMealMap = [];
-        $setMealList = OrderSetMealService::getInstance()
-            ->getListByOrderIdsAndSetMealIds($orderIdsByType[ProductType::SET_MEAL] ?? [], $productIdsByType[ProductType::SET_MEAL] ?? []);
+        $setMealList = OrderSetMealService::getInstance()->getListByOrderIdsAndSetMealIds(
+            $orderIdsByType[ProductType::SET_MEAL] ?? [],
+            $productIdsByType[ProductType::SET_MEAL] ?? []
+        );
         foreach ($setMealList as $setMeal) {
             $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = [
                 'id' => $setMeal->set_meal_id,
@@ -154,8 +163,10 @@ class CommissionController extends Controller
         }
 
         $goodsMap = [];
-        $goodsList = OrderGoodsService::getInstance()
-            ->getListByOrderIdsAndGoodsIds($orderIdsByType[ProductType::GOODS] ?? [], $productIdsByType[ProductType::GOODS] ?? []);
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderIdsAndGoodsIds(
+            $orderIdsByType[ProductType::GOODS] ?? [],
+            $productIdsByType[ProductType::GOODS] ?? []
+        );
         foreach ($goodsList as $goods) {
             $goodsMap[$goods->order_id][$goods->goods_id] = [
                 'id' => $goods->goods_id,
@@ -167,7 +178,13 @@ class CommissionController extends Controller
             ];
         }
 
-        $list = $commissionList->map(function (Commission $commission) use ($scenicTicketMap, $hotelRoomMap, $setMealMap, $mealTicketMap, $goodsMap) {
+        $list = $commissionList->map(function (Commission $commission) use (
+            $scenicTicketMap,
+            $hotelRoomMap,
+            $mealTicketMap,
+            $setMealMap,
+            $goodsMap
+        ) {
             $product = null;
             $orderId = $commission->order_id;
             $productId = $commission->product_id;
