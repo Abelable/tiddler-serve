@@ -171,7 +171,7 @@ class CommissionService extends BaseService
             $upperSuperiorLevel,
             $orderId,
             $orderSn,
-            ProductType::SET_MEAL,
+            ProductType::MEAL_TICKET,
             $ticket->id
         );
     }
