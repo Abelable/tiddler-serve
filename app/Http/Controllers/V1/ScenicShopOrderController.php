@@ -110,6 +110,7 @@ class ScenicShopOrderController extends Controller
                     'needExchange' => $ticket->need_exchange
                 ],
                 'totalPrice' => $order->total_price,
+                'deduction_balance' => $order->deduction_balance,
                 'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
@@ -132,6 +133,7 @@ class ScenicShopOrderController extends Controller
             'mobile',
             'id_card_number',
             'total_price',
+            'deduction_balance',
             'payment_amount',
             'approve_time',
             'pay_time',

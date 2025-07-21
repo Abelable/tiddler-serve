@@ -97,6 +97,7 @@ class ShopOrderController extends Controller
                 'statusDesc' => OrderStatus::TEXT_MAP[$order->status],
                 'goodsList' => $goodsList,
                 'payTime' => $order->pay_time,
+                'deduction_balance' => $order->deduction_balance,
                 'paymentAmount' => $order->payment_amount,
                 'deliveryMode' => $order->delivery_mode,
                 'consignee' => $order->consignee,
