@@ -120,6 +120,13 @@ class SetMealOrderService extends BaseService
             ->first($columns);
     }
 
+    public function getApprovedOrderById($id, $columns = ['*'])
+    {
+        return SetMealOrder::query()
+            ->where('status', SetMealOrderStatus::MERCHANT_APPROVED)
+            ->find($id, $columns);
+    }
+
     public function getPaidOrderById($id, $columns = ['*'])
     {
         return SetMealOrder::query()

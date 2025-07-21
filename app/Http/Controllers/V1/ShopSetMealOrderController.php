@@ -173,7 +173,7 @@ class ShopSetMealOrderController extends Controller
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
         }
 
-        $order = SetMealOrderService::getInstance()->getPaidOrderById($verifyCodeInfo->order_id);
+        $order = SetMealOrderService::getInstance()->getApprovedOrderById($verifyCodeInfo->order_id);
         if (is_null($order)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
         }

@@ -117,6 +117,13 @@ class MealTicketOrderService extends BaseService
             ->first($columns);
     }
 
+    public function getApprovedOrderById($id, $columns = ['*'])
+    {
+        return MealTicketOrder::query()
+            ->where('status', MealTicketOrderStatus::MERCHANT_APPROVED)
+            ->find($id, $columns);
+    }
+
     public function getPaidOrderById($id, $columns = ['*'])
     {
         return MealTicketOrder::query()
