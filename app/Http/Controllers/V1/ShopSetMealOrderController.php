@@ -117,7 +117,8 @@ class ShopSetMealOrderController extends Controller
 
     public function detail()
     {
-        $id = $this->verifyRequiredId('id');
+        $shopId = $this->verifyRequiredInteger('shopId');
+        $orderId = $this->verifyRequiredId('orderId');
         $columns = [
             'id',
             'order_sn',
@@ -133,7 +134,7 @@ class ShopSetMealOrderController extends Controller
             'created_at',
             'updated_at',
         ];
-        $order = SetMealOrderService::getInstance()->getOrderById($this->userId(), $id, $columns);
+        $order = SetMealOrderService::getInstance()->getShopOrder($shopId, $orderId, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
