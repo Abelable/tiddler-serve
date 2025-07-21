@@ -271,16 +271,19 @@ class MealTicketOrderController extends Controller
 
             return [
                 'id' => $order->id,
+                'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => MealTicketOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
-                'ticketInfo' => $ticket,
-                'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'orderSn' => $order->order_sn
+                'ticketInfo' => $ticket,
+                'totalPrice' => $order->total_price,
+                'paymentAmount' => $order->payment_amount,
+                'payTime' => $order->pay_time,
+                'createdAt' => $order->created_at
             ];
         });
     }

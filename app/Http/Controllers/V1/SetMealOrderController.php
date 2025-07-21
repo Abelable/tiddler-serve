@@ -260,16 +260,19 @@ class SetMealOrderController extends Controller
 
             return [
                 'id' => $order->id,
+                'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => SetMealOrderStatus::TEXT_MAP[$order->status],
                 'shopId' => $order->shop_id,
                 'shopLogo' => $order->shop_logo,
                 'shopName' => $order->shop_name,
-                'setMealInfo' => $setMeal,
-                'paymentAmount' => $order->payment_amount,
                 'consignee' => $order->consignee,
                 'mobile' => $order->mobile,
-                'orderSn' => $order->order_sn
+                'setMealInfo' => $setMeal,
+                'totalPrice' => $order->total_price,
+                'paymentAmount' => $order->payment_amount,
+                'payTime' => $order->pay_time,
+                'createdAt' => $order->created_at
             ];
         });
     }
