@@ -81,8 +81,10 @@ class ScenicController extends Controller
 
         $scenic['evaluationSummary'] = ScenicEvaluationService::getInstance()->evaluationSummary($id, 2);
         $scenic['qaSummary'] = ScenicQuestionService::getInstance()->qaSummary($id, 3);
-        $scenic['nearbyHotelSummary'] = HotelService::getInstance()->nearbySummary($scenic->longitude, $scenic->latitude, 10);
-        $scenic['nearbyScenicSummary'] = ScenicService::getInstance()->nearbySummary($scenic->longitude, $scenic->latitude, 10, $id);
+        $scenic['nearbyHotelSummary'] = HotelService::getInstance()
+            ->nearbySummary($scenic->longitude, $scenic->latitude, 10);
+        $scenic['nearbyScenicSummary'] = ScenicService::getInstance()
+            ->nearbySummary($scenic->longitude, $scenic->latitude, 10, $id);
 
         if ($this->isLogin()) {
             DB::transaction(function () use ($scenic) {

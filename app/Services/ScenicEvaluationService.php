@@ -34,6 +34,11 @@ class ScenicEvaluationService extends BaseService
         return $this->handelEvaluationList($list);
     }
 
+    public function getEvaluationTotal($scenicId)
+    {
+        return ScenicEvaluation::query()->where('scenic_id', $scenicId)->count();
+    }
+
     public function handelEvaluationList($evaluationList)
     {
         $userIds = $evaluationList->pluck('user_id')->toArray();
@@ -47,11 +52,6 @@ class ScenicEvaluationService extends BaseService
             unset($evaluation->scenic_id);
             return $evaluation;
         });
-    }
-
-    public function getEvaluationTotal($scenicId)
-    {
-        return ScenicEvaluation::query()->where('scenic_id', $scenicId)->count();
     }
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])

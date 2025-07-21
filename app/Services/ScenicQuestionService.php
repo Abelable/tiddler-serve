@@ -25,6 +25,11 @@ class ScenicQuestionService extends BaseService
         return $this->handelQuestionList($list);
     }
 
+    public function questionTotal($scenicId)
+    {
+        return ScenicQuestion::query()->where('scenic_id', $scenicId)->count();
+    }
+
     public function handelQuestionList($questionList)
     {
         return $questionList->map(function (ScenicQuestion $question, $index) {
@@ -59,11 +64,6 @@ class ScenicQuestionService extends BaseService
             ->orderBy('answer_num', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
-    }
-
-    public function questionTotal($scenicId)
-    {
-        return ScenicQuestion::query()->where('scenic_id', $scenicId)->count();
     }
 
     public function getQuestionById($id, $columns = ['*'])

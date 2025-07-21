@@ -7,6 +7,8 @@ use App\Models\Catering\MealTicket;
 use App\Models\Catering\Restaurant;
 use App\Models\Catering\RestaurantCategory;
 use App\Models\Catering\SetMeal;
+use App\Services\Mall\Catering\CateringEvaluationService;
+use App\Services\Mall\Catering\CateringQuestionService;
 use App\Services\MealTicketService;
 use App\Services\ProductHistoryService;
 use App\Services\RestaurantCategoryService;
@@ -104,15 +106,7 @@ class RestaurantController extends Controller
         $id = $this->verifyRequiredId('id');
         $restaurant = RestaurantService::getInstance()->getRestaurantById($id);
         if (is_null($restaurant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '美食不存在');
-        }
-
-        if ($this->isLogin()) {
-            DB::transaction(function () use ($restaurant) {
-                $restaurant->increment('views');
-                ProductHistoryService::getInstance()
-                    ->createHistory($this->userId(), ProductType::RESTAURANT, $restaurant->id);
-            });
+            return $this->fail(CodeResponse::NOT_FOUND, '餐饮门店不存在');
         }
 
         $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
@@ -132,6 +126,18 @@ class RestaurantController extends Controller
             return $setMeal;
         });
         $restaurant['setMealList'] = $setMealList;
+
+        $restaurant['evaluationSummary'] = CateringEvaluationService::getInstance()
+            ->evaluationSummary($id, 2);
+        $restaurant['qaSummary'] = CateringQuestionService::getInstance()->qaSummary($id, 3);
+
+        if ($this->isLogin()) {
+            DB::transaction(function () use ($restaurant) {
+                $restaurant->increment('views');
+                ProductHistoryService::getInstance()
+                    ->createHistory($this->userId(), ProductType::RESTAURANT, $restaurant->id);
+            });
+        }
 
         return $this->success($restaurant);
     }
