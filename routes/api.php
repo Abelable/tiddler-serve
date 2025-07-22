@@ -153,7 +153,7 @@ Route::prefix('goods')->group(function () {
     Route::get('list', 'GoodsController@list');
     Route::get('search', 'GoodsController@search');
     Route::get('detail', 'GoodsController@detail');
-    Route::get('shop_list', 'ShopGoodsController@shopList');
+    Route::get('shop_list', 'GoodsController@shopList');
     Route::get('purchased_list', 'GoodsController@purchasedList');
     Route::post('recommend_list', 'GoodsController@recommendList');
     Route::post('media_relative_list', 'GoodsController@mediaRelativeList');

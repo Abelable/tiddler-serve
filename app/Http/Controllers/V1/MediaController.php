@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
-    protected $except = ['topList', 'list', 'search'];
+    protected $except = ['topList', 'list', 'search', 'productMediaList'];
 
     public function topList()
     {

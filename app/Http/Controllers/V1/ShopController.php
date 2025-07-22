@@ -12,7 +12,7 @@ use App\Utils\Inputs\ShopInput;
 
 class ShopController extends Controller
 {
-    protected $except = ['shopInfo'];
+    protected $except = ['categoryOptions', 'shopInfo'];
 
     public function categoryOptions()
     {
