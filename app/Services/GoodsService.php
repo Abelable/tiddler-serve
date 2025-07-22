@@ -25,7 +25,7 @@ class GoodsService extends BaseService
         if (!empty($input->categoryId)) {
             $query = $query->where('category_id', $input->categoryId);
         }
-        if (!empty($input->sort)) {
+        if ($input->sort != 'created_at') {
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
