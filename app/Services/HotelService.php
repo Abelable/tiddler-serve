@@ -48,6 +48,7 @@ class HotelService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
+                ->orderBy('views', 'desc')
                 ->orderBy('sales_volume', 'desc')
                 ->orderBy('score', 'desc')
                 ->orderBy('created_at', 'desc');
