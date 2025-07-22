@@ -153,13 +153,7 @@ class CommissionController extends Controller
             $productIdsByType[ProductType::SET_MEAL] ?? []
         );
         foreach ($setMealList as $setMeal) {
-            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = [
-                'id' => $setMeal->set_meal_id,
-                'cover' => $setMeal->cover,
-                'name' => $setMeal->name,
-                'price' => $setMeal->price,
-                'number' => $setMeal->number,
-            ];
+            $setMealMap[$setMeal->order_id][$setMeal->set_meal_id] = $setMeal;
         }
 
         $goodsMap = [];
