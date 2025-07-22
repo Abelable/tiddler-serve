@@ -30,6 +30,7 @@ class GoodsService extends BaseService
         } else {
             $query = $query
                 ->orderBy('sales_commission_rate', 'desc')
+                ->orderBy('views', 'desc')
                 ->orderBy('score', 'desc')
                 ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
