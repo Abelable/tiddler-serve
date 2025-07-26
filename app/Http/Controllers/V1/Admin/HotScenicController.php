@@ -55,6 +55,21 @@ class HotScenicController extends Controller
         return $this->success();
     }
 
+    public function editInterestedNumber() {
+        $id = $this->verifyRequiredId('id');
+        $number = $this->verifyRequiredInteger('number');
+
+        $hotScenic = HotScenicService::getInstance()->getHotScenic($id);
+        if (is_null($hotScenic)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前网红打卡地不存在');
+        }
+
+        $hotScenic->interested_user_number = $number;
+        $hotScenic->save();
+
+        return $this->success();
+    }
+
     public function editSort() {
         $id = $this->verifyRequiredId('id');
         $sort = $this->verifyRequiredInteger('sort');

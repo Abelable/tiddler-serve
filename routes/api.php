@@ -973,6 +973,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'HotScenicController@detail');
         Route::post('add', 'HotScenicController@add');
         Route::post('edit', 'HotScenicController@edit');
+        Route::post('edit_interested_number', 'HotScenicController@editInterestedNumber');
+        Route::post('edit_sort', 'HotScenicController@editSort');
         Route::post('delete', 'HotScenicController@delete');
     });
 
