@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $scenic_id 景点id
- * @property int $scenic_cover 景点封面
+ * @property string $scenic_cover 景点封面
  * @property string $scenic_name 景点名称
  * @property string $recommend_reason 推荐理由
  * @property int $interested_user_number 感兴趣人数
