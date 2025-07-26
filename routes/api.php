@@ -223,6 +223,7 @@ Route::prefix('scenic')->group(function () {
     Route::post('edit', 'ScenicController@edit');
     Route::post('delete', 'ScenicController@delete');
     Route::get('shop_options', 'ScenicController@shopOptions');
+    Route::get('hot_list', 'ScenicController@hotList');
 
     Route::prefix('question')->group(function () {
         Route::get('list', 'ScenicQAController@questionList');
@@ -965,6 +966,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('reject', 'ScenicTicketController@reject');
             Route::post('delete', 'ScenicTicketController@delete');
         });
+    });
+
+    Route::prefix('hot_scenic')->group(function () {
+        Route::post('list', 'HotScenicController@list');
+        Route::get('detail', 'HotScenicController@detail');
+        Route::post('add', 'HotScenicController@add');
+        Route::post('edit', 'HotScenicController@edit');
+        Route::post('delete', 'HotScenicController@delete');
     });
 
     Route::prefix('hotel')->group(function () {

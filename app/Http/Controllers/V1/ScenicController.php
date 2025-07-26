@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicSpot;
 use App\Services\HotelService;
+use App\Services\HotScenicService;
 use App\Services\ProductHistoryService;
 use App\Services\ScenicEvaluationService;
 use App\Services\ScenicQuestionService;
@@ -171,5 +172,11 @@ class ScenicController extends Controller
         $options = ScenicService::getInstance()->getSelectableOptions($scenicIds, $keywords, ['id', 'name']);
 
         return $this->success($options);
+    }
+
+    public function hotList()
+    {
+        $list = HotScenicService::getInstance()->getHotScenicList();
+        return $this->success($list);
     }
 }
