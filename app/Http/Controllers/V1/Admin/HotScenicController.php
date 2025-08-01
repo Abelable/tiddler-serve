@@ -42,16 +42,16 @@ class HotScenicController extends Controller
 
     public function edit()
     {
+        /** @var HotScenicInput $input */
+        $input = HotScenicInput::new();
         $id = $this->verifyRequiredId('id');
-        $recommendReason = $this->verifyRequiredString('recommendReason');
-        $interestedUserNumber = $this->verifyRequiredInteger('interestedUserNumber');
 
         $hotScenic = HotScenicService::getInstance()->getHotScenic($id);
         if (is_null($hotScenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前网红打卡地不存在');
         }
 
-        HotScenicService::getInstance()->updateHotScenic($hotScenic, $recommendReason, $interestedUserNumber);
+        HotScenicService::getInstance()->updateHotScenic($hotScenic, $input);
         return $this->success();
     }
 

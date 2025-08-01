@@ -11,17 +11,16 @@ class HotScenicService extends BaseService
     public function createHotScenic(HotScenicInput $input)
     {
         $hotScenic = HotScenicSpot::new();
+        return $this->updateHotScenic($hotScenic, $input);
+    }
+
+    public function updateHotScenic(HotScenicSpot $hotScenic, HotScenicInput $input)
+    {
         $hotScenic->scenic_id = $input->scenicId;
         $hotScenic->scenic_cover = $input->scenicCover;
         $hotScenic->scenic_name = $input->scenicName;
-
-        return $this->updateHotScenic($hotScenic, $input->recommendReason, $input->interestedUserNumber);
-    }
-
-    public function updateHotScenic(HotScenicSpot $hotScenic, $recommendReason, $interestedUserNumber)
-    {
-        $hotScenic->recommend_reason = $recommendReason;
-        $hotScenic->interested_user_number = $interestedUserNumber;
+        $hotScenic->recommend_reason = $input->recommendReason;
+        $hotScenic->interested_user_number = $input->interestedUserNumber;
         $hotScenic->save();
         return $hotScenic;
     }

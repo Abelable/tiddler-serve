@@ -223,7 +223,6 @@ Route::prefix('scenic')->group(function () {
     Route::post('edit', 'ScenicController@edit');
     Route::post('delete', 'ScenicController@delete');
     Route::get('shop_options', 'ScenicController@shopOptions');
-    Route::get('hot_list', 'ScenicController@hotList');
 
     Route::prefix('question')->group(function () {
         Route::get('list', 'ScenicQAController@questionList');
@@ -616,6 +615,11 @@ Route::prefix('banner')->group(function () {
     Route::get('list', 'BannerController@list');
 });
 
+Route::prefix('trip_type')->group(function () {
+    Route::get('hot_scenic_list', 'TripTypeController@hotScenicList');
+    Route::get('lake_trip_list', 'TripTypeController@lakeTripList');
+});
+
 Route::prefix('mall')->group(function () {
     Route::get('product_list', 'MallController@list');
     Route::post('init_product_views', 'MallController@initViews');
@@ -797,6 +801,27 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'BannerController@delete');
     });
 
+    Route::prefix('trip_type')->group(function () {
+        Route::prefix('hot_scenic')->group(function () {
+            Route::post('list', 'HotScenicController@list');
+            Route::get('detail', 'HotScenicController@detail');
+            Route::post('add', 'HotScenicController@add');
+            Route::post('edit', 'HotScenicController@edit');
+            Route::post('edit_interested_number', 'HotScenicController@editInterestedNumber');
+            Route::post('edit_sort', 'HotScenicController@editSort');
+            Route::post('delete', 'HotScenicController@delete');
+        });
+
+        Route::prefix('lake_trip')->group(function () {
+            Route::post('list', 'LakeTripController@list');
+            Route::get('detail', 'LakeTripController@detail');
+            Route::post('add', 'LakeTripController@add');
+            Route::post('edit', 'LakeTripController@edit');
+            Route::post('edit_sort', 'LakeTripController@editSort');
+            Route::post('delete', 'LakeTripController@delete');
+        });
+    });
+
     Route::prefix('merchant')->group(function () {
         Route::post('list', 'MerchantController@list');
         Route::get('detail', 'MerchantController@detail');
@@ -966,16 +991,6 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('reject', 'ScenicTicketController@reject');
             Route::post('delete', 'ScenicTicketController@delete');
         });
-    });
-
-    Route::prefix('hot_scenic')->group(function () {
-        Route::post('list', 'HotScenicController@list');
-        Route::get('detail', 'HotScenicController@detail');
-        Route::post('add', 'HotScenicController@add');
-        Route::post('edit', 'HotScenicController@edit');
-        Route::post('edit_interested_number', 'HotScenicController@editInterestedNumber');
-        Route::post('edit_sort', 'HotScenicController@editSort');
-        Route::post('delete', 'HotScenicController@delete');
     });
 
     Route::prefix('hotel')->group(function () {
