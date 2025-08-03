@@ -820,6 +820,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit_sort', 'LakeTripController@editSort');
             Route::post('delete', 'LakeTripController@delete');
         });
+
+        Route::prefix('lake_cycle')->group(function () {
+            Route::post('list', 'LakeCycleController@list');
+            Route::get('detail', 'LakeCycleController@detail');
+            Route::post('add', 'LakeCycleController@add');
+            Route::post('edit', 'LakeCycleController@edit');
+            Route::post('edit_sort', 'LakeCycleController@editSort');
+            Route::post('delete', 'LakeCycleController@delete');
+        });
     });
 
     Route::prefix('merchant')->group(function () {
