@@ -8,6 +8,7 @@ use App\Services\LakeCycleMediaService;
 use App\Services\LakeCycleService;
 use App\Services\LakeTripService;
 use App\Services\NightTripService;
+use App\Services\StarTripService;
 use App\Utils\Inputs\PageInput;
 
 class TripTypeController extends Controller
@@ -45,6 +46,12 @@ class TripTypeController extends Controller
     public function nightTripList()
     {
         $list = NightTripService::getInstance()->getNightTripList();
+        return $this->success($list);
+    }
+
+    public function startTripList()
+    {
+        $list = StarTripService::getInstance()->getStarTripList();
         return $this->success($list);
     }
 }
