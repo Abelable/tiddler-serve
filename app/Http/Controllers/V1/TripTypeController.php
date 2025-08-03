@@ -4,8 +4,10 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\HotScenicService;
+use App\Services\LakeCycleMediaService;
 use App\Services\LakeCycleService;
 use App\Services\LakeTripService;
+use App\Utils\Inputs\PageInput;
 
 class TripTypeController extends Controller
 {
@@ -29,5 +31,13 @@ class TripTypeController extends Controller
         $routeId = $this->verifyRequiredId('routeId');
         $list = LakeCycleService::getInstance()->getLakeCycleList($routeId);
         return $this->success($list);
+    }
+
+    public function lakeCycleMediaList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $page = LakeCycleMediaService::getInstance()->getPage($input);
+        return $this->successPaginate($page);
     }
 }

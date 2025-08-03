@@ -618,6 +618,8 @@ Route::prefix('banner')->group(function () {
 Route::prefix('trip_type')->group(function () {
     Route::get('hot_scenic_list', 'TripTypeController@hotScenicList');
     Route::get('lake_trip_list', 'TripTypeController@lakeTripList');
+    Route::get('lake_cycle_list', 'TripTypeController@lakeCycleList');
+    Route::get('lake_cycle_media_list', 'TripTypeController@lakeCycleMediaList');
 });
 
 Route::prefix('mall')->group(function () {
@@ -828,6 +830,13 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'LakeCycleController@edit');
             Route::post('edit_sort', 'LakeCycleController@editSort');
             Route::post('delete', 'LakeCycleController@delete');
+
+            Route::prefix('media')->group(function () {
+                Route::post('list', 'LakeCycleController@list');
+                Route::post('add', 'LakeCycleController@add');
+                Route::post('edit_sort', 'LakeCycleController@editSort');
+                Route::post('delete', 'LakeCycleController@delete');
+            });
         });
     });
 
