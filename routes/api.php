@@ -620,6 +620,7 @@ Route::prefix('trip_type')->group(function () {
     Route::get('lake_trip_list', 'TripTypeController@lakeTripList');
     Route::get('lake_cycle_list', 'TripTypeController@lakeCycleList');
     Route::get('lake_cycle_media_list', 'TripTypeController@lakeCycleMediaList');
+    Route::get('night_trip_list', 'TripTypeController@nightTripList');
 });
 
 Route::prefix('mall')->group(function () {
@@ -837,6 +838,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
                 Route::post('edit_sort', 'LakeCycleController@editSort');
                 Route::post('delete', 'LakeCycleController@delete');
             });
+        });
+
+        Route::prefix('night_trip')->group(function () {
+            Route::post('list', 'NightTripController@list');
+            Route::get('detail', 'NightTripController@detail');
+            Route::post('add', 'NightTripController@add');
+            Route::post('edit', 'NightTripController@edit');
+            Route::post('edit_sort', 'NightTripController@editSort');
+            Route::post('delete', 'NightTripController@delete');
         });
     });
 

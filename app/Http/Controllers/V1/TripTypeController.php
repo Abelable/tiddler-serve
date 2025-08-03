@@ -7,6 +7,7 @@ use App\Services\HotScenicService;
 use App\Services\LakeCycleMediaService;
 use App\Services\LakeCycleService;
 use App\Services\LakeTripService;
+use App\Services\NightTripService;
 use App\Utils\Inputs\PageInput;
 
 class TripTypeController extends Controller
@@ -39,5 +40,11 @@ class TripTypeController extends Controller
         $input = PageInput::new();
         $page = LakeCycleMediaService::getInstance()->getPage($input);
         return $this->successPaginate($page);
+    }
+
+    public function nightTripList()
+    {
+        $list = NightTripService::getInstance()->getNightTripList();
+        return $this->success($list);
     }
 }
