@@ -834,10 +834,10 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('delete', 'LakeCycleController@delete');
 
             Route::prefix('media')->group(function () {
-                Route::post('list', 'LakeCycleController@list');
-                Route::post('add', 'LakeCycleController@add');
-                Route::post('edit_sort', 'LakeCycleController@editSort');
-                Route::post('delete', 'LakeCycleController@delete');
+                Route::post('list', 'LakeCycleMediaController@list');
+                Route::post('add', 'LakeCycleMediaController@add');
+                Route::post('edit_sort', 'LakeCycleMediaController@editSort');
+                Route::post('delete', 'LakeCycleMediaController@delete');
             });
         });
 
