@@ -24,23 +24,25 @@ class LakeCycleMediaController extends Controller
 
     public function add()
     {
-        $videoIds = $this->verifyArray('videoIds');
-        $noteIds = $this->verifyArray('noteIds');
+        $mediaType = $this->verifyRequiredInteger('mediaType');
+        $mediaIds = $this->verifyArrayNotEmpty('mediaIds');
 
-        $videoList = ShortVideoService::getInstance()->getListByIds($videoIds);
-        foreach ($videoList as $video) {
-            LakeCycleMediaService::getInstance()
-                ->createLakeCycleMedia(MediaType::VIDEO, $video->id, $video->cover, $video->title);
-        }
-
-        $noteList = TourismNoteService::getInstance()->getListByIds($noteIds);
-        foreach ($noteList as $note) {
-            LakeCycleMediaService::getInstance()->createLakeCycleMedia(
-                MediaType::NOTE,
-                $note->id,
-                json_decode($note->image_list)[0],
-                $note->title
-            );
+        if ($mediaType == MediaType::VIDEO) {
+            $mediaList = ShortVideoService::getInstance()->getListByIds($mediaIds);
+            foreach ($mediaList as $media) {
+                LakeCycleMediaService::getInstance()
+                    ->createLakeCycleMedia(MediaType::VIDEO, $media->id, $media->cover, $media->title);
+            }
+        } else {
+            $mediaList = TourismNoteService::getInstance()->getListByIds($mediaIds);
+            foreach ($mediaList as $media) {
+                LakeCycleMediaService::getInstance()->createLakeCycleMedia(
+                    MediaType::NOTE,
+                    $media->id,
+                    json_decode($media->image_list)[0],
+                    $media->title
+                );
+            }
         }
 
         return $this->success();
