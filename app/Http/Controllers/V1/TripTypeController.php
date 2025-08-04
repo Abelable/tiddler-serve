@@ -88,7 +88,7 @@ class TripTypeController extends Controller
         return $this->success($list);
     }
 
-    public function startTripList()
+    public function starTripList()
     {
         $list = StarTripService::getInstance()->getStarTripList();
         return $this->success($list);
