@@ -65,13 +65,16 @@ class TripTypeController extends Controller
                 ? $videoList->get($lakeCycleMedia->media_id)
                 : $noteList->get($lakeCycleMedia->media_id);
 
-            $media['type'] = $lakeCycleMedia->media_type == MediaType::VIDEO ? MediaType::VIDEO : MediaType::NOTE;
+            if ($lakeCycleMedia->media_type == MediaType::NOTE) {
+                $media['type'] = MediaType::NOTE;
+                $media['imageList'] = json_decode($media->image_list, true);
+            } else {
+                $media['type'] = MediaType::VIDEO;
+            }
 
             $authorInfo = $authorList->get($media['user_id']);
             $media['authorInfo'] = $authorInfo;
             unset($media['user_id']);
-
-            $media['cover'] = $lakeCycleMedia->cover;
 
             return $media;
         });
