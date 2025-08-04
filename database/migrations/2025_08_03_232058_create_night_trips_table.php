@@ -18,9 +18,9 @@ class CreateNightTripsTable extends Migration
             $table->integer('scenic_id')->comment('景点id');
             $table->string('scenic_cover')->comment('景点封面');
             $table->string('scenic_name')->comment('景点名称');
-            $table->string('feature_tips')->comment('特色');
-            $table->string('recommend_tips')->comment('推荐');
-            $table->string('guide_tips')->comment('特色');
+            $table->string('feature_tips')->default('')->comment('特色');
+            $table->string('recommend_tips')->default('')->comment('推荐');
+            $table->string('guide_tips')->default('')->comment('攻略');
             $table->integer('sort')->default(1)->comment('排序');
             $table->timestamps();
             $table->softDeletes();

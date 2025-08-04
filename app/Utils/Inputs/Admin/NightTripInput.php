@@ -19,9 +19,9 @@ class NightTripInput extends BaseInput
             'scenicId' => 'required|integer',
             'scenicCover' => 'required|string',
             'scenicName' => 'required|string',
-            'featureTips' => 'required|string',
-            'recommendTips' => 'required|string',
-            'guideTips' => 'required|string',
+            'featureTips' => 'string',
+            'recommendTips' => 'string',
+            'guideTips' => 'string',
         ];
     }
 }

@@ -11,7 +11,7 @@ namespace App\Models;
  * @property string $scenic_name 景点名称
  * @property string $feature_tips 特色
  * @property string $recommend_tips 推荐
- * @property string $guide_tips 特色
+ * @property string $guide_tips 攻略
  * @property int $sort 排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

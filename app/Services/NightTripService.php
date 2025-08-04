@@ -19,9 +19,9 @@ class NightTripService extends BaseService
         $hotScenic->scenic_id = $input->scenicId;
         $hotScenic->scenic_cover = $input->scenicCover;
         $hotScenic->scenic_name = $input->scenicName;
-        $hotScenic->feature_tips = $input->featureTips;
-        $hotScenic->recommend_tips = $input->recommendTips;
-        $hotScenic->guide_tips = $input->guideTips;
+        $hotScenic->feature_tips = $input->featureTips ?: '';
+        $hotScenic->recommend_tips = $input->recommendTips ?: '';
+        $hotScenic->guide_tips = $input->guideTips ?: '';
         $hotScenic->save();
         return $hotScenic;
     }
