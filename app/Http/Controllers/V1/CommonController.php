@@ -47,9 +47,9 @@ class CommonController extends Controller
         $page = $this->verifyRequiredString('page');
 
         $imageData = WxMpServe::new()->getQrCode($scene, $page);
-        $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
+        $qrCode = 'data:image/png;base64,' . base64_encode($imageData);
 
-        return $this->success($qrcode);
+        return $this->success($qrCode);
 
 //        return response($imageData)
 //            ->header('Content-Type', 'image/png')

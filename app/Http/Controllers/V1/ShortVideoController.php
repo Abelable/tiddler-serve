@@ -307,9 +307,9 @@ class ShortVideoController extends Controller
         $video->save();
 
         $imageData = WxMpServe::new()->getQrCode($scene, $page);
-        $qrcode = 'data:image/png;base64,' . base64_encode($imageData);
+        $qrCode = 'data:image/png;base64,' . base64_encode($imageData);
 
-        return $this->success(['qrcode' => $qrcode, 'shareTimes' => $shareTimes]);
+        return $this->success(['qrCode' => $qrCode, 'shareTimes' => $shareTimes]);
     }
 
     public function toggleLikeStatus()
