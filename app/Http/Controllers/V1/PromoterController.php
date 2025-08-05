@@ -30,7 +30,10 @@ class PromoterController extends Controller
     {
         $todayNewCustomerCount = RelationService::getInstance()->getTodayCountBySuperiorId($this->userId());
 
-        $customerIds = RelationService::getInstance()->getListBySuperiorId($this->userId())->pluck('fan_id')->toArray();
+        $customerIds = RelationService::getInstance()
+            ->getListBySuperiorId($this->userId())
+            ->pluck('user_id')
+            ->toArray();
         $todayOrderingCustomerCount = OrderService::getInstance()->getTodayOrderingUserCountByUserIds($customerIds);
 
         $customerTotalCount = RelationService::getInstance()->getCountBySuperiorId($this->userId());
@@ -45,7 +48,9 @@ class PromoterController extends Controller
     public function todayNewCustomerList()
     {
         $todayNewCustomerIds = RelationService::getInstance()
-            ->getTodayListBySuperiorId($this->userId())->pluck('fan_id')->toArray();
+            ->getTodayListBySuperiorId($this->userId())
+            ->pluck('user_id')
+            ->toArray();
         $customerList = UserService::getInstance()->getListByIds($todayNewCustomerIds);
         $list = $this->handleCustomerList($todayNewCustomerIds, $customerList);
         return $this->success($list);
@@ -54,7 +59,9 @@ class PromoterController extends Controller
     public function todayOrderingCustomerList()
     {
         $totalCustomerIds = RelationService::getInstance()
-            ->getListBySuperiorId($this->userId())->pluck('fan_id')->toArray();
+            ->getListBySuperiorId($this->userId())
+            ->pluck('user_id')
+            ->toArray();
         $todayOrderingCustomerIds = OrderService::getInstance()
             ->getTodayOrderListByUserIds($totalCustomerIds)->pluck('user_id')->toArray();
         $customerList = UserService::getInstance()->getListByIds($todayOrderingCustomerIds);

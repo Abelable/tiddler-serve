@@ -31,9 +31,12 @@ class UserService extends BaseService
         return User::query()->where('mobile', $mobile)->first();
     }
 
-    public function getUserPage(UserPageInput $input, $columns = ['*'])
+    public function getUserPage(UserPageInput $input, $userIds = null, $columns = ['*'])
     {
         $query = User::query();
+        if (!is_null($userIds)) {
+            $query = $query->whereIn('id', $userIds);
+        }
         if (!empty($input->nickname)) {
             $query = $query->where('nickname', 'like', "%$input->nickname%");
         }

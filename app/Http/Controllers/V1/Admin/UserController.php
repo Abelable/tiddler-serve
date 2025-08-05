@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Relation;
+use App\Models\User;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
@@ -17,8 +19,30 @@ class UserController extends Controller
     {
         /** @var UserPageInput $input */
         $input = UserPageInput::new();
-        $list = UserService::getInstance()->getUserPage($input);
-        return $this->successPaginate($list);
+
+        $userIds = null;
+        if (!empty($input->superiorId)) {
+            $userIds = RelationService::getInstance()
+                ->getRelationListBySuperiorIds([$input->superiorId])
+                ->pluck('user_id')
+                ->toArray();
+        }
+
+        $page = UserService::getInstance()->getUserPage($input, $userIds);
+        $userList = collect($page->items());
+
+        $userIds = $userList->pluck('id')->toArray();
+        $relationList = RelationService::getInstance()->getListByFanIds($userIds)->keyBy('user_id');
+
+        $list = $userList->map(function (User $user) use ($relationList) {
+            /** @var Relation $relation */
+            $relation = $relationList->get($user->id);
+            $user['superiorId'] = $relation ? $relation->superior_id : 0;
+
+            return $user;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()

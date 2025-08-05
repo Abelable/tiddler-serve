@@ -262,11 +262,20 @@ class CommissionController extends Controller
     {
         $timeType = $this->verifyRequiredInteger('timeType');
 
-        $customerIds = RelationService::getInstance()->getListBySuperiorId($this->userId())->pluck('fan_id')->toArray();
-        $promoterIds = PromoterService::getInstance()->getPromoterListByUserIds($customerIds)->pluck('user_id')->toArray();
+        $customerIds = RelationService::getInstance()
+            ->getListBySuperiorId($this->userId())
+            ->pluck('user_id')
+            ->toArray();
+        $promoterIds = PromoterService::getInstance()
+            ->getPromoterListByUserIds($customerIds)
+            ->pluck('user_id')
+            ->toArray();
 
         $query = CommissionService::getInstance()->getUserCommissionQueryByTimeType($promoterIds, $timeType);
-        $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
+        $orderCount = (clone $query)
+            ->whereIn('status', [1, 2, 3, 4])
+            ->distinct('order_id')
+            ->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
 
         $pendingAmount = 0;
