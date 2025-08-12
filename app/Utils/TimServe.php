@@ -77,7 +77,6 @@ class TimServe
         }
     }
 
-
     public function getLoginInfo($userId)
     {
         $userSig = $this->api->generate_user_sig($userId, 31536000);
