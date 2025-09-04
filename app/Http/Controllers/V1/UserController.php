@@ -69,32 +69,36 @@ class UserController extends Controller
         $user['authInfoId'] = $user->authInfo->id ?? 0;
 
         $scenicShopId = $user->scenicShop->id ?? 0;
-        $user['scenicShopId'] = $scenicShopId;
         if ($scenicShopId != 0) {
+            $user['scenicShopId'] = $scenicShopId;
+
             $scenicShopManagerList = ScenicShopManagerService::getInstance()
                 ->getManagerList($scenicShopId, ['id', 'user_id', 'role_id']);
             $user['scenicShopManagerList'] = $scenicShopManagerList;
         }
 
         $hotelShopId = $user->hotelShop->id ?? 0;
-        $user['hotelShopId'] = $hotelShopId;
         if ($hotelShopId != 0) {
+            $user['hotelShopId'] = $hotelShopId;
+
             $hotelShopManagerList = HotelShopManagerService::getInstance()
                 ->getManagerList($hotelShopId, ['id', 'user_id', 'role_id']);
             $user['hotelShopManagerList'] = $hotelShopManagerList;
         }
 
         $cateringShopId = $user->cateringShop->id ?? 0;
-        $user['cateringShopId'] = $cateringShopId;
         if ($cateringShopId != 0) {
+            $user['cateringShopId'] = $cateringShopId;
+
             $cateringShopManagerList = CateringShopManagerService::getInstance()
                 ->getManagerList($cateringShopId, ['id', 'user_id', 'role_id']);
             $user['cateringShopManagerList'] = $cateringShopManagerList;
         }
 
         $shopId = $user->shop->id ?? 0;
-        $user['shopId'] = $shopId;
         if ($shopId != 0) {
+            $user['shopId'] = $shopId;
+
             $shopManagerList = ShopManagerService::getInstance()
                 ->getManagerList($shopId, ['id', 'user_id', 'role_id']);
             $user['shopManagerList'] = $shopManagerList;
