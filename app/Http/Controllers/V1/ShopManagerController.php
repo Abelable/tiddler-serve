@@ -56,7 +56,12 @@ class ShopManagerController extends Controller
         $userId = $this->verifyRequiredId('userId');
         $roleId = $this->verifyRequiredId('roleId');
 
-        ShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+        $manager = ShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        if (is_null($manager)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
+        }
+
+        ShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
 
         return $this->success();
     }
