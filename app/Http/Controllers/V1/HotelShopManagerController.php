@@ -62,8 +62,13 @@ class HotelShopManagerController extends Controller
         $roleId = $this->verifyRequiredId('roleId');
         $hotelIds = $this->verifyArray('hotelIds');
 
+        $manager = HotelShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        if (!is_null($manager)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
+        }
+
         DB::transaction(function () use ($shopId, $userId, $roleId, $hotelIds) {
-            $manager = HotelShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+            $manager = HotelShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
             foreach ($hotelIds as $hotelId) {
                 HotelManagerService::getInstance()->createManager($hotelId, $manager->id);
             }

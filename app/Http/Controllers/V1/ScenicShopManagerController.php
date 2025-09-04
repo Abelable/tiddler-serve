@@ -62,8 +62,13 @@ class ScenicShopManagerController extends Controller
         $roleId = $this->verifyRequiredId('roleId');
         $scenicIds = $this->verifyArray('scenicIds');
 
+        $manager = ScenicShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        if (!is_null($manager)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
+        }
+
         DB::transaction(function () use ($shopId, $userId, $roleId, $scenicIds) {
-            $manager = ScenicShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+            $manager = ScenicShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
             foreach ($scenicIds as $scenicId) {
                 ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
             }

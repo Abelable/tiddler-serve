@@ -19,6 +19,8 @@ use App\Models\BaseModel;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Catering\CateringShopManager[] $managerList
+ * @property-read int|null $manager_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringShop onlyTrashed()
@@ -41,4 +43,8 @@ use App\Models\BaseModel;
  */
 class CateringShop extends BaseModel
 {
+    public function managerList()
+    {
+        return $this->hasMany(CateringShopManager::class, 'shop_id');
+    }
 }

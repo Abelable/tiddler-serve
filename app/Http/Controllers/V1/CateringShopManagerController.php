@@ -62,8 +62,13 @@ class CateringShopManagerController extends Controller
         $roleId = $this->verifyRequiredId('roleId');
         $restaurantIds = $this->verifyArray('restaurantIds');
 
+        $manager = CateringShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        if (!is_null($manager)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
+        }
+
         DB::transaction(function () use ($shopId, $userId, $roleId, $restaurantIds) {
-            $manager = CateringShopManagerService::getInstance()->createManager($userId, $roleId, $shopId);
+            $manager = CateringShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
             foreach ($restaurantIds as $restaurantId) {
                 RestaurantManagerService::getInstance()->createManager($restaurantId, $manager->id);
             }

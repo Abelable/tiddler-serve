@@ -17,6 +17,8 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ScenicShopManager[] $managerList
+ * @property-read int|null $manager_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicShop onlyTrashed()
@@ -39,4 +41,8 @@ namespace App\Models;
  */
 class ScenicShop extends BaseModel
 {
+    public function managerList()
+    {
+        return $this->hasMany(ScenicShopManager::class, 'shop_id');
+    }
 }

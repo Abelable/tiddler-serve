@@ -38,4 +38,12 @@ class CateringShopManagerService extends BaseService
     {
         return CateringShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
     }
+
+    public function getManagerByUserId($shopId, $userId, $columns = ['*'])
+    {
+        return CateringShopManager::query()
+            ->where('shop_id', $shopId)
+            ->where('user_id', $userId)
+            ->first($columns);
+    }
 }

@@ -37,4 +37,12 @@ class HotelShopManagerService extends BaseService
     {
         return HotelShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
     }
+
+    public function getManagerByUserId($shopId, $userId, $columns = ['*'])
+    {
+        return HotelShopManager::query()
+            ->where('shop_id', $shopId)
+            ->where('user_id', $userId)
+            ->first($columns);
+    }
 }

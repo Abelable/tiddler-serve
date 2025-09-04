@@ -17,6 +17,8 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\HotelShopManager[] $managerList
+ * @property-read int|null $manager_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelShop onlyTrashed()
@@ -39,4 +41,8 @@ namespace App\Models;
  */
 class HotelShop extends BaseModel
 {
+    public function managerList()
+    {
+        return $this->hasMany(HotelShopManager::class, 'shop_id');
+    }
 }
