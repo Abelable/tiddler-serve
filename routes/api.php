@@ -36,6 +36,7 @@ Route::prefix('user')->group(function () {
     Route::get('tim_login_info', 'UserController@timLoginInfo');
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
+    Route::get('options', 'UserController@options');
     Route::get('add_temp_user', 'UserController@addTempUser');
     Route::get('supply_user_mobile', 'UserController@supplyUserMobile');
 });

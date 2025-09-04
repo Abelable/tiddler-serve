@@ -14,7 +14,7 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['userInfo', 'authorInfo', 'search', 'addTempUser'];
+    protected $except = ['userInfo', 'authorInfo', 'search', 'options', 'addTempUser'];
 
     public function myInfo()
     {
@@ -164,6 +164,13 @@ class UserController extends Controller
         });
 
         return $this->success($this->paginate($page, $list));
+    }
+
+    public function options()
+    {
+        $nickname = $this->verifyString('nickname');
+        $options = UserService::getInstance()->getOptions($nickname);
+        return $this->success($options);
     }
 
     public function addTempUser()

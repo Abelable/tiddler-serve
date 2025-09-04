@@ -91,6 +91,15 @@ class UserService extends BaseService
         return User::search($keywords)->get();
     }
 
+    public function getOptions($nickname, $columns = ['*'])
+    {
+        $query = User::query();
+        if (!empty($nickname)) {
+            $query = $query->where('nickname', 'like', "%$nickname%");
+        }
+        return $query->get($columns);
+    }
+
     public function searchUserIds($keywords)
     {
         $list = $this->searchList($keywords);
