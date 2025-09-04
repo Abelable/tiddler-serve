@@ -5,7 +5,11 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\FanService;
+use App\Services\HotelShopManagerService;
+use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\Media\MediaService;
+use App\Services\ScenicShopManagerService;
+use App\Services\ShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\SearchPageInput;
@@ -64,14 +68,37 @@ class UserController extends Controller
 
         $user['authInfoId'] = $user->authInfo->id ?? 0;
 
-        $user['scenicShopId'] = $user->scenicShop->id ?? 0;
-        $user['scenicShopManagerList'] = $user->scenicShopManagerList;
-        $user['hotelShopId'] = $user->hotelShop->id ?? 0;
-        $user['hotelShopManagerList'] = $user->hotelShopManagerList;
-        $user['cateringShopId'] = $user->cateringShop->id ?? 0;
-        $user['cateringShopManagerList'] = $user->cateringShopManagerList;
-        $user['shopId'] = $user->shop->id ?? 0;
-        $user['shopManagerList'] = $user->shopManagerList;
+        $scenicShopId = $user->scenicShop->id ?? 0;
+        $user['scenicShopId'] = $scenicShopId;
+        if ($scenicShopId != 0) {
+            $scenicShopManagerList = ScenicShopManagerService::getInstance()
+                ->getManagerList($scenicShopId, ['id', 'user_id', 'role_id']);
+            $user['scenicShopManagerList'] = $scenicShopManagerList;
+        }
+
+        $hotelShopId = $user->hotelShop->id ?? 0;
+        $user['hotelShopId'] = $hotelShopId;
+        if ($hotelShopId != 0) {
+            $hotelShopManagerList = HotelShopManagerService::getInstance()
+                ->getManagerList($hotelShopId, ['id', 'user_id', 'role_id']);
+            $user['hotelShopManagerList'] = $hotelShopManagerList;
+        }
+
+        $cateringShopId = $user->cateringShop->id ?? 0;
+        $user['cateringShopId'] = $cateringShopId;
+        if ($cateringShopId != 0) {
+            $cateringShopManagerList = CateringShopManagerService::getInstance()
+                ->getManagerList($cateringShopId, ['id', 'user_id', 'role_id']);
+            $user['cateringShopManagerList'] = $cateringShopManagerList;
+        }
+
+        $shopId = $user->shop->id ?? 0;
+        $user['shopId'] = $shopId;
+        if ($shopId != 0) {
+            $shopManagerList = ShopManagerService::getInstance()
+                ->getManagerList($shopId, ['id', 'user_id', 'role_id']);
+            $user['shopManagerList'] = $shopManagerList;
+        }
 
         unset($user->openid);
         unset($user->authInfo);
