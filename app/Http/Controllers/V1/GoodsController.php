@@ -15,6 +15,7 @@ use App\Services\GoodsService;
 use App\Services\Mall\Goods\CartGoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\ProductHistoryService;
+use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
 use App\Utils\CodeResponse;
@@ -135,13 +136,18 @@ class GoodsController extends Controller
         }
 
         if ($goods->shop_id != 0) {
-            $shopInfo = ShopService::getInstance()->getShopById($goods->shop_id, ['id', 'type', 'logo', 'name']);
+            $shopInfo = ShopService::getInstance()
+                ->getShopById($goods->shop_id, ['id', 'user_id', 'type', 'logo', 'name']);
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
-            $shopInfo['manager_list'] = $shopInfo->managerList;
+
+            $shopInfo['manager_list'] = ShopManagerService::getInstance()
+                ->getManagerList($shopInfo->id, ['id', 'user_id', 'role_id']);
+
             $shopInfo['goods_list'] = GoodsService::getInstance()
                 ->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price', 'sales_volume']);
+
             $goods['shop_info'] = $shopInfo;
         }
         unset($goods->shop_id);
