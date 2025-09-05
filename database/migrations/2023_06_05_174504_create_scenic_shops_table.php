@@ -22,6 +22,9 @@ class CreateScenicShopsTable extends Migration
             $table->integer('merchant_id')->comment('商家id');
             $table->integer('type')->comment('店铺类型：1-景区官方，2-旅行社，3-平台自营');
             $table->float('deposit')->comment('店铺保证金');
+            $table->string('owner_avatar')->default('')->comment('店主头像');
+            $table->string('owner_name')->default('')->comment('店主姓名');
+            $table->string('mobile')->default('')->comment('联系方式');
             $table->string('bg')->default('')->comment('店铺背景图');
             $table->string('logo')->comment('店铺logo');
             $table->string('name')->comment('店铺名称');

@@ -25,6 +25,7 @@ class CreateShopsTable extends Migration
             $table->string('logo')->comment('店铺logo');
             $table->string('name')->comment('店铺名称');
             $table->string('brief')->default('')->comment('店铺简称');
+            $table->string('owner_avatar')->default('')->comment('店主头像');
             $table->string('owner_name')->default('')->comment('店主姓名');
             $table->string('mobile')->default('')->comment('联系方式');
             $table->string('address_detail')->default('')->comment('店铺地址详情');

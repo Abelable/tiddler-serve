@@ -11,6 +11,9 @@ namespace App\Models;
  * @property int $merchant_id 商家id
  * @property int $type 店铺类型：1-景区官方，2-旅行社，3-平台自营
  * @property float $deposit 店铺保证金
+ * @property string $owner_avatar 店主头像
+ * @property string $owner_name 店主姓名
+ * @property string $mobile 联系方式
  * @property string $bg 店铺背景图
  * @property string $logo 店铺logo
  * @property string $name 店铺名称
@@ -30,7 +33,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereMerchantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereOwnerAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereOwnerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicShop whereUpdatedAt($value)

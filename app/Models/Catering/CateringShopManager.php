@@ -10,6 +10,8 @@ use App\Models\BaseModel;
  * @property int $id
  * @property int $shop_id 店铺id
  * @property int $user_id 用户id
+ * @property string $avatar 用户头像
+ * @property string $nickname 用户昵称
  * @property int $role_id 管理员角色id：1-超级管理员，2-运营，3-核销员
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -18,9 +20,11 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager newQuery()
  * @method static \Illuminate\Database\Query\Builder|CateringShopManager onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager query()
+ * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShopManager whereUpdatedAt($value)

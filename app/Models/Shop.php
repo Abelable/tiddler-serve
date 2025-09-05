@@ -16,6 +16,7 @@ namespace App\Models;
  * @property string $logo 店铺logo
  * @property string $name 店铺名称
  * @property string $brief 店铺简称
+ * @property string $owner_avatar 店主头像
  * @property string $owner_name 店主姓名
  * @property string $mobile 联系方式
  * @property string $address_detail 店铺地址详情
@@ -46,6 +47,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereOpenTimeList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Shop whereOwnerAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereOwnerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Shop whereType($value)

@@ -18,6 +18,7 @@ use App\Services\ProductHistoryService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\GoodsPageInput;
@@ -142,13 +143,17 @@ class GoodsController extends Controller
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
 
-            $shopInfo['manager_list'] = ShopManagerService::getInstance()
+            $shopInfo['ownerInfo'] = UserService::getInstance()
+                ->getUserById($shopInfo->user_id, ['id', 'nickname', 'avatar']);
+            unset($shopInfo->user_id);
+
+            $shopInfo['managerList'] = ShopManagerService::getInstance()
                 ->getManagerList($shopInfo->id, ['id', 'user_id', 'role_id']);
 
-            $shopInfo['goods_list'] = GoodsService::getInstance()
+            $shopInfo['goodsList'] = GoodsService::getInstance()
                 ->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price', 'sales_volume']);
 
-            $goods['shop_info'] = $shopInfo;
+            $goods['shopInfo'] = $shopInfo;
         }
         unset($goods->shop_id);
 

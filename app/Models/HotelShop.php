@@ -11,6 +11,9 @@ namespace App\Models;
  * @property int $merchant_id 服务商id
  * @property int $type 店铺类型：1-酒店官方，2-专营店，3-平台自营
  * @property float $deposit 店铺保证金
+ * @property string $owner_avatar 店主头像
+ * @property string $owner_name 店主姓名
+ * @property string $mobile 联系方式
  * @property string $bg 店铺背景图
  * @property string $logo 店铺logo
  * @property string $name 店铺名称
@@ -30,7 +33,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereMerchantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereOwnerAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereOwnerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShop whereUpdatedAt($value)

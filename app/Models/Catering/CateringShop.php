@@ -13,6 +13,9 @@ use App\Models\BaseModel;
  * @property int $merchant_id 服务商id
  * @property int $type 店铺类型：1-餐饮官方，2-专营店，3-平台自营
  * @property float $deposit 店铺保证金
+ * @property string $owner_avatar 店主头像
+ * @property string $owner_name 店主姓名
+ * @property string $mobile 联系方式
  * @property string $bg 店铺背景图
  * @property string $logo 店铺logo
  * @property string $name 店铺名称
@@ -32,7 +35,10 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereMerchantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereOwnerAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereOwnerName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereUpdatedAt($value)

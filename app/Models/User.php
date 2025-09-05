@@ -14,6 +14,58 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Scout\Searchable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * App\Models\User
+ *
+ * @property int $id
+ * @property string $avatar 用户头像图片
+ * @property string $nickname 用户昵称或网络名称
+ * @property string $mobile 用户手机号码
+ * @property string $openid 小程序openid
+ * @property int $gender 性别：0-未知，1-男，2-女
+ * @property string $bg 背景图
+ * @property string $birthday 生日
+ * @property string $constellation 星座
+ * @property string $career 职业
+ * @property string $signature 签名
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\AuthInfo|null $authInfo
+ * @property-read CateringMerchant|null $cateringMerchant
+ * @property-read CateringShop|null $cateringShop
+ * @property-read \App\Models\HotelMerchant|null $hotelMerchant
+ * @property-read \App\Models\HotelShop|null $hotelShop
+ * @property-read \App\Models\Merchant|null $merchant
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \App\Models\Promoter|null $promoterInfo
+ * @property-read \App\Models\ScenicMerchant|null $scenicMerchant
+ * @property-read \App\Models\ScenicShop|null $scenicShop
+ * @property-read \App\Models\Shop|null $shop
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
+ * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
+ * @method static \Illuminate\Database\Query\Builder|User onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatar($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBg($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereBirthday($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCareer($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereConstellation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereOpenid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereSignature($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|User withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
+ * @mixin \Eloquent
+ */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable, HasFactory, Notifiable, Searchable;
