@@ -138,17 +138,13 @@ class GoodsController extends Controller
 
         if ($goods->shop_id != 0) {
             $shopInfo = ShopService::getInstance()
-                ->getShopById($goods->shop_id, ['id', 'user_id', 'type', 'logo', 'name']);
+                ->getShopById($goods->shop_id, ['id', 'user_id', 'type', 'logo', 'name', 'owner_avatar', 'owner_name']);
             if (is_null($shopInfo)) {
                 return $this->fail(CodeResponse::NOT_FOUND, '店铺已下架，当前商品不存在');
             }
 
-            $shopInfo['ownerInfo'] = UserService::getInstance()
-                ->getUserById($shopInfo->user_id, ['id', 'nickname', 'avatar']);
-            unset($shopInfo->user_id);
-
             $shopInfo['managerList'] = ShopManagerService::getInstance()
-                ->getManagerList($shopInfo->id, ['id', 'user_id', 'role_id']);
+                ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
 
             $shopInfo['goodsList'] = GoodsService::getInstance()
                 ->getShopTopList($id, $goods->shop_id, 6, ['id', 'cover', 'name', 'price', 'sales_volume']);

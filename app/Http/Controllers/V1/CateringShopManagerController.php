@@ -9,6 +9,7 @@ use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\ManagerInput;
 use Illuminate\Support\Facades\DB;
 
 class CateringShopManagerController extends Controller
@@ -57,18 +58,17 @@ class CateringShopManagerController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
-        $roleId = $this->verifyRequiredId('roleId');
+        /** @var ManagerInput $input */
+        $input = ManagerInput::new();
         $restaurantIds = $this->verifyArray('restaurantIds');
 
-        $manager = CateringShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        $manager = CateringShopManagerService::getInstance()->getManagerByUserId($input->shopId, $input->userId);
         if (!is_null($manager)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($shopId, $userId, $roleId, $restaurantIds) {
-            $manager = CateringShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
+        DB::transaction(function () use ($input, $restaurantIds) {
+            $manager = CateringShopManagerService::getInstance()->createManager($input);
             foreach ($restaurantIds as $restaurantId) {
                 RestaurantManagerService::getInstance()->createManager($restaurantId, $manager->id);
             }

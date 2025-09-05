@@ -9,6 +9,7 @@ use App\Services\HotelManagerService;
 use App\Services\HotelShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\ManagerInput;
 use Illuminate\Support\Facades\DB;
 
 class HotelShopManagerController extends Controller
@@ -57,18 +58,17 @@ class HotelShopManagerController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
-        $roleId = $this->verifyRequiredId('roleId');
+        /** @var ManagerInput $input */
+        $input = ManagerInput::new();
         $hotelIds = $this->verifyArray('hotelIds');
 
-        $manager = HotelShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        $manager = HotelShopManagerService::getInstance()->getManagerByUserId($input->shopId, $input->userId);
         if (!is_null($manager)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($shopId, $userId, $roleId, $hotelIds) {
-            $manager = HotelShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
+        DB::transaction(function () use ($input, $hotelIds) {
+            $manager = HotelShopManagerService::getInstance()->createManager($input);
             foreach ($hotelIds as $hotelId) {
                 HotelManagerService::getInstance()->createManager($hotelId, $manager->id);
             }

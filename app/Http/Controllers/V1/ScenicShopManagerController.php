@@ -9,6 +9,7 @@ use App\Services\ScenicManagerService;
 use App\Services\ScenicShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\ManagerInput;
 use Illuminate\Support\Facades\DB;
 
 class ScenicShopManagerController extends Controller
@@ -57,18 +58,17 @@ class ScenicShopManagerController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
-        $roleId = $this->verifyRequiredId('roleId');
+        /** @var ManagerInput $input */
+        $input = ManagerInput::new();
         $scenicIds = $this->verifyArray('scenicIds');
 
-        $manager = ScenicShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        $manager = ScenicShopManagerService::getInstance()->getManagerByUserId($input->shopId, $input->userId);
         if (!is_null($manager)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($shopId, $userId, $roleId, $scenicIds) {
-            $manager = ScenicShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
+        DB::transaction(function () use ($input, $scenicIds) {
+            $manager = ScenicShopManagerService::getInstance()->createManager($input);
             foreach ($scenicIds as $scenicId) {
                 ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
             }

@@ -3,16 +3,19 @@
 namespace App\Services;
 
 use App\Models\ScenicShopManager;
+use App\Utils\Inputs\ManagerInput;
 
 class ScenicShopManagerService extends BaseService
 {
-    public function createManager($shopId, $userId, $roleId)
+    public function createManager(ManagerInput $input)
     {
         $manager = ScenicShopManager::new();
-        $manager->shop_id = $shopId;
-        $manager->user_id = $userId;
+        $manager->shop_id = $input->shopId;
+        $manager->user_id = $input->userId;
+        $manager->avatar = $input->avatar;
+        $manager->nickname = $input->nickname;
 
-        return $this->updateManager($manager, $roleId);
+        return $this->updateManager($manager, $input->roleId);
     }
 
     public function updateManager(ScenicShopManager $manager, $roleId)

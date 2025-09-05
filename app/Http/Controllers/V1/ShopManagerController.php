@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\ShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\ManagerInput;
 
 class ShopManagerController extends Controller
 {
@@ -52,16 +53,15 @@ class ShopManagerController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $userId = $this->verifyRequiredId('userId');
-        $roleId = $this->verifyRequiredId('roleId');
+        /** @var ManagerInput $input */
+        $input = ManagerInput::new();
 
-        $manager = ShopManagerService::getInstance()->getManagerByUserId($shopId, $userId);
+        $manager = ShopManagerService::getInstance()->getManagerByUserId($input->shopId, $input->userId);
         if (!is_null($manager)) {
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        ShopManagerService::getInstance()->createManager($shopId, $userId, $roleId);
+        ShopManagerService::getInstance()->createManager($input);
 
         return $this->success();
     }
