@@ -43,7 +43,7 @@ class HotelRoomController extends Controller
             ->getShopListByIds($shopIds, ['id', 'user_id', 'name', 'type', 'owner_avatar', 'owner_name'])
             ->keyBy('id');
         $shopManagerListGroup = HotelShopManagerService::getInstance()
-            ->getListByShopIds($shopIds, ['id', 'user_id', 'avatar', 'nickname', 'role_id'])
+            ->getListByShopIds($shopIds, ['id', 'shop_id', 'user_id', 'avatar', 'nickname', 'role_id'])
             ->groupBy('shop_id');
 
         $roomList = $roomList->map(function (HotelRoom $room) use ($shopList, $shopManagerListGroup) {

@@ -37,7 +37,7 @@ class ScenicTicketController extends Controller
             ->getShopListByIds($shopIds, ['id', 'user_id', 'name', 'type', 'owner_avatar', 'owner_name'])
             ->keyBy('id');
         $shopManagerListGroup = ScenicShopManagerService::getInstance()
-            ->getListByShopIds($shopIds, ['id', 'user_id', 'avatar', 'nickname', 'role_id'])
+            ->getListByShopIds($shopIds, ['id', 'shop_id', 'user_id', 'avatar', 'nickname', 'role_id'])
             ->groupBy('shop_id');
 
         $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($scenic, $shopList, $shopManagerListGroup) {
@@ -49,7 +49,7 @@ class ScenicTicketController extends Controller
             $ticket['shopInfo'] = $shop;
 
             $managerList = $shopManagerListGroup->get($ticket->shop_id);
-            $ticket['managerList'] = $managerList;
+            $ticket['managerList'] = $managerList ?: [];
 
             unset($ticket->shop_id);
             unset($ticket->status);
