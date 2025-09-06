@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicShop;
 use App\Models\ScenicTicket;
+use App\Services\ScenicService;
+use App\Services\ScenicShopManagerService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
@@ -25,6 +26,7 @@ class ScenicTicketController extends Controller
     public function list()
     {
         $scenicId = $this->verifyRequiredId('scenicId');
+        $scenic = ScenicService::getInstance()->getScenicById($scenicId);
 
         $ticketIds = TicketScenicService::getInstance()
             ->getListByScenicId($scenicId)->pluck('ticket_id')->toArray();
@@ -32,12 +34,22 @@ class ScenicTicketController extends Controller
 
         $shopIds = $ticketList->pluck('shop_id')->toArray();
         $shopList = ScenicShopService::getInstance()
-            ->getShopListByIds($shopIds, ['id', 'name', 'type'])->keyBy('id');
+            ->getShopListByIds($shopIds, ['id', 'user_id', 'name', 'type', 'owner_avatar', 'owner_name'])
+            ->keyBy('id');
+        $shopManagerListGroup = ScenicShopManagerService::getInstance()
+            ->getListByShopIds($shopIds, ['id', 'user_id', 'avatar', 'nickname', 'role_id'])
+            ->groupBy('shop_id');
 
-        $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($shopList) {
-            /** @var ScenicShop $shop */
+        $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($scenic, $shopList, $shopManagerListGroup) {
+            $ticket['scenicId'] = $scenic->id;
+            $ticket['scenicCover'] = $scenic->image_list[0];
+            $ticket['scenicName'] = $scenic->name;
+
             $shop = $shopList->get($ticket->shop_id);
             $ticket['shopInfo'] = $shop;
+
+            $managerList = $shopManagerListGroup->get($ticket->shop_id);
+            $ticket['managerList'] = $managerList;
 
             unset($ticket->shop_id);
             unset($ticket->status);

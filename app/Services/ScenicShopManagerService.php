@@ -31,6 +31,11 @@ class ScenicShopManagerService extends BaseService
         return ScenicShopManager::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getListByShopIds(array $shopIds, $columns = ['*'])
+    {
+        return ScenicShopManager::query()->whereIn('shop_id', $shopIds)->get($columns);
+    }
+
     public function getListByIds(array $ids, $columns = ['*'])
     {
         return ScenicShopManager::query()->whereIn('id', $ids)->get($columns);
