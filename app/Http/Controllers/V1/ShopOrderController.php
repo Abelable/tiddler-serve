@@ -11,6 +11,7 @@ use App\Services\OrderService;
 use App\Services\OrderVerifyService;
 use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;
 use App\Utils\Inputs\PageInput;
@@ -89,12 +90,22 @@ class ShopOrderController extends Controller
         $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
         $groupedGoodsList = OrderGoodsService::getInstance()
             ->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
-        return $orderList->map(function (Order $order) use ($groupedGoodsList) {
+
+        $userIds = $orderList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
+        return $orderList->map(function (Order $order) use ($groupedGoodsList, $userList) {
             $goodsList = $groupedGoodsList->get($order->id);
+
+            $userInfo = $userList->get($order->user_id);
+
             return [
                 'id' => $order->id,
                 'status' => $order->status,
                 'statusDesc' => OrderStatus::TEXT_MAP[$order->status],
+                'userInfo' => $userInfo,
                 'goodsList' => $goodsList,
                 'payTime' => $order->pay_time,
                 'deduction_balance' => $order->deduction_balance,
