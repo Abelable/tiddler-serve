@@ -31,6 +31,11 @@ class HotelShopManagerService extends BaseService
         return HotelShopManager::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getListByShopIds(array $shopIds, $columns = ['*'])
+    {
+        return HotelShopManager::query()->whereIn('shop_id', $shopIds)->get($columns);
+    }
+
     public function getListByIds(array $ids, $columns = ['*'])
     {
         return HotelShopManager::query()->whereIn('id', $ids)->get($columns);
