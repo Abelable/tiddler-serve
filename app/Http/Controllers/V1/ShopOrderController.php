@@ -86,20 +86,19 @@ class ShopOrderController extends Controller
 
     private function handleOrderList($orderList)
     {
-        $orderIds = $orderList->pluck('id')->toArray();
-        $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
-        $groupedGoodsList = OrderGoodsService::getInstance()
-            ->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
-
         $userIds = $orderList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()
             ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
             ->keyBy('id');
 
-        return $orderList->map(function (Order $order) use ($groupedGoodsList, $userList) {
-            $goodsList = $groupedGoodsList->get($order->id);
+        $orderIds = $orderList->pluck('id')->toArray();
+        $goodsListColumns = ['order_id', 'goods_id', 'cover', 'name', 'selected_sku_name', 'price', 'number'];
+        $groupedGoodsList = OrderGoodsService::getInstance()
+            ->getListByOrderIds($orderIds, $goodsListColumns)->groupBy('order_id');
 
+        return $orderList->map(function (Order $order) use ($groupedGoodsList, $userList) {
             $userInfo = $userList->get($order->user_id);
+            $goodsList = $groupedGoodsList->get($order->id);
 
             return [
                 'id' => $order->id,
@@ -154,6 +153,10 @@ class ShopOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
 
         $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
         $order['goods_list'] = $goodsList;

@@ -16,6 +16,7 @@ use App\Services\RestaurantService;
 use App\Services\SetMealOrderService;
 use App\Services\SetMealService;
 use App\Services\SetMealVerifyService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\PageInput;
@@ -47,7 +48,7 @@ class ShopSetMealOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = SetMealOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $list = $this->handleOrderList($page);
+        $list = $this->handleOrderList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }
@@ -88,12 +89,19 @@ class ShopSetMealOrderController extends Controller
         return $statusList;
     }
 
-    private function handleOrderList($page)
+    private function handleOrderList($orderList)
     {
-        $orderList = collect($page->items());
+        $userIds = $orderList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
         $orderIds = $orderList->pluck('id')->toArray();
         $setMealList = OrderSetMealService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
-        return $orderList->map(function (SetMealOrder $order) use ($setMealList) {
+
+        return $orderList->map(function (SetMealOrder $order) use ($userList, $setMealList) {
+            $userInfo = $userList->get($order->user_id);
+
             /** @var OrderSetMeal $setMeal */
             $setMeal = $setMealList->get($order->id);
             $setMeal->package_details = json_decode($setMeal->package_details);
@@ -104,6 +112,7 @@ class ShopSetMealOrderController extends Controller
                 'id' => $order->id,
                 'status' => $order->status,
                 'statusDesc' => SetMealOrderStatus::TEXT_MAP[$order->status],
+                'userInfo' => $userInfo,
                 'setMealInfo' => $setMeal,
                 'totalPrice' => $order->total_price,
                 'deduction_balance' => $order->deduction_balance,
@@ -121,6 +130,7 @@ class ShopSetMealOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $columns = [
             'id',
+            'user_id',
             'order_sn',
             'status',
             'consignee',
@@ -134,10 +144,15 @@ class ShopSetMealOrderController extends Controller
             'created_at',
             'updated_at',
         ];
+
         $order = SetMealOrderService::getInstance()->getShopOrder($shopId, $orderId, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
 
         $setMeal = OrderSetMealService::getInstance()->getSetMealByOrderId($order->id);
         unset($setMeal->id);

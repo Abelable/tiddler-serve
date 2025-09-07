@@ -10,6 +10,7 @@ use App\Services\HotelOrderService;
 use App\Services\HotelOrderRoomService;
 use App\Services\HotelOrderVerifyService;
 use App\Services\HotelShopManagerService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderStatus;
 use App\Utils\Inputs\PageInput;
@@ -82,12 +83,19 @@ class HotelShopOrderController extends Controller
 
     private function handleOrderList($orderList)
     {
+        $userIds = $orderList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
         $orderIds = $orderList->pluck('id')->toArray();
         $roomList = HotelOrderRoomService::getInstance()
             ->getListByOrderIds($orderIds)
             ->keyBy('order_id');
 
-        return $orderList->map(function (HotelOrder $order) use ($roomList) {
+        return $orderList->map(function (HotelOrder $order) use ($userList, $roomList) {
+            $userInfo = $userList->get($order->user_id);
+
             /** @var HotelOrderRoom $room */
             $room = $roomList->get($order->id);
             $room->image_list = json_decode($room->image_list);
@@ -98,6 +106,7 @@ class HotelShopOrderController extends Controller
                 'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => HotelOrderStatus::TEXT_MAP[$order->status],
+                'userInfo' => $userInfo,
                 'roomInfo' => $room,
                 'totalPrice' => $order->total_price,
                 'deduction_balance' => $order->deduction_balance,
@@ -116,6 +125,7 @@ class HotelShopOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $columns = [
             'id',
+            'user_id',
             'order_sn',
             'status',
             'consignee',
@@ -133,6 +143,10 @@ class HotelShopOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
 
         $room = HotelOrderRoomService::getInstance()->getRoomByOrderId($order->id);
         $room->image_list = json_decode($room->image_list);

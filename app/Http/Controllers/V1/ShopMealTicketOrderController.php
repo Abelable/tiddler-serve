@@ -10,6 +10,7 @@ use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\MealTicketOrderService;
 use App\Services\MealTicketVerifyService;
 use App\Services\OrderMealTicketService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MealTicketOrderStatus;
 use App\Utils\Inputs\PageInput;
@@ -38,8 +39,7 @@ class ShopMealTicketOrderController extends Controller
 
         $statusList = $this->statusList($status);
         $page = MealTicketOrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
-        $orderList = collect($page->items());
-        $list = $this->handleOrderList($orderList);
+        $list = $this->handleOrderList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }
@@ -82,9 +82,17 @@ class ShopMealTicketOrderController extends Controller
 
     private function handleOrderList($orderList)
     {
+        $userIds = $orderList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = OrderMealTicketService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
-        return $orderList->map(function (MealTicketOrder $order) use ($ticketList) {
+
+        return $orderList->map(function (MealTicketOrder $order) use ($userList, $ticketList) {
+            $userInfo = $userList->get($order->user_id);
+
             /** @var OrderMealTicket $ticket */
             $ticket = $ticketList->get($order->id);
             $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
@@ -95,6 +103,7 @@ class ShopMealTicketOrderController extends Controller
                 'id' => $order->id,
                 'status' => $order->status,
                 'statusDesc' => MealTicketOrderStatus::TEXT_MAP[$order->status],
+                'userInfo' => $userInfo,
                 'ticketInfo' => $ticket,
                 'totalPrice' => $order->total_price,
                 'deduction_balance' => $order->deduction_balance,
@@ -112,6 +121,7 @@ class ShopMealTicketOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $columns = [
             'id',
+            'user_id',
             'order_sn',
             'status',
             'consignee',
@@ -125,10 +135,15 @@ class ShopMealTicketOrderController extends Controller
             'created_at',
             'updated_at',
         ];
+
         $order = MealTicketOrderService::getInstance()->getShopOrder($shopId, $orderId, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
 
         $ticket = OrderMealTicketService::getInstance()->getTicketByOrderId($order->id);
         $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];

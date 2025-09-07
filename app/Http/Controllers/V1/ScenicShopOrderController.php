@@ -10,6 +10,7 @@ use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicOrderVerifyService;
 use App\Services\ScenicShopManagerService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\PageInput;
@@ -82,12 +83,18 @@ class ScenicShopOrderController extends Controller
 
     private function handleOrderList($orderList)
     {
+        $userIds = $orderList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
         $orderIds = $orderList->pluck('id')->toArray();
         $ticketList = ScenicOrderTicketService::getInstance()
             ->getListByOrderIds($orderIds)
             ->keyBy('order_id');
 
-        return $orderList->map(function (ScenicOrder $order) use ($ticketList) {
+        return $orderList->map(function (ScenicOrder $order) use ($userList, $ticketList) {
+            $userInfo = $userList->get($order->user_id);
             /** @var ScenicOrderTicket $ticket */
             $ticket = $ticketList->get($order->id);
 
@@ -96,6 +103,7 @@ class ScenicShopOrderController extends Controller
                 'orderSn' => $order->order_sn,
                 'status' => $order->status,
                 'statusDesc' => ScenicOrderStatus::TEXT_MAP[$order->status],
+                'userInfo' => $userInfo,
                 'ticketInfo' => [
                     'id' => $ticket->ticket_id,
                     'name' => $ticket->name,
@@ -127,6 +135,7 @@ class ScenicShopOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $columns = [
             'id',
+            'user_id',
             'order_sn',
             'status',
             'consignee',
@@ -146,6 +155,10 @@ class ScenicShopOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
 
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
         $order['ticketInfo'] = [
