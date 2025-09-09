@@ -23,6 +23,7 @@ use App\Services\OrderVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ShopIncomeService;
+use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
@@ -477,8 +478,6 @@ class OrderController extends Controller
             'pickup_time',
             'pickup_mobile',
             'shop_id',
-            'shop_logo',
-            'shop_name',
             'goods_price',
             'freight_price',
             'deduction_balance',
@@ -492,10 +491,20 @@ class OrderController extends Controller
             'created_at',
             'updated_at',
         ];
+
         $order = OrderService::getInstance()->getUserOrder($this->userId(), $id, $columns);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $shopInfo = ShopService::getInstance()
+            ->getShopById($order->shop_id, ['id', 'user_id', 'type', 'logo', 'name', 'owner_avatar', 'owner_name']);
+        $order['shopInfo'] = $shopInfo ?: null;
+        unset($order->shop_id);
+
+        $shopInfo['managerList'] = ShopManagerService::getInstance()
+            ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
+
         $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
         $order['goods_list'] = $goodsList;
 
