@@ -125,6 +125,7 @@ class MealTicketOrderController extends Controller
                 $userId,
                 $order->id,
                 $input->restaurantId,
+                $input->restaurantCover,
                 $input->restaurantName,
                 $input->num,
                 $ticket

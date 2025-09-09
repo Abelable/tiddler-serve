@@ -10,8 +10,9 @@ use App\Models\BaseModel;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $order_id 订单id
- * @property int $restaurant_id 餐饮门店id
- * @property string $restaurant_name 餐饮门店名称
+ * @property int $restaurant_id 餐厅id
+ * @property string $restaurant_cover 餐厅封面
+ * @property string $restaurant_name 餐厅名称
  * @property int $ticket_id 餐券id
  * @property int $number 餐券数量
  * @property float $price 餐券售价
@@ -54,6 +55,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket wherePromotionCommissionUpperLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereRestaurantCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereRestaurantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereRestaurantName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderMealTicket whereSalesCommissionRate($value)

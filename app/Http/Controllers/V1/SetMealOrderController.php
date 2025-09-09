@@ -124,6 +124,7 @@ class SetMealOrderController extends Controller
                 $userId,
                 $order->id,
                 $input->restaurantId,
+                $input->restaurantCover,
                 $input->restaurantName,
                 $input->num,
                 $setMeal

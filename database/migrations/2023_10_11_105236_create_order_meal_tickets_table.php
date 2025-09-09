@@ -17,8 +17,9 @@ class CreateOrderMealTicketsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('order_id')->comment('订单id');
-            $table->integer('restaurant_id')->comment('餐饮门店id');
-            $table->string('restaurant_name')->comment('餐饮门店名称');
+            $table->integer('restaurant_id')->comment('餐厅id');
+            $table->string('restaurant_cover')->default('')->comment('餐厅封面');
+            $table->string('restaurant_name')->comment('餐厅名称');
             $table->integer('ticket_id')->comment('餐券id');
             $table->integer('number')->comment('餐券数量');
             $table->float('price')->comment('餐券售价');

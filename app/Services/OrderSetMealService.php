@@ -11,6 +11,7 @@ class OrderSetMealService extends BaseService
         $userId,
         $orderId,
         $restaurantId,
+        $restaurantCover,
         $restaurantName,
         $number,
         SetMeal $setMealInfo
@@ -20,6 +21,7 @@ class OrderSetMealService extends BaseService
         $setMeal->user_id = $userId;
         $setMeal->order_id = $orderId;
         $setMeal->restaurant_id = $restaurantId;
+        $setMeal->restaurant_cover = $restaurantCover;
         $setMeal->restaurant_name = $restaurantName;
         $setMeal->set_meal_id = $setMealInfo->id;
         $setMeal->cover = $setMealInfo->cover;

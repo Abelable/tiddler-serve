@@ -11,6 +11,7 @@ class OrderMealTicketService extends BaseService
         $userId,
         $orderId,
         $restaurantId,
+        $restaurantCover,
         $restaurantName,
         $number,
         MealTicket $ticketInfo
@@ -20,6 +21,7 @@ class OrderMealTicketService extends BaseService
         $ticket->user_id = $userId;
         $ticket->order_id = $orderId;
         $ticket->restaurant_id = $restaurantId;
+        $ticket->restaurant_cover = $restaurantCover;
         $ticket->restaurant_name = $restaurantName;
         $ticket->ticket_id = $ticketInfo->id;
         $ticket->number = $number;

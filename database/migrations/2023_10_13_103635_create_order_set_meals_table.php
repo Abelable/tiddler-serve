@@ -17,8 +17,9 @@ class CreateOrderSetMealsTable extends Migration
             $table->id();
             $table->integer('user_id')->comment('用户id');
             $table->integer('order_id')->comment('订单id');
-            $table->integer('restaurant_id')->comment('餐饮门店id');
-            $table->string('restaurant_name')->comment('餐饮门店名称');
+            $table->integer('restaurant_id')->comment('餐厅id');
+            $table->string('restaurant_cover')->default('')->comment('餐厅封面');
+            $table->string('restaurant_name')->comment('餐厅名称');
             $table->integer('set_meal_id')->comment('套餐id');
             $table->string('cover')->comment('套餐图片');
             $table->string('name')->comment('套餐名称');
