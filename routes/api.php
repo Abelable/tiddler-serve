@@ -801,6 +801,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('detail', 'BannerController@detail');
         Route::post('add', 'BannerController@add');
         Route::post('edit', 'BannerController@edit');
+        Route::post('edit_sort', 'BannerController@editSort');
         Route::post('up', 'BannerController@up');
         Route::post('down', 'BannerController@down');
         Route::post('delete', 'BannerController@delete');
