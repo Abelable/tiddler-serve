@@ -341,7 +341,7 @@ Route::prefix('hotel')->group(function () {
     Route::post('add', 'HotelController@add');
     Route::post('edit', 'HotelController@edit');
     Route::post('delete', 'HotelController@delete');
-    Route::get('homestay_list', 'HotelController@homestayList');
+    Route::post('homestay_list', 'HotelController@homestayList');
     Route::get('shop_options', 'HotelController@shopOptions');
 
     Route::prefix('question')->group(function () {
