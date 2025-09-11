@@ -112,7 +112,7 @@ class TripTypeController extends Controller
             return [
                 'id' => $hotel->id,
                 'cover' => $lakeHomestay->cover,
-                'name' => $hotel->name,
+                'name' => $lakeHomestay->name,
                 'price' => $hotel->price,
                 'score' => $hotel->score,
                 'address' => $hotel->address,

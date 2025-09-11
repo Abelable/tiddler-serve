@@ -16,6 +16,7 @@ use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
 class HotelController extends Controller
@@ -150,6 +151,18 @@ class HotelController extends Controller
         $restaurant->delete();
 
         return $this->success();
+    }
+
+    public function homestayList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $ids = $this->verifyArray('ids');
+
+        $page = HotelService::getInstance()->getHomestayPage($ids, $input);
+        $list = HotelService::getInstance()->handelList(collect($page->items()));
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function shopOptions()

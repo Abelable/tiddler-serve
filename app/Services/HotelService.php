@@ -8,6 +8,7 @@ use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\CommonPageInput;
 use App\Utils\Inputs\HotelInput;
 use App\Utils\Inputs\NearbyPageInput;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
 class HotelService extends BaseService
@@ -285,5 +286,14 @@ class HotelService extends BaseService
     public function updateViews($id, $views)
     {
         return Hotel::query()->where('id', $id)->update(['views' => $views]);
+    }
+
+    public function getHomestayPage(array $ids, PageInput $input, $columns = ['*'])
+    {
+        return Hotel::query()
+            ->whereNotIn('id', $ids)
+            ->where('category_id', 5)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 }
