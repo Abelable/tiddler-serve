@@ -82,4 +82,10 @@ class HotelController extends Controller
         $options = HotelService::getInstance()->getHotelOptions(['id', 'name', 'cover']);
         return $this->success($options);
     }
+
+    public function homestayOptions()
+    {
+        $options = HotelService::getInstance()->getHomestayOptions(['id', 'name', 'cover']);
+        return $this->success($options);
+    }
 }

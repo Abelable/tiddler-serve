@@ -1060,6 +1060,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('edit_views', 'HotelController@editViews');
         Route::post('delete', 'HotelController@delete');
         Route::get('options', 'HotelController@options');
+        Route::get('homestay_options', 'HotelController@homestayOptions');
 
         Route::prefix('room_type')->group(function () {
             Route::post('list', 'HotelRoomTypeController@list');

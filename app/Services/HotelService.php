@@ -183,6 +183,11 @@ class HotelService extends BaseService
         return Hotel::query()->orderBy('id', 'asc')->get($columns);
     }
 
+    public function getHomestayOptions($columns = ['*'])
+    {
+        return Hotel::query()->where('category_id', 5)->orderBy('id', 'asc')->get($columns);
+    }
+
     public function createHotel(HotelInput $input) {
         $hotel = Hotel::new();
         return $this->updateHotel($hotel, $input);
