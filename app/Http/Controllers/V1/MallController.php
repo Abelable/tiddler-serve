@@ -29,8 +29,9 @@ class MallController extends Controller
 
         $scenicColumns = [
             'id',
-            DB::raw('NULL as shop_id'),
             DB::raw('NULL as status'),
+            DB::raw('NULL as shop_id'),
+            DB::raw('NULL as category_id'),
             'name',
             DB::raw('NULL as cover'),
             'image_list',
@@ -47,8 +48,9 @@ class MallController extends Controller
         ];
         $hotelColumns = [
             'id',
-            DB::raw('NULL as shop_id'),
             DB::raw('NULL as status'),
+            DB::raw('NULL as shop_id'),
+            'category_id',
             'name',
             'cover',
             DB::raw('NULL as image_list'),
@@ -65,8 +67,9 @@ class MallController extends Controller
         ];
         $restaurantColumns = [
             'id',
-            DB::raw('NULL as shop_id'),
             DB::raw('NULL as status'),
+            DB::raw('NULL as shop_id'),
+            DB::raw('NULL as category_id'),
             'name',
             'cover',
             DB::raw('NULL as image_list'),
@@ -83,8 +86,9 @@ class MallController extends Controller
         ];
         $goodsColumns = [
             'id',
-            'shop_id',
             'status',
+            'shop_id',
+            DB::raw('NULL as category_id'),
             'name',
             'cover',
             'image_list',

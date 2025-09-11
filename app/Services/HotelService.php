@@ -108,6 +108,7 @@ class HotelService extends BaseService
         return $hotelList->map(function (Hotel $hotel) {
             return [
                 'id' => $hotel->id,
+                'categoryId' => $hotel->category_id,
                 'cover' => $hotel->cover,
                 'name' => $hotel->name,
                 'englishName' => $hotel->english_name,

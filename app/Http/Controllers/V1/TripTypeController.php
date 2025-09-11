@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Hotel;
 use App\Models\LakeCycleMedia;
+use App\Models\LakeHomestay;
+use App\Services\HotelService;
 use App\Services\HotScenicService;
 use App\Services\LakeCycleMediaService;
 use App\Services\LakeCycleService;
+use App\Services\LakeHomestayService;
 use App\Services\LakeTripService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoService;
@@ -92,5 +96,29 @@ class TripTypeController extends Controller
     {
         $list = StarTripService::getInstance()->getStarTripList();
         return $this->success($list);
+    }
+
+    public function lakeHomestayList()
+    {
+        $list = LakeHomestayService::getInstance()->getLakeHomestayList();
+
+        $hotelIds = $list->pluck('hotel_id')->toArray();
+        $hotelList = HotelService::getInstance()->getListByIds($hotelIds)->keyBy('id');
+
+        $homestayList = $list->map(function (LakeHomestay $lakeHomestay) use ($hotelList) {
+            /** @var Hotel $hotel */
+            $hotel = $hotelList->get($lakeHomestay->hotel_id);
+
+            return [
+                'id' => $hotel->id,
+                'cover' => $lakeHomestay->cover,
+                'name' => $hotel->name,
+                'price' => $hotel->price,
+                'score' => $hotel->score,
+                'address' => $hotel->address,
+            ];
+        });
+
+        return $this->success($homestayList);
     }
 }

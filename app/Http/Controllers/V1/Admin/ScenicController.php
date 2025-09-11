@@ -17,8 +17,12 @@ class ScenicController extends Controller
     {
         /** @var ScenicPageInput $input */
         $input = ScenicPageInput::new();
-        $list = ScenicService::getInstance()->getAdminScenicPage($input);
-        return $this->successPaginate($list);
+        $page = ScenicService::getInstance()->getAdminScenicPage($input);
+        $list = collect($page->items())->map(function (ScenicSpot $scenic) {
+            $scenic['imageList'] = json_decode($scenic->image_list);
+            return $scenic;
+        });
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
