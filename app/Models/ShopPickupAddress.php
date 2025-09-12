@@ -7,6 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $shop_id 店铺id
+ * @property string $logo 提货门店logo
  * @property string $name 提货门店名称
  * @property string $address_detail 提货门店地址详情
  * @property string $longitude 提货点经度
@@ -24,6 +25,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereLatitude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereLongitude($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopPickupAddress whereOpenTimeList($value)
