@@ -242,7 +242,7 @@ class UserController extends Controller
         return $this->success();
     }
 
-    public function orderTotals()
+    public function orderTotal()
     {
         $scenicStatusList = [
             ScenicOrderStatus::CREATED,

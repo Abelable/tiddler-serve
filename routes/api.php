@@ -37,7 +37,7 @@ Route::prefix('user')->group(function () {
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
     Route::get('options', 'UserController@options');
-    Route::get('order_totals', 'UserController@orderTotals');
+    Route::get('order_total', 'UserController@orderTotal');
     Route::get('add_temp_user', 'UserController@addTempUser');
     Route::get('supply_user_mobile', 'UserController@supplyUserMobile');
 });
