@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\TopMediaService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 
 class TopMediaController extends Controller
 {
@@ -38,6 +39,8 @@ class TopMediaController extends Controller
 
         TopMediaService::getInstance()->createTopMedia($mediaType, $mediaId, $cover, $title);
 
+        Cache::forget('top_media_cache');
+
         return $this->success();
     }
 
@@ -56,6 +59,8 @@ class TopMediaController extends Controller
 
         TopMediaService::getInstance()->updateTopMedia($topMedia, $mediaType, $mediaId, $cover, $title);
 
+        Cache::forget('top_media_cache');
+
         return $this->success();
     }
 
@@ -67,6 +72,8 @@ class TopMediaController extends Controller
         if (is_null($media)) {
             return $this->fail(CodeResponse::NOT_FOUND, '最佳游记不存在');
         }
+
+        Cache::forget('top_media_cache');
 
         $media->delete();
 

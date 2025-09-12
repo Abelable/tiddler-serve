@@ -22,6 +22,7 @@ use App\Services\UserService;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\ProductMediaPageInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
@@ -33,6 +34,19 @@ class MediaController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
+        if ($input->page == 1) {
+            $page = Cache::remember('top_media_cache', 1440, function () use ($input) {
+                return $this->topPage($input);
+            });
+        } else {
+            $page = $this->topPage($input);
+        }
+
+        return $this->success($page);
+    }
+
+    private function topPage(PageInput $input)
+    {
         $page = TopMediaService::getInstance()->getTopMediaPage($input);
 
         $topMediaList = collect($page->items());
@@ -64,7 +78,7 @@ class MediaController extends Controller
             return $media;
         });
 
-        return $this->success($this->paginate($page, $list));
+        return $this->paginate($page, $list);
     }
 
     public function list()

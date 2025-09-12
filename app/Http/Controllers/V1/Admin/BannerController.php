@@ -8,6 +8,7 @@ use App\Services\BannerService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\BannerInput;
 use App\Utils\Inputs\BannerPageInput;
+use Illuminate\Support\Facades\Cache;
 
 class BannerController extends Controller
 {
@@ -35,8 +36,12 @@ class BannerController extends Controller
     {
         /** @var BannerInput $input */
         $input = BannerInput::new();
+
         $banner = Banner::new();
         BannerService::getInstance()->updateBanner($banner, $input);
+
+        Cache::forget('banner_list_' . $input->position);
+
         return $this->success();
     }
 
@@ -53,6 +58,8 @@ class BannerController extends Controller
 
         BannerService::getInstance()->updateBanner($banner, $input);
 
+        Cache::forget('banner_list_' . $input->position);
+
         return $this->success();
     }
 
@@ -68,6 +75,8 @@ class BannerController extends Controller
         $banner->sort = $sort;
         $banner->save();
 
+        Cache::forget('banner_list_' . $banner->position);
+
         return $this->success();
     }
 
@@ -81,6 +90,8 @@ class BannerController extends Controller
 
         $banner->status = 1;
         $banner->save();
+
+        Cache::forget('banner_list_' . $banner->position);
 
         return $this->success();
     }
@@ -96,6 +107,8 @@ class BannerController extends Controller
         $banner->status = 2;
         $banner->save();
 
+        Cache::forget('banner_list_' . $banner->position);
+
         return $this->success();
     }
 
@@ -106,7 +119,11 @@ class BannerController extends Controller
         if (is_null($banner)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前活动banner不存在');
         }
+
+        Cache::forget('banner_list_' . $banner->position);
+
         $banner->delete();
+
         return $this->success();
     }
 }
