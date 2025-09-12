@@ -5,13 +5,23 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\FanService;
+use App\Services\HotelOrderService;
 use App\Services\HotelShopManagerService;
 use App\Services\Mall\Catering\CateringShopManagerService;
+use App\Services\MealTicketOrderService;
 use App\Services\Media\MediaService;
+use App\Services\OrderService;
+use App\Services\ScenicOrderService;
 use App\Services\ScenicShopManagerService;
+use App\Services\SetMealOrderService;
 use App\Services\ShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\HotelOrderStatus;
+use App\Utils\Enums\MealTicketOrderStatus;
+use App\Utils\Enums\OrderStatus;
+use App\Utils\Enums\ScenicOrderStatus;
+use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\UserInfoInput;
 use App\Utils\TimServe;
@@ -230,5 +240,73 @@ class UserController extends Controller
             }
         });
         return $this->success();
+    }
+
+    public function orderTotals()
+    {
+        $scenicStatusList = [
+            ScenicOrderStatus::CREATED,
+            ScenicOrderStatus::PAID,
+            ScenicOrderStatus::MERCHANT_APPROVED,
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED,
+            ScenicOrderStatus::REFUNDING
+        ];
+        $scenicOrderTotal = ScenicOrderService::getInstance()->getTotal($this->userId(), $scenicStatusList);
+
+        $hotelStatusList = [
+            HotelOrderStatus::CREATED,
+            HotelOrderStatus::PAID,
+            HotelOrderStatus::MERCHANT_APPROVED,
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED,
+            HotelOrderStatus::REFUNDING
+        ];
+        $hotelOrderTotal = HotelOrderService::getInstance()->getTotal($this->userId(), $hotelStatusList);
+
+        $mealTicketStatusList = [
+            MealTicketOrderStatus::CREATED,
+            MealTicketOrderStatus::PAID,
+            MealTicketOrderStatus::MERCHANT_APPROVED,
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED,
+            MealTicketOrderStatus::REFUNDING
+        ];
+        $mealTicketOrderTotal = MealTicketOrderService::getInstance()->getTotal($this->userId(), $mealTicketStatusList);
+
+        $setMealStatusList = [
+            SetMealOrderStatus::CREATED,
+            SetMealOrderStatus::PAID,
+            SetMealOrderStatus::MERCHANT_APPROVED,
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED,
+            SetMealOrderStatus::REFUNDING
+        ];
+        $setMealOrderTotal = SetMealOrderService::getInstance()->getTotal($this->userId(), $setMealStatusList);
+
+        $goodsStatusList = [
+            OrderStatus::CREATED,
+            OrderStatus::PAID,
+            OrderStatus::EXPORTED,
+            OrderStatus::SHIPPED,
+            OrderStatus::PENDING_VERIFICATION,
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
+            OrderStatus::REFUNDING
+        ];
+        $goodsOrderTotal = OrderService::getInstance()->getTotal($this->userId(), $goodsStatusList);
+
+        return $this->success([
+            $scenicOrderTotal,
+            $hotelOrderTotal,
+            $mealTicketOrderTotal,
+            $setMealOrderTotal,
+            $goodsOrderTotal
+        ]);
     }
 }
