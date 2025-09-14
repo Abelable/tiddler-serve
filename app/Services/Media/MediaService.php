@@ -23,6 +23,8 @@ class MediaService extends BaseService
         $liveColumns = ['*'],
         $authorIds = null,
         $withLiveList = true,
+        $longitude = null,
+        $latitude = null,
         $keywords = ''
     )
     {
@@ -58,9 +60,16 @@ class MediaService extends BaseService
             $mediaQuery = $mediaQuery->union($liveQuery);
         }
 
-        return $mediaQuery
+        $mediaQuery = $mediaQuery
             ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
-            ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END");
+
+        if ($longitude !== null && $latitude !== null) {
+            $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(latitude))))";
+            $mediaQuery = $mediaQuery->selectRaw("$haversine as distance")->orderBy('distance', 'asc');
+        }
+
+        return $mediaQuery
             ->orderBy('views', 'desc')
             ->orderBy('share_times', 'desc')
             ->orderBy('collection_times', 'desc')

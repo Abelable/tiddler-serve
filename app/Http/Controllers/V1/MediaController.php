@@ -20,6 +20,7 @@ use App\Services\MediaProductService;
 use App\Services\TopMediaService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaType;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\ProductMediaPageInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -92,7 +93,14 @@ class MediaController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        return $this->getMediaList($input, null, true, '', true);
+        return $this->getMediaList($input, null, true, '', null, null, true);
+    }
+
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        return $this->getMediaList($input, null, true, '', $input->longitude, $input->latitude);
     }
 
     public function followList()
@@ -118,6 +126,8 @@ class MediaController extends Controller
         $authorIds = null,
         $withLiveList = true,
         $keywords = '',
+        $longitude = null,
+        $latitude = null,
         $random = false
     )
     {
@@ -134,6 +144,8 @@ class MediaController extends Controller
             DB::raw('NULL as image_list'),
             DB::raw('NULL as play_url'),
             'address',
+            'longitude',
+            'latitude',
             'views',
             'like_number',
             'comments_number',
@@ -156,6 +168,8 @@ class MediaController extends Controller
             'image_list',
             DB::raw('NULL as play_url'),
             'address',
+            'longitude',
+            'latitude',
             'views',
             'like_number',
             'comments_number',
@@ -178,6 +192,8 @@ class MediaController extends Controller
             DB::raw('NULL as image_list'),
             'play_url',
             DB::raw('NULL as address'),
+            DB::raw('NULL as longitude'),
+            DB::raw('NULL as latitude'),
             'views',
             DB::raw('NULL as like_number'),
             DB::raw('NULL as comments_number'),
@@ -192,8 +208,17 @@ class MediaController extends Controller
         if ($random) {
             $page = MediaService::getInstance()->randomMediaPage($input, $videoColumns, $noteColumns, $liveColumns);
         } else {
-            $page = MediaService::getInstance()
-                ->mediaPage($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList, $keywords);
+            $page = MediaService::getInstance()->mediaPage(
+                $input,
+                $videoColumns,
+                $noteColumns,
+                $liveColumns,
+                $authorIds,
+                $withLiveList,
+                $keywords,
+                $longitude,
+                $latitude
+            );
         }
         $mediaList = collect($page->items());
 
