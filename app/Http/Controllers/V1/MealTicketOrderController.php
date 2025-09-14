@@ -8,6 +8,7 @@ use App\Models\Catering\OrderMealTicket;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\Mall\Catering\CateringShopIncomeService;
+use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketOrderService;
 use App\Services\MealTicketService;
@@ -303,8 +304,6 @@ class MealTicketOrderController extends Controller
             'order_sn',
             'status',
             'shop_id',
-            'shop_logo',
-            'shop_name',
             'restaurant_id',
             'restaurant_cover',
             'restaurant_name',
@@ -322,6 +321,14 @@ class MealTicketOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $shopInfo = CateringShopService::getInstance()
+            ->getShopById($order->shop_id, ['id', 'user_id', 'type', 'logo', 'name', 'owner_avatar', 'owner_name']);
+        $order['shopInfo'] = $shopInfo ?: null;
+        unset($order->shop_id);
+
+        $shopInfo['managerList'] = CateringShopManagerService::getInstance()
+            ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
 
         $ticket = OrderMealTicketService::getInstance()->getTicketByOrderId($order->id);
         $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];

@@ -15,6 +15,7 @@ use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicOrderVerifyService;
 use App\Services\ScenicService;
 use App\Services\ScenicShopIncomeService;
+use App\Services\ScenicShopManagerService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketCategoryService;
 use App\Services\ScenicTicketService;
@@ -303,8 +304,6 @@ class ScenicOrderController extends Controller
             'consignee',
             'mobile',
             'shop_id',
-            'shop_logo',
-            'shop_name',
             'total_price',
             'payment_amount',
             'pay_time',
@@ -317,6 +316,14 @@ class ScenicOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $shopInfo = ScenicShopService::getInstance()
+            ->getShopById($order->shop_id, ['id', 'user_id', 'type', 'logo', 'name', 'owner_avatar', 'owner_name']);
+        $order['shopInfo'] = $shopInfo ?: null;
+        unset($order->shop_id);
+
+        $shopInfo['managerList'] = ScenicShopManagerService::getInstance()
+            ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
 
         $ticket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
         $order['ticketInfo'] =  [

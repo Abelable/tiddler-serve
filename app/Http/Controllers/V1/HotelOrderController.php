@@ -14,6 +14,7 @@ use App\Services\HotelRoomService;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
 use App\Services\HotelShopIncomeService;
+use App\Services\HotelShopManagerService;
 use App\Services\HotelShopService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
@@ -306,8 +307,6 @@ class HotelOrderController extends Controller
             'consignee',
             'mobile',
             'shop_id',
-            'shop_logo',
-            'shop_name',
             'hotel_id',
             'hotel_cover',
             'hotel_name',
@@ -324,6 +323,14 @@ class HotelOrderController extends Controller
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
+
+        $shopInfo = HotelShopService::getInstance()
+            ->getShopById($order->shop_id, ['id', 'user_id', 'type', 'logo', 'name', 'owner_avatar', 'owner_name']);
+        $order['shopInfo'] = $shopInfo ?: null;
+        unset($order->shop_id);
+
+        $shopInfo['managerList'] = HotelShopManagerService::getInstance()
+            ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
 
         $room = HotelOrderRoomService::getInstance()->getRoomByOrderId($order->id);
         $room->image_list = json_decode($room->image_list);
