@@ -88,6 +88,13 @@ class MediaController extends Controller
         return $this->getMediaList($input);
     }
 
+    public function randomList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        return $this->getMediaList($input, null, true, '', true);
+    }
+
     public function followList()
     {
         /** @var PageInput $input */
@@ -106,7 +113,13 @@ class MediaController extends Controller
         return $this->getMediaList($input, count($authorIds) == 0 ? null :  $authorIds, true, $keywords);
     }
 
-    private function getMediaList(PageInput $input, $authorIds = null, $withLiveList = true, $keywords = '')
+    private function getMediaList(
+        PageInput $input,
+        $authorIds = null,
+        $withLiveList = true,
+        $keywords = '',
+        $random = false
+    )
     {
         $videoColumns = [
             'id',
@@ -175,7 +188,13 @@ class MediaController extends Controller
             'created_at',
         ];
 
-        $page = MediaService::getInstance()->pageList($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList, $keywords);
+        // todo 在推荐算法之前，临时使用
+        if ($random) {
+            $page = MediaService::getInstance()->randomMediaPage($input, $videoColumns, $noteColumns, $liveColumns);
+        } else {
+            $page = MediaService::getInstance()
+                ->mediaPage($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList, $keywords);
+        }
         $mediaList = collect($page->items());
 
         $videoList = $mediaList->filter(function ($media) {
