@@ -174,6 +174,9 @@ class MealTicketOrderService extends BaseService
     public function createOrder(
         User $user,
         CateringShop $shop,
+        $restaurantId,
+        $restaurantCover,
+        $restaurantName,
         $totalPrice,
         $deductionBalance,
         $paymentAmount
@@ -187,6 +190,9 @@ class MealTicketOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->restaurant_id = $restaurantId;
+        $order->restaurant_cover = $restaurantCover;
+        $order->restaurant_name = $restaurantName;
         $order->user_id = $user->id;
         $order->consignee = $user->nickname;
         $order->mobile = $user->mobile;

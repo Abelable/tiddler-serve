@@ -15,6 +15,9 @@ use App\Utils\Traits\SetMealOrderStatusTrait;
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺头像
  * @property string $shop_name 店铺名称
+ * @property int $restaurant_id 餐厅id
+ * @property string $restaurant_cover 餐厅封面
+ * @property string $restaurant_name 餐厅名称
  * @property string $consignee 用户姓名
  * @property string $mobile 用户手机号
  * @property float $total_price 总价
@@ -61,6 +64,9 @@ use App\Utils\Traits\SetMealOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRefundTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRefundType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRestaurantCover($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRestaurantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereRestaurantName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereShopLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|SetMealOrder whereShopName($value)

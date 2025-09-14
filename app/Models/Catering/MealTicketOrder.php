@@ -15,6 +15,9 @@ use App\Utils\Traits\MealTicketOrderStatusTrait;
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺logo
  * @property string $shop_name 店铺名称
+ * @property int $restaurant_id 餐厅id
+ * @property string $restaurant_cover 餐厅封面
+ * @property string $restaurant_name 餐厅名称
  * @property string $consignee 用户姓名
  * @property string $mobile 用户手机号
  * @property float $total_price 总价
@@ -61,6 +64,9 @@ use App\Utils\Traits\MealTicketOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRefundTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRefundType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRestaurantCover($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRestaurantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereRestaurantName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereShopLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder whereShopName($value)

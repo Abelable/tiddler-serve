@@ -21,6 +21,9 @@ class CreateMealTicketOrdersTable extends Migration
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->string('shop_logo')->default('')->comment('店铺logo');
             $table->string('shop_name')->default('')->comment('店铺名称');
+            $table->integer('restaurant_id')->default(0)->comment('餐厅id');
+            $table->string('restaurant_cover')->default('')->comment('餐厅封面');
+            $table->string('restaurant_name')->default('')->comment('餐厅名称');
             $table->string('consignee')->comment('用户姓名');
             $table->string('mobile')->comment('用户手机号');
             $table->float('total_price')->comment('总价');
