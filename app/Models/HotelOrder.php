@@ -14,6 +14,9 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺头像
  * @property string $shop_name 店铺名称
+ * @property int $hotel_id 酒店id
+ * @property string $hotel_cover 酒店头像
+ * @property string $hotel_name 酒店名称
  * @property string $consignee 入住人姓名
  * @property string $mobile 入住人手机号
  * @property float $total_price 房间总价
@@ -48,6 +51,9 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereDeductionBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereFinishTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereHotelCover($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereHotelId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereHotelName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder whereOrderSn($value)

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Hotel;
 use App\Models\HotelOrder;
 use App\Models\HotelShop;
 use App\Utils\CodeResponse;
@@ -173,6 +174,7 @@ class HotelOrderService extends BaseService
     public function createOrder(
         $userId,
         HotelOrderInput $input,
+        Hotel $hotel,
         HotelShop $shop,
         $totalPrice,
         $deductionBalance,
@@ -190,6 +192,9 @@ class HotelOrderService extends BaseService
         $order->shop_id = $shop->id;
         $order->shop_logo = $shop->logo;
         $order->shop_name = $shop->name;
+        $order->hotel_id = $hotel->id;
+        $order->hotel_cover = $hotel->cover;
+        $order->hotel_name = $hotel->name;
         $order->total_price = $totalPrice;
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;

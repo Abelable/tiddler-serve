@@ -21,6 +21,9 @@ class CreateHotelOrdersTable extends Migration
             $table->integer('shop_id')->default(0)->comment('店铺id');
             $table->string('shop_logo')->default('')->comment('店铺头像');
             $table->string('shop_name')->default('')->comment('店铺名称');
+            $table->integer('hotel_id')->default(0)->comment('酒店id');
+            $table->string('hotel_cover')->default('')->comment('酒店头像');
+            $table->string('hotel_name')->default('')->comment('酒店名称');
             $table->string('consignee')->comment('入住人姓名');
             $table->string('mobile')->comment('入住人手机号');
             $table->float('total_price')->comment('房间总价');

@@ -123,6 +123,7 @@ class HotelOrderController extends Controller
             $order = HotelOrderService::getInstance()->createOrder(
                 $userId,
                 $input,
+                $hotel,
                 $shop,
                 $totalPrice,
                 $deductionBalance,
