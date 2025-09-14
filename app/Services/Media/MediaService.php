@@ -13,6 +13,7 @@ use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class MediaService extends BaseService
 {
@@ -23,8 +24,6 @@ class MediaService extends BaseService
         $liveColumns = ['*'],
         $authorIds = null,
         $withLiveList = true,
-        $longitude = null,
-        $latitude = null,
         $keywords = ''
     )
     {
@@ -60,16 +59,9 @@ class MediaService extends BaseService
             $mediaQuery = $mediaQuery->union($liveQuery);
         }
 
-        $mediaQuery = $mediaQuery
-            ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
-            ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END");
-
-        if ($longitude !== null && $latitude !== null) {
-            $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(latitude))))";
-            $mediaQuery = $mediaQuery->selectRaw("$haversine as distance")->orderBy('distance', 'asc');
-        }
-
         return $mediaQuery
+            ->orderByRaw("CASE WHEN type = 1 THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status = 1 THEN 0 ELSE 1 END")
             ->orderBy('views', 'desc')
             ->orderBy('share_times', 'desc')
             ->orderBy('collection_times', 'desc')
@@ -172,6 +164,37 @@ class MediaService extends BaseService
             $input->page,
             ['path' => request()->url(), 'query' => request()->query()]
         );
+    }
+
+    public function nearbyMediaPage(
+        PageInput $input,
+        $videoColumns = ['*'],
+        $noteColumns = ['*'],
+        $longitude = null,
+        $latitude = null
+    )
+    {
+        $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
+
+        $noteQuery = TourismNote::query()->select($noteColumns)->where('is_private', 0)->selectRaw("3 as type");
+
+        $mediaQuery = $videoQuery->union($noteQuery);
+
+        if ($longitude !== null && $latitude !== null) {
+            $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(latitude)))) as distance";
+            $mediaQuery = $mediaQuery->select('*', DB::raw($haversine))
+                ->orderBy('distance', 'asc');
+        }
+
+        return $mediaQuery
+            ->orderBy('views', 'desc')
+            ->orderBy('share_times', 'desc')
+            ->orderBy('collection_times', 'desc')
+            ->orderBy('like_number', 'desc')
+            ->orderBy('praise_number', 'desc')
+            ->orderBy('comments_number', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, ['*'], 'page', $input->page);
     }
 
     public function collectPageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
