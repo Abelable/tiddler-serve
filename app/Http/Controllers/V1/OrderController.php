@@ -46,7 +46,7 @@ class OrderController extends Controller
             ->pluck('pickup_address_id')
             ->toArray();
 
-        $columns = ['id', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
+        $columns = ['id', 'logo', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
         $pickupAddressList = ShopPickupAddressService::getInstance()
             ->getListByIds($pickupAddressIds, $columns);
 
