@@ -142,7 +142,7 @@ class MallController extends Controller
             return $product;
         });
 
-        return $this->success($this->paginate($page, $list));
+        return $this->paginate($page, $list);
     }
 
     public function initViews()
