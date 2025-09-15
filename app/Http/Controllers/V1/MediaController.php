@@ -93,14 +93,14 @@ class MediaController extends Controller
     {
         /** @var PageInput $input */
         $input = PageInput::new();
-        return $this->getMediaList($input, null, true, '', null, null, true);
+        return $this->getMediaList($input, null, true, '', 2);
     }
 
     public function nearbyList()
     {
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
-        return $this->getMediaList($input, null, false, '', $input->longitude, $input->latitude);
+        return $this->getMediaList($input, null, false, '', 3, $input->longitude, $input->latitude);
     }
 
     public function followList()
@@ -126,9 +126,9 @@ class MediaController extends Controller
         $authorIds = null,
         $withLiveList = true,
         $keywords = '',
+        $scene = 1,
         $longitude = null,
-        $latitude = null,
-        $random = false
+        $latitude = null
     )
     {
         $videoColumns = [
@@ -204,21 +204,15 @@ class MediaController extends Controller
             'created_at',
         ];
 
-        // todo 在推荐算法之前，临时使用
-        if ($random) {
+
+        if ($scene == 1) {
+            $page = MediaService::getInstance()
+                ->mediaPage($input, $videoColumns, $noteColumns, $liveColumns, $authorIds, $withLiveList, $keywords);
+        } else if ($scene == 2) {
+            // todo 随机数据 - 在推荐算法之前，临时使用
             $page = MediaService::getInstance()->randomMediaPage($input, $videoColumns, $noteColumns, $liveColumns);
         } else {
-            $page = MediaService::getInstance()->mediaPage(
-                $input,
-                $videoColumns,
-                $noteColumns,
-                $liveColumns,
-                $authorIds,
-                $withLiveList,
-                $keywords,
-                $longitude,
-                $latitude
-            );
+            $page = MediaService::getInstance()->nearbyMediaPage($input, $longitude, $latitude, $videoColumns, $noteColumns);
         }
         $mediaList = collect($page->items());
 

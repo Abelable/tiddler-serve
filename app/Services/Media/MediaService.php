@@ -168,34 +168,64 @@ class MediaService extends BaseService
 
     public function nearbyMediaPage(
         PageInput $input,
+        $longitude,
+        $latitude,
         $videoColumns = ['*'],
-        $noteColumns = ['*'],
-        $longitude = null,
-        $latitude = null
-    )
-    {
-        $videoQuery = ShortVideo::query()->select($videoColumns)->where('is_private', 0)->selectRaw("2 as type");
+        $noteColumns = ['*']
+    ) {
+        $videoQuery = ShortVideo::query()
+            ->select(array_merge($videoColumns, [DB::raw('2 as type')]))
+            ->where('is_private', 0);
 
-        $noteQuery = TourismNote::query()->select($noteColumns)->where('is_private', 0)->selectRaw("3 as type");
+        $noteQuery = TourismNote::query()
+            ->select(array_merge($noteColumns, [DB::raw('3 as type')]))
+            ->where('is_private', 0);
 
-        $mediaQuery = $videoQuery->union($noteQuery);
+        $unionQuery = $videoQuery->unionAll($noteQuery);
 
-        if ($longitude !== null && $latitude !== null) {
-            $haversine = "(6371 * acos(cos(radians($latitude)) * cos(radians(latitude)) * cos(radians(longitude) - radians($longitude)) + sin(radians($latitude)) * sin(radians(latitude)))) as distance";
-            $mediaQuery = $mediaQuery->select('*', DB::raw($haversine))
-                ->orderBy('distance', 'asc');
-        }
+        $haversine = "(6371 * acos(
+            cos(radians(?)) * cos(radians(latitude))
+            * cos(radians(longitude) - radians(?))
+            + sin(radians(?)) * sin(radians(latitude))
+        ))";
 
-        return $mediaQuery
+        $mediaQuery = DB::query()
+            ->fromSub($unionQuery, 'media')
+            ->select('media.*', DB::raw("$haversine as distance"))
+            ->addBinding([$latitude, $longitude, $latitude], 'select')
+            ->orderBy('distance', 'asc')
             ->orderBy('views', 'desc')
             ->orderBy('share_times', 'desc')
             ->orderBy('collection_times', 'desc')
             ->orderBy('like_number', 'desc')
             ->orderBy('praise_number', 'desc')
             ->orderBy('comments_number', 'desc')
-            ->orderBy($input->sort, $input->order)
-            ->paginate($input->limit, ['*'], 'page', $input->page);
+            ->orderBy($input->sort ?: 'created_at', $input->order ?: 'desc');
+
+        $paginator = $mediaQuery->paginate(
+            $input->limit,
+            ['*'],
+            'page',
+            $input->page
+        );
+
+        $mapped = collect($paginator->items())->map(function ($item) {
+            $arr = (array)$item;
+            $type = isset($arr['type']) ? intval($arr['type']) : null;
+
+            if ($type === 2) {
+                return (new ShortVideo)->newFromBuilder($arr);
+            } elseif ($type === 3) {
+                return (new TourismNote)->newFromBuilder($arr);
+            } else {
+                return (object)$arr;
+            }
+        });
+
+        $paginator->setCollection($mapped);
+        return $paginator;
     }
+
 
     public function collectPageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
     {
