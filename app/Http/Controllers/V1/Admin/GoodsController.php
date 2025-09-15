@@ -13,6 +13,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class GoodsController extends Controller
@@ -157,6 +158,8 @@ class GoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
+
+        Cache::forget('product_list_cache');
 
         $goods->views = $views;
         $goods->save();

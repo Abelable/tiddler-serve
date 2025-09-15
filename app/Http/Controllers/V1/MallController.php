@@ -16,6 +16,7 @@ use App\Services\ScenicService;
 use App\Services\ShopService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class MallController extends Controller
@@ -27,6 +28,19 @@ class MallController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
 
+        if ($input->page == 1) {
+            $page = Cache::remember('product_list_cache', 1440, function () use ($input) {
+                return $this->page($input);
+            });
+        } else {
+            $page = $this->page($input);
+        }
+
+        return $this->success($page);
+    }
+
+    private function page(PageInput $input)
+    {
         $scenicColumns = [
             'id',
             DB::raw('NULL as status'),

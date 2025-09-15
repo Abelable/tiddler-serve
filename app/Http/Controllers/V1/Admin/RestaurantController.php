@@ -8,6 +8,7 @@ use App\Services\RestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\RestaurantInput;
+use Illuminate\Support\Facades\Cache;
 
 class RestaurantController extends Controller
 {
@@ -61,7 +62,10 @@ class RestaurantController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
+
+        Cache::forget('product_list_cache');
         RestaurantService::getInstance()->updateViews($id, $views);
+
         return $this->success();
     }
 

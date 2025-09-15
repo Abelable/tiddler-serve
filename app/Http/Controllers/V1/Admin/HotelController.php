@@ -7,6 +7,7 @@ use App\Services\HotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\HotelPageInput;
 use App\Utils\Inputs\HotelInput;
+use Illuminate\Support\Facades\Cache;
 
 class HotelController extends Controller
 {
@@ -60,7 +61,10 @@ class HotelController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
+
+        Cache::forget('product_list_cache');
         HotelService::getInstance()->updateViews($id, $views);
+
         return $this->success();
     }
 

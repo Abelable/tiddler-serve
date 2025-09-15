@@ -8,6 +8,7 @@ use App\Services\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\ScenicInput;
+use Illuminate\Support\Facades\Cache;
 
 class ScenicController extends Controller
 {
@@ -64,7 +65,10 @@ class ScenicController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $views = $this->verifyRequiredInteger('views');
+
+        Cache::forget('product_list_cache');
         ScenicService::getInstance()->updateViews($id, $views);
+
         return $this->success();
     }
 
