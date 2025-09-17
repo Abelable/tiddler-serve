@@ -20,7 +20,7 @@ class AiServe
 
     public function __construct()
     {
-        $this->apiKey    = env('DIFY_API_KEY');
+        $this->apiKey = env('DIFY_API_KEY');
         $this->serverUrl = rtrim(env('DIFY_SERVER_URL'), '/');
 
         if (empty($this->apiKey) || empty($this->serverUrl)) {
@@ -29,9 +29,23 @@ class AiServe
     }
 
     /**
-     * 流式发送消息
+     * 发送消息到 Dify（流式模式）
+     *
+     * @param string $query
+     * @param string|null $user
+     * @param string|null $conversationId
+     * @param array $inputs
+     * @param array $files
+     * @return \Generator
+     * @throws \Exception
      */
-    public function sendMessageStream($query, callable $callback, $user = null, $conversationId = '', $inputs = [], $files = [])
+    public function sendMessageStream(
+        $query,
+        $user = null,
+        $conversationId = '',
+        $inputs = [],
+        $files = []
+    )
     {
         $url = sprintf(self::CHAT_MESSAGES_URL, $this->serverUrl);
 
@@ -52,18 +66,6 @@ class AiServe
             'Content-Type'  => 'application/json',
         ];
 
-        // 逐块读取流式输出
-        $this->httpPostStream($url, $payload, function ($chunk) use ($callback) {
-            $lines = explode("\n", $chunk);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if ($line === '') continue;
-                if (strpos($line, 'data:') === 0) {
-                    $json = trim(substr($line, 5));
-                    $data = json_decode($json, true);
-                    if ($data) $callback($data);
-                }
-            }
-        }, $headers);
+        return $this->httpPostStreamGenerator($url, $payload, $headers);
     }
 }
