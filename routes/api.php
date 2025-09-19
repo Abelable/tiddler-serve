@@ -47,6 +47,7 @@ Route::get('qr_code', 'CommonController@qrCode');
 
 Route::prefix('ai')->group(function () {
     Route::post('stream', 'AiController@stream');
+    Route::post('mp_stream', 'AiController@mpStream');
 });
 
 Route::prefix('wx')->group(function () {

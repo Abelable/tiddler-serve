@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\GiftGoods;
 use App\Models\Goods;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
@@ -144,6 +145,47 @@ class GoodsService extends BaseService
             ->get($columns);
     }
 
+    public function getTopList($count, $columns = ['*'])
+    {
+        return Goods::query()
+            ->orderBy('sales_commission_rate', 'desc')
+            ->orderBy('views', 'desc')
+            ->orderBy('score', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($count)
+            ->get($columns);
+    }
+
+    public function handleList($goodsList)
+    {
+        $goodsIds = $goodsList->pluck('id')->toArray();
+        $shopIds = $goodsList->pluck('shop_id')->toArray();
+
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
+        $groupedCouponList = CouponService::getInstance()
+            ->getCouponListByGoodsIds($goodsIds, ['goods_id', 'name', 'denomination', 'type', 'num_limit', 'price_limit'])
+            ->groupBy('goods_id');
+        $giftGoodsList = GiftGoodsService::getInstance()->getList()->keyBy('goods_id');
+
+        return $goodsList->map(function (Goods $goods) use ($shopList, $groupedCouponList, $giftGoodsList) {
+            $shopInfo = $goods->shop_id != 0 ? $shopList->get($goods->shop_id) : null;
+            $goods['shopInfo'] = $shopInfo;
+
+            $couponList = $groupedCouponList->get($goods->id);
+            $goods['couponList'] = $couponList ?: [];
+
+            /** @var GiftGoods $giftGoods */
+            $giftGoods = $giftGoodsList->get($goods->id);
+            if (!empty($giftGoods)) {
+                $goods['isGift'] = 1;
+                $goods['giftDuration'] = $giftGoods->duration;
+            }
+
+            return $goods;
+        });
+    }
+
     public function getListTotal($shopId, $status)
     {
         return Goods::query()->where('shop_id', $shopId)->where('status', $status)->count();
@@ -152,6 +194,22 @@ class GoodsService extends BaseService
     public function getGoodsById($id, $columns=['*'])
     {
         return Goods::query()->find($id, $columns);
+    }
+
+    public function getGoodsByName($name, $columns = ['*'])
+    {
+        return Goods::query()
+            ->where('name', 'like', '%' . $name . '%')
+            ->first($columns);
+    }
+
+    public function decodeGoodsInfo(Goods $goods)
+    {
+        $goods->image_list = json_decode($goods->image_list);
+        $goods->detail_image_list = json_decode($goods->detail_image_list);
+        $goods->sku_list = json_decode($goods->sku_list);
+        $goods->spec_list = json_decode($goods->spec_list);
+        return $goods;
     }
 
     public function getShopGoods($shopId, $id, $columns = ['*'])

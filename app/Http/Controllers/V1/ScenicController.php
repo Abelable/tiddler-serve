@@ -33,7 +33,7 @@ class ScenicController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = ScenicService::getInstance()->getScenicPage($input);
-        $list = ScenicService::getInstance()->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -42,7 +42,7 @@ class ScenicController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = ScenicService::getInstance()->search($input);
-        $list = ScenicService::getInstance()->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -51,7 +51,7 @@ class ScenicController extends Controller
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
         $page = ScenicService::getInstance()->getNearbyPage($input);
-        $list = ScenicService::getInstance()->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -65,7 +65,7 @@ class ScenicController extends Controller
         } else {
             $page = ScenicService::getInstance()->getScenicPage($input);
         }
-        $list = ScenicService::getInstance()->handelList(collect($page->items()));
+        $list = ScenicService::getInstance()->handleList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }
@@ -78,6 +78,8 @@ class ScenicController extends Controller
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
+
+        $scenic = ScenicService::getInstance()->decodeScenicInfo($scenic);
 
         $scenic['evaluationSummary'] = ScenicEvaluationService::getInstance()->evaluationSummary($id, 2);
         $scenic['qaSummary'] = ScenicQuestionService::getInstance()->qaSummary($id, 3);

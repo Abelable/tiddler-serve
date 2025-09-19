@@ -5,8 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Coupon;
-use App\Models\GiftGoods;
-use App\Models\Goods;
 use App\Services\AddressService;
 use App\Services\CouponService;
 use App\Services\GiftGoodsService;
@@ -18,7 +16,6 @@ use App\Services\ProductHistoryService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
 use App\Services\UserCouponService;
-use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\GoodsPageInput;
@@ -42,7 +39,7 @@ class GoodsController extends Controller
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
         $page = GoodsService::getInstance()->getAllList($input);
-        $list = $this->supplementGoodsList($page);
+        $list = GoodsService::getInstance()->handleList($page);
         return $this->success($this->paginate($page, $list));
     }
 
@@ -52,7 +49,7 @@ class GoodsController extends Controller
         /** @var GoodsPageInput $input */
         $input = GoodsPageInput::new();
         $page = GoodsService::getInstance()->search($keywords, $input);
-        $list = $this->supplementGoodsList($page);
+        $list = GoodsService::getInstance()->handleList($page);
         return $this->success($this->paginate($page, $list));
     }
 
@@ -93,10 +90,7 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $goods->image_list = json_decode($goods->image_list);
-        $goods->detail_image_list = json_decode($goods->detail_image_list);
-        $goods->spec_list = json_decode($goods->spec_list);
-        $goods->sku_list = json_decode($goods->sku_list);
+        $goods = GoodsService::getInstance()->decodeGoodsInfo($goods);
 
         if ($this->isLogin()) {
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
@@ -214,38 +208,8 @@ class GoodsController extends Controller
         /** @var RecommendGoodsPageInput $input */
         $input = RecommendGoodsPageInput::new();
         $page = GoodsService::getInstance()->getRecommendGoodsList($input);
-        $list = $this->supplementGoodsList($page);
+        $list = GoodsService::getInstance()->handleList($page);
         return $this->success($this->paginate($page, $list));
-    }
-
-    private function supplementGoodsList($page)
-    {
-        $goodsList = collect($page->items());
-        $goodsIds = $goodsList->pluck('id')->toArray();
-        $shopIds = $goodsList->pluck('shop_id')->toArray();
-
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
-        $groupedCouponList = CouponService::getInstance()
-            ->getCouponListByGoodsIds($goodsIds, ['goods_id', 'name', 'denomination', 'type', 'num_limit', 'price_limit'])
-            ->groupBy('goods_id');
-        $giftGoodsList = GiftGoodsService::getInstance()->getList()->keyBy('goods_id');
-
-        return $goodsList->map(function (Goods $goods) use ($shopList, $groupedCouponList, $giftGoodsList) {
-            $shopInfo = $goods->shop_id != 0 ? $shopList->get($goods->shop_id) : null;
-            $goods['shopInfo'] = $shopInfo;
-
-            $couponList = $groupedCouponList->get($goods->id);
-            $goods['couponList'] = $couponList ?: [];
-
-            /** @var GiftGoods $giftGoods */
-            $giftGoods = $giftGoodsList->get($goods->id);
-            if (!empty($giftGoods)) {
-                $goods['isGift'] = 1;
-                $goods['giftDuration'] = $giftGoods->duration;
-            }
-
-            return $goods;
-        });
     }
 
     public function mediaRelativeList()

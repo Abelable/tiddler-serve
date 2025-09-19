@@ -31,10 +31,13 @@ class GoodsController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $goods = GoodsService::getInstance()->getGoodsById($id);
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
+
+        $goods = GoodsService::getInstance()->decodeGoodsInfo($goods);
 
         if ($goods->shop_id != 0) {
             $shopColumns = [
@@ -70,11 +73,6 @@ class GoodsController extends Controller
             unset($shop->merchant_id);
             unset($goods->shop_id);
         }
-
-        $goods->image_list = json_decode($goods->image_list);
-        $goods->detail_image_list = json_decode($goods->detail_image_list);
-        $goods->sku_list = json_decode($goods->sku_list);
-        $goods->spec_list = json_decode($goods->spec_list);
 
         $goods['pickupAddressIds'] = $goods->pickupAddressIds();
         $goods['refundAddressIds'] = $goods->refundAddressIds();

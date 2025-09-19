@@ -42,7 +42,7 @@ class ScenicTicketController extends Controller
 
         $ticketList = $ticketList->map(function (ScenicTicket $ticket) use ($scenic, $shopList, $shopManagerListGroup) {
             $ticket['scenicId'] = $scenic->id;
-            $ticket['scenicCover'] = $scenic->image_list[0];
+            $ticket['scenicCover'] = json_decode($scenic->image_list)[0];
             $ticket['scenicName'] = $scenic->name;
 
             $shop = $shopList->get($ticket->shop_id);

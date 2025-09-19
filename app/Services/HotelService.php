@@ -101,10 +101,21 @@ class HotelService extends BaseService
             ->orderBy('distance')
             ->take($limit)
             ->get($columns);
-        return $this->handelList($list);
+        return $this->handleList($list);
     }
 
-    public function handelList($hotelList)
+    public function getTopList($count, $columns = ['*'])
+    {
+        return Hotel::query()
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('score', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($count)
+            ->get($columns);
+    }
+
+    public function handleList($hotelList)
     {
         return $hotelList->map(function (Hotel $hotel) {
             return [
@@ -133,23 +144,17 @@ class HotelService extends BaseService
 
     public function getHotelById($id, $columns=['*'])
     {
-        $hotel = Hotel::query()->find($id, $columns);
-        if (is_null($hotel)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '酒店不存在');
-        }
-        return $this->handleHotelInfo($hotel);
+        return Hotel::query()->find($id, $columns);
     }
 
     public function getHotelByName($name, $columns=['*'])
     {
-        $hotel = Hotel::query()->where('name', $name)->first($columns);
-        if (is_null($hotel)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '酒店不存在');
-        }
-        return $this->handleHotelInfo($hotel);
+        return Hotel::query()
+            ->where('name', 'like', '%' . $name . '%')
+            ->first($columns);
     }
 
-    private function handleHotelInfo(Hotel $hotel)
+    public function handleHotelInfo(Hotel $hotel)
     {
         $hotel->appearance_image_list = json_decode($hotel->appearance_image_list);
         $hotel->interior_image_list = json_decode($hotel->interior_image_list);

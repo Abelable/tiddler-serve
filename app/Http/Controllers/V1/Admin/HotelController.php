@@ -30,6 +30,8 @@ class HotelController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店不存在');
         }
 
+        $hotel = HotelService::getInstance()->handleHotelInfo($hotel);
+
         return $this->success($hotel);
     }
 

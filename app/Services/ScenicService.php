@@ -92,10 +92,21 @@ class ScenicService extends BaseService
             ->orderBy('distance')
             ->take($limit)
             ->get($columns);
-        return $this->handelList($list);
+        return $this->handleList($list);
     }
 
-    public function handelList($scenicList)
+    public function getTopList($count, $columns = ['*'])
+    {
+        return ScenicSpot::query()
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('score', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($count)
+            ->get($columns);
+    }
+
+    public function handleList($scenicList)
     {
         return $scenicList->map(function (ScenicSpot $spot) {
             return [
@@ -123,36 +134,21 @@ class ScenicService extends BaseService
 
     public function getScenicById($id, $columns=['*'])
     {
-        $scenic = ScenicSpot::query()->find($id, $columns);
-        if (is_null($scenic)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
-        }
-        return $this->decodeScenicInfo($scenic);
-    }
-
-    public function getUserScenic($userId, $scenicId, $columns = ['*'])
-    {
-        $scenic = ScenicSpot::query()->where('user_id', $userId)->find($scenicId, $columns);
-        if (is_null($scenic)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
-        }
-        return $this->decodeScenicInfo($scenic);
+        return ScenicSpot::query()->find($id, $columns);
     }
 
     public function getScenicByName($name, $columns = ['*'])
     {
-        $scenic = ScenicSpot::query()->where('name', $name)->first($columns);
-        if (is_null($scenic)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '景点不存在');
-        }
-        return $this->decodeScenicInfo($scenic);
+        return ScenicSpot::query()
+            ->where('name', 'like', '%' . $name . '%')
+            ->first($columns);
     }
 
-    private function decodeScenicInfo(ScenicSpot $scenic)
+    public function decodeScenicInfo(ScenicSpot $scenic)
     {
+        $scenic->image_list = json_decode($scenic->image_list);
         $scenic->longitude = (float) $scenic->longitude;
         $scenic->latitude = (float) $scenic->latitude;
-        $scenic->image_list = json_decode($scenic->image_list);
         $scenic->open_time_list = json_decode($scenic->open_time_list);
         $scenic->policy_list = json_decode($scenic->policy_list);
         $scenic->hotline_list = json_decode($scenic->hotline_list);

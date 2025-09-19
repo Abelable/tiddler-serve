@@ -2,7 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Catering\MealTicket;
 use App\Models\Catering\Restaurant;
+use App\Models\Catering\RestaurantCategory;
+use App\Models\Catering\SetMeal;
+use App\Services\Mall\Catering\CateringEvaluationService;
+use App\Services\Mall\Catering\CateringQuestionService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\CommonPageInput;
@@ -57,25 +62,62 @@ class RestaurantService extends BaseService
             ->paginate($input->limit, 'page', $input->page);
     }
 
+    public function getTopList($count, $columns = ['*'])
+    {
+        return Restaurant::query()
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('score', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->limit($count)
+            ->get($columns);
+    }
+
+    public function handleList($restaurantList)
+    {
+        $categoryIds = $restaurantList->pluck('category_id')->toArray();
+        $categoryList = RestaurantCategoryService::getInstance()->getListByIds($categoryIds)->keyBy('id');
+
+        return $restaurantList->map(function (Restaurant $restaurant) use ($categoryList) {
+            /** @var RestaurantCategory $category */
+            $category = $categoryList->get($restaurant->category_id);
+            $restaurant['categoryName'] = $category->name;
+            unset($restaurant->category_id);
+
+            $mealTicketList = MealTicketService::getInstance()
+                ->getListByIds($restaurant->mealTicketIds(), ['price', 'original_price']);
+            $restaurant['mealTicketList'] = $mealTicketList;
+
+            $setMealList = SetMealService::getInstance()
+                ->getListByIds($restaurant->setMealIds(), ['name', 'price', 'original_price']);
+            $restaurant['setMealList'] = $setMealList;
+
+            $restaurant->longitude = (float) $restaurant->longitude;
+            $restaurant->latitude = (float) $restaurant->latitude;
+            $restaurant->food_image_list = json_decode($restaurant->food_image_list);
+            $restaurant->environment_image_list = json_decode($restaurant->environment_image_list);
+            $restaurant->price_image_list = json_decode($restaurant->price_image_list);
+            $restaurant->tel_list = json_decode($restaurant->tel_list);
+            $restaurant->facility_list = json_decode($restaurant->facility_list);
+            $restaurant->open_time_list = json_decode($restaurant->open_time_list);
+
+            return $restaurant;
+        });
+    }
+
     public function getRestaurantById($id, $columns=['*'])
     {
-        $restaurant = Restaurant::query()->find($id, $columns);
-        if (is_null($restaurant)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '餐馆不存在');
-        }
-        return $this->decodeRestaurantInfo($restaurant);
+        return Restaurant::query()->find($id, $columns);
     }
 
-    public function getRestaurantByProviderId($providerId, $columns=['*'])
+    public function getRestaurantByName($name, $columns = ['*'])
     {
-        $restaurant = Restaurant::query()->where('provider_id', $providerId)->first($columns);
-        if (is_null($restaurant)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '餐馆不存在');
-        }
-        return $this->decodeRestaurantInfo($restaurant);
+        return Restaurant::query()
+            ->where('name', 'like', '%' . $name . '%')
+            ->first($columns);
     }
 
-    private function decodeRestaurantInfo(Restaurant $restaurant) {
+    public function decodeRestaurantInfo(Restaurant $restaurant) {
         $restaurant->longitude = (float) $restaurant->longitude;
         $restaurant->latitude = (float) $restaurant->latitude;
         $restaurant->food_image_list = json_decode($restaurant->food_image_list);
@@ -84,6 +126,29 @@ class RestaurantService extends BaseService
         $restaurant->tel_list = json_decode($restaurant->tel_list);
         $restaurant->facility_list = json_decode($restaurant->facility_list);
         $restaurant->open_time_list = json_decode($restaurant->open_time_list);
+
+        $category = RestaurantCategoryService::getInstance()->getCategoryById($restaurant->category_id);
+        $restaurant['categoryName'] = $category->name;
+
+        $mealTicketList = MealTicketService::getInstance()->getListByIds($restaurant->mealTicketIds());
+        $mealTicketList = $mealTicketList->map(function (MealTicket $ticket) {
+            $ticket->use_time_list = json_decode($ticket->use_time_list) ?: [];
+            $ticket->inapplicable_products = json_decode($ticket->inapplicable_products) ?: [];
+            return $ticket;
+        });
+        $restaurant['mealTicketList'] = $mealTicketList;
+
+        $setMealList = SetMealService::getInstance()->getListByIds($restaurant->setMealIds());
+        $setMealList = $setMealList->map(function (SetMeal $setMeal) {
+            $setMeal->use_time_list = json_decode($setMeal->use_time_list) ?: [];
+            return $setMeal;
+        });
+        $restaurant['setMealList'] = $setMealList;
+
+        $restaurant['evaluationSummary'] = CateringEvaluationService::getInstance()
+            ->evaluationSummary($restaurant->id, 2);
+        $restaurant['qaSummary'] = CateringQuestionService::getInstance()->qaSummary($restaurant->id, 3);
+
         return $restaurant;
     }
 

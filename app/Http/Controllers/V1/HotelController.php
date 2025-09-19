@@ -34,7 +34,7 @@ class HotelController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = HotelService::getInstance()->getHotelPage($input);
-        $list = HotelService::getInstance()->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -43,7 +43,7 @@ class HotelController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = HotelService::getInstance()->search($input);
-        $list = HotelService::getInstance()->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -52,7 +52,7 @@ class HotelController extends Controller
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
         $page = HotelService::getInstance()->getNearbyPage($input);
-        $list = HotelService::getInstance()->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }
 
@@ -66,7 +66,7 @@ class HotelController extends Controller
         } else {
             $page = HotelService::getInstance()->getHotelPage($input);
         }
-        $list = HotelService::getInstance()->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handleList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }
@@ -79,6 +79,8 @@ class HotelController extends Controller
         if (is_null($hotel)) {
             return $this->fail(CodeResponse::NOT_FOUND, '酒店不存在');
         }
+
+        $hotel = HotelService::getInstance()->handleHotelInfo($hotel);
 
         $hotel['evaluationSummary'] = HotelEvaluationService::getInstance()->evaluationSummary($id, 2);
         $hotel['qaSummary'] = HotelQuestionService::getInstance()->qaSummary($id, 3);
@@ -160,7 +162,7 @@ class HotelController extends Controller
         $ids = $this->verifyArray('ids');
 
         $page = HotelService::getInstance()->getHomestayPage($ids, $input);
-        $list = HotelService::getInstance()->handelList(collect($page->items()));
+        $list = HotelService::getInstance()->handleList(collect($page->items()));
 
         return $this->success($this->paginate($page, $list));
     }

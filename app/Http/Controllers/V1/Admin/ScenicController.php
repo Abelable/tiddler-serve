@@ -29,10 +29,14 @@ class ScenicController extends Controller
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
+
         $scenic = ScenicService::getInstance()->getScenicById($id);
         if (is_null($scenic)) {
             return $this->fail(CodeResponse::NOT_FOUND, '景点不存在');
         }
+
+        $scenic = ScenicService::getInstance()->decodeScenicInfo($scenic);
+
         return $this->success($scenic);
     }
 

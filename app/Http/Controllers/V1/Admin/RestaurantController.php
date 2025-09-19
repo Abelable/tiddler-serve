@@ -31,6 +31,8 @@ class RestaurantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐馆不存在');
         }
 
+        $restaurant = RestaurantService::getInstance()->decodeRestaurantInfo($restaurant);
+
         return $this->success($restaurant);
     }
 
