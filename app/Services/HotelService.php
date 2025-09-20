@@ -149,9 +149,7 @@ class HotelService extends BaseService
 
     public function getHotelByName($name, $columns=['*'])
     {
-        return Hotel::query()
-            ->where('name', 'like', '%' . $name . '%')
-            ->first($columns);
+        return Hotel::search($name)->first();
     }
 
     public function handleHotelInfo(Hotel $hotel)

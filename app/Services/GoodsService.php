@@ -198,9 +198,7 @@ class GoodsService extends BaseService
 
     public function getGoodsByName($name, $columns = ['*'])
     {
-        return Goods::query()
-            ->where('name', 'like', '%' . $name . '%')
-            ->first($columns);
+        return Goods::search($name)->first();
     }
 
     public function decodeGoodsInfo(Goods $goods)

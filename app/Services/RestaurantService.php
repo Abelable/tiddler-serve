@@ -112,9 +112,7 @@ class RestaurantService extends BaseService
 
     public function getRestaurantByName($name, $columns = ['*'])
     {
-        return Restaurant::query()
-            ->where('name', 'like', '%' . $name . '%')
-            ->first($columns);
+        return Restaurant::search($name)->first();
     }
 
     public function decodeRestaurantInfo(Restaurant $restaurant) {

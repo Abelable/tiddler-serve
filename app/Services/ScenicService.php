@@ -137,11 +137,9 @@ class ScenicService extends BaseService
         return ScenicSpot::query()->find($id, $columns);
     }
 
-    public function getScenicByName($name, $columns = ['*'])
+    public function getScenicByName($name)
     {
-        return ScenicSpot::query()
-            ->where('name', 'like', '%' . $name . '%')
-            ->first($columns);
+        return ScenicSpot::search($name)->first();
     }
 
     public function decodeScenicInfo(ScenicSpot $scenic)

@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Catering\Restaurant;
+use App\Models\Goods;
+use App\Models\Hotel;
+use App\Models\ScenicSpot;
 use App\Services\GoodsService;
 use App\Services\HotelService;
 use App\Services\RestaurantService;
@@ -103,33 +107,37 @@ class AiController extends Controller
                         // 有明确名称
                         switch ($product_type) {
                             case 1:
-                                $product = ScenicService::getInstance()->getScenicByName($name);
-                                if ($product) {
-                                    $product = ScenicService::getInstance()->decodeScenicInfo($product);
-                                    $product['cover'] = $product->image_list[0];
-                                    unset($product->image_list);
-                                    $products[] = $product;
+                                /** @var ScenicSpot $scenic */
+                                $scenic = ScenicService::getInstance()->getScenicByName($name);
+                                if ($scenic) {
+                                    $scenic = ScenicService::getInstance()->decodeScenicInfo($scenic);
+                                    $scenic['cover'] = $scenic->image_list[0];
+                                    unset($scenic->image_list);
+                                    $products[] = $scenic;
                                 }
                                 break;
 
                             case 2:
-                                $product = HotelService::getInstance()->getHotelByName($name);
-                                if ($product) {
-                                    $products[] = HotelService::getInstance()->handleHotelInfo($product);
+                                /** @var Hotel $hotel */
+                                $hotel = HotelService::getInstance()->getHotelByName($name);
+                                if ($hotel) {
+                                    $products[] = HotelService::getInstance()->handleHotelInfo($hotel);
                                 }
                                 break;
 
                             case 3:
-                                $product = RestaurantService::getInstance()->getRestaurantByName($name);
-                                if ($product) {
-                                    $products[] = RestaurantService::getInstance()->decodeRestaurantInfo($product);
+                                /** @var Restaurant $restaurant */
+                                $restaurant = RestaurantService::getInstance()->getRestaurantByName($name);
+                                if ($restaurant) {
+                                    $products[] = RestaurantService::getInstance()->decodeRestaurantInfo($restaurant);
                                 }
                                 break;
 
                             case 4:
-                                $product = GoodsService::getInstance()->getGoodsByName($name);
-                                if ($product) {
-                                    $products[] = GoodsService::getInstance()->decodeGoodsInfo($product);
+                                /** @var Goods $goods */
+                                $goods = GoodsService::getInstance()->getGoodsByName($name);
+                                if ($goods) {
+                                    $products[] = GoodsService::getInstance()->decodeGoodsInfo($goods);
                                 }
                                 break;
                         }
