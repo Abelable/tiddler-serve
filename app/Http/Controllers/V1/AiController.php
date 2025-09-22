@@ -43,6 +43,9 @@ class AiController extends Controller
             $stopOutput = false;
 
             foreach ($stream as $chunk) {
+                if (!$conversationId && $chunk['conversation_id']) {
+                    $conversationId = $chunk['conversation_id'];
+                }
                 $text = $chunk['answer'] ?? $chunk['content'] ?? $chunk['text'] ?? '';
                 if (!empty($text)) {
                     $fullText .= $text;
@@ -168,7 +171,7 @@ class AiController extends Controller
                 }
             }
 
-            echo "done: " . json_encode(['type' => $product_type ?? 0, 'list' => $products], JSON_UNESCAPED_UNICODE) . "\n\n";
+            echo "done: " . json_encode(['conversationId' => $conversationId, 'productType' => $product_type ?? 0, 'productList' => $products], JSON_UNESCAPED_UNICODE) . "\n\n";
             flush();
         } catch (\Exception $e) {
             echo "error: " . json_encode(['message' => $e->getMessage()], JSON_UNESCAPED_UNICODE) . "\n\n";
