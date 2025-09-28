@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ShopDepositPaymentLog;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Log;
 
 class ShopDepositPaymentLogService extends BaseService
@@ -40,6 +41,10 @@ class ShopDepositPaymentLogService extends BaseService
         $log->pay_id = $payId;
         $log->pay_time = now()->format('Y-m-d\TH:i:s');
         $log->save();
+
+        // 同步微信后台订单自提
+        $openid = UserService::getInstance()->getUserById($log->user_id)->openid;
+        WxMpServe::new()->verify($openid, $payId);
 
         return $log;
     }

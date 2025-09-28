@@ -373,7 +373,7 @@ class OrderService extends BaseService
                     $order->status = OrderStatus::PENDING_VERIFICATION;
                     OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
-                    // 同步微信后台订单发货
+                    // 同步微信后台订单自提
                     $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
                     WxMpServe::new()->verify($openid, $order->pay_id);
                 }

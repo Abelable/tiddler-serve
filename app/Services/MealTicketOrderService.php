@@ -247,7 +247,7 @@ class MealTicketOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
-        // 同步微信后台订单发货
+        // 同步微信后台订单自提
         $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
         WxMpServe::new()->verify($openid, $order->pay_id);
 
