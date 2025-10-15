@@ -93,12 +93,11 @@ class ScenicController extends Controller
     {
         $scenicOptions = ScenicService::getInstance()->getScenicOptions();
         $options = $scenicOptions->map(function (ScenicSpot $scenicSpot) {
-            $telList = json_decode($scenicSpot->hotline_list) ?? [];
             return [
                 'id' => $scenicSpot->id,
                 'name' => $scenicSpot->name,
                 'cover' => json_decode($scenicSpot->image_list)[0],
-                'tel' => $telList[0],
+                'tel' => json_decode($scenicSpot->hotline_list)[0] ?? "",
                 'address' => $scenicSpot->address,
                 'longitude' => $scenicSpot->longitude,
                 'latitude' => $scenicSpot->latitude,
