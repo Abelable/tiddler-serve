@@ -71,6 +71,18 @@ class RestaurantController extends Controller
         return $this->success();
     }
 
+    public function options()
+    {
+        $restaurantOptions = RestaurantService::getInstance()
+            ->getOptions(['id', 'name', 'cover', 'tel_list', 'address', 'longitude', 'latitude']);
+        $options = $restaurantOptions->map(function (Restaurant $restaurant) {
+            $restaurant['tel'] = json_decode($restaurant['tel_list'], true)[0];
+            unset($restaurant['tel_list']);
+            return $restaurant;
+        });
+        return $this->success($options);
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
@@ -82,11 +94,5 @@ class RestaurantController extends Controller
 
         $restaurant->delete();
         return $this->success();
-    }
-
-    public function options()
-    {
-        $options = RestaurantService::getInstance()->getOptions(['id', 'name', 'cover']);
-        return $this->success($options);
     }
 }

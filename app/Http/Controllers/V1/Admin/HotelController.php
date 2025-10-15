@@ -85,7 +85,8 @@ class HotelController extends Controller
 
     public function options()
     {
-        $options = HotelService::getInstance()->getHotelOptions(['id', 'name', 'cover']);
+        $options = HotelService::getInstance()
+            ->getHotelOptions(['id', 'name', 'cover', 'tel', 'address', 'longitude', 'latitude']);
         return $this->success($options);
     }
 
