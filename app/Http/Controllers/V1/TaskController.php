@@ -46,9 +46,10 @@ class TaskController extends Controller
     {
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
+        $statusList = $input->status == 0 ? [1, 2, 3, 4, 5, 6] : ($input->status == 2 ? [2, 3, 4, 5] : [$input->status]);
 
         $page = UserTaskService::getInstance()
-            ->getUserTaskPage($this->userId(), $input->status == 2 ? [2, 3, 4, 5] : [$input->status], $input);
+            ->getUserTaskPage($this->userId(), $statusList, $input);
         $userTaskList = collect($page->items());
 
         $taskIds = $userTaskList->pluck('task_id')->toArray();
