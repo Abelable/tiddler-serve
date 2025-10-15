@@ -10,6 +10,7 @@ namespace App\Models;
  * @property int $step 任务进度
  * @property int $user_id 用户id
  * @property int $task_id 任务id
+ * @property float $task_reward 任务奖励
  * @property int $product_type 产品类型：1-景点，2-酒店，3-餐饮，4-电商
  * @property int $product_id 产品id
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -27,6 +28,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStep($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereTaskId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereTaskReward($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|UserTask withTrashed()

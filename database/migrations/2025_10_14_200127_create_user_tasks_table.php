@@ -20,6 +20,7 @@ class CreateUserTasksTable extends Migration
             $table->integer('step')->default(0)->comment('任务进度');
             $table->integer('user_id')->comment('用户id');
             $table->integer('task_id')->comment('任务id');
+            $table->float('task_reward')->comment('任务奖励');
             $table->integer('product_type')->comment('产品类型：1-景点，2-酒店，3-餐饮，4-电商');
             $table->integer('product_id')->default(0)->comment('产品id');
             $table->timestamps();
