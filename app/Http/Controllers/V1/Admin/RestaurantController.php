@@ -76,7 +76,8 @@ class RestaurantController extends Controller
         $restaurantOptions = RestaurantService::getInstance()
             ->getOptions(['id', 'name', 'cover', 'tel_list', 'address', 'longitude', 'latitude']);
         $options = $restaurantOptions->map(function (Restaurant $restaurant) {
-            $restaurant['tel'] = json_decode($restaurant['tel_list'], true)[0];
+            $telList = json_decode($restaurant->tel_list) ?? [];
+            $restaurant['tel'] = $telList[0];
             unset($restaurant['tel_list']);
             return $restaurant;
         });
