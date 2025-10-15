@@ -38,15 +38,6 @@ class UserTaskService extends BaseService
             ->get();
     }
 
-    public function getListByTaskIds($userId, array $taskIds, $columns = ['*'])
-    {
-        return UserTask::query()
-            ->where('status', 1)
-            ->where('user_id', $userId)
-            ->whereIn('task_id', $taskIds)
-            ->get($columns);
-    }
-
     public function createUserTask($userId, TaskOfInviteMerchant $task)
     {
         $userTask = UserTask::new();
@@ -81,25 +72,24 @@ class UserTaskService extends BaseService
         return UserTask::query()->where('task_id', $taskId)->delete();
     }
 
-    public function expireTask($taskId)
-    {
-        $taskList = $this->getListByTaskId($taskId);
-        foreach ($taskList as $task) {
-            if (is_null($task)) {
-                $this->throwBusinessException(CodeResponse::NOT_FOUND, '用户领取的优惠券不存在');
-            }
-            $task->status = 3;
-            $task->save();
-        }
-    }
-
     public function getListByTaskId($taskId, $columns = ['*'])
     {
         return UserTask::query()->where('task_id', $taskId)->get($columns);
     }
 
-    public function getFinishedCount($userId)
+    public function getUserTaskCount($userId)
     {
-        return UserTask::query()->where('user_id', $userId)->where('status', [2, 3, 4])->count();
+        return UserTask::query()
+            ->where('user_id', $userId)
+            ->where('status', [2, 3, 4, 5])
+            ->count();
+    }
+
+    public function getUserRewardTotal($userId)
+    {
+        return UserTask::query()
+            ->where('user_id', $userId)
+            ->where('status', [2, 3, 4, 5])
+            ->sum('task_reward');
     }
 }

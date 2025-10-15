@@ -42,6 +42,17 @@ class TaskController extends Controller
         return $this->success();
     }
 
+    public function userTaskData()
+    {
+        $finishedTaskCount = UserTaskService::getInstance()->getUserTaskCount($this->userId());
+        $taskRewardTotal = UserTaskService::getInstance()->getUserRewardTotal($this->userId());
+
+        return $this->success([
+            'finishedTaskCount' => $finishedTaskCount,
+            'taskRewardTotal' => $taskRewardTotal
+        ]);
+    }
+
     public function userTaskList()
     {
         /** @var StatusPageInput $input */
