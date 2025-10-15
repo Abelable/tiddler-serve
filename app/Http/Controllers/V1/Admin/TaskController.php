@@ -28,6 +28,7 @@ class TaskController extends Controller
         if (is_null($task)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前任务不存在');
         }
+        $task['rewardList'] = json_decode($task->reward_list, true);
         return $this->success($task);
     }
 
