@@ -20,7 +20,7 @@ class TaskInput extends BaseInput
     {
         return [
             'productType' => 'required|integer|in:1,2,3,4',
-            'productId' => 'required|integer|digits_between:1,20',
+            'productId' => 'integer|digits_between:1,20',
             'productName' => 'required|string',
             'tel' => 'string',
             'address' => 'string',

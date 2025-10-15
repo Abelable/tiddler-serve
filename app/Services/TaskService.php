@@ -11,12 +11,12 @@ class TaskService extends BaseService
     public function updateTask(TaskOfInviteMerchant $task, TaskInput $input)
     {
         $task->product_type = $input->productType;
-        $task->product_id = $input->productId;
+        $task->product_id = $input->productId ?? 0;
         $task->product_name = $input->productName;
         $task->tel = $input->tel;
         $task->address = $input->address;
-        $task->longitude = $input->longitude;
-        $task->latitude = $input->latitude;
+        $task->longitude = $input->longitude ?? 0;
+        $task->latitude = $input->latitude ?? 0;
         $task->reward_total = $input->rewardTotal;
         $task->reward_list = json_encode($input->rewardList);
         $task->save();
