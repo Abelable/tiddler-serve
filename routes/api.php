@@ -622,6 +622,13 @@ Route::prefix('banner')->group(function () {
     Route::get('list', 'BannerController@list');
 });
 
+Route::prefix('task')->group(function () {
+    Route::get('list', 'TaskController@list');
+    Route::post('receive', 'TaskController@receiveTask');
+    Route::get('user_list', 'TaskController@userTasklist');
+    Route::get('detail', 'TaskController@taskDetail');
+});
+
 Route::prefix('trip_type')->group(function () {
     Route::get('hot_scenic_list', 'TripTypeController@hotScenicList');
     Route::get('lake_trip_list', 'TripTypeController@lakeTripList');
@@ -814,6 +821,16 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('up', 'BannerController@up');
         Route::post('down', 'BannerController@down');
         Route::post('delete', 'BannerController@delete');
+    });
+
+    Route::prefix('task')->group(function () {
+        Route::post('list', 'TaskController@list');
+        Route::get('detail', 'TaskController@detail');
+        Route::post('add', 'TaskController@add');
+        Route::post('edit', 'TaskController@edit');
+        Route::post('up', 'TaskController@up');
+        Route::post('down', 'TaskController@down');
+        Route::post('delete', 'TaskController@delete');
     });
 
     Route::prefix('trip_type')->group(function () {

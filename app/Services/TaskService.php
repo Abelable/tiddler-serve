@@ -44,4 +44,14 @@ class TaskService extends BaseService
     {
         return TaskOfInviteMerchant::query()->find($id, $columns);
     }
+
+    public function getTaskByStatus($id, $status, $columns = ['*'])
+    {
+        return TaskOfInviteMerchant::query()->where('status', $status)->find($id, $columns);
+    }
+
+    public function getTaskListByIds(array $ids, $columns = ['*'])
+    {
+        return TaskOfInviteMerchant::query()->whereIn('id', $ids)->get($columns);
+    }
 }

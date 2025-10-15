@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\TaskOfInviteMerchant;
 use App\Models\UserTask;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -46,10 +47,21 @@ class UserTaskService extends BaseService
             ->get($columns);
     }
 
+    public function createUserTask($userId, TaskOfInviteMerchant $task)
+    {
+        $userTask = UserTask::new();
+        $userTask->user_id = $userId;
+        $userTask->task_id = $task->id;
+        $userTask->task_reward = $task->reward_total;
+        $userTask->product_type = $task->product_type;
+        $userTask->product_id = $task->product_id;
+        $userTask->save();
+        return $userTask;
+    }
+
     public function getUserTask($userId, $taskId, $columns = ['*'])
     {
         return UserTask::query()
-            ->where('status', 1)
             ->where('user_id', $userId)
             ->where('task_id', $taskId)
             ->first($columns);
@@ -62,14 +74,6 @@ class UserTaskService extends BaseService
             ->where('user_id', $userId)
             ->where('task_id', $taskId)
             ->first($columns);
-    }
-
-    public function useTask($userId, $taskId)
-    {
-        $userTask = $this->getUserTask($userId, $taskId);
-        $userTask->status = 2;
-        $userTask->save();
-        return $userTask;
     }
 
     public function deleteByTaskId($taskId)
@@ -94,8 +98,8 @@ class UserTaskService extends BaseService
         return UserTask::query()->where('task_id', $taskId)->get($columns);
     }
 
-    public function getReceivedCount($userId, $taskId)
+    public function getFinishedCount($userId)
     {
-        return UserTask::query()->where('user_id', $userId)->where('task_id', $taskId)->count();
+        return UserTask::query()->where('user_id', $userId)->where('status', [2, 3, 4])->count();
     }
 }
