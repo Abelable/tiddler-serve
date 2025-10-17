@@ -59,17 +59,14 @@ class ScenicMerchantController extends Controller
     public function info()
     {
         $merchant = ScenicMerchantService::getInstance()->getMerchantByUserId($this->userId());
-        if (is_null($merchant)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '暂无商家信息');
+        if (!is_null($merchant)) {
+            $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
+            $merchant['shopType'] = $shop->type;
+            $merchant['deposit'] = $shop->deposit;
+            $merchant['shopBg'] = $shop->bg;
+            $merchant['shopLogo'] = $shop->logo;
+            $merchant['shopName'] = $shop->name;
         }
-
-        $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
-        $merchant['shopType'] = $shop->type;
-        $merchant['deposit'] = $shop->deposit;
-        $merchant['shopBg'] = $shop->bg;
-        $merchant['shopLogo'] = $shop->logo;
-        $merchant['shopName'] = $shop->name;
-
         return $this->success($merchant);
     }
 
