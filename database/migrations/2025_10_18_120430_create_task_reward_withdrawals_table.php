@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRewardWithdrawalsTable extends Migration
+class CreateTaskRewardWithdrawalsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateRewardWithdrawalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('reward_withdrawals', function (Blueprint $table) {
+        Schema::create('task_reward_withdrawals', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(0)->comment('状态：0-待审核；1-提现成功; 2-提现失败;');
             $table->string('failure_reason')->default('')->comment('提现失败原因');
@@ -37,6 +37,6 @@ class CreateRewardWithdrawalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reward_withdrawals');
+        Schema::dropIfExists('task_reward_withdrawals');
     }
 }
