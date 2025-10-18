@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
-    protected $except = ['list'];
+    protected $except = ['list', 'status'];
 
     public function list()
     {
@@ -24,7 +24,7 @@ class TaskController extends Controller
         return $this->successPaginate($list);
     }
 
-    public function receiveTask()
+    public function pickTask()
     {
         $id = $this->verifyRequiredId('id');
         $task = TaskService::getInstance()->getTaskByStatus($id, [1]);
@@ -32,10 +32,41 @@ class TaskController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在，或已被领取');
         }
 
-        DB::transaction(function () use ($task) {
-            UserTaskService::getInstance()->createUserTask($this->userId(), $task);
+        $userTask = UserTaskService::getInstance()->getUserTaskByStatus($this->userId(), $id, [6]);
+
+        DB::transaction(function () use ($userTask, $task) {
+            if (!is_null($userTask)) {
+                $userTask->status = 1;
+                $userTask->save();
+            } else {
+                UserTaskService::getInstance()->createUserTask($this->userId(), $task);
+            }
 
             $task->status = 2;
+            $task->save();
+        });
+
+        return $this->success();
+    }
+
+    public function cancelTask()
+    {
+        $id = $this->verifyRequiredId('id');
+        $userTask = UserTaskService::getInstance()->getUserTaskByStatus($this->userId(), $id, [1]);
+        if (is_null($userTask)) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '当前任务不可取消');
+        }
+
+        $task = TaskService::getInstance()->getTaskById($id);
+        if (is_null($task)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前任务不存在');
+        }
+
+        DB::transaction(function () use ($task, $userTask) {
+            $userTask->status = 6;
+            $userTask->save();
+
+            $task->status = 1;
             $task->save();
         });
 
@@ -109,5 +140,18 @@ class TaskController extends Controller
         unset($userTask->user_id);
 
         return $this->success($userTask);
+    }
+
+    public function status()
+    {
+        $userId = $this->verifyRequiredId('userId');
+        $taskId = $this->verifyRequiredId('taskId');
+
+        $userTask = UserTaskService::getInstance()->getUserTask($userId, $taskId);
+        if (is_null($userTask)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '请确认是否领取任务');
+        }
+
+        return $this->success($userTask->status);
     }
 }

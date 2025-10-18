@@ -624,10 +624,12 @@ Route::prefix('banner')->group(function () {
 
 Route::prefix('task')->group(function () {
     Route::get('list', 'TaskController@list');
-    Route::post('receive', 'TaskController@receiveTask');
+    Route::post('pick', 'TaskController@pickTask');
+    Route::post('cancel', 'TaskController@cancelTask');
     Route::get('user_data', 'TaskController@userTaskData');
     Route::get('user_list', 'TaskController@userTasklist');
     Route::get('detail', 'TaskController@detail');
+    Route::get('status', 'TaskController@status');
 });
 
 Route::prefix('trip_type')->group(function () {

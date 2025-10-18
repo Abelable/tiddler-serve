@@ -58,10 +58,10 @@ class UserTaskService extends BaseService
             ->first($columns);
     }
 
-    public function getUserUsedTaskByTaskId($userId, $taskId, $columns = ['*'])
+    public function getUserTaskByStatus($userId, $taskId, array $statusList, $columns = ['*'])
     {
         return UserTask::query()
-            ->where('status', 2)
+            ->whereIn('status', [$statusList])
             ->where('user_id', $userId)
             ->where('task_id', $taskId)
             ->first($columns);
