@@ -27,7 +27,7 @@ class TaskController extends Controller
     public function receiveTask()
     {
         $id = $this->verifyRequiredId('id');
-        $task = TaskService::getInstance()->getTaskByStatus($id, 1);
+        $task = TaskService::getInstance()->getTaskByStatus($id, [1]);
         if (is_null($task)) {
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在，或已被领取');
         }
@@ -98,6 +98,7 @@ class TaskController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在');
         }
 
+        $userTask['taskStatus'] = $task->status;
         $userTask['productName'] = $task->product_name;
         $userTask['tel'] = $task->tel;
         $userTask['address'] = $task->address;
