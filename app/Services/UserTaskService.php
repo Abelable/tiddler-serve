@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\TaskOfInviteMerchant;
 use App\Models\UserTask;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -44,8 +43,9 @@ class UserTaskService extends BaseService
         $userTask->user_id = $userId;
         $userTask->task_id = $task->id;
         $userTask->task_reward = $task->reward_total;
-        $userTask->product_type = $task->product_type;
+        $userTask->merchant_type = $task->merchant_type;
         $userTask->product_id = $task->product_id;
+        $userTask->pick_time = now()->format('Y-m-d\TH:i:s');
         $userTask->save();
         return $userTask;
     }

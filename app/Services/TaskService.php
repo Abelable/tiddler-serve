@@ -10,9 +10,9 @@ class TaskService extends BaseService
 {
     public function updateTask(TaskOfInviteMerchant $task, TaskInput $input)
     {
-        $task->product_type = $input->productType;
+        $task->merchant_type = $input->merchantType;
         $task->product_id = $input->productId ?? 0;
-        $task->product_name = $input->productName;
+        $task->merchant_name = $input->merchantName;
         $task->tel = $input->tel;
         $task->address = $input->address;
         $task->longitude = $input->longitude ?? 0;
@@ -29,11 +29,11 @@ class TaskService extends BaseService
         if (!is_null($input->status)) {
             $query->where('status', $input->status);
         }
-        if (!is_null($input->productType)) {
-            $query->where('product_type', $input->productType);
+        if (!is_null($input->merchantType)) {
+            $query->where('merchant_type', $input->merchantType);
         }
-        if (!is_null($input->productName)) {
-            $query->where('product_name', 'like', "%$input->productName%");
+        if (!is_null($input->merchantName)) {
+            $query->where('merchant_name', 'like', "%$input->merchantName%");
         }
         return $query
             ->orderBy($input->sort, $input->order)

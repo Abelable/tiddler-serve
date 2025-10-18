@@ -6,9 +6,9 @@ use App\Utils\Inputs\BaseInput;
 
 class TaskInput extends BaseInput
 {
-    public $productType;
+    public $merchantType;
     public $productId;
-    public $productName;
+    public $merchantName;
     public $tel;
     public $address;
     public $longitude;
@@ -19,9 +19,9 @@ class TaskInput extends BaseInput
     public function rules()
     {
         return [
-            'productType' => 'required|integer|in:1,2,3,4',
+            'merchantType' => 'required|integer|in:1,2,3,4',
             'productId' => 'integer|digits_between:1,20',
-            'productName' => 'required|string',
+            'merchantName' => 'required|string',
             'tel' => 'string',
             'address' => 'string',
             'longitude' => 'numeric',

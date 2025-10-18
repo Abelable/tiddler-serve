@@ -37,6 +37,7 @@ class TaskController extends Controller
         DB::transaction(function () use ($userTask, $task) {
             if (!is_null($userTask)) {
                 $userTask->status = 1;
+                $userTask->pick_time = now()->format('Y-m-d\TH:i:s');
                 $userTask->save();
             } else {
                 UserTaskService::getInstance()->createUserTask($this->userId(), $task);
@@ -101,7 +102,7 @@ class TaskController extends Controller
             /** @var TaskOfInviteMerchant $task */
             $task = $taskList->get($userTask->task_id);
 
-            $userTask['productName'] = $task->product_name;
+            $userTask['merchantName'] = $task->merchant_name;
             $userTask['tel'] = $task->tel;
             $userTask['address'] = $task->address;
             $userTask['longitude'] = $task->longitude;
@@ -130,7 +131,7 @@ class TaskController extends Controller
         }
 
         $userTask['taskStatus'] = $task->status;
-        $userTask['productName'] = $task->product_name;
+        $userTask['merchantName'] = $task->merchant_name;
         $userTask['tel'] = $task->tel;
         $userTask['address'] = $task->address;
         $userTask['longitude'] = $task->longitude;

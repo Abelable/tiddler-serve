@@ -11,9 +11,10 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $task_id 任务id
  * @property float $task_reward 任务奖励
- * @property int $product_type 产品类型：1-景点，2-酒店，3-餐饮，4-电商
+ * @property int $merchant_type 商家类型：1-景点，2-酒店，3-餐饮，4-电商
  * @property int $product_id 产品id
  * @property int $merchant_id 商家id
+ * @property string $pick_time 领取时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -25,8 +26,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereMerchantId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereMerchantType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask wherePickTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereProductId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereProductType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStep($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereTaskId($value)
