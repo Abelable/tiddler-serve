@@ -627,7 +627,7 @@ Route::prefix('task')->group(function () {
     Route::post('receive', 'TaskController@receiveTask');
     Route::get('user_data', 'TaskController@userTaskData');
     Route::get('user_list', 'TaskController@userTasklist');
-    Route::get('detail', 'TaskController@taskDetail');
+    Route::get('detail', 'TaskController@detail');
 });
 
 Route::prefix('trip_type')->group(function () {

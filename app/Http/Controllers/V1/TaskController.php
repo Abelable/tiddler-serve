@@ -84,16 +84,16 @@ class TaskController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
-    public function taskDetail()
+    public function detail()
     {
-        $taskId = $this->verifyRequiredId('taskId');
+        $id = $this->verifyRequiredId('id');
 
-        $userTask = UserTaskService::getInstance()->getUserTask($this->userId(), $taskId);
+        $userTask = UserTaskService::getInstance()->getUserTask($this->userId(), $id);
         if (is_null($userTask)) {
             return $this->fail(CodeResponse::NOT_FOUND, '用户未领取当前任务');
         }
 
-        $task = TaskService::getInstance()->getTaskById($taskId);
+        $task = TaskService::getInstance()->getTaskById($id);
         if (is_null($task)) {
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在');
         }
