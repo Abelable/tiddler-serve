@@ -24,6 +24,8 @@ class CreateUserTasksTable extends Migration
             $table->integer('merchant_type')->comment('商家类型：1-景点，2-酒店，3-餐饮，4-电商');
             $table->integer('product_id')->default(0)->comment('产品id');
             $table->integer('merchant_id')->default(0)->comment('商家id');
+            $table->integer('order_id')->default(0)->comment('订单id');
+            $table->integer('product_type')->default(0)->comment('产品类型：5-餐券，6-套餐');
             $table->string('pick_time')->default('')->comment('领取时间');
             $table->timestamps();
             $table->softDeletes();

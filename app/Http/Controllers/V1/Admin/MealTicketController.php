@@ -7,9 +7,11 @@ use App\Models\Catering\MealTicket;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\MealTicketListInput;
+use Illuminate\Support\Facades\DB;
 
 class MealTicketController extends Controller
 {
@@ -90,12 +92,23 @@ class MealTicketController extends Controller
         if (is_null($ticket)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐券不存在');
         }
-        $ticket->status = 1;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
-        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
-        $ticket->save();
+
+        DB::transaction(function () use ($ticket, $input) {
+            $ticket->status = 1;
+            $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+            $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+            $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+            $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+            $ticket->save();
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(3, $ticket->shopInfo->merchant_id, 2);
+            if (!is_null($userTask) && in_array($userTask->product_id, $ticket->restaurantIds())) {
+                $userTask->step = 3;
+                $userTask->save();
+            }
+        });
 
         return $this->success();
     }

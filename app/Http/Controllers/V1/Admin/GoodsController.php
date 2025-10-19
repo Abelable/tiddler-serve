@@ -9,6 +9,7 @@ use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\GoodsPageInput;
@@ -176,12 +177,22 @@ class GoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $goods->status = 1;
-        $goods->promotion_commission_rate = $input->promotionCommissionRate;
-        $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
-        $goods->save();
+        DB::transaction(function () use ($goods, $input) {
+            $goods->status = 1;
+            $goods->promotion_commission_rate = $input->promotionCommissionRate;
+            $goods->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+            $goods->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+            $goods->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+            $goods->save();
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(4, $goods->shopInfo->merchant_id, 2);
+            if (!is_null($userTask)) {
+                $userTask->step = 3;
+                $userTask->save();
+            }
+        });
 
         return $this->success();
     }

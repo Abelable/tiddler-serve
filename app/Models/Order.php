@@ -42,6 +42,7 @@ use App\Utils\Traits\OrderStatusTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Shop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
  * @method static \Illuminate\Database\Query\Builder|Order onlyTrashed()
@@ -88,4 +89,9 @@ use App\Utils\Traits\OrderStatusTrait;
 class Order extends BaseModel
 {
     use OrderStatusTrait;
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id');
+    }
 }

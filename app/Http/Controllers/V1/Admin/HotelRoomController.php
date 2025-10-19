@@ -11,9 +11,11 @@ use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
 use App\Services\HotelRoomService;
 use App\Services\HotelShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\HotelRoomListInput;
+use Illuminate\Support\Facades\DB;
 
 class HotelRoomController extends Controller
 {
@@ -116,12 +118,23 @@ class HotelRoomController extends Controller
         if (is_null($room)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店房间不存在');
         }
-        $room->status = 1;
-        $room->promotion_commission_rate = $input->promotionCommissionRate;
-        $room->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $room->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $room->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
-        $room->save();
+
+        DB::transaction(function () use ($room, $input) {
+            $room->status = 1;
+            $room->promotion_commission_rate = $input->promotionCommissionRate;
+            $room->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+            $room->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+            $room->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+            $room->save();
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(2, $room->shopInfo->merchant_id, 2);
+            if (!is_null($userTask) && $userTask->product_id == $room->hotel_id) {
+                $userTask->step = 3;
+                $userTask->save();
+            }
+        });
 
         return $this->success();
     }

@@ -7,9 +7,11 @@ use App\Models\ScenicTicket;
 use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\ScenicTicketListInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicTicketController extends Controller
 {
@@ -92,12 +94,22 @@ class ScenicTicketController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景点门票不存在');
         }
 
-        $ticket->status = 1;
-        $ticket->promotion_commission_rate = $input->promotionCommissionRate;
-        $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
-        $ticket->save();
+        DB::transaction(function () use ($ticket, $input) {
+            $ticket->status = 1;
+            $ticket->promotion_commission_rate = $input->promotionCommissionRate;
+            $ticket->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+            $ticket->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+            $ticket->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+            $ticket->save();
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(1, $ticket->shopInfo->merchant_id, 2);
+            if (!is_null($userTask) && in_array($userTask->product_id, $ticket->scenicIds())) {
+                $userTask->step = 3;
+                $userTask->save();
+            }
+        });
 
         return $this->success();
     }

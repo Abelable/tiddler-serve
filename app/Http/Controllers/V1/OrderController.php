@@ -362,7 +362,9 @@ class OrderController extends Controller
         $payParams = null;
         if ($order['total_fee'] == 0) {
             $orderList = OrderService::getInstance()->getUnpaidListByIds($orderIds);
-            OrderService::getInstance()->paySuccess($orderList);
+            DB::transaction(function () use ($orderList) {
+                OrderService::getInstance()->paySuccess($orderList);
+            });
         } else {
             $payParams = Pay::wechat()->miniapp($order);
         }

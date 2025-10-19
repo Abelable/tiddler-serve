@@ -7,6 +7,7 @@ use App\Services\ShopDepositPaymentLogService;
 use App\Services\MerchantService;
 use App\Services\ShopDepositService;
 use App\Services\ShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\MerchantInput;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,9 @@ class MerchantController extends Controller
         /** @var MerchantInput $input */
         $input = MerchantInput::new();
 
+        $inviterId = $this->verifyId('inviterId');
+        $taskId = $this->verifyId('taskId');
+
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
             if ($merchant->status == 3) {
@@ -28,12 +32,22 @@ class MerchantController extends Controller
                 return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
             }
         } else {
-            DB::transaction(function () use ($input) {
+            DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
                 ShopDepositPaymentLogService::getInstance()
                     ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 ShopDepositService::getInstance()->createShopDeposit($shop->id);
+
+                // 邀请商家入驻活动
+                if ($inviterId) {
+                    $userTask = UserTaskService::getInstance()->getUserTaskByStatus($inviterId, $taskId, [1]);
+                    if (!is_null($userTask)) {
+                        $userTask->step = 1;
+                        $userTask->merchant_id = $merchant->id;
+                        $userTask->save();
+                    }
+                }
             });
         }
 

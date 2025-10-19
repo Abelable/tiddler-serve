@@ -33,6 +33,7 @@ use App\Models\BaseModel;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Catering\CateringShop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SetMeal newQuery()
  * @method static \Illuminate\Database\Query\Builder|SetMeal onlyTrashed()
@@ -75,5 +76,10 @@ class SetMeal extends BaseModel
             ->hasMany(SetMealRestaurant::class, 'set_meal_id')
             ->pluck('restaurant_id')
             ->toArray();
+    }
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(CateringShop::class, 'shop_id');
     }
 }

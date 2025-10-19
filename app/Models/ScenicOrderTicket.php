@@ -61,4 +61,5 @@ namespace App\Models;
  */
 class ScenicOrderTicket extends BaseModel
 {
+
 }

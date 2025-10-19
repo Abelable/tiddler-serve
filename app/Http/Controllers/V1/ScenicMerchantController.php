@@ -7,6 +7,7 @@ use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopDepositPaymentLogService;
 use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ScenicMerchantInput;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,9 @@ class ScenicMerchantController extends Controller
     {
         /** @var ScenicMerchantInput $input */
         $input = ScenicMerchantInput::new();
+
+        $inviterId = $this->verifyId('inviterId');
+        $taskId = $this->verifyId('taskId');
 
         $merchant = ScenicMerchantService::getInstance()->getMerchantByUserId($this->userId());
 
@@ -29,12 +33,22 @@ class ScenicMerchantController extends Controller
                 return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
             }
         } else {
-            DB::transaction(function () use ($input) {
+            DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = ScenicMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = ScenicShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
                 ScenicShopDepositPaymentLogService::getInstance()
                     ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 ScenicShopDepositService::getInstance()->createShopDeposit($shop->id);
+
+                // 邀请商家入驻活动
+                if ($inviterId) {
+                    $userTask = UserTaskService::getInstance()->getUserTaskByStatus($inviterId, $taskId, [1]);
+                    if (!is_null($userTask)) {
+                        $userTask->step = 1;
+                        $userTask->merchant_id = $merchant->id;
+                        $userTask->save();
+                    }
+                }
             });
         }
 

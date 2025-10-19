@@ -7,6 +7,7 @@ use App\Services\HotelMerchantService;
 use App\Services\HotelShopDepositPaymentLogService;
 use App\Services\HotelShopDepositService;
 use App\Services\HotelShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelMerchantInput;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,9 @@ class HotelMerchantController extends Controller
     {
         /** @var HotelMerchantInput $input */
         $input = HotelMerchantInput::new();
+
+        $inviterId = $this->verifyId('inviterId');
+        $taskId = $this->verifyId('taskId');
 
         $merchant = HotelMerchantService::getInstance()->getMerchantByUserId($this->userId());
 
@@ -29,12 +33,22 @@ class HotelMerchantController extends Controller
                 return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
             }
         } else {
-            DB::transaction(function () use ($input) {
+            DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = HotelMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = HotelShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
                 HotelShopDepositPaymentLogService::getInstance()
                     ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 HotelShopDepositService::getInstance()->createShopDeposit($shop->id);
+
+                // 邀请商家入驻活动
+                if ($inviterId) {
+                    $userTask = UserTaskService::getInstance()->getUserTaskByStatus($inviterId, $taskId, [1]);
+                    if (!is_null($userTask)) {
+                        $userTask->step = 1;
+                        $userTask->merchant_id = $merchant->id;
+                        $userTask->save();
+                    }
+                }
             });
         }
 

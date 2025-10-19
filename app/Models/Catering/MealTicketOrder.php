@@ -39,6 +39,7 @@ use App\Utils\Traits\MealTicketOrderStatusTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\Catering\CateringShop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|MealTicketOrder newQuery()
  * @method static \Illuminate\Database\Query\Builder|MealTicketOrder onlyTrashed()
@@ -81,4 +82,9 @@ use App\Utils\Traits\MealTicketOrderStatusTrait;
 class MealTicketOrder extends BaseModel
 {
     use MealTicketOrderStatusTrait;
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(CateringShop::class, 'shop_id');
+    }
 }

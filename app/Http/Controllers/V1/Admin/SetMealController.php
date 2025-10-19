@@ -7,9 +7,11 @@ use App\Models\Catering\SetMeal;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\SetMealService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\SetMealListInput;
+use Illuminate\Support\Facades\DB;
 
 class SetMealController extends Controller
 {
@@ -90,12 +92,23 @@ class SetMealController extends Controller
         if (is_null($setMeal)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前餐饮套餐不存在');
         }
-        $setMeal->status = 1;
-        $setMeal->promotion_commission_rate = $input->promotionCommissionRate;
-        $setMeal->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
-        $setMeal->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
-        $setMeal->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
-        $setMeal->save();
+
+        DB::transaction(function () use ($setMeal, $input) {
+            $setMeal->status = 1;
+            $setMeal->promotion_commission_rate = $input->promotionCommissionRate;
+            $setMeal->promotion_commission_upper_limit = $input->promotionCommissionUpperLimit;
+            $setMeal->superior_promotion_commission_rate = $input->superiorPromotionCommissionRate;
+            $setMeal->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
+            $setMeal->save();
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(3, $setMeal->shopInfo->merchant_id, 2);
+            if (!is_null($userTask) && in_array($userTask->product_id, $setMeal->restaurantIds())) {
+                $userTask->step = 3;
+                $userTask->save();
+            }
+        });
 
         return $this->success();
     }

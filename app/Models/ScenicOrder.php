@@ -36,6 +36,7 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\ScenicShop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicOrder newQuery()
  * @method static \Illuminate\Database\Query\Builder|ScenicOrder onlyTrashed()
@@ -76,4 +77,9 @@ use App\Utils\Traits\ScenicOrderStatusTrait;
 class ScenicOrder extends BaseModel
 {
     use ScenicOrderStatusTrait;
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(ScenicShop::class, 'shop_id');
+    }
 }

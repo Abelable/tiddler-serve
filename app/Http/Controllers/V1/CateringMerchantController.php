@@ -7,6 +7,7 @@ use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
 use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
+use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringMerchantInput;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,9 @@ class CateringMerchantController extends Controller
     {
         /** @var CateringMerchantInput $input */
         $input = CateringMerchantInput::new();
+
+        $inviterId = $this->verifyId('inviterId');
+        $taskId = $this->verifyId('taskId');
 
         $merchant = CateringMerchantService::getInstance()->getMerchantByUserId($this->userId());
 
@@ -29,12 +33,22 @@ class CateringMerchantController extends Controller
                 return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
             }
         } else {
-            DB::transaction(function () use ($input) {
+            DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = CateringMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = CateringShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
                 CateringShopDepositPaymentLogService::getInstance()
                     ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 CateringShopDepositService::getInstance()->createShopDeposit($shop->id);
+
+                // 邀请商家入驻活动
+                if ($inviterId) {
+                    $userTask = UserTaskService::getInstance()->getUserTaskByStatus($inviterId, $taskId, [1]);
+                    if (!is_null($userTask)) {
+                        $userTask->step = 1;
+                        $userTask->merchant_id = $merchant->id;
+                        $userTask->save();
+                    }
+                }
             });
         }
 

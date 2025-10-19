@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Services\HotelMerchantService;
 use App\Services\HotelOrderService;
 use App\Services\HotelShopDepositPaymentLogService;
@@ -17,14 +18,19 @@ use App\Services\MerchantService;
 use App\Services\OrderService;
 use App\Services\ScenicMerchantService;
 use App\Services\ScenicOrderService;
+use App\Services\ScenicOrderTicketService;
 use App\Services\ScenicShopDepositPaymentLogService;
 use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
+use App\Services\ScenicTicketService;
 use App\Services\SetMealOrderService;
 use App\Services\ShopDepositPaymentLogService;
 use App\Services\ShopDepositService;
 use App\Services\ShopService;
+use App\Services\TaskService;
+use App\Services\UserTaskService;
 use App\Utils\AliOssServe;
+use App\Utils\Enums\ProductType;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -84,13 +90,37 @@ class CommonController extends Controller
                 ScenicMerchantService::getInstance()->paySuccess($log->merchant_id);
                 ScenicShopService::getInstance()->paySuccess($log->shop_id);
                 ScenicShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()->getByMerchantId(1, $log->merchant_id, 1);
+                if (!is_null($userTask)) {
+                    $userTask->step = 2;
+                    $userTask->save();
+                }
             });
         }
 
         if (strpos($data['attach'], 'scenic_order_sn') !== false) {
             Log::info('scenic_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                ScenicOrderService::getInstance()->wxPaySuccess($data);
+                $order = ScenicOrderService::getInstance()->wxPaySuccess($data);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()
+                    ->getByMerchantId(1, $order->shopInfo->merchant_id, 3);
+                if (!is_null($userTask)) {
+                    $scenicOrderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
+                    $scenicTicket = ScenicTicketService::getInstance()->getTicketById($scenicOrderTicket->ticket_id);
+                    if (in_array($userTask->product_id, $scenicTicket->scenicIds())) {
+                        $userTask->step = 4;
+                        $userTask->order_id = $order->id;
+                        $userTask->save();
+
+                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                        $task->status = 3;
+                        $task->save();
+                    }
+                }
             });
         }
 
@@ -101,13 +131,33 @@ class CommonController extends Controller
                 HotelMerchantService::getInstance()->paySuccess($log->merchant_id);
                 HotelShopService::getInstance()->paySuccess($log->shop_id);
                 HotelShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()->getByMerchantId(2, $log->merchant_id, 1);
+                if (!is_null($userTask)) {
+                    $userTask->step = 2;
+                    $userTask->save();
+                }
             });
         }
 
         if (strpos($data['attach'], 'hotel_order_sn') !== false) {
             Log::info('hotel_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                HotelOrderService::getInstance()->wxPaySuccess($data);
+                $order = HotelOrderService::getInstance()->wxPaySuccess($data);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()
+                    ->getByMerchantId(2, $order->shopInfo->merchant_id, 3);
+                if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
+                    $userTask->step = 4;
+                    $userTask->order_id = $order->id;
+                    $userTask->save();
+
+                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                    $task->status = 3;
+                    $task->save();
+                }
             });
         }
 
@@ -118,20 +168,55 @@ class CommonController extends Controller
                 CateringMerchantService::getInstance()->paySuccess($log->merchant_id);
                 CateringShopService::getInstance()->paySuccess($log->shop_id);
                 CateringShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()->getByMerchantId(3, $log->merchant_id, 1);
+                if (!is_null($userTask)) {
+                    $userTask->step = 2;
+                    $userTask->save();
+                }
             });
         }
 
         if (strpos($data['attach'], 'meal_ticket_order_sn') !== false) {
             Log::info('meal_ticket_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                MealTicketOrderService::getInstance()->wxPaySuccess($data);
+                $order = MealTicketOrderService::getInstance()->wxPaySuccess($data);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()
+                    ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
+                if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                    $userTask->step = 4;
+                    $userTask->order_id = $order->id;
+                    $userTask->product_type = ProductType::MEAL_TICKET;
+                    $userTask->save();
+
+                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                    $task->status = 3;
+                    $task->save();
+                }
             });
         }
 
         if (strpos($data['attach'], 'set_meal_order_sn') !== false) {
             Log::info('set_meal_order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                SetMealOrderService::getInstance()->wxPaySuccess($data);
+                $order = SetMealOrderService::getInstance()->wxPaySuccess($data);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()
+                    ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
+                if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                    $userTask->step = 4;
+                    $userTask->order_id = $order->id;
+                    $userTask->product_type = ProductType::SET_MEAL;
+                    $userTask->save();
+
+                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                    $task->status = 3;
+                    $task->save();
+                }
             });
         }
 
@@ -142,13 +227,36 @@ class CommonController extends Controller
                 MerchantService::getInstance()->paySuccess($log->merchant_id);
                 ShopService::getInstance()->paySuccess($log->shop_id);
                 ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
+
+                // 邀请商家入驻活动
+                $userTask = UserTaskService::getInstance()->getByMerchantId(4, $log->merchant_id, 1);
+                if (!is_null($userTask)) {
+                    $userTask->step = 2;
+                    $userTask->save();
+                }
             });
         }
 
         if (strpos($data['attach'], 'order_sn_list') !== false) {
             Log::info('order_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                OrderService::getInstance()->wxPaySuccess($data);
+                $orderList = OrderService::getInstance()->wxPaySuccess($data);
+
+                /** @var Order $order */
+                foreach ($orderList as $order) {
+                    // 邀请商家入驻活动
+                    $userTask = UserTaskService::getInstance()
+                        ->getByMerchantId(4, $order->shopInfo->merchant_id, 3);
+                    if (!is_null($userTask)) {
+                        $userTask->step = 4;
+                        $userTask->order_id = $order->id;
+                        $userTask->save();
+
+                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                        $task->status = 3;
+                        $task->save();
+                    }
+                }
             });
         }
 

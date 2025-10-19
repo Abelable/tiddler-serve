@@ -45,6 +45,7 @@ use Laravel\Scout\Searchable;
  * @property-read int|null $pickup_address_list_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsRefundAddress[] $refundAddressList
  * @property-read int|null $refund_address_list_count
+ * @property-read \App\Models\Shop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
  * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
@@ -123,5 +124,10 @@ class Goods extends BaseModel
     public function pickupAddressIds()
     {
         return $this->pickupAddressList()->pluck('pickup_address_id');
+    }
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(Shop::class, 'shop_id');
     }
 }

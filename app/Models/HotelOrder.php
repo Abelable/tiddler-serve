@@ -38,6 +38,7 @@ use App\Utils\Traits\HotelOrderStatusTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\HotelShop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|HotelOrder newQuery()
  * @method static \Illuminate\Database\Query\Builder|HotelOrder onlyTrashed()
@@ -80,4 +81,9 @@ use App\Utils\Traits\HotelOrderStatusTrait;
 class HotelOrder extends BaseModel
 {
     use HotelOrderStatusTrait;
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(HotelShop::class, 'shop_id');
+    }
 }

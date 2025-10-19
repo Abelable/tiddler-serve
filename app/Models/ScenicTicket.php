@@ -39,6 +39,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\ScenicShop|null $shopInfo
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\TicketSpec[] $specList
  * @property-read int|null $spec_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|ScenicTicket newModelQuery()
@@ -98,5 +99,10 @@ class ScenicTicket extends BaseModel
     public function categoryIds(): array
     {
         return $this->specList()->pluck('category_id')->toArray();
+    }
+
+    public function shopInfo()
+    {
+        return $this->belongsTo(ScenicShop::class, 'shop_id');
     }
 }

@@ -357,50 +357,48 @@ class OrderService extends BaseService
 
     public function paySuccess($orderList, $payId = null, $actualPaymentAmount = null)
     {
-        return DB::transaction(function () use ($actualPaymentAmount, $payId, $orderList) {
-            $orderList = $orderList->map(function (Order $order) use ($actualPaymentAmount, $payId) {
-                if (!is_null($payId)) {
-                    $order->pay_id = $payId;
-                }
-                if (!is_null($actualPaymentAmount)) {
-                    $order->total_payment_amount = $actualPaymentAmount;
-                }
-                $order->pay_time = now()->format('Y-m-d\TH:i:s');
-                if ($order->delivery_mode == 1) {
-                    $order->status = OrderStatus::PAID;
-                    // todo 待发货通知
-                } else {
-                    $order->status = OrderStatus::PENDING_VERIFICATION;
-                    OrderVerifyService::getInstance()->createVerifyCode($order->id);
+        $orderList = $orderList->map(function (Order $order) use ($actualPaymentAmount, $payId) {
+            if (!is_null($payId)) {
+                $order->pay_id = $payId;
+            }
+            if (!is_null($actualPaymentAmount)) {
+                $order->total_payment_amount = $actualPaymentAmount;
+            }
+            $order->pay_time = now()->format('Y-m-d\TH:i:s');
+            if ($order->delivery_mode == 1) {
+                $order->status = OrderStatus::PAID;
+                // todo 待发货通知
+            } else {
+                $order->status = OrderStatus::PENDING_VERIFICATION;
+                OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
-                    // 同步微信后台订单自提
-                    $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-                    WxMpServe::new()->verify($openid, $order->pay_id);
-                }
+                // 同步微信后台订单自提
+                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                WxMpServe::new()->verify($openid, $order->pay_id);
+            }
 
-                if ($order->cas() == 0) {
-                    $this->throwUpdateFail();
-                }
+            if ($order->cas() == 0) {
+                $this->throwUpdateFail();
+            }
 
-                // todo 通知（邮件或钉钉）管理员、
-                // todo 通知（短信、系统消息）商家
+            // todo 通知（邮件或钉钉）管理员、
+            // todo 通知（短信、系统消息）商家
 
-                return $order;
-            });
-
-            $orderIds = $orderList->pluck('id')->toArray();
-
-            // 佣金记录状态更新为：已支付待结算
-            CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
-
-            // 收益记录状态更新为：已支付待结算
-            ShopIncomeService::getInstance()->updateListToPaidStatus($orderIds);
-
-            // 更新订单商品状态
-            OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
-
-            return $orderList;
+            return $order;
         });
+
+        $orderIds = $orderList->pluck('id')->toArray();
+
+        // 佣金记录状态更新为：已支付待结算
+        CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
+
+        // 收益记录状态更新为：已支付待结算
+        ShopIncomeService::getInstance()->updateListToPaidStatus($orderIds);
+
+        // 更新订单商品状态
+        OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
+
+        return $orderList;
     }
 
     public function userCancel($userId, $orderId)

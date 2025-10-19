@@ -14,6 +14,8 @@ namespace App\Models;
  * @property int $merchant_type 商家类型：1-景点，2-酒店，3-餐饮，4-电商
  * @property int $product_id 产品id
  * @property int $merchant_id 商家id
+ * @property int $order_id 订单id
+ * @property int $product_type 产品类型：5-餐券，6-套餐
  * @property string $pick_time 领取时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -27,8 +29,10 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereMerchantId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereMerchantType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask wherePickTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereProductId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereProductType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereStep($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereTaskId($value)
