@@ -541,6 +541,18 @@ class HotelOrderService extends BaseService
                 // 删除店铺收益
                 HotelShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
 
+                // 回退任务奖励
+                $userTask = UserTaskService::getInstance()->getByOrderId(2, $order->id);
+                if (!is_null($userTask)) {
+                    $userTask->step = 3;
+                    $userTask->order_id = 0;
+                    $userTask->save();
+
+                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                    $task->status = 2;
+                    $task->save();
+                }
+
                 // todo 通知商家
             } catch (GatewayException $exception) {
                 Log::error('wx_refund_fail', [$exception]);

@@ -77,6 +77,19 @@ class UserTaskService extends BaseService
             ->first($columns);
     }
 
+    public function getByOrderId($merchantType, $orderId, $productType = null, $columns = ['*'])
+    {
+        $query = UserTask::query()
+            ->where('status', 1)
+            ->where('step', 4)
+            ->where('merchant_type', $merchantType)
+            ->where('order_id', $orderId);
+        if (!is_null($productType)) {
+            $query = $query->where('product_type', $productType);
+        }
+        return $query->first($columns);
+    }
+
     public function deleteByTaskId($taskId)
     {
         return UserTask::query()->where('task_id', $taskId)->delete();
