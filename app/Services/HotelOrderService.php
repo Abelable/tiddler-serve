@@ -546,6 +546,7 @@ class HotelOrderService extends BaseService
                 if (!is_null($userTask)) {
                     $userTask->step = 3;
                     $userTask->order_id = 0;
+                    $userTask->finish_time = '';
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);

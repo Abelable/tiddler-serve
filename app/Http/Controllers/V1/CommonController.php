@@ -114,6 +114,7 @@ class CommonController extends Controller
                     if (in_array($userTask->product_id, $scenicTicket->scenicIds())) {
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
+                        $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
                         $userTask->save();
 
                         $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -152,6 +153,7 @@ class CommonController extends Controller
                 if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
+                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -190,6 +192,7 @@ class CommonController extends Controller
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::MEAL_TICKET;
+                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -211,6 +214,7 @@ class CommonController extends Controller
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::SET_MEAL;
+                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -250,6 +254,7 @@ class CommonController extends Controller
                     if (!is_null($userTask)) {
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
+                        $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
                         $userTask->save();
 
                         $task = TaskService::getInstance()->getTaskById($userTask->task_id);
