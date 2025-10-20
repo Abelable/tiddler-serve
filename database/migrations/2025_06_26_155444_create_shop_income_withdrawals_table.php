@@ -18,6 +18,8 @@ class CreateShopIncomeWithdrawalsTable extends Migration
             $table->integer('status')->default(0)->comment('状态：0-待审核；1-提现成功; 2-提现失败;');
             $table->string('failure_reason')->default('')->comment('提现失败原因');
             $table->integer('user_id')->comment('用户id');
+            $table->integer('merchant_type')->comment('商家类型：1-景点，2-酒店，3-餐饮，4-电商');
+            $table->integer('shop_type')->default(1)->comment('店铺类型：1-企业，2-个人');
             $table->integer('shop_id')->comment('店铺id');
             $table->float('withdraw_amount')->comment('提现金额');
             $table->float('tax_fee')->default(0)->comment('税费');

@@ -10,25 +10,23 @@ use Illuminate\Support\Facades\DB;
 
 class ShopWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, $shopId, $withdrawAmount, IncomeWithdrawalInput $input)
+    public function addWithdrawal($merchantType, $shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
     {
         $withdrawal = ShopIncomeWithdrawal::new();
 
         if ($input->path == 3) { // 提现至余额
-            $taxFee = 0;
             $handlingFee = 0;
             $actualAmount = $withdrawAmount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = bcmul($withdrawAmount, '0.06', 2);
-            $handlingFee = '1.00';
-            $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
+            $handlingFee = bcmul($withdrawAmount, '0.006', 2);
+            $actualAmount = bcsub($withdrawAmount, $handlingFee, 2);
         }
 
-        $withdrawal->user_id = $userId;
+        $withdrawal->merchant_type = $merchantType;
         $withdrawal->shop_id = $shopId;
+        $withdrawal->user_id = $userId;
         $withdrawal->withdraw_amount = $withdrawAmount;
-        $withdrawal->tax_fee = $taxFee;
         $withdrawal->handling_fee = $handlingFee;
         $withdrawal->actual_amount = $actualAmount;
         $withdrawal->path = $input->path;
@@ -40,9 +38,10 @@ class ShopWithdrawalService extends BaseService
         return $withdrawal;
     }
 
-    public function getShopPage($shopId, PageInput $input, $columns = ['*'])
+    public function getShopPage($merchantType, $shopId, PageInput $input, $columns = ['*'])
     {
         return ShopIncomeWithdrawal::query()
+            ->where('merchant_type', $merchantType)
             ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);

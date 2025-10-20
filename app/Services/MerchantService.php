@@ -19,7 +19,7 @@ class MerchantService extends BaseService
     public function updateMerchant(Merchant $merchant, MerchantInput $input)
     {
         $merchant->type = $input->type;
-        if ($input->type == 2) {
+        if ($input->type == 1) {
             $merchant->company_name = $input->companyName;
             $merchant->business_license_photo = $input->businessLicensePhoto;
         }

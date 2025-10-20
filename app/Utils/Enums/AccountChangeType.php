@@ -4,8 +4,9 @@ namespace App\Utils\Enums;
 
 class AccountChangeType
 {
-    const COMMISSION_WITHDRAWAL = 1;
-    const INCOME_WITHDRAWAL = 2;
-    const PURCHASE = 3;
-    const REFUND = 4;
+    const PURCHASE = 1;
+    const REFUND = 2;
+    const COMMISSION_WITHDRAWAL = 3;
+    const INCOME_WITHDRAWAL = 4;
+    const REWARD_WITHDRAWAL = 5;
 }

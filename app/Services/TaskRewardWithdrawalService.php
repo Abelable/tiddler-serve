@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use App\Models\HotelShopIncomeWithdrawal;
+use App\Models\TaskRewardWithdrawal;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\ShopWithdrawalPageInput;
-use App\Utils\Inputs\IncomeWithdrawalInput;
+use App\Utils\Inputs\WithdrawalPageInput;
+use App\Utils\Inputs\TaskRewardWithdrawalInput;
 use Illuminate\Support\Facades\DB;
 
-class HotelShopWithdrawalService extends BaseService
+class TaskRewardWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, $shopId, $withdrawAmount, IncomeWithdrawalInput $input)
+    public function addWithdrawal($userId, $withdrawAmount, TaskRewardWithdrawalInput $input)
     {
-        $withdrawal = HotelShopIncomeWithdrawal::new();
+        $withdrawal = TaskRewardWithdrawal::new();
 
         if ($input->path == 3) { // 提现至余额
             $taxFee = 0;
@@ -20,13 +20,12 @@ class HotelShopWithdrawalService extends BaseService
             $actualAmount = $withdrawAmount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = bcmul($withdrawAmount, '0.06', 2);
+            $taxFee = bcmul($withdrawAmount, 0.06, 2);
             $handlingFee = '1.00';
             $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
         }
 
         $withdrawal->user_id = $userId;
-        $withdrawal->shop_id = $shopId;
         $withdrawal->withdraw_amount = $withdrawAmount;
         $withdrawal->tax_fee = $taxFee;
         $withdrawal->handling_fee = $handlingFee;
@@ -40,25 +39,28 @@ class HotelShopWithdrawalService extends BaseService
         return $withdrawal;
     }
 
-    public function getShopPage($shopId, PageInput $input, $columns = ['*'])
+    public function getUserRecordList($userId, PageInput $input, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()
-            ->where('shop_id', $shopId)
+        return TaskRewardWithdrawal::query()
+            ->where('user_id', $userId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getAdminPage(ShopWithdrawalPageInput $input, $columns = ['*'])
+    public function getList(WithdrawalPageInput $input, $columns = ['*'])
     {
-        $query = HotelShopIncomeWithdrawal::query();
-        if (!is_null($input->shopId)) {
-            $query = $query->where('shop_id', $input->shopId);
-        }
+        $query = TaskRewardWithdrawal::query();
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
+        if (!is_null($input->scene)) {
+            $query = $query->where('scene', $input->scene);
+        }
         if (!is_null($input->path)) {
             $query = $query->where('path', $input->path);
+        }
+        if (!is_null($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
         }
         return $query
             ->orderByRaw("FIELD(status, 0) DESC")
@@ -68,12 +70,12 @@ class HotelShopWithdrawalService extends BaseService
 
     public function getRecordById($id, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()->find($id, $columns);
+        return TaskRewardWithdrawal::query()->find($id, $columns);
     }
 
     public function getUserApplication($userId, $scene, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()
+        return TaskRewardWithdrawal::query()
             ->where('user_id', $userId)
             ->where('scene', $scene)
             ->where('status', 0)
@@ -82,12 +84,12 @@ class HotelShopWithdrawalService extends BaseService
 
     public function getCountByStatus($status)
     {
-        return HotelShopIncomeWithdrawal::query()->where('status', $status)->count();
+        return TaskRewardWithdrawal::query()->where('status', $status)->count();
     }
 
     public function getWithdrawSumListByUserIds(array $userIds)
     {
-        return HotelShopIncomeWithdrawal::query()
+        return TaskRewardWithdrawal::query()
             ->where('status', 1)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('SUM(withdraw_amount) as sum'))

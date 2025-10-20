@@ -8,6 +8,7 @@ use App\Services\ShopIncomeService;
 use App\Services\ShopWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
+use App\Utils\Enums\MerchantType;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -47,7 +48,8 @@ class ShopWithdrawalController extends Controller
         }
 
         DB::transaction(function () use ($shopId, $withdrawAmount, $input) {
-            $withdrawal = ShopWithdrawalService::getInstance()->addWithdrawal($this->userId(), $shopId, $withdrawAmount, $input);
+            $withdrawal = ShopWithdrawalService::getInstance()
+                ->addWithdrawal(MerchantType::GOODS, $shopId, $this->userId(), $withdrawAmount, $input);
 
             if ($input->path == 3) { // 提现至余额
                 ShopIncomeService::getInstance()->finishWithdrawal($shopId, $withdrawal->id);
@@ -70,7 +72,7 @@ class ShopWithdrawalController extends Controller
         $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
 
-        $page = ShopWithdrawalService::getInstance()->getShopPage($shopId, $input);
+        $page = ShopWithdrawalService::getInstance()->getShopPage(MerchantType::GOODS, $shopId, $input);
 
         return $this->successPaginate($page);
     }

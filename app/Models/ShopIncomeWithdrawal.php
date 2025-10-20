@@ -9,6 +9,8 @@ namespace App\Models;
  * @property int $status 状态：0-待审核；1-提现成功; 2-提现失败;
  * @property string $failure_reason 提现失败原因
  * @property int $user_id 用户id
+ * @property int $merchant_type 商家类型：1-景点，2-酒店，3-餐饮，4-电商
+ * @property int $shop_type 店铺类型：1-企业，2-个人
  * @property int $shop_id 店铺id
  * @property float $withdraw_amount 提现金额
  * @property float $tax_fee 税费
@@ -29,9 +31,11 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereFailureReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereHandlingFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereMerchantType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal wherePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereRemark($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereShopId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereShopType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereTaxFee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncomeWithdrawal whereUpdatedAt($value)

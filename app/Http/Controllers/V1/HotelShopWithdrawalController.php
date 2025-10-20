@@ -5,9 +5,10 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
 use App\Services\HotelShopIncomeService;
-use App\Services\HotelShopWithdrawalService;
+use App\Services\ShopWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
+use App\Utils\Enums\MerchantType;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -47,8 +48,8 @@ class HotelShopWithdrawalController extends Controller
         }
 
         DB::transaction(function () use ($shopId, $withdrawAmount, $input) {
-            $withdrawal = HotelShopWithdrawalService::getInstance()
-                ->addWithdrawal($this->userId(), $shopId, $withdrawAmount, $input);
+            $withdrawal = ShopWithdrawalService::getInstance()
+                ->addWithdrawal(MerchantType::HOTEL, $shopId, $this->userId(), $withdrawAmount, $input);
 
             if ($input->path == 3) { // 提现至余额
                 HotelShopIncomeService::getInstance()->finishWithdrawal($shopId, $withdrawal->id);
@@ -71,7 +72,7 @@ class HotelShopWithdrawalController extends Controller
         $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
 
-        $page = HotelShopWithdrawalService::getInstance()->getShopPage($shopId, $input);
+        $page = ShopWithdrawalService::getInstance()->getShopPage(MerchantType::HOTEL, $shopId, $input);
 
         return $this->successPaginate($page);
     }

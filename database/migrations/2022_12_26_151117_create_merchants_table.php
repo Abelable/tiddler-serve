@@ -19,7 +19,7 @@ class CreateMerchantsTable extends Migration
             $table->integer('status')->default(0)
                 ->comment('申请状态：0-待审核，1-审核通过，待支付保证金，2-已支付保证金，3-审核失败');
             $table->string('failure_reason')->default('')->comment('审核失败原因');
-            $table->integer('type')->comment('商家类型：1-个人，2-企业');
+            $table->integer('type')->comment('商家类型：1-企业，2-个人');
             $table->string('company_name')->default('')->comment('企业名称');
             $table->string('region_desc')->comment('省市区描述');
             $table->string('region_code_list')->comment('省市区编码');

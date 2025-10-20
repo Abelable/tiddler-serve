@@ -68,9 +68,9 @@ class ShopController extends Controller
             $merchant = $merchantList->get($log->merchant_id);
             $log['merchant_type'] = $merchant->type;
             if ($merchant->type == 1) {
-                $log['name'] = $merchant->name;
-            } else {
                 $log['company_name'] = $merchant->company_name;
+            } else {
+                $log['name'] = $merchant->name;
             }
             return $log;
         });

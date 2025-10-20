@@ -11,7 +11,7 @@ use App\Models\BaseModel;
  * @property int $user_id 用户id
  * @property int $status 申请状态：0-待审核，1-审核通过，待支付保证金，2-已支付保证金，3-审核失败
  * @property string $failure_reason 审核失败原因
- * @property int $type 商家类型：1-个体，2-企业
+ * @property int $type 商家类型：1-企业，2-个体
  * @property string $company_name 企业名称
  * @property string $region_desc 省市区描述
  * @property string $region_code_list 省市区编码
