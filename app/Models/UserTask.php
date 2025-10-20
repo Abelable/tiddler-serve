@@ -18,6 +18,7 @@ namespace App\Models;
  * @property int $product_type 产品类型：5-餐券，6-套餐
  * @property string $pick_time 领取时间
  * @property string $finish_time 完成时间
+ * @property int $withdrawal_id 提现记录id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -41,6 +42,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereTaskReward($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|UserTask whereWithdrawalId($value)
  * @method static \Illuminate\Database\Query\Builder|UserTask withTrashed()
  * @method static \Illuminate\Database\Query\Builder|UserTask withoutTrashed()
  * @mixin \Eloquent

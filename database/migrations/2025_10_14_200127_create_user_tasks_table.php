@@ -28,6 +28,7 @@ class CreateUserTasksTable extends Migration
             $table->integer('product_type')->default(0)->comment('产品类型：5-餐券，6-套餐');
             $table->string('pick_time')->default('')->comment('领取时间');
             $table->string('finish_time')->default('')->comment('完成时间');
+            $table->integer('withdrawal_id')->default(0)->comment('提现记录id');
             $table->timestamps();
             $table->softDeletes();
         });

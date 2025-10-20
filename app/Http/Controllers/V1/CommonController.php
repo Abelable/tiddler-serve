@@ -112,6 +112,7 @@ class CommonController extends Controller
                     $scenicOrderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
                     $scenicTicket = ScenicTicketService::getInstance()->getTicketById($scenicOrderTicket->ticket_id);
                     if (in_array($userTask->product_id, $scenicTicket->scenicIds())) {
+                        $userTask->status = 2;
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
                         $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
@@ -151,6 +152,7 @@ class CommonController extends Controller
                 $userTask = UserTaskService::getInstance()
                     ->getByMerchantId(2, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
+                    $userTask->status = 2;
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
@@ -189,6 +191,7 @@ class CommonController extends Controller
                 $userTask = UserTaskService::getInstance()
                     ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                    $userTask->status = 2;
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::MEAL_TICKET;
@@ -211,6 +214,7 @@ class CommonController extends Controller
                 $userTask = UserTaskService::getInstance()
                     ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                    $userTask->status = 2;
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::SET_MEAL;
@@ -252,6 +256,7 @@ class CommonController extends Controller
                     $userTask = UserTaskService::getInstance()
                         ->getByMerchantId(4, $order->shopInfo->merchant_id, 3);
                     if (!is_null($userTask)) {
+                        $userTask->status = 2;
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
                         $userTask->finish_time = now()->format('Y-m-d\TH:i:s');

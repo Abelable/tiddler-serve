@@ -10,23 +10,24 @@ use Illuminate\Support\Facades\DB;
 
 class RewardWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, $withdrawAmount, RewardWithdrawalInput $input)
+    public function addWithdrawal($userId, RewardWithdrawalInput $input)
     {
         $withdrawal = TaskRewardWithdrawal::new();
 
         if ($input->path == 3) { // 提现至余额
             $taxFee = 0;
             $handlingFee = 0;
-            $actualAmount = $withdrawAmount;
+            $actualAmount = $input->amount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = bcmul($withdrawAmount, 0.06, 2);
-            $handlingFee = bcmul($withdrawAmount, 0.006, 2);
-            $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
+            $taxFee = bcmul($input->amount, 0.06, 2);
+            $handlingFee = bcmul($input->amount, 0.006, 2);
+            $actualAmount = bcsub(bcsub($input->amount, $taxFee, 2), $handlingFee, 2);
         }
 
+        $withdrawal->task_id = $input->taskId;
         $withdrawal->user_id = $userId;
-        $withdrawal->withdraw_amount = $withdrawAmount;
+        $withdrawal->withdraw_amount = $input->amount;
         $withdrawal->tax_fee = $taxFee;
         $withdrawal->handling_fee = $handlingFee;
         $withdrawal->actual_amount = $actualAmount;
