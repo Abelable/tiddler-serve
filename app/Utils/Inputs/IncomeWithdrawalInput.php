@@ -4,14 +4,16 @@ namespace App\Utils\Inputs;
 
 class IncomeWithdrawalInput extends BaseInput
 {
-    public $withdrawAmount;
+    public $merchantType;
+    public $amount;
     public $path;
     public $remark;
 
     public function rules()
     {
         return [
-            'withdrawAmount' => 'required|numeric',
+            'merchantType' => 'integer|in:1,2,3,4',
+            'amount' => 'required|numeric',
             'path' => 'required|integer|in:1,2,3',
             'remark' => 'string',
         ];

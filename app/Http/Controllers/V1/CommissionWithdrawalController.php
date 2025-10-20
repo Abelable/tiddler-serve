@@ -30,7 +30,7 @@ class CommissionWithdrawalController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '每月25-31号才可提现');
         }
 
-        if ($input->withdrawAmount == 0) {
+        if ($input->amount == 0) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '提现金额不能为0');
         }
 
@@ -52,8 +52,8 @@ class CommissionWithdrawalController extends Controller
                 break;
         }
 
-        if (bccomp($withdrawAmount, $input->withdrawAmount, 2) != 0) {
-            $errMsg = "用户（ID：{$this->userId()}）提现金额（{$input->withdrawAmount}）与实际可提现金额（{$withdrawAmount}）不一致，请检查";
+        if (bccomp($withdrawAmount, $input->amount, 2) != 0) {
+            $errMsg = "用户（ID：{$this->userId()}）提现金额（{$input->amount}）与实际可提现金额（{$withdrawAmount}）不一致，请检查";
             Log::error($errMsg);
             return $this->fail(CodeResponse::INVALID_OPERATION, $errMsg);
         }

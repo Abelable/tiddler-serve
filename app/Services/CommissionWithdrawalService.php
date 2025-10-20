@@ -21,7 +21,7 @@ class CommissionWithdrawalService extends BaseService
             $withdrawal->status = 1;
         } else {
             $taxFee = $input->scene == 1 ? 0 : bcmul($withdrawAmount, 0.06, 2);
-            $handlingFee = '1.00';
+            $handlingFee = bcmul($withdrawAmount, 0.006, 2);
             $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
         }
 

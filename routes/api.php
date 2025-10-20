@@ -306,11 +306,6 @@ Route::prefix('scenic')->group(function () {
             Route::get('sum', 'ScenicShopIncomeController@sum');
             Route::get('time_data', 'ScenicShopIncomeController@timeData');
             Route::post('order_list', 'ScenicShopIncomeController@incomeOrderList');
-
-            Route::prefix('withdraw')->group(function () {
-                Route::post('submit', 'ScenicShopWithdrawalController@submit');
-                Route::get('record_list', 'ScenicShopWithdrawalController@recordList');
-            });
         });
     });
 
@@ -425,11 +420,6 @@ Route::prefix('hotel')->group(function () {
             Route::get('sum', 'HotelShopIncomeController@sum');
             Route::get('time_data', 'HotelShopIncomeController@timeData');
             Route::post('order_list', 'HotelShopIncomeController@incomeOrderList');
-
-            Route::prefix('withdraw')->group(function () {
-                Route::post('submit', 'HotelShopWithdrawalController@submit');
-                Route::get('record_list', 'HotelShopWithdrawalController@recordList');
-            });
         });
     });
 
@@ -565,11 +555,6 @@ Route::prefix('catering')->group(function () {
             Route::get('sum', 'CateringShopIncomeController@sum');
             Route::get('time_data', 'CateringShopIncomeController@timeData');
             Route::post('order_list', 'CateringShopIncomeController@incomeOrderList');
-
-            Route::prefix('withdraw')->group(function () {
-                Route::post('submit', 'CateringShopWithdrawalController@submit');
-                Route::get('record_list', 'CateringShopWithdrawalController@recordList');
-            });
         });
     });
 
@@ -746,10 +731,22 @@ Route::prefix('commission')->group(function () {
     Route::get('sum', 'CommissionController@sum');
     Route::get('time_data', 'CommissionController@timeData');
     Route::get('cash', 'CommissionController@cash');
+});
 
-    Route::prefix('withdraw')->group(function () {
+Route::prefix('withdraw')->group(function () {
+    Route::prefix('commission')->group(function () {
         Route::post('submit', 'CommissionWithdrawalController@submit');
         Route::get('record_list', 'CommissionWithdrawalController@recordList');
+    });
+
+    Route::prefix('income')->group(function () {
+        Route::post('submit', 'IncomeWithdrawalController@submit');
+        Route::get('record_list', 'IncomeWithdrawalController@recordList');
+    });
+
+    Route::prefix('reward')->group(function () {
+        Route::post('submit', 'RewardWithdrawalController@submit');
+        Route::get('record_list', 'RewardWithdrawalController@recordList');
     });
 });
 

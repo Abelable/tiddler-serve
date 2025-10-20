@@ -5,7 +5,7 @@ namespace App\Utils\Inputs;
 class CommissionWithdrawalInput extends BaseInput
 {
     public $scene;
-    public $withdrawAmount;
+    public $amount;
     public $path;
     public $remark;
 
@@ -13,7 +13,7 @@ class CommissionWithdrawalInput extends BaseInput
     {
         return [
             'scene' => 'required|integer|in:1,2,3',
-            'withdrawAmount' => 'required|numeric',
+            'amount' => 'required|numeric',
             'path' => 'required|integer|in:1,2,3',
             'remark' => 'string',
         ];
