@@ -49,6 +49,10 @@ Route::prefix('ai')->group(function () {
     Route::post('stream', 'AiController@stream');
 });
 
+Route::prefix('feedback')->group(function () {
+    Route::post('submit', 'FeedbackController@submit');
+});
+
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
     Route::get('qr_code', 'CommonController@wxQrCode');
