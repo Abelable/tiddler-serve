@@ -139,6 +139,7 @@ Route::prefix('shop')->group(function () {
     Route::prefix('order')->group(function () {
         Route::get('total', 'ShopOrderController@total');
         Route::get('list', 'ShopOrderController@list');
+        Route::get('search', 'ShopOrderController@search');
         Route::get('detail', 'ShopOrderController@detail');
         Route::post('verify', 'ShopOrderController@verify');
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
@@ -420,6 +421,7 @@ Route::prefix('hotel')->group(function () {
         Route::prefix('order')->group(function () {
             Route::get('total', 'HotelShopOrderController@total');
             Route::get('list', 'HotelShopOrderController@list');
+            Route::get('search', 'HotelShopOrderController@search');
             Route::get('detail', 'HotelShopOrderController@detail');
             Route::post('approve', 'HotelShopOrderController@approve');
             Route::post('refund', 'HotelShopOrderController@refund');
@@ -535,6 +537,7 @@ Route::prefix('catering')->group(function () {
             Route::prefix('order')->group(function () {
                 Route::get('total', 'ShopMealTicketOrderController@total');
                 Route::get('list', 'ShopMealTicketOrderController@list');
+                Route::get('search', 'ShopMealTicketOrderController@search');
                 Route::get('detail', 'ShopMealTicketOrderController@detail');
                 Route::post('approve', 'ShopMealTicketOrderController@approve');
                 Route::post('refund', 'ShopMealTicketOrderController@refund');
@@ -554,6 +557,7 @@ Route::prefix('catering')->group(function () {
             Route::prefix('order')->group(function () {
                 Route::get('total', 'ShopSetMealOrderController@total');
                 Route::get('list', 'ShopSetMealOrderController@list');
+                Route::get('search', 'ShopSetMealOrderController@search');
                 Route::get('detail', 'ShopSetMealOrderController@detail');
                 Route::post('approve', 'ShopSetMealOrderController@approve');
                 Route::post('refund', 'ShopSetMealOrderController@refund');

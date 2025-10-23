@@ -44,6 +44,17 @@ class ShopMealTicketOrderController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
+    public function search()
+    {
+        $shopId = $this->verifyId('shopId');
+        $keywords = $this->verifyRequiredString('keywords');
+
+        $orderList = MealTicketOrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $list = $this->handleOrderList($orderList);
+
+        return $this->success($list);
+    }
+
     private function statusList($status) {
         switch ($status) {
             case 1:
