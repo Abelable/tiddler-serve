@@ -143,6 +143,12 @@ Route::prefix('shop')->group(function () {
         Route::post('verify', 'ShopOrderController@verify');
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
         Route::post('ship', 'ShopOrderController@ship');
+
+        Route::prefix('keyword')->group(function () {
+            Route::get('list', 'ShopOrderKeywordController@list');
+            Route::post('add', 'ShopOrderKeywordController@add');
+            Route::post('clear', 'ShopOrderKeywordController@clear');
+        });
     });
 
     Route::prefix('income')->group(function () {

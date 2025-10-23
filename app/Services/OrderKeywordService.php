@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\OrderKeyword;
-use Illuminate\Support\Facades\DB;
 
 class OrderKeywordService extends BaseService
 {
