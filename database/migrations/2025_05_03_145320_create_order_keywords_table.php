@@ -16,6 +16,7 @@ class CreateOrderKeywordsTable extends Migration
         Schema::create('order_keywords', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->comment('用户id');
+            $table->integer('product_type')->comment('产品类型');
             $table->string('content')->comment('搜索关键字内容');
             $table->timestamps();
             $table->softDeletes();

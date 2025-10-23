@@ -7,19 +7,13 @@ use Illuminate\Support\Facades\DB;
 
 class OrderKeywordService extends BaseService
 {
-    public function getHotList()
+    public function getListByUserId($userId, $productType, $columns = ['*'])
     {
         return OrderKeyword::query()
-            ->select('content', DB::raw('count(*) as count'))
-            ->groupBy('content')
-            ->orderByDesc('count')
-            ->take(10)
-            ->get();
-    }
-
-    public function getListByUserId($userId, $columns = ['*'])
-    {
-        return OrderKeyword::query()->where('user_id', $userId)->orderBy('created_at', 'desc')->get($columns);
+            ->where('user_id', $userId)
+            ->where('product_type', $productType)
+            ->orderBy('created_at', 'desc')
+            ->get($columns);
     }
 
     public function clearUserKeywords($userId)
@@ -27,15 +21,20 @@ class OrderKeywordService extends BaseService
         OrderKeyword::query()->where('user_id', $userId)->delete();
     }
 
-    public function addKeyword($userId, $content)
+    public function addKeyword($userId, $productType, $content)
     {
-        $keyword = OrderKeyword::query()->where('user_id', $userId)->where('content', $content)->first();
+        $keyword = OrderKeyword::query()
+            ->where('user_id', $userId)
+            ->where('product_type', $productType)
+            ->where('content', $content)
+            ->first();
         if (!is_null($keyword)) {
             $keyword->delete();
         }
 
         $keyword = OrderKeyword::new();
         $keyword->user_id = $userId;
+        $keyword->product_type = $productType;
         $keyword->content = $content;
         $keyword->save();
     }

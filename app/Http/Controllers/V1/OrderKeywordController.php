@@ -11,15 +11,17 @@ class OrderKeywordController extends Controller
 
     public function list()
     {
-        $list = OrderKeywordService::getInstance()->getListByUserId($this->userId());
+        $productType = $this->verifyRequiredInteger('productType');
+        $list = OrderKeywordService::getInstance()->getListByUserId($this->userId(), $productType);
         $contentList = $list->pluck('content')->toArray();
         return $this->success($contentList);
     }
 
     public function add()
     {
+        $productType = $this->verifyRequiredInteger('productType');
         $keywords = $this->verifyRequiredString('keywords');
-        OrderKeywordService::getInstance()->addKeyword($this->userId(), $keywords);
+        OrderKeywordService::getInstance()->addKeyword($this->userId(), $productType, $keywords);
         return $this->success();
     }
 
