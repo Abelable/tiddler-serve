@@ -68,7 +68,7 @@ class OrderSetMealService extends BaseService
     {
         return OrderSetMeal::query()
             ->where('user_id', $userId)
-            ->where('name', 'like', "%{$keyword}%")
+            ->where('restaurant_name', 'like', "%{$keyword}%")
             ->get($columns);
     }
 
