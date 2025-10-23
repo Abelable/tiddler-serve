@@ -50,7 +50,19 @@ class ScenicShopOrderController extends Controller
         $shopId = $this->verifyId('shopId');
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderList = ScenicOrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $statusList = [
+            ScenicOrderStatus::PAID,
+            ScenicOrderStatus::REFUNDING,
+            ScenicOrderStatus::REFUNDED,
+            ScenicOrderStatus::MERCHANT_REJECTED,
+            ScenicOrderStatus::MERCHANT_APPROVED,
+            ScenicOrderStatus::CONFIRMED,
+            ScenicOrderStatus::AUTO_CONFIRMED,
+            ScenicOrderStatus::ADMIN_CONFIRMED,
+            ScenicOrderStatus::FINISHED,
+            ScenicOrderStatus::AUTO_FINISHED,
+        ];
+        $orderList = ScenicOrderService::getInstance()->searchShopOrderList($shopId, $statusList, $keywords);
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);

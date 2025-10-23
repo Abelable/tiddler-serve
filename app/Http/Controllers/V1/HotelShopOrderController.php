@@ -50,7 +50,19 @@ class HotelShopOrderController extends Controller
         $shopId = $this->verifyId('shopId');
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderList = HotelOrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $statusList = [
+            HotelOrderStatus::PAID,
+            HotelOrderStatus::REFUNDING,
+            HotelOrderStatus::REFUNDED,
+            HotelOrderStatus::MERCHANT_REJECTED,
+            HotelOrderStatus::MERCHANT_APPROVED,
+            HotelOrderStatus::CONFIRMED,
+            HotelOrderStatus::AUTO_CONFIRMED,
+            HotelOrderStatus::ADMIN_CONFIRMED,
+            HotelOrderStatus::FINISHED,
+            HotelOrderStatus::AUTO_FINISHED,
+        ];
+        $orderList = HotelOrderService::getInstance()->searchShopOrderList($shopId, $statusList, $keywords);
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);
