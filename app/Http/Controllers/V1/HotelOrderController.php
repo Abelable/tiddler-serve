@@ -224,8 +224,8 @@ class HotelOrderController extends Controller
     {
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderGoodsList = HotelOrderRoomService::getInstance()->searchList($this->userId(), $keywords);
-        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderRoomList = HotelOrderRoomService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderRoomList->pluck('order_id')->toArray();
         $orderList = HotelOrderService::getInstance()->getOrderListByIds($orderIds);
         $list = $this->handleOrderList($orderList);
 

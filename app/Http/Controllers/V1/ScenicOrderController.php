@@ -209,8 +209,8 @@ class ScenicOrderController extends Controller
     {
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderGoodsList = ScenicOrderTicketService::getInstance()->searchList($this->userId(), $keywords);
-        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderTicketList = ScenicOrderTicketService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderTicketList->pluck('order_id')->toArray();
         $orderList = ScenicOrderService::getInstance()->getOrderListByIds($orderIds);
         $list = $this->handleOrderList($orderList);
 

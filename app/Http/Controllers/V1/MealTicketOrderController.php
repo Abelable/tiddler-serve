@@ -222,8 +222,8 @@ class MealTicketOrderController extends Controller
     {
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderGoodsList = OrderMealTicketService::getInstance()->searchList($this->userId(), $keywords);
-        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderMealTicketList = OrderMealTicketService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderMealTicketList->pluck('order_id')->toArray();
         $orderList = MealTicketOrderService::getInstance()->getOrderListByIds($orderIds);
         $list = $this->handleOrderList($orderList);
 

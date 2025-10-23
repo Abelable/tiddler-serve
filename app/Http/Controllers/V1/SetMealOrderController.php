@@ -211,8 +211,8 @@ class SetMealOrderController extends Controller
     {
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderGoodsList = OrderSetMealService::getInstance()->searchList($this->userId(), $keywords);
-        $orderIds = $orderGoodsList->pluck('order_id')->toArray();
+        $orderSetMealList = OrderSetMealService::getInstance()->searchList($this->userId(), $keywords);
+        $orderIds = $orderSetMealList->pluck('order_id')->toArray();
         $orderList = SetMealOrderService::getInstance()->getOrderListByIds($orderIds);
         $list = $this->handleOrderList($orderList);
 

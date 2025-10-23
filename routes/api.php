@@ -299,6 +299,7 @@ Route::prefix('scenic')->group(function () {
         Route::prefix('order')->group(function () {
             Route::get('total', 'ScenicShopOrderController@total');
             Route::get('list', 'ScenicShopOrderController@list');
+            Route::get('search', 'ScenicShopOrderController@search');
             Route::get('detail', 'ScenicShopOrderController@detail');
             Route::post('approve', 'ScenicShopOrderController@approve');
             Route::post('refund', 'ScenicShopOrderController@refund');
