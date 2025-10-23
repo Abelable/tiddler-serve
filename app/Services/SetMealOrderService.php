@@ -90,10 +90,11 @@ class SetMealOrderService extends BaseService
         return SetMealOrder::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
-    public function searchShopOrderList($shopId, $keywords, $columns = ['*'])
+    public function searchShopOrderList($shopId, $statusList, $keywords, $columns = ['*'])
     {
         return SetMealOrder::query()
             ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
             ->where(function ($q) use ($keywords) {
                 $q->where('order_sn', 'like', "%{$keywords}%")
                     ->orWhere('consignee', 'like', "%{$keywords}%")

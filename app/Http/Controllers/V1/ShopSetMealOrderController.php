@@ -49,7 +49,19 @@ class ShopSetMealOrderController extends Controller
         $shopId = $this->verifyId('shopId');
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderList = SetMealOrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $statusList = [
+            SetMealOrderStatus::PAID,
+            SetMealOrderStatus::REFUNDING,
+            SetMealOrderStatus::REFUNDED,
+            SetMealOrderStatus::MERCHANT_REJECTED,
+            SetMealOrderStatus::MERCHANT_APPROVED,
+            SetMealOrderStatus::CONFIRMED,
+            SetMealOrderStatus::AUTO_CONFIRMED,
+            SetMealOrderStatus::ADMIN_CONFIRMED,
+            SetMealOrderStatus::FINISHED,
+            SetMealOrderStatus::AUTO_FINISHED,
+        ];
+        $orderList = SetMealOrderService::getInstance()->searchShopOrderList($shopId, $statusList, $keywords);
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);
