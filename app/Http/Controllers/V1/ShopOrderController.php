@@ -52,7 +52,20 @@ class ShopOrderController extends Controller
         $shopId = $this->verifyId('shopId');
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderList = OrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $statusList = [
+            OrderStatus::PAID,
+            OrderStatus::EXPORTED,
+            OrderStatus::REFUNDING,
+            OrderStatus::REFUNDED,
+            OrderStatus::SHIPPED,
+            OrderStatus::PENDING_VERIFICATION,
+            OrderStatus::CONFIRMED,
+            OrderStatus::AUTO_CONFIRMED,
+            OrderStatus::ADMIN_CONFIRMED,
+            OrderStatus::FINISHED,
+            OrderStatus::AUTO_FINISHED
+        ];
+        $orderList = OrderService::getInstance()->searchShopOrderList($shopId, $statusList, $keywords);
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);
