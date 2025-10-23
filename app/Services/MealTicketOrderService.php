@@ -58,10 +58,11 @@ class MealTicketOrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function searchShopOrderList($shopId, $keywords, $columns = ['*'])
+    public function searchShopOrderList($shopId, $statusList, $keywords, $columns = ['*'])
     {
         return MealTicketOrder::query()
             ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
             ->where(function ($q) use ($keywords) {
                 $q->where('order_sn', 'like', "%{$keywords}%")
                     ->orWhere('consignee', 'like', "%{$keywords}%")

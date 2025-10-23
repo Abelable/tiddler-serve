@@ -49,7 +49,19 @@ class ShopMealTicketOrderController extends Controller
         $shopId = $this->verifyId('shopId');
         $keywords = $this->verifyRequiredString('keywords');
 
-        $orderList = MealTicketOrderService::getInstance()->searchShopOrderList($shopId, $keywords);
+        $statusList = [
+            MealTicketOrderStatus::PAID,
+            MealTicketOrderStatus::REFUNDING,
+            MealTicketOrderStatus::REFUNDED,
+            MealTicketOrderStatus::MERCHANT_REJECTED,
+            MealTicketOrderStatus::MERCHANT_APPROVED,
+            MealTicketOrderStatus::CONFIRMED,
+            MealTicketOrderStatus::AUTO_CONFIRMED,
+            MealTicketOrderStatus::ADMIN_CONFIRMED,
+            MealTicketOrderStatus::FINISHED,
+            MealTicketOrderStatus::AUTO_FINISHED,
+        ];
+        $orderList = MealTicketOrderService::getInstance()->searchShopOrderList($shopId, $statusList, $keywords);
         $list = $this->handleOrderList($orderList);
 
         return $this->success($list);
