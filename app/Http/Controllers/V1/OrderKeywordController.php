@@ -27,7 +27,8 @@ class OrderKeywordController extends Controller
 
     public function clear()
     {
-        OrderKeywordService::getInstance()->clearUserKeywords($this->userId());
+        $productType = $this->verifyRequiredInteger('productType');
+        OrderKeywordService::getInstance()->clearUserKeywords($this->userId(), $productType);
         return $this->success();
     }
 }

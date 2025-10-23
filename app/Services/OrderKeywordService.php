@@ -16,9 +16,12 @@ class OrderKeywordService extends BaseService
             ->get($columns);
     }
 
-    public function clearUserKeywords($userId)
+    public function clearUserKeywords($userId, $productType)
     {
-        OrderKeyword::query()->where('user_id', $userId)->delete();
+        OrderKeyword::query()
+            ->where('user_id', $userId)
+            ->where('product_type', $productType)
+            ->delete();
     }
 
     public function addKeyword($userId, $productType, $content)

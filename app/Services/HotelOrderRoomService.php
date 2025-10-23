@@ -70,7 +70,7 @@ class HotelOrderRoomService extends BaseService
     {
         return HotelOrderRoom::query()
             ->where('user_id', $userId)
-            ->where('name', 'like', "%{$keyword}%")
+            ->where('hotel_name', 'like', "%{$keyword}%")
             ->get($columns);
     }
 
