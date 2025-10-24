@@ -37,7 +37,7 @@ class MerchantInput extends BaseInput
             'addressDetail' => 'required|string',
             'businessLicensePhoto' => 'required_if:type,2',
             'name' => 'required|string',
-            'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
+            'mobile' => 'required|regex:/^1[3-9]\d{9}$/',
             'email' => 'required|email',
             'idCardNumber' => 'required|string',
             'idCardFrontPhoto' => 'required|string',

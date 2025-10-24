@@ -23,7 +23,7 @@ class ShopInput extends BaseInput
             'name' => 'string',
             'brief' => 'string',
             'ownerName' => 'string',
-            'mobile' => 'regex:/^1[345789][0-9]{9}$/',
+            'mobile' => 'regex:/^1[3-9]\d{9}$/',
             'addressDetail' => 'string',
             'longitude' => 'numeric',
             'latitude' => 'numeric',

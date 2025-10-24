@@ -21,7 +21,7 @@ class ScenicOrderInput extends BaseInput
             'timeStamp' => 'required|integer',
             'num' => 'required|integer',
             'consignee' => 'required|string',
-            'mobile' => 'required|regex:/^1[345789][0-9]{9}$/',
+            'mobile' => 'required|regex:/^1[3-9]\d{9}$/',
             'idCardNumber' => 'required|string',
             'useBalance' => 'integer|in:0,1',
         ];
