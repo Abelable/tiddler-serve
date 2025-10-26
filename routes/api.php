@@ -437,7 +437,14 @@ Route::prefix('hotel')->group(function () {
     });
 
     Route::prefix('room')->group(function () {
-        Route::get('type_options', 'HotelRoomController@typeOptions');
+        Route::prefix('type')->group(function () {
+            Route::get('options', 'HotelRoomController@typeOptions');
+            Route::get('detail', 'HotelRoomController@typeDetail');
+            Route::post('add', 'HotelRoomController@addType');
+            Route::post('edit', 'HotelRoomController@editType');
+            Route::post('delete', 'HotelRoomController@deleteType');
+        });
+
         Route::get('list', 'HotelRoomController@list');
         Route::get('detail', 'HotelRoomController@detail');
     });

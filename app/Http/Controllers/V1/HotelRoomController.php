@@ -11,6 +11,7 @@ use App\Services\HotelRoomService;
 use App\Services\HotelShopManagerService;
 use App\Services\HotelShopService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\HotelRoomTypeInput;
 
 class HotelRoomController extends Controller
 {
@@ -19,7 +20,7 @@ class HotelRoomController extends Controller
     public function typeOptions()
     {
         $hotelId = $this->verifyRequiredId('hotelId');
-        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId);
+        $options = HotelRoomTypeService::getInstance()->getTypeOptions($hotelId, ['id', 'name']);
         $options = $options->map(function (HotelRoomType $type) {
             $type->image_list = json_decode($type->image_list);
             $type->facility_list = json_decode($type->facility_list);
@@ -31,6 +32,45 @@ class HotelRoomController extends Controller
             return $type;
         });
         return $this->success($options);
+    }
+
+    public function typeDetail()
+    {
+        $id = $this->verifyRequiredId('id');
+        $hotel = HotelRoomTypeService::getInstance()->getTypeById($id);
+        return $this->success($hotel);
+    }
+
+
+    public function addType()
+    {
+        /** @var HotelRoomTypeInput $input */
+        $input = HotelRoomTypeInput::new();
+        HotelRoomTypeService::getInstance()->createType($input);
+        return $this->success();
+    }
+
+    public function editType()
+    {
+        $id = $this->verifyRequiredId('id');
+        /** @var HotelRoomTypeInput $input */
+        $input = HotelRoomTypeInput::new();
+
+        $type = HotelRoomTypeService::getInstance()->getTypeById($id);
+
+        HotelRoomTypeService::getInstance()->updateType($type, $input);
+
+        return $this->success();
+    }
+
+    public function deleteType()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $type = HotelRoomTypeService::getInstance()->getTypeById($id);
+        $type->delete();
+
+        return $this->success();
     }
 
     public function list()
