@@ -15,6 +15,7 @@ use App\Services\RestaurantService;
 use App\Services\ScenicService;
 use App\Services\ShopService;
 use App\Utils\Enums\ProductType;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -39,7 +40,15 @@ class MallController extends Controller
         return $this->success($page);
     }
 
-    private function page(PageInput $input)
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        $page = $this->page($input, 2, $input->longitude, $input->latitude);
+        return $this->success($page);
+    }
+
+    private function page(PageInput $input, $scene = 1, $longitude = null, $latitude = null)
     {
         $scenicColumns = [
             'id',
@@ -120,7 +129,14 @@ class MallController extends Controller
 
         $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
 
-        $page = MallService::getInstance()->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        if ($scene == 1) {
+            $page = MallService::getInstance()
+                ->pageList($input, $scenicColumns, $hotelColumns, $restaurantColumns, $goodsColumns);
+        } else {
+            $page = MallService::getInstance()
+                ->nearbyPageList($input, $longitude, $latitude, $scenicColumns, $hotelColumns, $restaurantColumns);
+        }
+
         $list = collect($page->items())->map(function ($product) use ($giftGoodsIds) {
             if ($product['type'] == ProductType::SCENIC) {
                 $product['cover'] = json_decode($product['image_list'])[0];

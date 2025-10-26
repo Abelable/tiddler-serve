@@ -651,6 +651,7 @@ Route::prefix('trip_type')->group(function () {
 
 Route::prefix('mall')->group(function () {
     Route::get('product_list', 'MallController@list');
+    Route::get('nearby_product_list', 'MallController@nearbyList');
     Route::post('init_product_views', 'MallController@initViews');
 });
 

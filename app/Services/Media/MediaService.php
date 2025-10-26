@@ -226,7 +226,6 @@ class MediaService extends BaseService
         return $paginator;
     }
 
-
     public function collectPageList($userId, PageInput $input, $videoColumns = ['*'], $noteColumns = ['*'])
     {
         $videoQuery = ShortVideoCollection::query()->select($videoColumns)->where('user_id', $userId);
