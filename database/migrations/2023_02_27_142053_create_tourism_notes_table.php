@@ -20,8 +20,8 @@ class CreateTourismNotesTable extends Migration
             $table->longText('image_list')->comment('主图图片列表');
             $table->string('title')->comment('标题');
             $table->longText('content')->comment('内容');
-            $table->float('longitude')->default(0)->comment('经度');
-            $table->float('latitude')->default(0)->comment('纬度');
+            $table->decimal('longitude', 9, 6)->default(0)->comment('经度');
+            $table->decimal('latitude', 8, 6)->default(0)->comment('纬度');
             $table->string('address')->default('')->comment('具体地址');
             $table->integer('is_private')->default(0)->comment('是否为私密视频：0-否，1-是');
             $table->integer('like_number')->default(0)->comment('点赞数');

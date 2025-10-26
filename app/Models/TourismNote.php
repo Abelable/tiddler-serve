@@ -13,8 +13,8 @@ use Laravel\Scout\Searchable;
  * @property string $image_list 主图图片列表
  * @property string $title 标题
  * @property string $content 内容
- * @property float $longitude 经度
- * @property float $latitude 纬度
+ * @property string $longitude 经度
+ * @property string $latitude 纬度
  * @property string $address 具体地址
  * @property int $is_private 是否为私密视频：0-否，1-是
  * @property int $like_number 点赞数
