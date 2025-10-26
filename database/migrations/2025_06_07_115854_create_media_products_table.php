@@ -19,6 +19,7 @@ class CreateMediaProductsTable extends Migration
             $table->integer('media_id')->comment('媒体id');
             $table->integer('product_type')->comment('商品类型：1-景点，2-酒店，3-餐馆，4-商品');
             $table->integer('product_id')->comment('商品id');
+            $table->integer('sort')->default(1)->comment('排序');
             $table->timestamps();
             $table->softDeletes();
         });

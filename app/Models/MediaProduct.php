@@ -10,6 +10,7 @@ namespace App\Models;
  * @property int $media_id 媒体id
  * @property int $product_type 商品类型：1-景点，2-酒店，3-餐馆，4-商品
  * @property int $product_id 商品id
+ * @property int $sort 排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -24,6 +25,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|MediaProduct whereMediaType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaProduct whereProductId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaProduct whereProductType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|MediaProduct whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaProduct whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|MediaProduct withTrashed()
  * @method static \Illuminate\Database\Query\Builder|MediaProduct withoutTrashed()
