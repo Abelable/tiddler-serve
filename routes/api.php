@@ -469,6 +469,7 @@ Route::prefix('catering')->group(function () {
         Route::get('category_options', 'RestaurantController@categoryOptions');
         Route::get('list', 'RestaurantController@list');
         Route::get('search', 'RestaurantController@search');
+        Route::get('nearby_list', 'RestaurantController@nearbyList');
         Route::post('media_relative_list', 'RestaurantController@mediaRelativeList');
         Route::get('detail', 'RestaurantController@detail');
         Route::get('options', 'RestaurantController@options');

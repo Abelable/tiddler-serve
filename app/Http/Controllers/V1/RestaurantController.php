@@ -11,6 +11,7 @@ use App\Services\ShopRestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\RestaurantInput;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +39,15 @@ class RestaurantController extends Controller
         /** @var CommonPageInput $input */
         $input = CommonPageInput::new();
         $page = RestaurantService::getInstance()->search($input);
+        $list = RestaurantService::getInstance()->handleList(collect($page->items()));
+        return $this->success($this->paginate($page, $list));
+    }
+
+    public function nearbyList()
+    {
+        /** @var NearbyPageInput $input */
+        $input = NearbyPageInput::new();
+        $page = RestaurantService::getInstance()->getNearbyPage($input);
         $list = RestaurantService::getInstance()->handleList(collect($page->items()));
         return $this->success($this->paginate($page, $list));
     }

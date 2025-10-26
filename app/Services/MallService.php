@@ -7,6 +7,7 @@ use App\Models\Goods;
 use App\Models\Hotel;
 use App\Models\ScenicSpot;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\DB;
 
 class MallService extends BaseService
 {
@@ -42,7 +43,6 @@ class MallService extends BaseService
         $restaurantQuery = Restaurant::query()
             ->select(array_merge($restaurantColumns, [DB::raw('3 as type')]));
 
-        // 合并查询
         $unionQuery = $scenicQuery
             ->unionAll($hotelQuery)
             ->unionAll($restaurantQuery);
@@ -54,7 +54,6 @@ class MallService extends BaseService
         + sin(radians(?)) * sin(radians(latitude))
     ))";
 
-        // 主查询：计算距离 + 排序 + 分页
         $query = DB::query()
             ->fromSub($unionQuery, 'products')
             ->select('products.*', DB::raw("$haversine as distance"))
@@ -71,18 +70,22 @@ class MallService extends BaseService
             $input->page
         );
 
-        // 转换类型对应模型（方便后续访问）
         $mapped = collect($paginator->items())->map(function ($item) {
             $arr = (array)$item;
             $type = intval($arr['type'] ?? 0);
 
-            return match ($type) {
-                1 => (new ScenicSpot)->newFromBuilder($arr),
-                2 => (new Hotel)->newFromBuilder($arr),
-                3 => (new Restaurant)->newFromBuilder($arr),
-                default => (object)$arr,
-            };
+            switch ($type) {
+                case 1:
+                    return (new ScenicSpot)->newFromBuilder($arr);
+                case 2:
+                    return (new Hotel)->newFromBuilder($arr);
+                case 3:
+                    return (new Restaurant)->newFromBuilder($arr);
+                default:
+                    return (object)$arr;
+            }
         });
+
 
         $paginator->setCollection($mapped);
 

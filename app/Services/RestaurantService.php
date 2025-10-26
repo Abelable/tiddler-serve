@@ -11,6 +11,7 @@ use App\Services\Mall\Catering\CateringQuestionService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\RestaurantPageInput;
 use App\Utils\Inputs\CommonPageInput;
+use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\RestaurantInput;
 use Illuminate\Support\Facades\DB;
 
@@ -60,6 +61,28 @@ class RestaurantService extends BaseService
             ->orderBy('score', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, 'page', $input->page);
+    }
+
+    public function getNearbyPage(NearbyPageInput $input, $columns = ['*'])
+    {
+        $query = Restaurant::query();
+        if (!empty($input->id)) {
+            $query = $query->where('id', '!=', $input->id);
+        }
+        $query = $query
+            ->select(
+                '*',
+                DB::raw(
+                    '(6371 * acos(cos(radians(' . $input->latitude . ')) * cos(radians(latitude)) * cos(radians(longitude) - radians(' . $input->longitude . ')) + sin(radians(' . $input->latitude . ')) * sin(radians(latitude)))) AS distance'
+                )
+            );
+        if ($input->radius != 0) {
+            $query = $query->having('distance', '<=', $input->radius);
+        }
+        return $query
+            ->orderBy('distance')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getTopList($count, $columns = ['*'])

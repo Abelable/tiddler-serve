@@ -62,14 +62,17 @@ class ScenicService extends BaseService
         if (!empty($input->id)) {
             $query = $query->where('id', '!=', $input->id);
         }
-        return $query
+        $query = $query
             ->select(
                 '*',
                 DB::raw(
                     '(6371 * acos(cos(radians(' . $input->latitude . ')) * cos(radians(latitude)) * cos(radians(longitude) - radians(' . $input->longitude . ')) + sin(radians(' . $input->latitude . ')) * sin(radians(latitude)))) AS distance'
                 )
-            )
-            ->having('distance', '<=', $input->radius)
+            );
+        if ($input->radius != 0) {
+            $query = $query->having('distance', '<=', $input->radius);
+        }
+        return $query
             ->orderBy('distance')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
