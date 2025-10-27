@@ -389,7 +389,19 @@ class MediaController extends Controller
         /** @var ProductMediaPageInput $input */
         $input = ProductMediaPageInput::new();
 
-        $page = MediaProductService::getInstance()->getMediaPage($input);
+        if ($input->page == 1) {
+            $cacheKey = sprintf(
+                'product_media_list_%s_%s',
+                $input->productType ?? 0,
+                $input->productId ?? 0,
+            );
+            $page = Cache::remember($cacheKey, 1440, function () use ($input) {
+                return MediaProductService::getInstance()->getMediaPage($input);
+            });
+        } else {
+            $page = MediaProductService::getInstance()->getMediaPage($input);
+        }
+
         $mediaList = collect($page->items());
 
         $videoIds = $mediaList->filter(function (MediaProduct $mediaProduct) {
