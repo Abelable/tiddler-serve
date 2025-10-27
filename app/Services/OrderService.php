@@ -486,9 +486,19 @@ class OrderService extends BaseService
                 $this->restoreCoupon($order->user_id, $order->coupon_id);
             }
 
+            // 退还余额
+            if ($order->deduction_balance != 0) {
+                AccountService::getInstance()->updateBalance(
+                    $order->user_id,
+                    AccountChangeType::REFUND,
+                    $order->deduction_balance,
+                    $order->order_sn,
+                    ProductType::GOODS
+                );
+            }
+
             return $order;
         });
-
 
         $orderIds = $orderList->pluck('id')->toArray();
 
