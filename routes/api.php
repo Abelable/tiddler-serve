@@ -836,6 +836,22 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'AuthInfoController@delete');
     });
 
+    Route::prefix('complaint_option')->group(function () {
+        Route::post('list', 'ComplaintOptionController@list');
+        Route::get('detail', 'ComplaintOptionController@detail');
+        Route::post('add', 'ComplaintOptionController@add');
+        Route::post('edit', 'ComplaintOptionController@edit');
+        Route::post('delete', 'ComplaintOptionController@delete');
+    });
+
+    Route::prefix('evaluation_tag')->group(function () {
+        Route::post('list', 'EvaluationTagController@list');
+        Route::get('detail', 'EvaluationTagController@detail');
+        Route::post('add', 'EvaluationTagController@add');
+        Route::post('edit', 'EvaluationTagController@edit');
+        Route::post('delete', 'EvaluationTagController@delete');
+    });
+
     Route::prefix('banner')->group(function () {
         Route::post('list', 'BannerController@list');
         Route::get('detail', 'BannerController@detail');
