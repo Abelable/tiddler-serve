@@ -51,9 +51,9 @@ class PromoterQaController extends Controller
     public function add()
     {
         $promoterId = $this->verifyRequiredId('promoterId');
-        $question = $this->verifyRequiredString('question');
+        $content = $this->verifyRequiredString('content');
 
-        PromoterQaService::getInstance()->createQa($this->userId(), $promoterId, $question);
+        PromoterQaService::getInstance()->createQa($this->userId(), $promoterId, $content);
 
         return $this->success();
     }
