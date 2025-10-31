@@ -10,7 +10,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property float $score 评分
  * @property string $content 内容
- * @property string $imageList 图片
+ * @property string $image_list 图片
  * @property int $like_number 点赞数
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

@@ -8,7 +8,7 @@ namespace App\Models;
  * @property int $id
  * @property int $user_id 用户id
  * @property string $content 描述
- * @property string $imageList 凭证
+ * @property string $image_list 凭证
  * @property string $mobile 联系电话
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at

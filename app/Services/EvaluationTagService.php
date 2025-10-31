@@ -23,6 +23,11 @@ class EvaluationTagService extends BaseService
         return EvaluationTag::query()->find($id, $columns);
     }
 
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return EvaluationTag::query()->whereIn('id', $ids)->get($columns);
+    }
+
     public function getEvaluationTagOptions($columns = ['*'])
     {
         return EvaluationTag::query()->get($columns);

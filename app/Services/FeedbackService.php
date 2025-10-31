@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Models\Feedback;
-use App\Utils\Inputs\Admin\FeedbackInput;
+use App\Utils\Inputs\FeedbackInput;
 use App\Utils\Inputs\PageInput;
 
 class FeedbackService extends BaseService
@@ -11,7 +11,7 @@ class FeedbackService extends BaseService
     public function createFeedback(Feedback $feedback, FeedbackInput $input)
     {
         $feedback->content = $input->content;
-        $feedback->imageList = json_encode($input->imageList);
+        $feedback->image_list = json_encode($input->imageList);
         if (!is_null($input->mobile)) {
             $feedback->mobile = $input->mobile;
         }

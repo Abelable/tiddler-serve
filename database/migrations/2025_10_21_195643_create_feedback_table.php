@@ -17,7 +17,7 @@ class CreateFeedbackTable extends Migration
             $table->id();
             $table->integer('user_id')->default(0)->comment('用户id');
             $table->string('content')->comment('描述');
-            $table->string('imageList')->default('[]')->comment('凭证');
+            $table->string('image_list')->default('[]')->comment('凭证');
             $table->string('mobile')->default('')->comment('联系电话');
             $table->timestamps();
             $table->softDeletes();

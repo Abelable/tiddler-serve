@@ -19,7 +19,7 @@ class CreatePromoterEvaluationsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->float('score')->comment('评分');
             $table->string('content')->comment('内容');
-            $table->string('imageList')->default('[]')->comment('图片');
+            $table->string('image_list')->default('[]')->comment('图片');
             $table->integer('like_number')->default(0)->comment('点赞数');
             $table->timestamps();
             $table->softDeletes();

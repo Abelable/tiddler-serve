@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Utils\Inputs\Admin;
-
-use App\Utils\Inputs\BaseInput;
+namespace App\Utils\Inputs;
 
 class FeedbackInput extends BaseInput
 {
