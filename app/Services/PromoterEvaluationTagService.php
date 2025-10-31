@@ -22,11 +22,11 @@ class PromoterEvaluationTagService extends BaseService
         return PromoterEvaluationTag::query()->whereIn('evaluation_id', $evaluationIds)->get($columns);
     }
 
-    public function getPromoterTagList($promoterId, $columns = ['*'])
+    public function getPromoterTagList($promoterId)
     {
         return PromoterEvaluationTag::query()
             ->where('promoter_id', $promoterId)
-            ->select(array_merge($columns, [DB::raw('COUNT(*) as count')]))
+            ->select('tag_id', DB::raw('COUNT(*) as count'))
             ->groupBy('tag_id')
             ->get();
     }
