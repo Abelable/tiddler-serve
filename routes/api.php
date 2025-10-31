@@ -742,8 +742,26 @@ Route::prefix('promoter')->group(function () {
     Route::get('today_new_customer_list', 'PromoterController@todayNewCustomerList');
     Route::get('today_ordering_customer_list', 'PromoterController@todayOrderingCustomerList');
     Route::get('customer_list', 'PromoterController@customerList');
-});
 
+    Route::prefix('qa')->group(function () {
+        Route::get('summary', 'PromoterQaController@summary');
+        Route::get('list', 'PromoterQaController@list');
+        Route::post('add', 'PromoterQaController@add');
+        Route::post('answer', 'PromoterQaController@answer');
+        Route::post('delete', 'PromoterQaController@delete');
+    });
+
+    Route::prefix('evaluation')->group(function () {
+        Route::get('summary', 'PromoterEvaluationController@summary');
+        Route::get('list', 'PromoterEvaluationController@list');
+        Route::post('add', 'PromoterEvaluationController@add');
+        Route::post('delete', 'PromoterEvaluationController@delete');
+    });
+
+    Route::prefix('complaint')->group(function () {
+        Route::post('submit', 'PromoterComplaintController@submit');
+    });
+});
 Route::prefix('shop_deposit')->group(function () {
     Route::get('info', 'ShopDepositController@accountInfo');
     Route::get('change_log_list', 'ShopDepositController@changeLogList');
