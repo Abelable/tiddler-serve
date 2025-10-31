@@ -12,6 +12,7 @@ class PromoterComplaintService extends BaseService
     {
         $complaint = PromoterComplaint::new();
         $complaint->user_id = $userId;
+        $complaint->promoter_id = $input->promoterId;
         $complaint->option_ids = $input->optionIds;
         $complaint->content = $input->content ?? '';
         $complaint->imageList = json_encode($input->imageList);

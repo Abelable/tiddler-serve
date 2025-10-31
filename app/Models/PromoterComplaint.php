@@ -7,6 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $user_id 用户id
+ * @property int $promoter_id 代言人id
  * @property string $option_ids 选项ids
  * @property string $content 描述
  * @property string $imageList 凭证
@@ -23,6 +24,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint whereImageList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint whereOptionIds($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint wherePromoterId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|PromoterComplaint whereUserId($value)
  * @method static \Illuminate\Database\Query\Builder|PromoterComplaint withTrashed()
