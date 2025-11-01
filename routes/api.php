@@ -862,6 +862,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('add', 'ComplaintOptionController@add');
         Route::post('edit', 'ComplaintOptionController@edit');
         Route::post('delete', 'ComplaintOptionController@delete');
+        Route::get('options', 'ComplaintOptionController@options');
     });
 
     Route::prefix('evaluation_tag')->group(function () {

@@ -23,8 +23,8 @@ class ComplaintOptionService extends BaseService
         return ComplaintOption::query()->find($id, $columns);
     }
 
-    public function getComplaintOptionOptions($columns = ['*'])
+    public function getComplaintOptions($type, $columns = ['*'])
     {
-        return ComplaintOption::query()->get($columns);
+        return ComplaintOption::query()->where('type', $type)->get($columns);
     }
 }

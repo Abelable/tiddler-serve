@@ -75,4 +75,11 @@ class ComplaintOptionController extends Controller
         $option->delete();
         return $this->success();
     }
+
+    public function options()
+    {
+        $type = $this->verifyRequiredInteger('type');
+        $options = ComplaintOptionService::getInstance()->getComplaintOptions($type, ['id', 'title']);
+        return $this->success($options);
+    }
 }
