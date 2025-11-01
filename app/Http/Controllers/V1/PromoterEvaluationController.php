@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\EvaluationTag;
 use App\Models\PromoterEvaluation;
 use App\Models\PromoterEvaluationTag;
 use App\Services\EvaluationTagService;
@@ -48,15 +49,17 @@ class PromoterEvaluationController extends Controller
 
         $page = PromoterEvaluationService::getInstance()->evaluationPage($promoterId, $input);
         $evaluationList = collect($page->items());
-        $evaluationIds = $evaluationList->pluck('evaluation_id')->toArray();
+        $evaluationIds = $evaluationList->pluck('id')->toArray();
 
         $promoterEvaluationTagList = PromoterEvaluationTagService::getInstance()->getListByEvaluationIds($evaluationIds);
         $evaluationTagIds = $promoterEvaluationTagList->pluck('tag_id')->toArray();
-        $evaluationTagList = EvaluationTagService::getInstance()->getListByIds($evaluationTagIds);
+        $evaluationTagList = EvaluationTagService::getInstance()->getListByIds($evaluationTagIds)->keyBy('id');
         $tagLists = $promoterEvaluationTagList->map(function (PromoterEvaluationTag $item) use ($evaluationTagList) {
-            $item['content'] = $evaluationTagList->get($item->tag_id)->content;
+            /** @var EvaluationTag $evaluationTag */
+            $evaluationTag = $evaluationTagList->get($item->tag_id);
+            $item['content'] = $evaluationTag->content;
             return $item;
-        })->keyBy('evaluation_id');
+        })->groupBy('evaluation_id');
 
         $userIds = $evaluationList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname'])->keyBy('id');

@@ -5,8 +5,8 @@ namespace App\Utils\Inputs;
 class PromoterEvaluationInput extends BaseInput
 {
     public $promoterId;
-    public $tagIds;
     public $score;
+    public $tagIds;
     public $content;
     public $imageList;
 
@@ -14,8 +14,8 @@ class PromoterEvaluationInput extends BaseInput
     {
         return [
             'promoterId' => 'required|integer|digits_between:1,20',
-            'tagIds' => 'array',
             'score' => 'required|numeric',
+            'tagIds' => 'array',
             'content' => 'required|string',
             'imageList' => 'array',
         ];
