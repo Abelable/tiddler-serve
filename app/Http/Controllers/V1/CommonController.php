@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\EvaluationTagService;
 use App\Services\HotelMerchantService;
 use App\Services\HotelOrderService;
 use App\Services\HotelShopDepositPaymentLogService;
@@ -271,5 +272,15 @@ class CommonController extends Controller
         }
 
         return Pay::wechat()->success();
+    }
+
+    public function evaluationTagList()
+    {
+        $scene = $this->verifyRequiredInteger('scene');
+        $type = $this->verifyRequiredInteger('type');
+
+        $tagList = EvaluationTagService::getInstance()->getEvaluationTagOptions($scene, $type);
+
+        return $this->success($tagList);
     }
 }

@@ -31,8 +31,8 @@ class EvaluationTagService extends BaseService
         return EvaluationTag::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function getEvaluationTagOptions($columns = ['*'])
+    public function getEvaluationTagOptions($scene, $type,  $columns = ['*'])
     {
-        return EvaluationTag::query()->get($columns);
+        return EvaluationTag::query()->where('scene', $scene)->where('type', $type)->get($columns);
     }
 }

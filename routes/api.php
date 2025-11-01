@@ -45,6 +45,8 @@ Route::prefix('user')->group(function () {
 Route::get('oss_config', 'CommonController@ossConfig');
 Route::get('qr_code', 'CommonController@qrCode');
 
+Route::get('evaluation_tag_list', 'CommonController@evaluationTagList');
+
 Route::prefix('ai')->group(function () {
     Route::post('stream', 'AiController@stream');
 });
