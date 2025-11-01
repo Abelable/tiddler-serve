@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\ComplaintOptionService;
 use App\Services\EvaluationTagService;
 use App\Services\HotelMerchantService;
 use App\Services\HotelOrderService;
@@ -279,8 +280,15 @@ class CommonController extends Controller
         $scene = $this->verifyRequiredInteger('scene');
         $type = $this->verifyRequiredInteger('type');
 
-        $tagList = EvaluationTagService::getInstance()->getEvaluationTagOptions($scene, $type);
+        $tagList = EvaluationTagService::getInstance()->getEvaluationTagOptions($scene, $type, ['id', 'content']);
 
+        return $this->success($tagList);
+    }
+
+    public function complaintOptionList()
+    {
+        $type = $this->verifyRequiredInteger('type');
+        $tagList = ComplaintOptionService::getInstance()->getComplaintOptions($type, ['id', 'title', 'content']);
         return $this->success($tagList);
     }
 }
