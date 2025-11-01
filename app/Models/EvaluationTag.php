@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $scene 使用场景：1-景点，2-酒店，3-餐饮门店，4-商品，5-代言人
- * @property int $type 类型：1-正向标签（好评类），2-正向标签（好评类），3-负向标签（差评类）
+ * @property int $type 类型：1-正向标签（好评类），2-中性标签（一般类），3-负向标签（差评类）
  * @property string $content 内容
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
