@@ -870,6 +870,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('add', 'EvaluationTagController@add');
         Route::post('edit', 'EvaluationTagController@edit');
         Route::post('delete', 'EvaluationTagController@delete');
+        Route::get('options', 'EvaluationTagController@options');
     });
 
     Route::prefix('banner')->group(function () {

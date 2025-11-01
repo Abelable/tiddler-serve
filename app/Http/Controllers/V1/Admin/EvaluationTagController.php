@@ -75,4 +75,14 @@ class EvaluationTagController extends Controller
         $tag->delete();
         return $this->success();
     }
+
+    public function options()
+    {
+        $scene = $this->verifyRequiredInteger('scene');
+        $type = $this->verifyRequiredInteger('type');
+
+        $options = EvaluationTagService::getInstance()->getEvaluationTagOptions($scene, $type, ['id', 'content']);
+
+        return $this->success($options);
+    }
 }
