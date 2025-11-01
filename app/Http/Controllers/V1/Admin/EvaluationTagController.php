@@ -32,10 +32,12 @@ class EvaluationTagController extends Controller
 
     public function add()
     {
+        $scene = $this->verifyRequiredInteger('scene');
         $type = $this->verifyRequiredInteger('type');
         $content = $this->verifyString('content');
 
         $tag = EvaluationTag::new();
+        $tag->scene = $scene;
         $tag->type = $type;
         $tag->content = $content;
         $tag->save();
@@ -46,6 +48,7 @@ class EvaluationTagController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
+        $scene = $this->verifyRequiredInteger('scene');
         $type = $this->verifyRequiredInteger('type');
         $content = $this->verifyString('content');
 
@@ -54,6 +57,7 @@ class EvaluationTagController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前标签不存在');
         }
 
+        $tag->scene = $scene;
         $tag->type = $type;
         $tag->content = $content;
         $tag->save();

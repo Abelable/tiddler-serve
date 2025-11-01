@@ -49,11 +49,14 @@ class PromoterQaService extends BaseService
 
     public function getAnswerAverageDuration($promoterId)
     {
-        return PromoterQa::query()
+        $avg = PromoterQa::query()
             ->where('promoter_id', $promoterId)
+            ->whereNotNull('answer_time')
+            ->whereNotNull('created_at')
             ->where('answer', '!=', '')
             ->selectRaw('AVG(TIMESTAMPDIFF(SECOND, created_at, answer_time)) as avg_duration')
             ->value('avg_duration');
-    }
 
+        return $avg ? round($avg / 60, 2) : 0;
+    }
 }

@@ -10,6 +10,9 @@ class EvaluationTagService extends BaseService
     public function getEvaluationTagList(TypePageInput $input, $columns = ['*'])
     {
         $query = EvaluationTag::query();
+        if (!empty($input->scene)) {
+            $query = $query->where('scene', $input->scene);
+        }
         if (!empty($input->type)) {
             $query = $query->where('type', $input->type);
         }

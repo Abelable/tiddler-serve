@@ -22,7 +22,7 @@ class PromoterQaController extends Controller
 
         return $this->success([
             'answerCount' => $answerCount ?? 0,
-            'averageDuration' => $averageDuration ?? 0,
+            'averageDuration' => (int)$averageDuration ?? 0,
         ]);
     }
 
@@ -60,16 +60,17 @@ class PromoterQaController extends Controller
 
     public function answer()
     {
-        $id = $this->verifyRequiredId('$id');
-        $answer = $this->verifyRequiredString('answer');
+        $id = $this->verifyRequiredId('id');
+        $content = $this->verifyRequiredString('content');
 
         $qa = PromoterQaService::getInstance()->getPromoterQa($this->userId(), $id);
         if (is_null($qa)) {
             return $this->fail(CodeResponse::NOT_FOUND, '提问不存在');
         }
 
-        $qa->answer = $answer;
+        $qa->answer = $content;
         $qa->answer_time = now()->format('Y-m-d\TH:i:s');
+        $qa->save();
 
         return $this->success();
     }
