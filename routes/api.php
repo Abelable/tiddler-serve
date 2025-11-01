@@ -46,7 +46,7 @@ Route::get('oss_config', 'CommonController@ossConfig');
 Route::get('qr_code', 'CommonController@qrCode');
 
 Route::get('evaluation_tag_list', 'CommonController@evaluationTagList');
-Route::get('complaint_option_list', 'CommonController@complaintOptionList');
+Route::get('complaint_options', 'CommonController@complaintOptions');
 
 Route::prefix('ai')->group(function () {
     Route::post('stream', 'AiController@stream');

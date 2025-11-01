@@ -285,7 +285,7 @@ class CommonController extends Controller
         return $this->success($tagList);
     }
 
-    public function complaintOptionList()
+    public function complaintOptions()
     {
         $type = $this->verifyRequiredInteger('type');
         $tagList = ComplaintOptionService::getInstance()->getComplaintOptions($type, ['id', 'title', 'content']);
