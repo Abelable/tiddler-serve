@@ -31,7 +31,7 @@ class PromoterEvaluationController extends Controller
                 'content' => $evaluationTagList->get($item->tag_id)->content,
                 'count' => $item['count'],
             ];
-        });
+        })->sortByDesc('count')->values();
 
         $avgScore = PromoterEvaluationService::getInstance()->getAverageScore($promoterId);
 
