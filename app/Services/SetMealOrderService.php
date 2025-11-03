@@ -391,7 +391,6 @@ class SetMealOrderService extends BaseService
                     break;
                 case 'admin':
                     $order->status = SetMealOrderStatus::ADMIN_CONFIRMED;
-
                     break;
                 case 'user':
                     $order->status = SetMealOrderStatus::CONFIRMED;
@@ -413,8 +412,6 @@ class SetMealOrderService extends BaseService
         // 收益记录变更为待提现
         CateringShopIncomeService::getInstance()
             ->updateListToConfirmStatus($orderIds, productType::SET_MEAL);
-
-        // todo 设置7天之后打款商家的定时任务，并通知管理员及商家。中间有退货的，取消定时任务。
 
         return $orderList;
     }
