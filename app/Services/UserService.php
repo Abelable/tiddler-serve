@@ -91,11 +91,14 @@ class UserService extends BaseService
         return User::search($keywords)->get();
     }
 
-    public function getOptions($nickname, $columns = ['*'])
+    public function getOptions($keywords, $columns = ['*'])
     {
         $query = User::query();
-        if (!empty($nickname)) {
-            $query = $query->where('nickname', 'like', "%$nickname%");
+        if (!empty($keywords)) {
+            $query = $query->where(function($query) use ($keywords) {
+                $query->where('nickname', 'like', "%$keywords%")
+                    ->orWhere('mobile', $keywords);
+            });
         }
         return $query->get($columns);
     }

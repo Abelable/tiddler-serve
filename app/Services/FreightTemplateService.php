@@ -16,6 +16,14 @@ class FreightTemplateService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getPageByShopId($shopId, PageInput $input, $columns = ['*'])
+    {
+        return FreightTemplate::query()
+            ->where('shop_id', $shopId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getListByShopId($shopId, $columns = ['*'])
     {
         return FreightTemplate::query()->where('shop_id', $shopId)->get($columns);

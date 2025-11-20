@@ -86,6 +86,19 @@ class ShortVideoService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function randomPageList(PageInput $input, $authorIds = null, $curVideoId = 0, $columns = ['*'])
+    {
+        $query = ShortVideo::query()->where('is_private', 0);
+        if (!is_null($authorIds)) {
+            $query = $query->whereIn('user_id', $authorIds);
+        }
+        if ($curVideoId != 0) {
+            $query = $query->orderByRaw("CASE WHEN id = " . $curVideoId . " THEN 0 ELSE 1 END");
+        }
+        $query = $query->inRandomOrder();
+        return $query->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function search(SearchPageInput $input)
     {
         return ShortVideo::search($input->keywords)

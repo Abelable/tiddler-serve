@@ -229,8 +229,8 @@ class UserController extends Controller
 
     public function options()
     {
-        $nickname = $this->verifyString('nickname');
-        $options = UserService::getInstance()->getOptions($nickname);
+        $keywords = $this->verifyString('keywords');
+        $options = UserService::getInstance()->getOptions($keywords, ['id', 'avatar', 'nickname', 'mobile']);
         return $this->success($options);
     }
 

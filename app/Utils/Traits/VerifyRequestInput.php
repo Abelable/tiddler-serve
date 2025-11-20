@@ -46,6 +46,11 @@ trait VerifyRequestInput
         return $this->verifyData($key, $default, 'required|integer');
     }
 
+    public function verifyRequiredNumeric($key, $default = null)
+    {
+        return $this->verifyData($key, $default, 'required|numeric');
+    }
+
     public function verifyPositiveInteger($key, $default = null)
     {
         return $this->verifyData($key, $default, 'integer|min:1');

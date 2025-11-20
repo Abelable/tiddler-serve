@@ -6,16 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\ShopRefundAddress;
 use App\Services\ShopRefundAddressService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShopRefundAddressInput;
 
 class ShopRefundAddressController extends Controller
 {
     public function list()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'consignee_name', 'mobile', 'address_detail'];
-        $list = ShopRefundAddressService::getInstance()->getListByShopId($shopId, $columns);
-        return $this->success($list);
+        $columns = ['id', 'consignee_name', 'mobile', 'address_detail', 'created_at', 'updated_at'];
+        $page = ShopRefundAddressService::getInstance()->getPageByShopId($shopId, $input, $columns);
+        return $this->successPaginate($page);
     }
 
     public function detail()
@@ -65,5 +68,13 @@ class ShopRefundAddressController extends Controller
         }
         $address->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $columns = ['id', 'consignee_name', 'mobile', 'address_detail'];
+        $list = ShopRefundAddressService::getInstance()->getListByShopId($shopId, $columns);
+        return $this->success($list);
     }
 }

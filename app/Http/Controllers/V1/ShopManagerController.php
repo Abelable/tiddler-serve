@@ -9,15 +9,19 @@ use App\Services\ShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;
+use App\Utils\Inputs\ManagerPageInput;
 
 class ShopManagerController extends Controller
 {
     public function list()
     {
+        /** @var ManagerPageInput $input */
+        $input = ManagerPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'role_id'];
+        $columns = ['id', 'user_id', 'role_id', 'created_at', 'updated_at'];
 
-        $managerList = ShopManagerService::getInstance()->getManagerList($shopId, $columns);
+        $page = ShopManagerService::getInstance()->getManagerPage($shopId, $input, $columns);
+        $managerList = collect($page->items());
 
         $userIds = $managerList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
@@ -33,8 +37,7 @@ class ShopManagerController extends Controller
             return $manager;
         });
 
-
-        return $this->success($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -61,7 +64,8 @@ class ShopManagerController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        ShopManagerService::getInstance()->createManager($input);
+        $userInfo = UserService::getInstance()->getUserById($input->userId);
+        ShopManagerService::getInstance()->createManager($input, $userInfo);
 
         return $this->success();
     }

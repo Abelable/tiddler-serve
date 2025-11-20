@@ -7,14 +7,18 @@ use App\Models\FreightTemplate;
 use App\Services\FreightTemplateService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\FreightTemplateInput;
+use App\Utils\Inputs\PageInput;
 
 class FreightTemplateController extends Controller
 {
     public function list()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $list = FreightTemplateService::getInstance()->getListByShopId($shopId, ['id', 'name']);
-        return $this->success($list);
+        $list = FreightTemplateService::getInstance()
+            ->getPageByShopId($shopId, $input, ['id', 'name', 'created_at', 'updated_at']);
+        return $this->successPaginate($list);
     }
 
     public function detail()
@@ -64,5 +68,12 @@ class FreightTemplateController extends Controller
         }
         $freightTemplate->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $list = FreightTemplateService::getInstance()->getListByShopId($shopId, ['id', 'name']);
+        return $this->success($list);
     }
 }

@@ -29,6 +29,14 @@ class ShopPickupAddressService extends BaseService
         return ShopPickupAddress::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getPageByShopId($shopId, PageInput $input, $columns = ['*'])
+    {
+        return ShopPickupAddress::query()
+            ->where('shop_id', $shopId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function getAddressById($id, $columns = ['*'])
     {
         return ShopPickupAddress::query()->find($id, $columns);

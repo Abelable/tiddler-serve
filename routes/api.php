@@ -96,7 +96,7 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('manager')->group(function () {
-        Route::get('list', 'ShopManagerController@list');
+        Route::post('list', 'ShopManagerController@list');
         Route::get('detail', 'ShopManagerController@detail');
         Route::post('add', 'ShopManagerController@add');
         Route::post('edit', 'ShopManagerController@edit');
@@ -104,44 +104,49 @@ Route::prefix('shop')->group(function () {
     });
 
     Route::prefix('freight_template')->group(function () {
-        Route::get('list', 'FreightTemplateController@list');
+        Route::post('list', 'FreightTemplateController@list');
         Route::get('detail', 'FreightTemplateController@detail');
         Route::post('add', 'FreightTemplateController@add');
         Route::post('edit', 'FreightTemplateController@edit');
         Route::post('delete', 'FreightTemplateController@delete');
+        Route::get('options', 'FreightTemplateController@options');
     });
 
     Route::prefix('refund_address')->group(function () {
-        Route::get('list', 'ShopRefundAddressController@list');
+        Route::post('list', 'ShopRefundAddressController@list');
         Route::get('detail', 'ShopRefundAddressController@detail');
         Route::post('add', 'ShopRefundAddressController@add');
         Route::post('edit', 'ShopRefundAddressController@edit');
         Route::post('delete', 'ShopRefundAddressController@delete');
+        Route::get('options', 'ShopRefundAddressController@options');
     });
 
     Route::prefix('pickup_address')->group(function () {
-        Route::get('list', 'ShopPickupAddressController@list');
+        Route::post('list', 'ShopPickupAddressController@list');
         Route::get('detail', 'ShopPickupAddressController@detail');
         Route::post('add', 'ShopPickupAddressController@add');
         Route::post('edit', 'ShopPickupAddressController@edit');
         Route::post('delete', 'ShopPickupAddressController@delete');
+        Route::get('options', 'ShopPickupAddressController@options');
     });
 
     Route::prefix('goods')->group(function () {
         Route::get('category_options', 'ShopGoodsController@categoryOptions');
         Route::get('totals', 'ShopGoodsController@totals');
-        Route::get('list', 'ShopGoodsController@list');
+        Route::post('list', 'ShopGoodsController@list');
         Route::get('detail', 'ShopGoodsController@detail');
         Route::post('add', 'ShopGoodsController@add');
         Route::post('edit', 'ShopGoodsController@edit');
         Route::post('up', 'ShopGoodsController@up');
         Route::post('down', 'ShopGoodsController@down');
+        Route::post('edit_commission', 'ShopGoodsController@editCommission');
+        Route::post('edit_stock', 'ShopGoodsController@editStock');
         Route::post('delete', 'ShopGoodsController@delete');
     });
 
     Route::prefix('order')->group(function () {
         Route::get('total', 'ShopOrderController@total');
-        Route::get('list', 'ShopOrderController@list');
+        Route::post('list', 'ShopOrderController@list');
         Route::get('search', 'ShopOrderController@search');
         Route::get('detail', 'ShopOrderController@detail');
         Route::post('verify', 'ShopOrderController@verify');

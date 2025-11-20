@@ -6,16 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\ShopPickupAddress;
 use App\Services\ShopPickupAddressService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShopPickupAddressInput;
 
 class ShopPickupAddressController extends Controller
 {
     public function list()
     {
+        /** @var PageInput $input */
+        $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'name', 'longitude', 'latitude', 'address_detail'];
-        $list = ShopPickupAddressService::getInstance()->getListByShopId($shopId, $columns);
-        return $this->success($list);
+        $columns = ['id', 'name', 'longitude', 'latitude', 'address_detail', 'created_at', 'updated_at'];
+        $page = ShopPickupAddressService::getInstance()->getPageByShopId($shopId, $input, $columns);
+        return $this->successPaginate($page);
     }
 
     public function detail()
@@ -68,5 +71,13 @@ class ShopPickupAddressController extends Controller
         }
         $address->delete();
         return $this->success();
+    }
+
+    public function options()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $columns = ['id', 'name', 'longitude', 'latitude', 'address_detail'];
+        $list = ShopPickupAddressService::getInstance()->getListByShopId($shopId, $columns);
+        return $this->success($list);
     }
 }

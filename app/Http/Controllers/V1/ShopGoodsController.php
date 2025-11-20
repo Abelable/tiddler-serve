@@ -26,7 +26,11 @@ class ShopGoodsController extends Controller
         }
 
         $shopCategoryIds = json_decode($shopInfo->category_ids);
-        $options = GoodsCategoryService::getInstance()->getOptionsByShopCategoryIds($shopCategoryIds);
+        $options = GoodsCategoryService::getInstance()
+            ->getOptionsByShopCategoryIds(
+                $shopCategoryIds,
+                ['id', 'shop_category_id', 'name', 'min_sales_commission_rate', 'max_sales_commission_rate']
+            );
 
         return $this->success($options);
     }
@@ -44,10 +48,23 @@ class ShopGoodsController extends Controller
 
     public function list()
     {
-        $shopId = $this->verifyRequiredId('shopId');
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
-        $columns = ['id', 'cover', 'name', 'price', 'sales_volume', 'failure_reason', 'created_at', 'updated_at'];
+        $shopId = $this->verifyRequiredId('shopId');
+        $columns = [
+            'id',
+            'status',
+            'failure_reason',
+            'category_id',
+            'cover',
+            'name',
+            'price',
+            'sales_commission_rate',
+            'sales_volume',
+            'stock',
+            'created_at',
+            'updated_at'
+        ];
         $page = GoodsService::getInstance()->getShopGoodsPage($shopId, $input, $columns);
         return $this->successPaginate($page);
     }
@@ -160,6 +177,50 @@ class ShopGoodsController extends Controller
             return $this->fail(CodeResponse::FORBIDDEN, '非售卖中商品，无法下架');
         }
         $goods->status = 3;
+        $goods->save();
+
+        return $this->success();
+    }
+
+    public function editCommission()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
+        $salesCommissionRate = $this->verifyRequiredNumeric('salesCommissionRate');
+
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品佣金');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $goods->sales_commission_rate = $salesCommissionRate;
+        $goods->save();
+
+        return $this->success();
+    }
+
+    public function editStock()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
+        $stock = $this->verifyRequiredInteger('stock');
+
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品库存');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $goods->stock = $stock;
         $goods->save();
 
         return $this->success();

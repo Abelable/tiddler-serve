@@ -7,10 +7,11 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $shop_id 店铺id
+ * @property int $role_id 管理员角色id
  * @property int $user_id 用户id
  * @property string $avatar 用户头像
  * @property string $nickname 用户昵称
- * @property int $role_id 管理员角色id：1-超级管理员，2-运营，3-核销员
+ * @property string $mobile 联系方式
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -22,6 +23,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereRoleId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|HotelShopManager whereShopId($value)

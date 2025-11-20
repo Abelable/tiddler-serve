@@ -36,7 +36,7 @@ class AiController extends Controller
 
         try {
             $ai = AiServe::new();
-            $stream = $ai->sendMessageStream($query, $this->userId() ?: 'visitor', $conversationId);
+            $stream = $ai->sendMessageStream($query, $this->isLogin() ? $this->userId() : 'visitor', $conversationId);
 
             $fullText = '';
             $pendingBracket = false;

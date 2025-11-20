@@ -16,10 +16,11 @@ class CreateShopManagersTable extends Migration
         Schema::create('shop_managers', function (Blueprint $table) {
             $table->id();
             $table->integer('shop_id')->comment('店铺id');
+            $table->integer('role_id')->comment('管理员角色id');
             $table->integer('user_id')->comment('用户id');
             $table->string('avatar')->default('')->comment('用户头像');
             $table->string('nickname')->default('')->comment('用户昵称');
-            $table->integer('role_id')->comment('管理员角色id');
+            $table->string('mobile')->default('')->comment('联系方式');
             $table->timestamps();
             $table->softDeletes();
         });

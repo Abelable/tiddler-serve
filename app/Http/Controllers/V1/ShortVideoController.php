@@ -37,7 +37,7 @@ class ShortVideoController extends Controller
         $input = PageInput::new();
         $id = $this->verifyId('id', 0);
         $authorId = $this->verifyId('authorId', 0);
-        $page = ShortVideoService::getInstance()->pageList($input, $authorId != 0 ? [$authorId] : null, $id);
+        $page = ShortVideoService::getInstance()->randomPageList($input, $authorId != 0 ? [$authorId] : null, $id);
         $list = $this->handleList(collect($page->items()), $this->isLogin());
         return $this->success($this->paginate($page, $list));
     }

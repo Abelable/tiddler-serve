@@ -89,6 +89,11 @@ class PromoterController extends Controller
         $scene = $this->verifyRequiredInteger('scene');
         $duration = $this->verifyRequiredInteger('duration');
 
+        $promoter = PromoterService::getInstance()->getPromoterByUserId($userId);
+        if (!is_null($promoter)) {
+            return $this->fail(CodeResponse::DATA_EXISTED, '代言人已存在，请勿重复添加');
+        }
+
         DB::transaction(function () use ($duration, $userId, $level, $scene) {
             $promoter = PromoterService::getInstance()->adminCreate($userId, $level, $scene, $duration);
 

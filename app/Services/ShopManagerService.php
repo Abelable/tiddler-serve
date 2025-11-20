@@ -3,17 +3,19 @@
 namespace App\Services;
 
 use App\Models\ShopManager;
+use App\Models\User;
 use App\Utils\Inputs\ManagerInput;
+use App\Utils\Inputs\ManagerPageInput;
 
 class ShopManagerService extends BaseService
 {
-    public function createManager(ManagerInput $input)
+    public function createManager(ManagerInput $input, User $user)
     {
         $manager = ShopManager::new();
         $manager->shop_id = $input->shopId;
         $manager->user_id = $input->userId;
-        $manager->avatar = $input->avatar;
-        $manager->nickname = $input->nickname;
+        $manager->avatar = $user->avatar;
+        $manager->nickname = $user->nickname;
 
         return $this->updateManager($manager, $input->roleId);
     }
@@ -24,6 +26,17 @@ class ShopManagerService extends BaseService
         $manager->save();
 
         return $manager;
+    }
+
+    public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
+    {
+        $query = ShopManager::new()->where('shop_id', $shopId);
+        if (!empty($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
+        }
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getManagerList($shopId, $columns = ['*'])

@@ -17,7 +17,7 @@ class FeedbackController extends Controller
         $input = FeedbackInput::new();
 
         $feedback = Feedback::new();
-        $feedback->user_id = $this->userId() ?? 0;
+        $feedback->user_id = $this->isLogin() ? $this->userId() : 0;
         FeedbackService::getInstance()->createFeedback($feedback, $input);
 
         return $this->success();
