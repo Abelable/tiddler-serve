@@ -89,6 +89,15 @@ Route::prefix('shop')->group(function () {
     Route::get('info', 'ShopController@shopInfo');
     Route::post('update_info', 'ShopController@updateShopInfo');
 
+    Route::prefix('dashboard')->group(function () {
+        Route::get('sales_data', 'ShopDashboardController@salesData');
+        Route::get('income_data', 'ShopDashboardController@incomeData');
+        Route::get('order_count_data', 'ShopDashboardController@orderCountData');
+        Route::get('user_count_data', 'ShopDashboardController@userCountData');
+        Route::get('top_goods_list', 'ShopDashboardController@topGoodsList');
+        Route::get('todo_list', 'ShopDashboardController@todoList');
+    });
+
     Route::prefix('deposit')->group(function () {
         Route::post('pay_params', 'ShopDepositController@payParams');
         Route::get('info', 'ShopDepositController@depositInfo');

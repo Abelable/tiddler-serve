@@ -980,7 +980,7 @@ class OrderService extends BaseService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->select(
                 DB::raw('DATE(created_at) as created_at'),
-                DB::raw('SUM(refund_amount + deduction_balance) as sum')
+                DB::raw('SUM(payment_amount + deduction_balance) as sum')
             )
             ->groupBy(DB::raw('DATE(created_at)'))
             ->get();
@@ -997,7 +997,7 @@ class OrderService extends BaseService
             ->whereBetween('created_at', [$startDate, $endDate])
             ->select(
                 DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
-                DB::raw("SUM(refund_amount + deduction_balance) as sum")
+                DB::raw("SUM(payment_amount + deduction_balance) as sum")
             )
             ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
             ->orderBy('month', 'asc')

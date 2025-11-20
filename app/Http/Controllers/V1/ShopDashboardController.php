@@ -4,14 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminTodoService;
-use App\Services\GiftCommissionService;
 use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\ProductHistoryService;
 use App\Services\ShopIncomeService;
-use App\Services\TeamCommissionService;
-use App\Services\UserService;
 use App\Utils\Enums\ProductType;
 
 class ShopDashboardController extends Controller
@@ -94,11 +91,12 @@ class ShopDashboardController extends Controller
 
     public function topGoodsList()
     {
+        $shopId = $this->verifyRequiredId('shopId');
         $startDate = $this->verifyRequiredString('startDate');
         $endDate = $this->verifyRequiredString('endDate');
 
-        $topSalesList = OrderGoodsService::getInstance()->getTopSalesGoodsList($startDate, $endDate);
-        $topOrderCountList = OrderGoodsService::getInstance()->getTopOrderCountGoodsList($startDate, $endDate);
+        $topSalesList = OrderGoodsService::getInstance()->getShopTopSalesGoodsList($shopId, $startDate, $endDate);
+        $topOrderCountList = OrderGoodsService::getInstance()->getShopTopOrderCountGoodsList($shopId, $startDate, $endDate);
 
         $topSalesGoodsIds = $topSalesList->pluck('goods_id')->toArray();
         $topOrderCountGoodsIds = $topOrderCountList->pluck('goods_id')->toArray();
@@ -128,6 +126,19 @@ class ShopDashboardController extends Controller
         return $this->success([
             'topSalesGoodsList' => $topSalesGoodsList,
             'topOrderCountGoodsList' => $topOrderCountGoodsList
+        ]);
+    }
+
+    public function salesRecord()
+    {
+        $monthlyCommissionList = CommissionService::getInstance()->monthlyCommissionList();
+        $monthlyGiftCommissionList = GiftCommissionService::getInstance()->monthlyCommissionList();
+        $monthlyTeamCommissionList = TeamCommissionService::getInstance()->monthlyCommissionList();
+
+        return $this->success([
+            'monthlyCommissionList' => $monthlyCommissionList,
+            'monthlyGiftCommissionList' => $monthlyGiftCommissionList,
+            'monthlyTeamCommissionList' => $monthlyTeamCommissionList,
         ]);
     }
 
