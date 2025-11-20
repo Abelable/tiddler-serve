@@ -7,6 +7,7 @@ class ManagerPageInput extends PageInput
     public $nickname;
     public $mobile;
     public $roleId;
+
     public function rules()
     {
         return array_merge(parent::rules(), [

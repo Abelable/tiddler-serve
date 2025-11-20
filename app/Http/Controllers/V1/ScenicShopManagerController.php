@@ -10,16 +10,20 @@ use App\Services\ScenicShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;
+use App\Utils\Inputs\ManagerPageInput;
 use Illuminate\Support\Facades\DB;
 
 class ScenicShopManagerController extends Controller
 {
     public function list()
     {
+        /** @var ManagerPageInput $input */
+        $input = ManagerPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'role_id'];
+        $columns = ['id', 'user_id', 'role_id', 'created_at', 'updated_at'];
 
-        $managerList = ScenicShopManagerService::getInstance()->getManagerList($shopId, $columns);
+        $page = ScenicShopManagerService::getInstance()->getManagerPage($shopId, $input, $columns);
+        $managerList = collect($page->items());
 
         $userIds = $managerList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
@@ -35,7 +39,7 @@ class ScenicShopManagerController extends Controller
             return $manager;
         });
 
-        return $this->success($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -67,8 +71,10 @@ class ScenicShopManagerController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($input, $scenicIds) {
-            $manager = ScenicShopManagerService::getInstance()->createManager($input);
+        $userInfo = UserService::getInstance()->getUserById($input->userId);
+
+        DB::transaction(function () use ($input, $scenicIds, $userInfo) {
+            $manager = ScenicShopManagerService::getInstance()->createManager($input, $userInfo);
             foreach ($scenicIds as $scenicId) {
                 ScenicManagerService::getInstance()->createManager($scenicId, $manager->id);
             }

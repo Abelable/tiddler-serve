@@ -16,6 +16,7 @@ class ShopManagerService extends BaseService
         $manager->user_id = $input->userId;
         $manager->avatar = $user->avatar;
         $manager->nickname = $user->nickname;
+        $manager->mobile = $user->mobile;
 
         return $this->updateManager($manager, $input->roleId);
     }
@@ -31,8 +32,14 @@ class ShopManagerService extends BaseService
     public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
     {
         $query = ShopManager::new()->where('shop_id', $shopId);
-        if (!empty($input->userId)) {
-            $query = $query->where('user_id', $input->userId);
+        if (!empty($input->nickname)) {
+            $query = $query->where('nickname', $input->nickname);
+        }
+        if (!empty($input->mobile)) {
+            $query = $query->where('mobile', $input->mobile);
+        }
+        if (!empty($input->roleId)) {
+            $query = $query->where('role_id', $input->roleId);
         }
         return $query
             ->orderBy($input->sort, $input->order)
