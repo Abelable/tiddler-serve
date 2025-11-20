@@ -3,39 +3,23 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\CateringShopManager;
-use App\Models\User;
 use App\Services\Mall\Catering\RestaurantManagerService;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;
+use App\Utils\Inputs\ManagerPageInput;
 use Illuminate\Support\Facades\DB;
 
 class CateringShopManagerController extends Controller
 {
     public function list()
     {
+        /** @var ManagerPageInput $input */
+        $input = ManagerPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'role_id'];
-
-        $managerList = CateringShopManagerService::getInstance()->getManagerList($shopId, $columns);
-
-        $userIds = $managerList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
-
-        $list = $managerList->map(function (CateringShopManager $manager) use ($userList) {
-            /** @var User $user */
-            $user = $userList->get($manager->user_id);
-
-            $manager['avatar'] = $user->avatar;
-            $manager['nickname'] = $user->nickname;
-            $manager['mobile'] = $user->mobile;
-
-            return $manager;
-        });
-
-        return $this->success($list);
+        $page = CateringShopManagerService::getInstance()->getManagerPage($shopId, $input);
+        return $this->successPaginate($page);
     }
 
     public function detail()
@@ -67,8 +51,10 @@ class CateringShopManagerController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($input, $restaurantIds) {
-            $manager = CateringShopManagerService::getInstance()->createManager($input);
+        $userInfo = UserService::getInstance()->getUserById($input->userId);
+
+        DB::transaction(function () use ($input, $restaurantIds, $userInfo) {
+            $manager = CateringShopManagerService::getInstance()->createManager($input, $userInfo);
             foreach ($restaurantIds as $restaurantId) {
                 RestaurantManagerService::getInstance()->createManager($restaurantId, $manager->id);
             }

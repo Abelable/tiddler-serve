@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicShopManager;
-use App\Models\User;
 use App\Services\ScenicManagerService;
 use App\Services\ScenicShopManagerService;
 use App\Services\UserService;
@@ -20,26 +18,8 @@ class ScenicShopManagerController extends Controller
         /** @var ManagerPageInput $input */
         $input = ManagerPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'role_id', 'created_at', 'updated_at'];
-
-        $page = ScenicShopManagerService::getInstance()->getManagerPage($shopId, $input, $columns);
-        $managerList = collect($page->items());
-
-        $userIds = $managerList->pluck('user_id')->toArray();
-        $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
-
-        $list = $managerList->map(function (ScenicShopManager $manager) use ($userList) {
-            /** @var User $user */
-            $user = $userList->get($manager->user_id);
-
-            $manager['avatar'] = $user->avatar;
-            $manager['nickname'] = $user->nickname;
-            $manager['mobile'] = $user->mobile;
-
-            return $manager;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        $page = ScenicShopManagerService::getInstance()->getManagerPage($shopId, $input);
+        return $this->successPaginate($page);
     }
 
     public function detail()
