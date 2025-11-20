@@ -10,16 +10,20 @@ use App\Services\HotelShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;
+use App\Utils\Inputs\ManagerPageInput;
 use Illuminate\Support\Facades\DB;
 
 class HotelShopManagerController extends Controller
 {
     public function list()
     {
+        /** @var ManagerPageInput $input */
+        $input = ManagerPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'role_id'];
+        $columns = ['id', 'user_id', 'role_id', 'created_at', 'updated_at'];
 
-        $managerList = HotelShopManagerService::getInstance()->getManagerList($shopId, $columns);
+        $page = HotelShopManagerService::getInstance()->getManagerPage($shopId, $input, $columns);
+        $managerList = collect($page->items());
 
         $userIds = $managerList->pluck('user_id')->toArray();
         $userList = UserService::getInstance()->getListByIds($userIds)->keyBy('id');
@@ -35,7 +39,7 @@ class HotelShopManagerController extends Controller
             return $manager;
         });
 
-        return $this->success($list);
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -67,8 +71,10 @@ class HotelShopManagerController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '管理人员已存在，请勿重复添加');
         }
 
-        DB::transaction(function () use ($input, $hotelIds) {
-            $manager = HotelShopManagerService::getInstance()->createManager($input);
+        $userInfo = UserService::getInstance()->getUserById($input->userId);
+
+        DB::transaction(function () use ($input, $hotelIds, $userInfo) {
+            $manager = HotelShopManagerService::getInstance()->createManager($input, $userInfo);
             foreach ($hotelIds as $hotelId) {
                 HotelManagerService::getInstance()->createManager($hotelId, $manager->id);
             }
