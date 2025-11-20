@@ -9,6 +9,7 @@ use App\Models\ShopIncome;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ShopIncomeService extends BaseService
 {
@@ -81,6 +82,76 @@ class ShopIncomeService extends BaseService
     public function getShopIncomeSum($shopId, $statusList)
     {
         return $this->getShopIncomeQuery($shopId, $statusList)->sum('income_amount');
+    }
+
+    public function dailyIncomeList($shopId, $statusList)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subDays(17);
+
+        return $this->getShopIncomeQuery($shopId, $statusList)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(created_at) as created_at'),
+                DB::raw('SUM(income_amount) as sum')
+            )
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get();
+    }
+
+    public function monthlyIncomeList($shopId, $statusList)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subMonths(12)->startOfMonth();
+
+        return $this->getShopIncomeQuery($shopId, $statusList)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw("SUM(income_amount) as sum")
+            )
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->orderBy('month', 'asc')
+            ->get();
+    }
+
+    public function dailyIncomeGrowthRate($shopId, $statusList)
+    {
+        $query = $this->getShopIncomeQuery($shopId, $statusList);
+
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        $todayIncomeAmount = (clone $query)->whereDate('created_at', $today)->sum('income_amount');
+        $yesterdayIncomeAmount = (clone $query)->whereDate('created_at', $yesterday)->sum('income_amount');
+
+        if ($yesterdayIncomeAmount > 0) {
+            $dailyGrowthRate = round((($todayIncomeAmount - $yesterdayIncomeAmount) / $yesterdayIncomeAmount) * 100);
+        } else {
+            $dailyGrowthRate = 0;
+        }
+
+        return $dailyGrowthRate;
+    }
+
+    public function weeklyIncomeGrowthRate($shopId, $statusList)
+    {
+        $query = $this->getShopIncomeQuery($shopId, $statusList);
+
+        $startOfThisWeek = Carbon::now()->startOfWeek();
+        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+
+        $thisWeekIncomeAmount = (clone $query)->whereBetween('created_at', [$startOfThisWeek, now()])->sum('income_amount');
+        $lastWeekIncomeAmount = (clone $query)->whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])->sum('income_amount');
+
+        if ($lastWeekIncomeAmount > 0) {
+            $weeklyGrowthRate = round((($thisWeekIncomeAmount - $lastWeekIncomeAmount) / $lastWeekIncomeAmount) * 100);
+        } else {
+            $weeklyGrowthRate = 0; // 防止除以零
+        }
+
+        return $weeklyGrowthRate;
     }
 
     public function applyWithdrawal($shopId, $withdrawalId)

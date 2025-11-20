@@ -18,6 +18,7 @@ class CreateMediaHistoriesTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('media_type')->comment('媒体类型');
             $table->integer('media_id')->comment('媒体id');
+            $table->integer('count')->default(1)->comment('次数');
             $table->timestamps();
             $table->softDeletes();
         });

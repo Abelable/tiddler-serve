@@ -9,6 +9,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $product_type 产品类型
  * @property int $product_id 产品id
+ * @property int $count 次数
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -16,6 +17,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory newQuery()
  * @method static \Illuminate\Database\Query\Builder|ProductHistory onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory whereCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ProductHistory whereId($value)

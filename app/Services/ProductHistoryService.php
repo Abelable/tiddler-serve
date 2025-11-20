@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ProductHistory;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ProductHistoryService extends BaseService
 {
@@ -14,21 +15,22 @@ class ProductHistoryService extends BaseService
         return ProductHistory::query()
             ->where('user_id', $userId)
             ->where('product_type', $type)
-            ->orderBy($input->sort, $input->order)
+            ->orderBy('updated_at', $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function createHistory($userId, $productType, $productId)
     {
         $history = $this->getHistory($userId, $productType, $productId);
-        if (!is_null($history)) {
-            $history->delete();
-        }
 
-        $history = ProductHistory::new();
-        $history->user_id = $userId;
-        $history->product_type = $productType;
-        $history->product_id = $productId;
+        if (!is_null($history)) {
+            $history->count = $history->count + 1;
+        } else {
+            $history = ProductHistory::new();
+            $history->user_id = $userId;
+            $history->product_type = $productType;
+            $history->product_id = $productId;
+        }
         $history->save();
 
         return $history;
@@ -57,7 +59,72 @@ class ProductHistoryService extends BaseService
         return ProductHistory::query()
             ->where('product_type', $productType)
             ->whereIn('product_id', $productIds)
-            ->whereDate('created_at', $date)
+            ->whereDate('updated_at', $date)
             ->count();
+    }
+
+    public function countSum($productType, $productIds)
+    {
+        return ProductHistory::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds)
+            ->sum('count');
+    }
+
+    public function dailyCountList($productType, $productIds)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subDays(17);
+
+        return ProductHistory::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds)
+            ->whereBetween('updated_at', [$startDate, $endDate])
+            ->select(DB::raw('DATE(updated_at) as updated_at'), DB::raw('COUNT(*) as count'))
+            ->groupBy(DB::raw('DATE(updated_at)'))
+            ->get();
+    }
+
+    public function dailyCountGrowthRate($productType, $productIds)
+    {
+        $query = ProductHistory::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds);
+
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        $todayCount = (clone $query)->whereDate('updated_at', $today)->count();
+        $yesterdayCount = (clone $query)->whereDate('updated_at', $yesterday)->count();
+
+        if ($yesterdayCount > 0) {
+            $dailyGrowthRate = round((($todayCount - $yesterdayCount) / $yesterdayCount) * 100);
+        } else {
+            $dailyGrowthRate = 0;
+        }
+
+        return $dailyGrowthRate;
+    }
+
+    public function weeklyCountGrowthRate($productType, $productIds)
+    {
+        $query = ProductHistory::query()
+            ->where('product_type', $productType)
+            ->whereIn('product_id', $productIds);
+
+        $startOfThisWeek = Carbon::now()->startOfWeek();
+        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+
+        $thisWeekCount = (clone $query)->whereBetween('updated_at', [$startOfThisWeek, now()])->count();
+        $lastWeekCount = (clone $query)->whereBetween('updated_at', [$startOfLastWeek, $endOfLastWeek])->count();
+
+        if ($lastWeekCount > 0) {
+            $weeklyGrowthRate = round((($thisWeekCount - $lastWeekCount) / $lastWeekCount) * 100);
+        } else {
+            $weeklyGrowthRate = 0; // 防止除以零
+        }
+
+        return $weeklyGrowthRate;
     }
 }

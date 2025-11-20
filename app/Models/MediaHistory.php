@@ -9,6 +9,7 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $media_type 媒体类型
  * @property int $media_id 媒体id
+ * @property int $count 次数
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -16,6 +17,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory newQuery()
  * @method static \Illuminate\Database\Query\Builder|MediaHistory onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory query()
+ * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory whereCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|MediaHistory whereId($value)

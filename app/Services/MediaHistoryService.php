@@ -12,21 +12,22 @@ class MediaHistoryService extends BaseService
     {
         return MediaHistory::query()
             ->where('user_id', $userId)
-            ->orderBy($input->sort, $input->order)
+            ->orderBy('updated_at', $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function createHistory($userId, $mediaType, $mediaId)
     {
         $history = $this->getHistory($userId, $mediaType, $mediaId);
-        if (!is_null($history)) {
-            $history->delete();
-        }
 
-        $history = MediaHistory::new();
-        $history->user_id = $userId;
-        $history->media_type = $mediaType;
-        $history->media_id = $mediaId;
+        if (!is_null($history)) {
+            $history->count = $history->count + 1;
+        } else {
+            $history = MediaHistory::new();
+            $history->user_id = $userId;
+            $history->media_type = $mediaType;
+            $history->media_id = $mediaId;
+        }
         $history->save();
 
         return $history;

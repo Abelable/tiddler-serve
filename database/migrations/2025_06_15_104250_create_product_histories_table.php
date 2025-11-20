@@ -18,6 +18,7 @@ class CreateProductHistoriesTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('product_type')->comment('产品类型');
             $table->integer('product_id')->comment('产品id');
+            $table->integer('count')->default(1)->comment('次数');
             $table->timestamps();
             $table->softDeletes();
         });

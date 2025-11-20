@@ -960,4 +960,178 @@ class OrderService extends BaseService
             $order->delete();
         }
     }
+
+    public function shopSalesSum($shopId)
+    {
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->sum(DB::raw('payment_amount + deduction_balance'));
+    }
+
+    public function shopDailySalesList($shopId)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subDays(17);
+
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(created_at) as created_at'),
+                DB::raw('SUM(refund_amount + deduction_balance) as sum')
+            )
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get();
+    }
+
+    public function shopMonthlySalesList($shopId)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subMonths(12)->startOfMonth();
+
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw("SUM(refund_amount + deduction_balance) as sum")
+            )
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->orderBy('month', 'asc')
+            ->get();
+    }
+
+    public function shopDailySalesGrowthRate($shopId)
+    {
+        $query = Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502]);
+
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        $todayPaymentAmount = (clone $query)
+            ->whereDate('created_at', $today)
+            ->sum(DB::raw('payment_amount + deduction_balance'));
+        $yesterdayPaymentAmount = (clone $query)
+            ->whereDate('created_at', $yesterday)
+            ->sum(DB::raw('payment_amount + deduction_balance'));
+
+        if ($yesterdayPaymentAmount > 0) {
+            $dailyGrowthRate = round((($todayPaymentAmount - $yesterdayPaymentAmount) / $yesterdayPaymentAmount) * 100);
+        } else {
+            $dailyGrowthRate = 0;
+        }
+
+        return $dailyGrowthRate;
+    }
+
+    public function shopWeeklySalesGrowthRate($shopId)
+    {
+        $query = Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502]);
+
+        $startOfThisWeek = Carbon::now()->startOfWeek();
+        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+
+        $thisWeekPaymentAmount = (clone $query)
+            ->whereBetween('created_at', [$startOfThisWeek, now()])
+            ->sum(DB::raw('payment_amount + deduction_balance'));
+        $lastWeekPaymentAmount = (clone $query)
+            ->whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])
+            ->sum(DB::raw('payment_amount + deduction_balance'));
+
+        if ($lastWeekPaymentAmount > 0) {
+            $weeklyGrowthRate = round((($thisWeekPaymentAmount - $lastWeekPaymentAmount) / $lastWeekPaymentAmount) * 100);
+        } else {
+            $weeklyGrowthRate = 0; // 防止除以零
+        }
+
+        return $weeklyGrowthRate;
+    }
+
+    public function shopOrderCountSum($shopId)
+    {
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->count();
+    }
+
+    public function shopDailyOrderCountList($shopId)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subDays(17);
+
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(DB::raw('DATE(created_at) as created_at'), DB::raw('COUNT(*) as count'))
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->get();
+    }
+
+    public function shopMonthlyOrderCountList($shopId)
+    {
+        $endDate = Carbon::now();
+        $startDate = Carbon::now()->subMonths(12)->startOfMonth();
+
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"), DB::raw('COUNT(*) as count'))
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"))
+            ->orderBy('month', 'asc')
+            ->get();
+    }
+
+    public function shopDailyOrderCountGrowthRate($shopId)
+    {
+        $query = Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502]);
+
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        $todayOrderCount = (clone $query)->whereDate('created_at', $today)->count();
+        $yesterdayOrderCount = (clone $query)->whereDate('created_at', $yesterday)->count();
+
+        if ($yesterdayOrderCount > 0) {
+            $dailyGrowthRate = round((($todayOrderCount - $yesterdayOrderCount) / $yesterdayOrderCount) * 100);
+        } else {
+            $dailyGrowthRate = 0;
+        }
+
+        return $dailyGrowthRate;
+    }
+
+    public function shopWeeklyOrderCountGrowthRate($shopId)
+    {
+        $query = Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', [201, 202, 301, 302, 401, 402, 403, 501, 502]);
+
+        $startOfThisWeek = Carbon::now()->startOfWeek();
+        $startOfLastWeek = Carbon::now()->subWeek()->startOfWeek();
+        $endOfLastWeek = Carbon::now()->subWeek()->endOfWeek();
+
+        $thisWeekOrderCount = (clone $query)->whereBetween('created_at', [$startOfThisWeek, now()])->count();
+        $lastWeekOrderCount = (clone $query)->whereBetween('created_at', [$startOfLastWeek, $endOfLastWeek])->count();
+
+        if ($lastWeekOrderCount > 0) {
+            $weeklyGrowthRate = round((($thisWeekOrderCount - $lastWeekOrderCount) / $lastWeekOrderCount) * 100);
+        } else {
+            $weeklyGrowthRate = 0; // 防止除以零
+        }
+
+        return $weeklyGrowthRate;
+    }
 }
