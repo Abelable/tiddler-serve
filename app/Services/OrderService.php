@@ -1134,4 +1134,9 @@ class OrderService extends BaseService
 
         return $weeklyGrowthRate;
     }
+
+    public function getShopOrderCountByStatusList($shopId, array $statusList)
+    {
+        return Order::query()->where('shop_id', $shopId)->whereIn('status', $statusList)->count();
+    }
 }

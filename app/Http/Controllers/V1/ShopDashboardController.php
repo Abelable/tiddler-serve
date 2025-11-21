@@ -129,19 +129,6 @@ class ShopDashboardController extends Controller
         ]);
     }
 
-    public function salesRecord()
-    {
-        $monthlyCommissionList = CommissionService::getInstance()->monthlyCommissionList();
-        $monthlyGiftCommissionList = GiftCommissionService::getInstance()->monthlyCommissionList();
-        $monthlyTeamCommissionList = TeamCommissionService::getInstance()->monthlyCommissionList();
-
-        return $this->success([
-            'monthlyCommissionList' => $monthlyCommissionList,
-            'monthlyGiftCommissionList' => $monthlyGiftCommissionList,
-            'monthlyTeamCommissionList' => $monthlyTeamCommissionList,
-        ]);
-    }
-
     public function todoList()
     {
         $todoList = AdminTodoService::getInstance()->getTodoList();
