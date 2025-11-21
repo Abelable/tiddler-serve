@@ -40,6 +40,14 @@ class CateringShopManagerService extends BaseService
         return CateringShopManager::query()->where('user_id', $userId)->get($columns);
     }
 
+    public function getManagerListByRoleIds($userId, array $roleIds, $columns = ['*'])
+    {
+        return CateringShopManager::query()
+            ->where('user_id', $userId)
+            ->whereIn('role_id', $roleIds)
+            ->get($columns);
+    }
+
     public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
     {
         $query = CateringShopManager::new()->where('shop_id', $shopId);

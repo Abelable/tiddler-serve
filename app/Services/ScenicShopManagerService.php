@@ -39,6 +39,14 @@ class ScenicShopManagerService extends BaseService
         return ScenicShopManager::query()->where('user_id', $userId)->get($columns);
     }
 
+    public function getManagerListByRoleIds($userId, array $roleIds, $columns = ['*'])
+    {
+        return ScenicShopManager::query()
+            ->where('user_id', $userId)
+            ->whereIn('role_id', $roleIds)
+            ->get($columns);
+    }
+
     public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
     {
         $query = ScenicShopManager::new()->where('shop_id', $shopId);

@@ -56,6 +56,14 @@ class ShopManagerService extends BaseService
         return ShopManager::query()->where('user_id', $userId)->get($columns);
     }
 
+    public function getManagerListByRoleIds($userId, array $roleIds, $columns = ['*'])
+    {
+        return ShopManager::query()
+            ->where('user_id', $userId)
+            ->whereIn('role_id', $roleIds)
+            ->get($columns);
+    }
+
     public function getShopManager($shopId, $id, $columns = ['*'])
     {
         return ShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
