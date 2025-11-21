@@ -131,7 +131,8 @@ class ShopDashboardController extends Controller
 
     public function todoList()
     {
-        $todoList = ShopTodoService::getInstance()->getTodoList();
+        $shopId = $this->verifyRequiredId('shopId');
+        $todoList = ShopTodoService::getInstance()->getTodoList($shopId);
         return $this->success($todoList);
     }
 }
