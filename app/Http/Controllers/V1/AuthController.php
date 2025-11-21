@@ -182,7 +182,7 @@ class AuthController extends Controller
             /** @var ScenicShop $shopInfo */
             $shopInfo = $scenicShopList->get($scenicShopManager->shop_id);
             return [
-                'shopId' => $scenicShopManager->shop_id,
+                'id' => $scenicShopManager->shop_id,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => $scenicShopManager->role_id,
@@ -192,7 +192,7 @@ class AuthController extends Controller
         if ($scenicShopId != 0) {
             $shopInfo = $scenicShopList->get($scenicShopId);
             $scenicShopOptions->push([
-                'shopId' => $scenicShopId,
+                'id' => $scenicShopId,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => 1,
@@ -222,7 +222,7 @@ class AuthController extends Controller
             /** @var HotelShop $shopInfo */
             $shopInfo = $hotelShopList->get($manager->shop_id);
             return [
-                'shopId' => $manager->shop_id,
+                'id' => $manager->shop_id,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => $manager->role_id,
@@ -232,7 +232,7 @@ class AuthController extends Controller
         if ($hotelShopId != 0) {
             $shopInfo = $hotelShopList->get($hotelShopId);
             $hotelShopOptions->push([
-                'shopId' => $hotelShopId,
+                'id' => $hotelShopId,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => 1,
@@ -262,7 +262,7 @@ class AuthController extends Controller
             /** @var CateringShop $shopInfo */
             $shopInfo = $cateringShopList->get($manager->shop_id);
             return [
-                'shopId' => $manager->shop_id,
+                'id' => $manager->shop_id,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => $manager->role_id,
@@ -272,7 +272,7 @@ class AuthController extends Controller
         if ($cateringShopId != 0) {
             $shopInfo = $cateringShopList->get($cateringShopId);
             $cateringShopOptions->push([
-                'shopId' => $cateringShopId,
+                'id' => $cateringShopId,
                 'logo' => $shopInfo->logo ?? '',
                 'name' => $shopInfo->name ?? '',
                 'roleId' => 1,
@@ -302,7 +302,7 @@ class AuthController extends Controller
             /** @var Shop $shopInfo */
             $shopInfo = $shopList->get($manager->shop_id);
             return [
-                'shopId' => $manager->shop_id,
+                'id' => $manager->shop_id,
                 'logo'   => $shopInfo->logo ?? '',
                 'name'   => $shopInfo->name ?? '',
                 'roleId' => $manager->role_id,
@@ -312,7 +312,7 @@ class AuthController extends Controller
         if ($shopId != 0) {
             $shopInfo = $shopList->get($shopId);
             $shopOptions->push([
-                'shopId' => $shopId,
+                'id' => $shopId,
                 'logo'   => $shopInfo->logo ?? '',
                 'name'   => $shopInfo->name ?? '',
                 'roleId' => 1,
