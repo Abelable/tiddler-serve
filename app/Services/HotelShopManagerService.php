@@ -34,6 +34,11 @@ class HotelShopManagerService extends BaseService
         return HotelShopManager::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getManagerListByUserId($userId, $columns = ['*'])
+    {
+        return HotelShopManager::query()->where('user_id', $userId)->get($columns);
+    }
+
     public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
     {
         $query = HotelShopManager::new()->where('shop_id', $shopId);

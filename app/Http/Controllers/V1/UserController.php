@@ -83,56 +83,40 @@ class UserController extends Controller
             $user['scenicMerchantStatus'] = $user->scenicMerchant->status;
         }
 
-        $scenicShopId = $user->scenicShop->id ?? 0;
-        if ($scenicShopId != 0) {
-            $user['scenicShopId'] = $scenicShopId;
-
-            $scenicShopManagerList = ScenicShopManagerService::getInstance()
-                ->getManagerList($scenicShopId, ['id', 'user_id', 'role_id']);
-            $user['scenicShopManagerList'] = $scenicShopManagerList;
-        }
+        $user['scenicShopId'] = $user->scenicShop->id ?? 0;
+        $scenicShopManagerList = ScenicShopManagerService::getInstance()
+            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
+        $user['scenicShopManagerList'] = $scenicShopManagerList;
 
         if ($user->hotelMerchant) {
             $user['hotelMerchantId'] = $user->hotelMerchant->id;
             $user['hotelMerchantStatus'] = $user->hotelMerchant->status;
         }
 
-        $hotelShopId = $user->hotelShop->id ?? 0;
-        if ($hotelShopId != 0) {
-            $user['hotelShopId'] = $hotelShopId;
-
-            $hotelShopManagerList = HotelShopManagerService::getInstance()
-                ->getManagerList($hotelShopId, ['id', 'user_id', 'role_id']);
-            $user['hotelShopManagerList'] = $hotelShopManagerList;
-        }
+        $user['hotelShopId'] = $user->hotelShop->id ?? 0;
+        $hotelShopManagerList = HotelShopManagerService::getInstance()
+            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
+        $user['hotelShopManagerList'] = $hotelShopManagerList;
 
         if ($user->cateringMerchant) {
             $user['cateringMerchantId'] = $user->cateringMerchant->id;
             $user['cateringMerchantStatus'] = $user->cateringMerchant->status;
         }
 
-        $cateringShopId = $user->cateringShop->id ?? 0;
-        if ($cateringShopId != 0) {
-            $user['cateringShopId'] = $cateringShopId;
-
-            $cateringShopManagerList = CateringShopManagerService::getInstance()
-                ->getManagerList($cateringShopId, ['id', 'user_id', 'role_id']);
-            $user['cateringShopManagerList'] = $cateringShopManagerList;
-        }
+        $user['cateringShopId'] = $user->cateringShop->id ?? 0;
+        $cateringShopManagerList = CateringShopManagerService::getInstance()
+            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
+        $user['cateringShopManagerList'] = $cateringShopManagerList;
 
         if ($user->merchant) {
             $user['merchantId'] = $user->merchant->id;
             $user['merchantStatus'] = $user->merchant->status;
         }
 
-        $shopId = $user->shop->id ?? 0;
-        if ($shopId != 0) {
-            $user['shopId'] = $shopId;
-
-            $shopManagerList = ShopManagerService::getInstance()
-                ->getManagerList($shopId, ['id', 'user_id', 'role_id']);
-            $user['shopManagerList'] = $shopManagerList;
-        }
+        $user['shopId'] = $user->shop->id ?? 0;
+        $shopManagerList = ShopManagerService::getInstance()
+            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
+        $user['shopManagerList'] = $shopManagerList;
 
         unset($user->openid);
         unset($user->authInfo);

@@ -34,6 +34,11 @@ class ScenicShopManagerService extends BaseService
         return ScenicShopManager::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getManagerListByUserId($userId, $columns = ['*'])
+    {
+        return ScenicShopManager::query()->where('user_id', $userId)->get($columns);
+    }
+
     public function getManagerPage($shopId, ManagerPageInput $input, $columns = ['*'])
     {
         $query = ScenicShopManager::new()->where('shop_id', $shopId);
