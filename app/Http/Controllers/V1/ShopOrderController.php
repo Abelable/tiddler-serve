@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderPackageGoodsService;
 use App\Services\OrderPackageService;
@@ -40,7 +41,7 @@ class ShopOrderController extends Controller
         $shopId = $this->verifyId('shopId');
 
         $statusList = $this->statusList($status);
-        $page = OrderService::getInstance()->getShopOrderList($shopId, $statusList, $input);
+        $page = OrderService::getInstance()->getShopOrderPage($shopId, $statusList, $input);
         $orderList = collect($page->items());
         $list = $this->handleOrderList($orderList);
 
@@ -288,5 +289,24 @@ class ShopOrderController extends Controller
         $shopId = $this->verifyRequiredInteger('shopId');
         $count = OrderService::getInstance()->getShopOrderCountByStatusList($shopId, [201, 204]);
         return $this->success($count);
+    }
+
+    public function orderedGoodsOptions()
+    {
+        $shopId = $this->verifyRequiredInteger('shopId');
+        $goodsIds = array_unique(OrderGoodsService::getInstance()->getShopList($shopId)->pluck('goods_id')->toArray());
+        $goodsOptions = GoodsService::getInstance()->getListByIds($goodsIds, ['id', 'cover', 'name']);
+        return $this->success($goodsOptions);
+    }
+
+    public function orderedUserOptions()
+    {
+        $shopId = $this->verifyRequiredInteger('shopId');
+        $userIds = OrderService::getInstance()
+            ->getShopOrderList($shopId, [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->pluck('user_id')
+            ->toArray();
+        $userOptions = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname']);
+        return $this->success($userOptions);
     }
 }

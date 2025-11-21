@@ -108,6 +108,11 @@ class OrderGoodsService extends BaseService
         return OrderGoods::query()->get($columns);
     }
 
+    public function getShopList($shopId, $columns = ['*'])
+    {
+        return OrderGoods::query()->where('shop_id', $shopId)->get($columns);
+    }
+
     public function getLatestListByGoodsId($goodsId, $limit, $columns = ['*'])
     {
         return OrderGoods::query()

@@ -165,6 +165,8 @@ Route::prefix('shop')->group(function () {
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
         Route::post('ship', 'ShopOrderController@ship');
         Route::get('ship_order_count', 'ShopOrderController@shipOrderCount');
+        Route::get('goods_options', 'ShopOrderController@orderedGoodsOptions');
+        Route::get('user_options', 'ShopOrderController@orderedUserOptions');
 
         Route::prefix('keyword')->group(function () {
             Route::get('list', 'ShopOrderKeywordController@list');

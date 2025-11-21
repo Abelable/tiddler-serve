@@ -49,7 +49,7 @@ class OrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopOrderList($shopId, $statusList, PageInput $input, $columns = ['*'])
+    public function getShopOrderPage($shopId, $statusList, PageInput $input, $columns = ['*'])
     {
         $query = Order::query()->where('shop_id', $shopId);
         if (count($statusList) != 0) {
@@ -58,6 +58,14 @@ class OrderService extends BaseService
         return $query
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getShopOrderList($shopId, $statusList, $columns = ['*'])
+    {
+        return Order::query()
+            ->where('shop_id', $shopId)
+            ->whereIn('status', $statusList)
+            ->get($columns);
     }
 
     public function searchShopOrderList($shopId, $statusList, $keywords, $columns = ['*'])
