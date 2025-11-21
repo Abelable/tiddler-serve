@@ -13,10 +13,11 @@ use App\Utils\Inputs\WxMpRegisterInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    protected $only = [];
+    protected $only = ['setPassword', 'resetPassword'];
 
     public function getWxMpUserMobile()
     {
@@ -70,6 +71,26 @@ class AuthController extends Controller
         return $this->success($token);
     }
 
+    public function login()
+    {
+        $mobile = $this->verifyRequiredString('mobile');
+        $password = $this->verifyRequiredString('password');
+
+        $user = UserService::getInstance()->getByMobile($mobile);
+        if (is_null($user)) {
+            return $this->fail(CodeResponse::INVALID_ACCOUNT);
+        }
+
+        $isPass = Hash::check($password, $user->getAuthPassword());
+        if (!$isPass) {
+            return $this->fail(CodeResponse::INVALID_ACCOUNT);
+        }
+
+        $token = Auth::guard('user')->login($user);
+
+        return $this->success($token);
+    }
+
     public function refreshToken() {
         try {
             $token = Auth::guard('user')->refresh();
@@ -84,5 +105,32 @@ class AuthController extends Controller
             throw new BusinessException(CodeResponse::FORBIDDEN, 'token失效，请重新登录');
         }
         return $this->success($token);
+    }
+
+    public function setPassword()
+    {
+        $password = $this->verifyRequiredString('password');
+
+        $user = $this->user();
+        $user->password = Hash::make($password);
+        $user->save();
+
+        return $this->success();
+    }
+
+    public function resetPassword()
+    {
+        $password = $this->verifyRequiredString('password');
+        $newPassword = $this->verifyRequiredString('newPassword');
+        $user = $this->user();
+
+        $isPass = Hash::check($password, $user->getAuthPassword());
+        if (!$isPass) {
+            return $this->fail(CodeResponse::INVALID_ACCOUNT, '原密码错误');
+        }
+        $user->password = Hash::make($newPassword);
+        $user->save();
+
+        return $this->success();
     }
 }

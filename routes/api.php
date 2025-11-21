@@ -19,7 +19,10 @@ Route::prefix('auth')->group(function () {
         Route::post('login', 'AuthController@wxMpLogin');
     });
 
+    Route::post('login', 'AuthController@login');
     Route::get('token_refresh', 'AuthController@refreshToken');
+    Route::post('set_password', 'AuthController@setPassword');
+    Route::post('reset_password', 'AuthController@resetPassword');
 
     Route::prefix('info')->group(function () {
         Route::get('detail', 'AuthInfoController@detail');
