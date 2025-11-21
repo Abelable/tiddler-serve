@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\AdminTodoService;
+use App\Services\ShopTodoService;
 use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
@@ -131,7 +131,7 @@ class ShopDashboardController extends Controller
 
     public function todoList()
     {
-        $todoList = AdminTodoService::getInstance()->getTodoList();
+        $todoList = ShopTodoService::getInstance()->getTodoList();
         return $this->success($todoList);
     }
 }

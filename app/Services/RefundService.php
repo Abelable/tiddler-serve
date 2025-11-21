@@ -41,12 +41,30 @@ class RefundService extends BaseService
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
-        return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getShopRefundList($shopId, StatusPageInput $input, $columns = ['*'])
+    {
+        $query = Refund::query()->where('shop_id', $shopId);
+        if (!is_null($input->status)) {
+            $query = $query->where('status', $input->status);
+        }
+        return $query
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getRefundById($id, $columns = ['*'])
     {
         return Refund::query()->find($id, $columns);
+    }
+
+    public function getShopRefund($shopId, $id, $columns = ['*'])
+    {
+        return Refund::query()->where('shop_id', $shopId)->find($id, $columns);
     }
 
     public function getRefundByUserId($userId, $orderId, $goodsId, $columns = ['*'])
@@ -71,5 +89,10 @@ class RefundService extends BaseService
     public function getCountByStatus($status)
     {
         return Refund::query()->where('status', $status)->count();
+    }
+
+    public function getShopCountByStatus($shopId, $status)
+    {
+        return Refund::query()->where('shop_id', $shopId)->where('status', $status)->count();
     }
 }

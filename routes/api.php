@@ -170,6 +170,16 @@ Route::prefix('shop')->group(function () {
         });
     });
 
+    Route::prefix('refund')->group(function () {
+        Route::get('waiting_count', 'ShopRefundController@waitingRefundCount');
+        Route::post('list', 'ShopRefundController@list');
+        Route::get('detail', 'ShopRefundController@detail');
+        Route::post('approved', 'ShopRefundController@approved');
+        Route::post('reject', 'ShopRefundController@reject');
+        Route::post('delete', 'ShopRefundController@delete');
+        Route::get('shipping_info', 'ShopRefundController@shippingInfo');
+    });
+
     Route::prefix('income')->group(function () {
         Route::get('data_overview', 'ShopIncomeController@dataOverview');
         Route::get('sum', 'ShopIncomeController@sum');
