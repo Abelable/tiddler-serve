@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Models\Catering\CateringMerchant;
 use App\Models\Catering\CateringShop;
-use App\Models\Catering\CateringShopManager;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -21,6 +20,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $avatar 用户头像图片
  * @property string $nickname 用户昵称或网络名称
  * @property string $mobile 用户手机号码
+ * @property string $password 登录密码
  * @property string $openid 小程序openid
  * @property int $gender 性别：0-未知，1-男，2-女
  * @property string $bg 背景图
@@ -60,6 +60,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereOpenid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSignature($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|User withTrashed()

@@ -32,6 +32,7 @@ class AuthController extends Controller
 
         $token = Auth::guard('Admin')->login($admin);
         $permission = RoleService::getInstance()->getRoleById($admin->role_id)->permission;
+
         return $this->success([
             'token' => $token,
             'permission' => $permission,
