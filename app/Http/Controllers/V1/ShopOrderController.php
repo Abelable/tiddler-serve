@@ -16,6 +16,7 @@ use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ShopOrderPageInput;
 use Illuminate\Support\Facades\DB;
 
 class ShopOrderController extends Controller
@@ -35,12 +36,11 @@ class ShopOrderController extends Controller
 
     public function list()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $status = $this->verifyRequiredInteger('status');
+        /** @var ShopOrderPageInput $input */
+        $input = ShopOrderPageInput::new();
         $shopId = $this->verifyId('shopId');
 
-        $statusList = $this->statusList($status);
+        $statusList = $this->statusList($input->status ?? 0);
         $page = OrderService::getInstance()->getShopOrderPage($shopId, $statusList, $input);
         $orderList = collect($page->items());
         $list = $this->handleOrderList($orderList);

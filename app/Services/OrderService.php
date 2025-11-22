@@ -18,6 +18,7 @@ use App\Utils\Enums\OrderStatus;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ShopOrderPageInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -49,11 +50,30 @@ class OrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopOrderPage($shopId, $statusList, PageInput $input, $columns = ['*'])
+    public function getShopOrderPage($shopId, $statusList, ShopOrderPageInput $input, $columns = ['*'])
     {
-        $query = Order::query()->where('shop_id', $shopId);
-        if (count($statusList) != 0) {
-            $query = $query->whereIn('status', $statusList);
+        $query = Order::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
+        if (!empty($input->orderSn)) {
+            $query = $query->where('order_sn', $input->orderSn);
+        }
+        if (!empty($input->goodsId)) {
+            $orderIds = OrderGoodsService::getInstance()
+                ->getListByGoodsIds([$input->goodsId])
+                ->pluck('order_id')
+                ->toArray();
+            $query = $query->whereIn('id', $orderIds);
+        }
+        if (!empty($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
+        }
+        if (!empty($input->deliveryMode)) {
+            $query = $query->where('delivery_mode', $input->deliveryMode);
+        }
+        if (!empty($input->consignee)) {
+            $query = $query->where('consignee', $input->consignee);
+        }
+        if (!empty($input->mobile)) {
+            $query = $query->where('mobile', $input->mobile);
         }
         return $query
             ->orderBy($input->sort, $input->order)

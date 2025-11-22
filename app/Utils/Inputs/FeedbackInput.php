@@ -13,7 +13,7 @@ class FeedbackInput extends BaseInput
         return [
             'content' => 'required|string',
             'imageList' => 'array',
-            'mobile' => 'string',
+            'mobile' => 'regex:/^1[3-9]\d{9}$/',
         ];
     }
 }
