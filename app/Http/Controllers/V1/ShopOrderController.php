@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\ExpressService;
 use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderPackageGoodsService;
@@ -15,7 +16,7 @@ use App\Services\ShopPickupAddressService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;
-use App\Utils\Inputs\PageInput;
+use App\Utils\ExpressServe;
 use App\Utils\Inputs\ShopOrderPageInput;
 use Illuminate\Support\Facades\DB;
 
@@ -278,6 +279,76 @@ class ShopOrderController extends Controller
         }
 
         OrderService::getInstance()->splitShip($order, $packageList, $isAllDelivered == 1);
+
+        // todo: 管理员操组记录
+
+        return $this->success();
+    }
+
+    public function modifyShipment()
+    {
+        $id = $this->verifyRequiredInteger('id');
+        $packageList = $this->verifyArrayNotEmpty('packageList');
+
+        DB::transaction(function () use ($id, $packageList) {
+            OrderPackageService::getInstance()->deleteListByOrderId($id);
+            OrderPackageGoodsService::getInstance()->deleteListByOrderId($id);
+
+            foreach ($packageList as $package) {
+                $shipChannel = $package['shipChannel'];
+                $shipCode = $package['shipCode'];
+                $shipSn = $package['shipSn'];
+                if (empty($shipCode)) {
+                    $express = ExpressService::getInstance()->getExpressByName($shipChannel);
+                    $shipCode = $express->code;
+                }
+                $orderPackage = OrderPackageService::getInstance()->create($id, $shipChannel, $shipCode, $shipSn);
+
+                $goodsList = json_decode($package['goodsList']);
+                foreach ($goodsList as $goods) {
+                    OrderPackageGoodsService::getInstance()
+                        ->create($id, $orderPackage->id, $goods->goodsId, $goods->cover, $goods->name, $goods->selectedSkuName, $goods->number);
+                }
+            }
+        });
+
+        // todo: 管理员操组记录
+
+        return $this->success();
+    }
+
+    public function trackingInfo()
+    {
+        $id = $this->verifyRequiredId('id');
+        $package = OrderPackageService::getInstance()->getPackageById($id);
+
+        $order = OrderService::getInstance()->getOrder($package->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+        $traces = ExpressServe::new()->track($package->ship_code, $package->ship_sn, $order->mobile);
+
+        return $this->success([
+            'shipChannel' => $package->ship_channel,
+            'shipSn' => $package->ship_sn,
+            'traces' => $traces
+        ]);
+    }
+
+    public function refund()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids');
+        OrderService::getInstance()->adminRefund($ids);
+
+        // todo: 管理员操组记录
+
+        return $this->success();
+    }
+
+    public function confirm()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids');
+        OrderService::getInstance()->adminConfirm($ids);
 
         // todo: 管理员操组记录
 

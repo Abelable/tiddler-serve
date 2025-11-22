@@ -164,6 +164,10 @@ Route::prefix('shop')->group(function () {
         Route::post('verify', 'ShopOrderController@verify');
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
         Route::post('ship', 'ShopOrderController@ship');
+        Route::post('modify_shipment', 'ShopOrderController@modifyShipment');
+        Route::get('tracking_info', 'ShopOrderController@trackingInfo');
+        Route::post('confirm', 'ShopOrderController@confirm');
+        Route::post('refund', 'ShopOrderController@refund');
         Route::get('ship_order_count', 'ShopOrderController@shipOrderCount');
         Route::get('goods_options', 'ShopOrderController@orderedGoodsOptions');
         Route::get('user_options', 'ShopOrderController@orderedUserOptions');

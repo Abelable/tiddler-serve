@@ -6,7 +6,6 @@ use App\Models\OrderPackageGoods;
 
 class OrderPackageGoodsService extends BaseService
 {
-
     public function create($orderId, $packageId, $goodsId, $goodsCover, $goodsName, $selectedSkuName, $goodsNumber)
     {
         $goods = OrderPackageGoods::new();
@@ -23,5 +22,10 @@ class OrderPackageGoodsService extends BaseService
     public function getListByOrderId($orderId, $columns = ['*'])
     {
         return OrderPackageGoods::query()->where('order_id', $orderId)->get($columns);
+    }
+
+    public function deleteListByOrderId($orderId)
+    {
+        return OrderPackageGoods::query()->where('order_id', $orderId)->delete();
     }
 }
