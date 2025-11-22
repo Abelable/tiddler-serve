@@ -123,7 +123,7 @@ class AuthController extends Controller
         try {
             $token = Auth::guard('user')->refresh();
 
-            // 由于删除用户之后，鉴权失败，但刷新token依旧有效，暂未找到解决办法，因此增加这一层校验
+            // todo 由于删除用户之后，鉴权失败，但刷新token依旧有效，暂未找到解决办法，因此增加这一层校验
             try {
                 Auth::guard('user')->userOrFail();
             } catch (\Exception $e) {
