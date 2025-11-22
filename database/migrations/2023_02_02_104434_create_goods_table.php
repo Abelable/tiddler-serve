@@ -41,6 +41,7 @@ class CreateGoodsTable extends Migration
             $table->longText('sku_list')->comment('商品sku');
             $table->integer('delivery_mode')->default(1)->comment('提货方式：1-快递，2-自提，3-快递/自提');
             $table->integer('refund_status')->default(0)->comment('是否支持7天无理由：0-不支持，1-支持');
+            $table->integer('refund_address_id')->default(0)->comment('退货地址id');
             $table->integer('sales_volume')->default(0)->comment('销量');
             $table->float('score')->default(0)->comment('评分');
             $table->integer('views')->default(0)->comment('点击率');

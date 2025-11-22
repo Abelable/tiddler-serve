@@ -34,6 +34,7 @@ use Laravel\Scout\Searchable;
  * @property string $sku_list 商品sku
  * @property int $delivery_mode 提货方式：1-快递，2-自提，3-快递/自提
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property int $refund_address_id 退货地址id
  * @property int $sales_volume 销量
  * @property float $score 评分
  * @property int $views 点击率
@@ -43,8 +44,6 @@ use Laravel\Scout\Searchable;
  * @property-read \App\Models\FreightTemplate|null $freightTemplateInfo
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsPickupAddress[] $pickupAddressList
  * @property-read int|null $pickup_address_list_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GoodsRefundAddress[] $refundAddressList
- * @property-read int|null $refund_address_list_count
  * @property-read \App\Models\Shop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
@@ -68,6 +67,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods wherePromotionCommissionUpperLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSalesVolume($value)
@@ -104,16 +104,6 @@ class Goods extends BaseModel
     public function freightTemplateInfo()
     {
         return $this->belongsTo(FreightTemplate::class, 'freight_template_id');
-    }
-
-    public function refundAddressList()
-    {
-        return $this->hasMany(GoodsRefundAddress::class, 'goods_id');
-    }
-
-    public function refundAddressIds()
-    {
-        return $this->refundAddressList()->pluck('refund_address_id');
     }
 
     public function pickupAddressList()

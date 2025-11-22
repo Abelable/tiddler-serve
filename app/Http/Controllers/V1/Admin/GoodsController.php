@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\GiftGoodsService;
 use App\Services\GoodsPickupAddressService;
-use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\MerchantService;
 use App\Services\ShopService;
@@ -76,7 +75,6 @@ class GoodsController extends Controller
         }
 
         $goods['pickupAddressIds'] = $goods->pickupAddressIds();
-        $goods['refundAddressIds'] = $goods->refundAddressIds();
 
         return $this->success($goods);
     }
@@ -91,9 +89,6 @@ class GoodsController extends Controller
 
             if (!empty($input->pickupAddressIds)) {
                 GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds);
-            }
-            if (!empty($input->refundAddressIds)) {
-                GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds);
             }
         });
 
@@ -114,7 +109,6 @@ class GoodsController extends Controller
         DB::transaction(function () use ($goods, $input) {
             GoodsService::getInstance()->updateGoods($goods, $input);
             GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds);
-            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds);
         });
 
         return $this->success();

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\GoodsCategoryService;
 use App\Services\GoodsPickupAddressService;
-use App\Services\GoodsRefundAddressService;
 use App\Services\GoodsService;
 use App\Services\ShopManagerService;
 use App\Services\ShopService;
@@ -77,7 +76,6 @@ class ShopGoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        $goods['refundAddressIds'] = $goods->refundAddressIds();
         $goods['pickupAddressIds'] = $goods->pickupAddressIds();
         $goods->image_list = json_decode($goods->image_list);
         $goods->detail_image_list = json_decode($goods->detail_image_list);
@@ -101,7 +99,6 @@ class ShopGoodsController extends Controller
         DB::transaction(function () use ($input, $shopId) {
             $goods = GoodsService::getInstance()->createGoods($shopId, $input);
             GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds ?: []);
-            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds ?: []);
         });
 
         return $this->success();
@@ -130,7 +127,6 @@ class ShopGoodsController extends Controller
         DB::transaction(function () use ($goods, $input, $shopId) {
             GoodsService::getInstance()->updateGoods($goods, $input);
             GoodsPickupAddressService::getInstance()->createList($goods->id, $input->pickupAddressIds ?: []);
-            GoodsRefundAddressService::getInstance()->createList($goods->id, $input->refundAddressIds ?: []);
         });
 
         return $this->success();

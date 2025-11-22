@@ -28,7 +28,7 @@ class GoodsInput extends BaseInput
     public $freightTemplateId;
     public $pickupAddressIds;
     public $refundStatus;
-    public $refundAddressIds;
+    public $refundAddressId;
 
     public function rules()
     {
@@ -57,7 +57,7 @@ class GoodsInput extends BaseInput
             'freightTemplateId' => 'required|integer|digits_between:1,20',
             'pickupAddressIds' => 'array',
             'refundStatus' => 'required|integer|in:0,1',
-            'refundAddressIds' => 'array',
+            'refundAddressId' => 'integer|digits_between:1,20',
         ];
     }
 }
