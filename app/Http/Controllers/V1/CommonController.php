@@ -33,6 +33,7 @@ use App\Services\TaskService;
 use App\Services\UserTaskService;
 use App\Utils\AliOssServe;
 use App\Utils\Enums\ProductType;
+use App\Utils\ExpressServe;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -69,6 +70,16 @@ class CommonController extends Controller
         $code = $this->verifyRequiredId('code');
         $qrCode = QrCode::format('png')->size(400)->generate($code);
         return response($qrCode)->header('Content-Type', 'image/png');
+    }
+
+    public function shippingInfo()
+    {
+        $shipCode = $this->verifyRequiredString('shipCode');
+        $shipSn = $this->verifyRequiredString('shipSn');
+        $mobile = $this->verifyString('mobile');
+
+        $traces = ExpressServe::new()->track($shipCode, $shipSn, $mobile);
+        return $this->success($traces);
     }
 
     private function fileToBase64($file){

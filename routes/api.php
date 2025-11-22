@@ -47,6 +47,7 @@ Route::prefix('user')->group(function () {
 
 Route::get('oss_config', 'CommonController@ossConfig');
 Route::get('qr_code', 'CommonController@qrCode');
+Route::get('shipping_info', 'CommonController@shippingInfo');
 
 Route::get('evaluation_tag_list', 'CommonController@evaluationTagList');
 Route::get('complaint_options', 'CommonController@complaintOptions');
