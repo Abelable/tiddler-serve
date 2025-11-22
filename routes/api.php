@@ -20,7 +20,7 @@ Route::prefix('auth')->group(function () {
     });
 
     Route::post('login', 'AuthController@login');
-    Route::get('token_refresh', 'AuthController@refreshToken');
+    Route::post('token_refresh', 'AuthController@refreshToken');
     Route::post('set_password', 'AuthController@setPassword');
     Route::post('reset_password', 'AuthController@resetPassword');
 
@@ -852,8 +852,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
 
     Route::prefix('auth')->group(function () {
         Route::post('login', 'AuthController@login');
-        Route::get('logout', 'AuthController@logout');
-        Route::get('token_refresh', 'AuthController@refreshToken');
+        Route::post('logout', 'AuthController@logout');
+        Route::post('token_refresh', 'AuthController@refreshToken');
         Route::post('reset_password', 'AuthController@resetPassword');
         Route::get('base_info', 'AuthController@baseInfo');
         Route::post('update_base_info', 'AuthController@updateBaseInfo');
