@@ -16,6 +16,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \App\Models\OrderPackage|null $package
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods newQuery()
  * @method static \Illuminate\Database\Query\Builder|OrderPackageGoods onlyTrashed()
@@ -37,4 +38,8 @@ namespace App\Models;
  */
 class OrderPackageGoods extends BaseModel
 {
+    public function package()
+    {
+        return $this->belongsTo(OrderPackage::class, 'package_id');
+    }
 }

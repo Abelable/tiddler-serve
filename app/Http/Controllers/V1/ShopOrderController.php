@@ -273,7 +273,7 @@ class ShopOrderController extends Controller
 
         OrderService::getInstance()->exportOrderList($ids);
 
-        $excelFile =  Excel::raw(new OrdersExport($ids), \Maatwebsite\Excel\Excel::XLSX);
+        $excelFile = Excel::raw(new OrdersExport($ids), \Maatwebsite\Excel\Excel::XLSX);
         return response($excelFile)
             ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
             ->header('Content-Disposition', 'attachment; filename="orders.xlsx"')
