@@ -23,6 +23,7 @@ class OrderGoodsService extends BaseService
             $goods->is_gift = $cartGoods->is_gift;
             $goods->duration = $cartGoods->duration;
             $goods->refund_status = $cartGoods->refund_status;
+            $goods->refund_address_id = $cartGoods->refund_address_id;
             $goods->cover = $cartGoods->cover;
             $goods->name = $cartGoods->name;
             $goods->selected_sku_name = $cartGoods->selected_sku_name;

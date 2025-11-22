@@ -67,6 +67,7 @@ class CartGoodsService extends BaseService
             $cartGoods->shop_category_id = $goods->shop_category_id;
             $cartGoods->freight_template_id = $goods->freight_template_id;
             $cartGoods->refund_status = $goods->refund_status;
+            $cartGoods->refund_address_id = $goods->refund_address_id;
             $cartGoods->delivery_mode = $goods->delivery_mode;
             if (!is_null($giftGoods)) {
                 $cartGoods->is_gift =  1;

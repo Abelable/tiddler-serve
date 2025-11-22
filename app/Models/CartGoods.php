@@ -17,6 +17,7 @@ namespace App\Models;
  * @property int $is_gift 是否为礼包商品：0-否，1-是
  * @property int $duration 代言时长（天）
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property int $refund_address_id 退货地址
  * @property int $delivery_mode 提货方式：1-快递，2-自提，3-快递/自提
  * @property string $cover 商品图片
  * @property string $name 商品名称
@@ -52,6 +53,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods wherePrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods wherePromotionCommissionUpperLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereRefundAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereScene($value)

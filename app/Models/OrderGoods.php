@@ -16,6 +16,7 @@ namespace App\Models;
  * @property int $is_gift 是否为礼包商品：0-否，1-是
  * @property int $duration 代言时长（天）
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
+ * @property int $refund_address_id 退货地址
  * @property string $cover 商品图片
  * @property string $name 商品名称
  * @property float $price 商品价格
@@ -49,6 +50,7 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromoterStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromotionCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods wherePromotionCommissionUpperLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereRefundAddressId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereSelectedSkuIndex($value)
