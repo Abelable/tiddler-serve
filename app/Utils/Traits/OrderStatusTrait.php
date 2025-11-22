@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
  * @method bool canCancelHandle()
  * @method bool canDeleteHandle()
  * @method bool canPayHandle()
+ * @method bool canExportHandle()
  * @method bool canShipHandle()
  * @method bool canCommentHandle()
  * @method bool canConfirmHandle()
@@ -69,6 +70,7 @@ trait OrderStatusTrait
             OrderStatus::EXPORTED,
         ],
         'agreeRefund' => [OrderStatus::REFUNDING],
+        'export' => [OrderStatus::PAID],
         'ship' => [OrderStatus::PAID],
         'confirm' => [OrderStatus::SHIPPED, OrderStatus::PENDING_VERIFICATION],
         'comment' => [
@@ -115,6 +117,7 @@ trait OrderStatusTrait
             'delete' => $this->canDeleteHandle(),
             'refund' => $this->canRefundHandle(),
             'agreeRefund' => $this->canAgreeRefundHandle(),
+            'export' => $this->canExportHandle(),
             'ship' => $this->canShipHandle(),
             'confirm' => $this->canConfirmHandle(),
             'comment' => $this->canCommentHandle(),

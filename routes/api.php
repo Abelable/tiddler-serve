@@ -163,6 +163,8 @@ Route::prefix('shop')->group(function () {
         Route::get('detail', 'ShopOrderController@detail');
         Route::post('verify', 'ShopOrderController@verify');
         Route::get('unshipped_goods_list', 'ShopOrderController@unshippedGoodsList');
+        Route::post('export', 'OrderController@export');
+        Route::post('import', 'OrderController@import');
         Route::post('ship', 'ShopOrderController@ship');
         Route::post('modify_shipment', 'ShopOrderController@modifyShipment');
         Route::get('tracking_info', 'ShopOrderController@trackingInfo');

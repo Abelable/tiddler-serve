@@ -42,6 +42,10 @@ use App\Utils\Traits\OrderStatusTrait;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\OrderGoods[] $goodsList
+ * @property-read int|null $goods_list_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\OrderPackage[] $packages
+ * @property-read int|null $packages_count
  * @property-read \App\Models\Shop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
@@ -93,5 +97,15 @@ class Order extends BaseModel
     public function shopInfo()
     {
         return $this->belongsTo(Shop::class, 'shop_id');
+    }
+
+    public function goodsList()
+    {
+        return $this->hasMany(OrderGoods::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(OrderPackage::class, 'order_id');
     }
 }

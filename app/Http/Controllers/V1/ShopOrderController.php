@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\V1;
 
+use App\Exceptions\BusinessException;
+use App\Exports\OrdersExport;
 use App\Http\Controllers\Controller;
+use App\Imports\OrdersImport;
 use App\Models\Order;
 use App\Services\ExpressService;
 use App\Services\GoodsService;
@@ -19,6 +22,7 @@ use App\Utils\Enums\OrderStatus;
 use App\Utils\ExpressServe;
 use App\Utils\Inputs\ShopOrderPageInput;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ShopOrderController extends Controller
 {
@@ -261,6 +265,33 @@ class ShopOrderController extends Controller
         }
 
         return $this->success($unshippedGoodsList);
+    }
+
+    public function export()
+    {
+        $ids = $this->verifyArrayNotEmpty('ids', []);
+
+        OrderService::getInstance()->exportOrderList($ids);
+
+        $excelFile =  Excel::raw(new OrdersExport($ids), \Maatwebsite\Excel\Excel::XLSX);
+        return response($excelFile)
+            ->header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            ->header('Content-Disposition', 'attachment; filename="orders.xlsx"')
+            ->header('X-File-Name', 'orders.xlsx')
+            ->header('Access-Control-Expose-Headers', 'X-File-Name');
+    }
+
+    public function import()
+    {
+        $excel = $this->verifyExcel();
+
+        try {
+            Excel::import(new OrdersImport(), $excel);
+        } catch (\Exception $e) {
+            throw new BusinessException(CodeResponse::INVALID_OPERATION, '订单导入失败' . $e->getMessage());
+        }
+
+        return $this->success();
     }
 
     public function ship()

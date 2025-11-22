@@ -577,6 +577,19 @@ class OrderService extends BaseService
         $this->ship($row['order_id'], $row['ship_channel'], $row['ship_code'], $row['ship_sn']);
     }
 
+    public function exportOrderList(array $ids)
+    {
+        foreach ($ids as $id) {
+            $order = $this->getOrder($id);
+            if ($order->canExportHandle()) {
+                $order->status = OrderStatus::EXPORTED;
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
+            }
+        }
+    }
+
     public function ship($orderId, $shipChannel, $shipCode, $shipSn)
     {
         $order = $this->getOrder($orderId);
