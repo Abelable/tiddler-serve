@@ -48,7 +48,8 @@ class RefundController extends Controller
 
         DB::transaction(function () use ($shopId, $orderSn, $input, $couponId, $goodsId, $orderId) {
             $refundAmount = $this->calcRefundAmount($orderId, $goodsId, $couponId);
-            RefundService::getInstance()->createRefund($shopId, $this->userId(), $orderId, $orderSn, $goodsId, $couponId, $refundAmount, $input);
+            RefundService::getInstance()
+                ->createRefund($shopId, $this->userId(), $orderId, $orderSn, $goodsId, $couponId, $refundAmount, $input);
 
             OrderService::getInstance()->afterSale($this->userId(), $orderId);
 
