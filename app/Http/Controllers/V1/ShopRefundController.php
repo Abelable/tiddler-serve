@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Refund;
 use App\Services\ShopTodoService;
 use App\Services\NotificationService;
 use App\Services\OrderGoodsService;
@@ -22,11 +23,21 @@ class ShopRefundController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'status', 'failure_reason', 'order_sn', 'refund_type', 'refund_amount', 'created_at', 'updated_at'];
+        $columns = ['id', 'user_id', 'status', 'failure_reason', 'order_sn', 'order_id', 'goods_id', 'refund_type', 'refund_amount', 'created_at', 'updated_at'];
 
         $page = RefundService::getInstance()->getShopRefundList($shopId, $input, $columns);
+        $refundList = collect($page->items());
 
-        return $this->successPaginate($page);
+        $orderGoodsIds = $refundList->pluck('order_goods_id')->toArray();
+        $orderGoodsList = OrderGoodsService::getInstance()->getListByIds($orderGoodsIds)->keyBy('id');
+
+        $list = $refundList->map(function (Refund $refund) use ($orderGoodsList) {
+            $goodsInfo = $orderGoodsList->get($refund->order_goods_id);
+            $refund['goodsInfo'] = $goodsInfo;
+            return $refund;
+        });
+
+        return $this->success($this->paginate($page, $list));
     }
 
     public function detail()
@@ -40,6 +51,7 @@ class ShopRefundController extends Controller
         }
 
         $refund->image_list = json_decode($refund->image_list);
+
         $goods = OrderGoodsService::getInstance()->getOrderGoods($refund->order_id, $refund->goods_id);
         $refund['goodsInfo'] = $goods;
 

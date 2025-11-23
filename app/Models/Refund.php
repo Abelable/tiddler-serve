@@ -12,12 +12,14 @@ namespace App\Models;
  * @property int $shop_id 店铺id
  * @property int $order_id 订单id
  * @property string $order_sn 订单编号
- * @property int $goods_id 商品id
  * @property int $coupon_id 优惠券id
+ * @property int $order_goods_id 订单商品id
+ * @property int $goods_id 商品id
  * @property float $refund_amount 退款金额
  * @property int $refund_type 售后类型：1-仅退款，2-退货退款
  * @property string $refund_reason 退款说明
  * @property string $image_list 图片说明
+ * @property string $ship_channel 快递公司
  * @property string $ship_code 快递公司编号
  * @property string $ship_sn 快递编号
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -34,11 +36,13 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereImageList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Refund whereOrderGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereOrderSn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereRefundAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereRefundReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereRefundType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShipChannel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShipCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShipSn($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Refund whereShopId($value)

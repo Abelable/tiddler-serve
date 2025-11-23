@@ -8,15 +8,16 @@ use App\Utils\Inputs\StatusPageInput;
 
 class RefundService extends BaseService
 {
-    public function createRefund($shopId, $userId, $orderId, $orderSn, $goodsId, $couponId, $refundAmount, RefundInput $input)
+    public function createRefund($userId, RefundInput $input, $refundAmount)
     {
         $refund = Refund::new();
-        $refund->shop_id = $shopId;
         $refund->user_id = $userId;
-        $refund->order_id = $orderId;
-        $refund->order_sn = $orderSn;
-        $refund->goods_id = $goodsId;
-        $refund->coupon_id = $couponId;
+        $refund->shop_id = $input->shopId;
+        $refund->order_id = $input->orderId;
+        $refund->order_sn = $input->orderSn;
+        $refund->coupon_id = $input->couponId ?? 0;
+        $refund->order_goods_id = $input->orderGoodsId;
+        $refund->goods_id = $input->goodsId;
         $refund->refund_amount = $refundAmount;
         return $this->updateRefund($refund, $input);
     }

@@ -915,17 +915,7 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单不支持退款');
         }
 
-        /** @var OrderGoods $orderGoods */
-        $orderGoods = OrderGoodsService::getInstance()->getOrderGoods($orderId, $goodsId);
-        $totalPrice = bcmul($orderGoods->price, $orderGoods->number, 2);
-        $couponDenomination = 0;
-        if ($couponId != 0) {
-            $coupon = CouponService::getInstance()->getGoodsCoupon($couponId, $goodsId);
-            if (!is_null($coupon)) {
-                $couponDenomination = $coupon->denomination;
-            }
-        }
-        $actualRefundAmount = bcsub($totalPrice, $couponDenomination, 2);
+        $actualRefundAmount = $this->calcRefundAmount($orderId, $goodsId, $couponId);
 
         if (bccomp($actualRefundAmount, $refundAmount, 2) != 0) {
             $errMsg = "退款申请，订单id为{$orderId}商品id为{$goodsId}，退款金额（{$refundAmount}）与实际可退款金额（{$actualRefundAmount}）不一致";
@@ -990,6 +980,23 @@ class OrderService extends BaseService
         } catch (GatewayException $exception) {
             Log::error('wx_refund_fail', [$exception]);
         }
+    }
+
+    public function calcRefundAmount($orderId, $goodsId, $couponId)
+    {
+        /** @var OrderGoods $orderGoods */
+        $orderGoods = OrderGoodsService::getInstance()->getOrderGoods($orderId, $goodsId);
+        $totalPrice = bcmul($orderGoods->price, $orderGoods->number, 2);
+
+        $couponDenomination = 0;
+        if (!empty($couponId)) {
+            $coupon = CouponService::getInstance()->getGoodsCoupon($couponId, $goodsId);
+            if (!is_null($coupon)) {
+                $couponDenomination = $coupon->denomination;
+            }
+        }
+
+        return bcsub($totalPrice, $couponDenomination, 2);
     }
 
     public function delete($orderList)

@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\OrderGoods;
 use App\Models\Refund;
-use App\Services\CouponService;
-use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\RefundService;
 use App\Utils\CodeResponse;
@@ -20,7 +17,9 @@ class RefundController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $goodsId = $this->verifyRequiredId('goodsId');
         $couponId = $this->verifyId('couponId');
-        $refundAmount = $this->calcRefundAmount($orderId, $goodsId, $couponId);
+
+        $refundAmount = OrderService::getInstance()->calcRefundAmount($orderId, $goodsId, $couponId);
+
         return $this->success($refundAmount);
     }
 
@@ -38,20 +37,15 @@ class RefundController extends Controller
 
     public function add()
     {
-        $shopId = $this->verifyRequiredId('shopId');
-        $orderId = $this->verifyRequiredId('orderId');
-        $orderSn = $this->verifyRequiredString('orderSn');
-        $goodsId = $this->verifyRequiredId('goodsId');
-        $couponId = $this->verifyId('couponId');
         /** @var RefundInput $input */
         $input = RefundInput::new();
 
-        DB::transaction(function () use ($shopId, $orderSn, $input, $couponId, $goodsId, $orderId) {
-            $refundAmount = $this->calcRefundAmount($orderId, $goodsId, $couponId);
-            RefundService::getInstance()
-                ->createRefund($shopId, $this->userId(), $orderId, $orderSn, $goodsId, $couponId, $refundAmount, $input);
+        $refundAmount = OrderService::getInstance()->calcRefundAmount($input->orderId, $input->goodsId, $input->couponId);
 
-            OrderService::getInstance()->afterSale($this->userId(), $orderId);
+        DB::transaction(function () use ($refundAmount, $input) {
+            RefundService::getInstance()->createRefund($this->userId(), $input, $refundAmount);
+
+            OrderService::getInstance()->afterSale($this->userId(), $input->orderId);
 
             // todo 售后通知
         });
@@ -78,6 +72,7 @@ class RefundController extends Controller
     public function submitShippingInfo()
     {
         $id = $this->verifyRequiredId('id');
+        $shipChannel = $this->verifyRequiredString('shipChannel');
         $shipCode = $this->verifyRequiredString('shipCode');
         $shipSn = $this->verifyRequiredString('shipSn');
 
@@ -88,7 +83,9 @@ class RefundController extends Controller
         if ($refund->status != 1) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '后台未审核通过，无法上传物流信息');
         }
+
         $refund->status = 2;
+        $refund->ship_channel = $shipChannel;
         $refund->ship_code = $shipCode;
         $refund->ship_sn = $shipSn;
         $refund->save();
@@ -105,22 +102,5 @@ class RefundController extends Controller
         }
         $refund->delete();
         return $this->success();
-    }
-
-    private function calcRefundAmount($orderId, $goodsId, $couponId)
-    {
-        /** @var OrderGoods $orderGoods */
-        $orderGoods = OrderGoodsService::getInstance()->getOrderGoods($orderId, $goodsId);
-        $totalPrice = bcmul($orderGoods->price, $orderGoods->number, 2);
-
-        $couponDenomination = 0;
-        if ($couponId != 0) {
-            $coupon = CouponService::getInstance()->getGoodsCoupon($couponId, $goodsId);
-            if (!is_null($coupon)) {
-                $couponDenomination = $coupon->denomination;
-            }
-        }
-
-        return bcsub($totalPrice, $couponDenomination, 2);
     }
 }
