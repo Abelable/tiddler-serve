@@ -168,6 +168,7 @@ class ShopOrderController extends Controller
             'pickup_mobile',
             'goods_price',
             'freight_price',
+            'coupon_denomination',
             'deduction_balance',
             'payment_amount',
             'refund_amount',
@@ -185,7 +186,7 @@ class ShopOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
 
-        $userInfo = UserService::getInstance()->getUserById($order->user_id);
+        $userInfo = UserService::getInstance()->getUserById($order->user_id, ['id', 'avatar', 'nickname']);
         $order['userInfo'] = $userInfo;
         unset($order->user_id);
 
@@ -200,6 +201,9 @@ class ShopOrderController extends Controller
                 ->getAddressById($order->pickup_address_id, ['id', 'name', 'address_detail', 'latitude', 'longitude']);
             $order['pickup_address'] = $pickupAddress;
             unset($order['pickup_address_id']);
+
+            $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
+            $order['verify_code'] = $verifyInfo->code ?: null;
         }
 
         return $this->success($order);

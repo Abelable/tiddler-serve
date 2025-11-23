@@ -268,6 +268,15 @@ Route::prefix('order')->group(function () {
     });
 });
 
+Route::prefix('refund')->group(function () {
+    Route::get('amount', 'RefundController@refundAmount');
+    Route::get('detail', 'RefundController@detail');
+    Route::post('add', 'RefundController@add');
+    Route::post('edit', 'RefundController@edit');
+    Route::post('submit_shipping_info', 'RefundController@submitShippingInfo');
+    Route::post('delete', 'RefundController@delete');
+});
+
 Route::prefix('scenic')->group(function () {
     Route::get('category_options', 'ScenicController@categoryOptions');
     Route::get('list', 'ScenicController@list');
