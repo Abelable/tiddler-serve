@@ -10,6 +10,7 @@ use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\RefundService;
 use App\Services\ShopService;
+use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\NotificationEnums;
 use App\Utils\ExpressServe;
@@ -44,12 +45,22 @@ class ShopRefundController extends Controller
         $page = RefundService::getInstance()->getShopRefundList($shopId, $input, $columns);
         $refundList = collect($page->items());
 
+        $userIds = $refundList->pluck('user_id')->toArray();
+        $userList = UserService::getInstance()
+            ->getListByIds($userIds, ['id', 'avatar', 'nickname'])
+            ->keyBy('id');
+
         $orderGoodsIds = $refundList->pluck('order_goods_id')->toArray();
         $orderGoodsList = OrderGoodsService::getInstance()->getListByIds($orderGoodsIds)->keyBy('id');
 
-        $list = $refundList->map(function (Refund $refund) use ($orderGoodsList) {
+        $list = $refundList->map(function (Refund $refund) use ($userList, $orderGoodsList) {
+            $userInfo = $userList->get($refund->user_id);
+            $refund['userInfo'] = $userInfo;
+            unset($refund['user_id']);
+
             $goodsInfo = $orderGoodsList->get($refund->order_goods_id);
             $refund['goodsInfo'] = $goodsInfo;
+
             return $refund;
         });
 
