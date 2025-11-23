@@ -34,8 +34,6 @@ class ShopOrderController extends Controller
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(1)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(2)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(3)),
-            0,
-            OrderService::getInstance()->getShopTotal($shopId, [OrderStatus::REFUNDING]),
         ]);
     }
 
@@ -90,9 +88,6 @@ class ShopOrderController extends Controller
                 break;
             case 4:
                 $statusList = [OrderStatus::FINISHED];
-                break;
-            case 5:
-                $statusList = [OrderStatus::REFUNDING, OrderStatus::REFUNDED];
                 break;
             default:
                 $statusList = [
