@@ -372,8 +372,15 @@ class ShopOrderController extends Controller
 
     public function refund()
     {
-        $ids = $this->verifyArrayNotEmpty('ids');
-        OrderService::getInstance()->adminRefund($ids);
+        $shopId = $this->verifyRequiredInteger('shopId');
+        $orderId = $this->verifyArrayNotEmpty('orderId');
+
+        $order = OrderService::getInstance()->getShopOrder($shopId, $orderId);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+
+        OrderService::getInstance()->refund($order);
 
         // todo: 管理员操组记录
 
