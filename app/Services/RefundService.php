@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Refund;
 use App\Utils\Inputs\RefundInput;
+use App\Utils\Inputs\RefundPageInput;
 use App\Utils\Inputs\StatusPageInput;
 
 class RefundService extends BaseService
@@ -47,13 +48,22 @@ class RefundService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopRefundList($shopId, StatusPageInput $input, $columns = ['*'])
+    public function getShopTotal($shopId, $statusList)
+    {
+        return Refund::query()->where('shop_id', $shopId)->whereIn('status', $statusList)->count();
+    }
+
+    public function getShopRefundList($shopId, RefundPageInput $input, $columns = ['*'])
     {
         $query = Refund::query()->where('shop_id', $shopId);
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
         }
+        if (!is_null($input->orderSn)) {
+            $query = $query->where('order_sn', $input->orderSn);
+        }
         return $query
+            ->orderByRaw("FIELD(status, 0, 2) DESC")
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

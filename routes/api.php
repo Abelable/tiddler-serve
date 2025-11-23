@@ -184,6 +184,7 @@ Route::prefix('shop')->group(function () {
 
     Route::prefix('refund')->group(function () {
         Route::get('waiting_count', 'ShopRefundController@waitingRefundCount');
+        Route::get('total', 'ShopRefundController@total');
         Route::post('list', 'ShopRefundController@list');
         Route::get('detail', 'ShopRefundController@detail');
         Route::post('approved', 'ShopRefundController@approved');

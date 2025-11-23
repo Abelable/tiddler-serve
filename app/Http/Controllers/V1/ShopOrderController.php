@@ -14,6 +14,7 @@ use App\Services\OrderPackageGoodsService;
 use App\Services\OrderPackageService;
 use App\Services\OrderService;
 use App\Services\OrderVerifyService;
+use App\Services\RefundService;
 use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
 use App\Services\UserService;
@@ -34,6 +35,8 @@ class ShopOrderController extends Controller
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(1)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(2)),
             OrderService::getInstance()->getShopTotal($shopId, $this->statusList(3)),
+            0,
+            RefundService::getInstance()->getShopTotal($shopId, [0, 2]),
         ]);
     }
 

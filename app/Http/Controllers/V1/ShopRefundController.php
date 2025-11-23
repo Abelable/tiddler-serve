@@ -13,17 +13,33 @@ use App\Services\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\NotificationEnums;
 use App\Utils\ExpressServe;
-use App\Utils\Inputs\StatusPageInput;
+use App\Utils\Inputs\RefundPageInput;
 use Illuminate\Support\Facades\DB;
 
 class ShopRefundController extends Controller
 {
+    public function waitingRefundCount()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $count = RefundService::getInstance()->getShopTotal($shopId, [0, 2]);
+        return $this->success($count);
+    }
+
+    public function total()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        return $this->success([
+            RefundService::getInstance()->getShopTotal($shopId, [0]),
+            RefundService::getInstance()->getShopTotal($shopId, [2]),
+        ]);
+    }
+
     public function list()
     {
-        /** @var StatusPageInput $input */
-        $input = StatusPageInput::new();
+        /** @var RefundPageInput $input */
+        $input = RefundPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'status', 'failure_reason', 'order_sn', 'order_id', 'goods_id', 'refund_type', 'refund_amount', 'created_at', 'updated_at'];
+        $columns = ['id', 'user_id', 'status', 'failure_reason', 'order_sn', 'order_goods_id', 'refund_type', 'refund_amount', 'created_at', 'updated_at'];
 
         $page = RefundService::getInstance()->getShopRefundList($shopId, $input, $columns);
         $refundList = collect($page->items());
@@ -152,12 +168,5 @@ class ShopRefundController extends Controller
             'shipSn' => $refund->ship_sn,
             'traces' => $traces
         ]);
-    }
-
-    public function waitingRefundCount()
-    {
-        $shopId = $this->verifyRequiredId('shopId');
-        $count = RefundService::getInstance()->getShopCountByStatus($shopId, 0);
-        return $this->success($count);
     }
 }
