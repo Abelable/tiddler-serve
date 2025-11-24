@@ -19,6 +19,7 @@ class RefundService extends BaseService
         $refund->coupon_id = $input->couponId ?? 0;
         $refund->order_goods_id = $input->orderGoodsId;
         $refund->goods_id = $input->goodsId;
+        $refund->refund_address_id = $input->refundAddressId ?? 0;
         $refund->refund_amount = $refundAmount;
         return $this->updateRefund($refund, $input);
     }

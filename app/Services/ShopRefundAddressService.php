@@ -29,6 +29,11 @@ class ShopRefundAddressService extends BaseService
         return ShopRefundAddress::query()->where('shop_id', $shopId)->get($columns);
     }
 
+    public function getListByIds(array $ids, $columns = ['*'])
+    {
+        return ShopRefundAddress::query()->where('id', $ids)->get($columns);
+    }
+
     public function getPageByShopId($shopId, PageInput $input, $columns = ['*'])
     {
         return ShopRefundAddress::query()

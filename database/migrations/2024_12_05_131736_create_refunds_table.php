@@ -27,6 +27,7 @@ class CreateRefundsTable extends Migration
             $table->float('refund_amount')->comment('退款金额');
             $table->integer('refund_type')->comment('售后类型：1-仅退款，2-退货退款');
             $table->string('refund_reason')->comment('退款说明');
+            $table->integer('refund_address_id')->default(0)->comment('退货地址id');
             $table->string('image_list')->default('')->comment('图片说明');
             $table->string('ship_channel')->default('')->comment('快递公司');
             $table->string('ship_code')->default('')->comment('快递公司编号');

@@ -10,6 +10,7 @@ class RefundInput extends BaseInput
     public $couponId;
     public $orderGoodsId;
     public $goodsId;
+    public $refundAddressId;
     public $type;
     public $reason;
     public $imageList;
@@ -23,6 +24,7 @@ class RefundInput extends BaseInput
             'couponId' => 'integer|digits_between:1,20',
             'orderGoodsId' => 'required|integer|digits_between:1,20',
             'goodsId' => 'required|integer|digits_between:1,20',
+            'refundAddressId' => 'integer|digits_between:1,20',
             'type' => 'required|integer|in:1,2',
             'reason' => 'required|string',
             'imageList' => 'array',

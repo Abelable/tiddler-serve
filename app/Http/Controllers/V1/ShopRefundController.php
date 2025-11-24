@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Refund;
+use App\Services\ShopRefundAddressService;
 use App\Services\ShopTodoService;
 use App\Services\NotificationService;
 use App\Services\OrderGoodsService;
@@ -40,7 +41,22 @@ class ShopRefundController extends Controller
         /** @var RefundPageInput $input */
         $input = RefundPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'user_id', 'status', 'failure_reason', 'order_sn', 'order_goods_id', 'refund_type', 'refund_amount', 'created_at', 'updated_at'];
+        $columns = [
+            'id',
+            'user_id',
+            'status',
+            'failure_reason',
+            'order_sn',
+            'order_goods_id',
+            'refund_address_id',
+            'refund_type',
+            'refund_amount',
+            'ship_channel',
+            'ship_code',
+            'ship_sn',
+            'created_at',
+            'updated_at'
+        ];
 
         $page = RefundService::getInstance()->getShopRefundList($shopId, $input, $columns);
         $refundList = collect($page->items());
@@ -53,13 +69,21 @@ class ShopRefundController extends Controller
         $orderGoodsIds = $refundList->pluck('order_goods_id')->toArray();
         $orderGoodsList = OrderGoodsService::getInstance()->getListByIds($orderGoodsIds)->keyBy('id');
 
-        $list = $refundList->map(function (Refund $refund) use ($userList, $orderGoodsList) {
+        $refundAddressIds = $refundList->pluck('refund_address_id')->toArray();
+        $refundAddressList = ShopRefundAddressService::getInstance()->getListByIds($refundAddressIds)->keyBy('id');
+
+        $list = $refundList->map(function (Refund $refund) use ($refundAddressList, $userList, $orderGoodsList) {
             $userInfo = $userList->get($refund->user_id);
             $refund['userInfo'] = $userInfo;
             unset($refund['user_id']);
 
             $goodsInfo = $orderGoodsList->get($refund->order_goods_id);
             $refund['goodsInfo'] = $goodsInfo;
+            unset($refund['order_goods_id']);
+
+            $refundAddressInfo = $refundAddressList->get($refund->refund_address_id);
+            $refund['refundAddressInfo'] = $refundAddressInfo;
+            unset($refund['refund_address_id']);
 
             return $refund;
         });

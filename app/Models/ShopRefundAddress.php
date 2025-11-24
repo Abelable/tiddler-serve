@@ -6,10 +6,10 @@ namespace App\Models;
  * App\Models\ShopRefundAddress
  *
  * @property int $id
- * @property int $shop_id 用户id
+ * @property int $shop_id 店铺id
  * @property string $consignee_name 收货人姓名
  * @property string $mobile 手机号
- * @property string $address_detail 收获地址
+ * @property string $address_detail 收货地址
  * @property string $supplement 补充说明
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
