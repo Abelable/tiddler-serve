@@ -14,7 +14,7 @@ class IncomeWithdrawalInput extends BaseInput
         return [
             'merchantType' => 'integer|in:1,2,3,4',
             'amount' => 'required|numeric',
-            'path' => 'required|integer|in:1,2,3',
+            'path' => 'integer|in:1,2,3',
             'remark' => 'string',
         ];
     }
