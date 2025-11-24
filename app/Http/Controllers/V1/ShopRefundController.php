@@ -103,8 +103,18 @@ class ShopRefundController extends Controller
 
         $refund->image_list = json_decode($refund->image_list);
 
+        $userInfo = UserService::getInstance()->getUserById($refund->user_id);
+        $refund['userInfo'] = $userInfo;
+        unset($refund['user_id']);
+
         $goods = OrderGoodsService::getInstance()->getOrderGoods($refund->order_id, $refund->goods_id);
         $refund['goodsInfo'] = $goods;
+        unset($refund['order_goods_id']);
+        unset($refund['goods_id']);
+
+        $refundAddressInfo = ShopRefundAddressService::getInstance()->getAddressById($refund->refund_address_id);
+        $refund['refundAddressInfo'] = $refundAddressInfo;
+        unset($refund['refund_address_id']);
 
         return $this->success($refund);
     }
