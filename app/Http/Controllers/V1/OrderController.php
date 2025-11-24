@@ -307,7 +307,9 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0)) {
+                    // 普通商品的购买，一定会执行佣金生成逻辑（逻辑中包含上级判断）
+                    // 礼包商品的购买，在特定情况下也会执行（有效身份代言人购买礼包商品）
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
@@ -332,7 +334,7 @@ class OrderController extends Controller
 
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
-                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0)) {
+                    if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
                         CommissionService::getInstance()
                             ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
                     }
