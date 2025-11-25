@@ -412,7 +412,7 @@ class OrderService extends BaseService
             if ($order->delivery_mode == 1) {
                 $order->status = OrderStatus::PAID;
 
-                // todo 待发货通知（之后）
+                // 待发货短信通知
                 $shopId = $order->shopInfo->id;
                 $cacheKey = "order_sms_{$shopId}";
                 Cache::remember($cacheKey, now()->addHours(3), function () use ($order) {
