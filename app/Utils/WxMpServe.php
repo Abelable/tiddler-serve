@@ -20,6 +20,7 @@ class WxMpServe
     const GET_PHONE_NUMBER_URL = 'https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=%s';
     const GET_OPENID_URL = 'https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code';
     const GET_QRCODE_URL = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=%s';
+    const GET_LINK_URL = 'https://api.weixin.qq.com/wxa/generate_urllink?access_token=%s';
     const UPLOAD_SHIPPING_INFO_URL = 'https://api.weixin.qq.com/wxa/sec/order/upload_shipping_info?access_token=%s';
 
     protected $accessToken;
@@ -117,6 +118,18 @@ class WxMpServe
     public function getQrCode($scene, $page)
     {
         return  $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
+    }
+
+    public function getURLLink($path, $query, $expireType = 1, $expireTime = 30, $expireInterval = 30, $envVersion = 'release')
+    {
+        return  $this->httpPost(sprintf(self::GET_LINK_URL, $this->accessToken), [
+            'path' => $path,
+            'query' => $query,
+            'expire_type' => $expireType,
+            'expire_time' => $expireTime,
+            'expire_interval' => $expireInterval,
+            'env_version' => $envVersion
+        ], false);
     }
 
     public function uploadShippingInfo($openid, Order $order, array $orderPackageList, $isAllDelivered)
