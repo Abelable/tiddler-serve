@@ -49,7 +49,11 @@ class WxMpServe
 
     private function getStableAccessToken()
     {
-        $result = $this->httpPost(self::GET_STABLE_ACCESS_TOKEN_URL, ['grant_type' => 'client_credential', 'appid' => env('WX_MP_APPID'), 'secret' => env('WX_MP_SECRET')]);
+        $result = $this->httpPost(self::GET_STABLE_ACCESS_TOKEN_URL, [
+            'grant_type' => 'client_credential',
+            'appid' => env('WX_MP_APPID'),
+            'secret' => env('WX_MP_SECRET')
+        ]);
         if (!empty($result['errcode'])) {
             throw new \Exception('获取微信小程序stable_access_token异常：' . $result['errcode'] . $result['errmsg']);
         }
@@ -120,7 +124,7 @@ class WxMpServe
         return  $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
     }
 
-    public function getURLLink($path, $query, $expireType = 1, $expireTime = 30, $expireInterval = 30, $envVersion = 'release')
+    public function getURLLink($path = '', $query = '', $expireType = 1, $expireTime = 30, $expireInterval = 30, $envVersion = 'release')
     {
         return  $this->httpPost(sprintf(self::GET_LINK_URL, $this->accessToken), [
             'path' => $path,

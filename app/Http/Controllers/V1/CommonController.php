@@ -42,7 +42,7 @@ use Yansongda\LaravelPay\Facades\Pay;
 
 class CommonController extends Controller
 {
-    protected $except = ['ossConfig', 'wxPayNotify', 'qrCode'];
+    protected $except = ['ossConfig', 'wxPayNotify', 'qrCode', 'URLLink'];
 
     public function ossConfig()
     {
@@ -63,6 +63,14 @@ class CommonController extends Controller
 //        return response($imageData)
 //            ->header('Content-Type', 'image/png')
 //            ->header('Content-Disposition', 'inline');
+    }
+
+    public function URLLink()
+    {
+        $path = $this->verifyString('path');
+        $query = $this->verifyString('query');
+        $URLLink = WxMpServe::new()->getURLLink($path, $query);
+        return $this->success($URLLink);
     }
 
     public function qrCode()

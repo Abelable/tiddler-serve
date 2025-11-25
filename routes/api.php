@@ -63,6 +63,7 @@ Route::prefix('feedback')->group(function () {
 Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
     Route::get('qr_code', 'CommonController@wxQrCode');
+    Route::get('url_link', 'CommonController@URLLink');
 });
 
 Route::prefix('fan')->group(function () {
