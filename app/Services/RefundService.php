@@ -90,7 +90,7 @@ class RefundService extends BaseService
 
     public function getUserRefund($userId, $id, $columns = ['*'])
     {
-        return Refund::query()->where('user_id', $userId)->find($id, $columns);
+        return Refund::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getListByIds(array $ids, $columns = ['*'])

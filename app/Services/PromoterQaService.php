@@ -32,7 +32,7 @@ class PromoterQaService extends BaseService
 
     public function getUserQa($userId, $id, $columns = ['*'])
     {
-        return PromoterQa::query()->where('user_id', $userId)->find($id, $columns);
+        return PromoterQa::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getPromoterQa($promoterId, $id, $columns = ['*'])

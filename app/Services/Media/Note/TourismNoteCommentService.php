@@ -37,7 +37,7 @@ class TourismNoteCommentService extends BaseService
 
     public function getComment($userId, $id, $columns = ['*'])
     {
-        return TourismNoteComment::query()->where('user_id', $userId)->find($id, $columns);
+        return TourismNoteComment::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function repliesCountList($ids)

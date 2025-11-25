@@ -37,7 +37,7 @@ class ShortVideoCommentService extends BaseService
 
     public function getComment($userId, $id, $columns = ['*'])
     {
-        return ShortVideoComment::query()->where('user_id', $userId)->find($id, $columns);
+        return ShortVideoComment::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function repliesCount($id)

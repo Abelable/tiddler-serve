@@ -169,7 +169,7 @@ class TourismNoteService extends BaseService
 
     public function getUserNote($userId, $id, $columns = ['*'])
     {
-        return TourismNote::query()->where('user_id', $userId)->find($id, $columns);
+        return TourismNote::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getNoteByTitle($title, $columns = ['*'])

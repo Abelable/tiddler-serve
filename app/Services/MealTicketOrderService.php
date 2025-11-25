@@ -73,7 +73,7 @@ class MealTicketOrderService extends BaseService
 
     public function getOrderById($userId, $id, $columns = ['*'])
     {
-        return MealTicketOrder::query()->where('user_id', $userId)->find($id, $columns);
+        return MealTicketOrder::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
@@ -100,7 +100,7 @@ class MealTicketOrderService extends BaseService
 
     public function getUserOrderById($userId, $id, $columns = ['*'])
     {
-        return MealTicketOrder::query()->where('user_id', $userId)->find($id, $columns);
+        return MealTicketOrder::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getShopOrder($shopId, $id, $columns = ['*'])

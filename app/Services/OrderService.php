@@ -106,7 +106,7 @@ class OrderService extends BaseService
 
     public function getUserOrder($userId, $id, $columns = ['*'])
     {
-        return Order::query()->where('user_id', $userId)->find($id, $columns);
+        return Order::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getShopOrder($shopId, $id, $columns = ['*'])

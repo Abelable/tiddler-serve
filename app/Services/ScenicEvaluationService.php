@@ -56,7 +56,7 @@ class ScenicEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return ScenicEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return ScenicEvaluation::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createEvaluation($userId, array $scenicIds, ScenicEvaluationInput $input)

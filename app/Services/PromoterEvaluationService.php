@@ -18,7 +18,7 @@ class PromoterEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return PromoterEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return PromoterEvaluation::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createEvaluation($userId, PromoterEvaluationInput $input)
