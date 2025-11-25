@@ -121,7 +121,7 @@ class WxMpServe
 
     public function getQrCode($scene, $page)
     {
-        return $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
+        return $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], 1, false);
     }
 
     public function getURLLink($path = '', $query = '', $expireType = 1, $expireTime = 30, $expireInterval = 30, $envVersion = 'release')
