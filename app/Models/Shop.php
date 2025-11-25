@@ -28,6 +28,7 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ShopManager[] $managerList
  * @property-read int|null $manager_list_count
+ * @property-read \App\Models\Merchant|null $merchantInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Shop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Shop newQuery()
  * @method static \Illuminate\Database\Query\Builder|Shop onlyTrashed()
@@ -62,5 +63,10 @@ class Shop extends BaseModel
     public function managerList()
     {
         return $this->hasMany(ShopManager::class, 'shop_id');
+    }
+
+    public function merchantInfo()
+    {
+        return $this->belongsTo(Merchant::class, 'merchant_id');
     }
 }

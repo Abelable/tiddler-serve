@@ -12,6 +12,7 @@ use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
+use App\Utils\AliSmsServe;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\OrderStatus;
@@ -21,6 +22,7 @@ use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShopOrderPageInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -409,7 +411,14 @@ class OrderService extends BaseService
             $order->pay_time = now()->format('Y-m-d\TH:i:s');
             if ($order->delivery_mode == 1) {
                 $order->status = OrderStatus::PAID;
-                // todo 待发货通知
+
+                // todo 待发货通知（之后）
+                $shopId = $order->shopInfo->id;
+                $cacheKey = "order_sms_{$shopId}";
+                Cache::remember($cacheKey, now()->addHours(3), function () use ($order) {
+                    AliSmsServe::new()->send($order->shopInfo->merchantInfo->mobile, 'order');
+                    return 'sent';
+                });
             } else {
                 $order->status = OrderStatus::PENDING_VERIFICATION;
                 OrderVerifyService::getInstance()->createVerifyCode($order->id);
@@ -423,8 +432,8 @@ class OrderService extends BaseService
                 $this->throwUpdateFail();
             }
 
-            // todo 通知（邮件或钉钉）管理员、
-            // todo 通知（短信、系统消息）商家
+            // todo 通知商家（系统消息）、通知系统后台+管理员（消息、钉钉、邮箱...）
+
 
             return $order;
         });
