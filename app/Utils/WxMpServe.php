@@ -7,6 +7,7 @@ use App\Models\OrderPackage;
 use App\Utils\Traits\HttpClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class WxMpServe
 {
@@ -171,10 +172,10 @@ class WxMpServe
         );
     }
 
-    public function verify($openid, $payId)
+    public function verify($openid, $payId, $productName)
     {
-        return $this->httpPost(
-            sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->stableAccessToken),
+        $result = $this->httpPost(
+            sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->accessToken),
             [
                 'order_key' => [
                     'order_number_type' => 2,
@@ -182,7 +183,9 @@ class WxMpServe
                 ],
                 'logistics_type' => 4,
                 'delivery_mode' => 1,
-                'shipping_list' => [],
+                'shipping_list' => [[
+                    'item_desc' => $productName,
+                ]],
                 'upload_time' => Carbon::now()->format('Y-m-d\TH:i:s.uP'),
                 'payer' => [
                     'openid' => $openid
@@ -190,5 +193,6 @@ class WxMpServe
             ],
             3
         );
+        Log::info(json_encode($result, JSON_UNESCAPED_UNICODE));
     }
 }

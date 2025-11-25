@@ -14,13 +14,9 @@ trait HttpClient
         return $needDecode ? json_decode((string)$response->getBody(), true) : $response->getBody();
     }
 
-    public function httpPost($url, $data, $dataType = 1, $needDecode = true, array $headers = [])
+    public function httpPost($url, $data, $dataType = 1, $needDecode = true)
     {
         $client = new Client();
-
-        if (!empty($headers)) {
-            $options['headers'] = $headers;
-        }
 
         switch ($dataType) {
             case 1:
@@ -36,12 +32,6 @@ trait HttpClient
                 $response = $client->request('POST', $url, ['body' => $jsonData, 'headers' => ['Content-Type' => 'application/json']]);
                 break;
         }
-
-        $options = [
-            'json' => $data
-        ];
-
-        $response = $client->request('POST', $url, $options);
 
         return $needDecode ? json_decode((string)$response->getBody(), true) : $response->getBody();
     }

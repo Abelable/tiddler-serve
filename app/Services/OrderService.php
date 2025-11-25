@@ -425,7 +425,9 @@ class OrderService extends BaseService
 
                 // 同步微信后台订单自提
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-                WxMpServe::new()->verify($openid, $order->pay_id);
+                $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+                $goodsName = $goodsList->pluck('name')->implode('，');
+                WxMpServe::new()->verify($openid, $order->pay_id, $goodsName);
             }
 
             if ($order->cas() == 0) {

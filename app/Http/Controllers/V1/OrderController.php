@@ -40,15 +40,19 @@ class OrderController extends Controller
     public function pickupAddressList()
     {
         $cartGoodsId = $this->verifyRequiredId('cartGoodsId');
-        $goodsId = CartGoodsService::getInstance()->getCartGoodsById($cartGoodsId)->goods_id;
-        $pickupAddressIds = GoodsPickupAddressService::getInstance()
-            ->getListByGoodsId($goodsId)
-            ->pluck('pickup_address_id')
-            ->toArray();
+        $cartGoods = CartGoodsService::getInstance()->getCartGoodsById($cartGoodsId);
 
-        $columns = ['id', 'logo', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
-        $pickupAddressList = ShopPickupAddressService::getInstance()
-            ->getListByIds($pickupAddressIds, $columns);
+        $pickupAddressList = [];
+        if (!is_null($cartGoods)) {
+            $pickupAddressIds = GoodsPickupAddressService::getInstance()
+                ->getListByGoodsId($cartGoods->goods_id)
+                ->pluck('pickup_address_id')
+                ->toArray();
+
+            $columns = ['id', 'logo', 'name', 'open_time_list', 'address_detail', 'longitude', 'latitude'];
+            $pickupAddressList = ShopPickupAddressService::getInstance()
+                ->getListByIds($pickupAddressIds, $columns);
+        }
 
         return $this->success($pickupAddressList);
     }
