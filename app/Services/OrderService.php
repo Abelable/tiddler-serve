@@ -424,6 +424,7 @@ class OrderService extends BaseService
                 OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
                 // 同步微信后台订单自提
+                sleep(10); // 延迟10s执行
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
                 $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
                 $goodsName = $goodsList->pluck('name')->implode('，');
