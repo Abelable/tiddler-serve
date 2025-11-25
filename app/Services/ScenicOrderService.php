@@ -119,7 +119,7 @@ class ScenicOrderService extends BaseService
 
     public function getApprovedOrderById($id, $columns = ['*'])
     {
-        return ScenicOrder::query()->where('status', ScenicOrderStatus::MERCHANT_APPROVED)->find($id, $columns);
+        return ScenicOrder::query()->where('status', ScenicOrderStatus::MERCHANT_APPROVED)->where('id', $id)->first($columns);
     }
 
     // todo 核销有效期

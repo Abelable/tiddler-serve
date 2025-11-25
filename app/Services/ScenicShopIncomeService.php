@@ -147,7 +147,7 @@ class ScenicShopIncomeService extends BaseService
 
     public function getPaidIncomeById($id, $columns = ['*'])
     {
-        return ScenicShopIncome::query()->where('status', 1)->find($id, $columns);
+        return ScenicShopIncome::query()->where('status', 1)->where('id', $id)->first($columns);
     }
 
     public function deleteListByOrderIds(array $orderIds, $status)

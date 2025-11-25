@@ -217,7 +217,7 @@ class OrderService extends BaseService
 
     public function getPendingVerifyOrderById($id, $columns = ['*'])
     {
-        return Order::query()->where('status', OrderStatus::PENDING_VERIFICATION)->find($id, $columns);
+        return Order::query()->where('status', OrderStatus::PENDING_VERIFICATION)->where('id', $id)->first($columns);
     }
 
     public function getTimeoutUnFinishedOrders($columns = ['*'])

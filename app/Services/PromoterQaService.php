@@ -37,7 +37,7 @@ class PromoterQaService extends BaseService
 
     public function getPromoterQa($promoterId, $id, $columns = ['*'])
     {
-        return PromoterQa::query()->where('promoter_id', $promoterId)->find($id, $columns);
+        return PromoterQa::query()->where('promoter_id', $promoterId)->where('id', $id)->first($columns);
     }
 
     public function getAnswerCount($promoterId) {

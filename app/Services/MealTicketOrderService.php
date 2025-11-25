@@ -134,14 +134,14 @@ class MealTicketOrderService extends BaseService
     {
         return MealTicketOrder::query()
             ->where('status', MealTicketOrderStatus::MERCHANT_APPROVED)
-            ->find($id, $columns);
+            ->where('id', $id)->first($columns);
     }
 
     public function getPaidOrderById($id, $columns = ['*'])
     {
         return MealTicketOrder::query()
             ->where('status', MealTicketOrderStatus::PAID)
-            ->find($id, $columns);
+            ->where('id', $id)->first($columns);
     }
 
     // todo 核销有效期
