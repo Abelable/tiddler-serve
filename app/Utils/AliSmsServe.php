@@ -2,7 +2,7 @@
 
 namespace App\Utils;
 
-class AliOssServe
+class AliSmsServe
 {
     public static function new()
     {
