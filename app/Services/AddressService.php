@@ -16,7 +16,7 @@ class AddressService extends BaseService
 
     public function getById($userId, $id, $columns=['*'])
     {
-        return Address::query()->where('user_id', $userId)->find($id, $columns);
+        return Address::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getDefaultAddress($userId, $columns=['*'])

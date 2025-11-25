@@ -76,7 +76,7 @@ class ScenicShopManagerService extends BaseService
 
     public function getShopManager($shopId, $id, $columns = ['*'])
     {
-        return ScenicShopManager::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ScenicShopManager::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getManagerByUserId($shopId, $userId, $columns = ['*'])

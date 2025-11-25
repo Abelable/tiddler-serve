@@ -374,6 +374,7 @@ class ShopOrderController extends Controller
         $orderId = $this->verifyArrayNotEmpty('orderId');
 
         $order = OrderService::getInstance()->getShopOrder($shopId, $orderId);
+        dd($order);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }

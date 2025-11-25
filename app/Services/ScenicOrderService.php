@@ -77,7 +77,7 @@ class ScenicOrderService extends BaseService
 
     public function getShopOrder($shopId, $id, $columns = ['*'])
     {
-        return ScenicOrder::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ScenicOrder::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
@@ -114,7 +114,7 @@ class ScenicOrderService extends BaseService
 
     public function getPaidOrderById($id, $columns = ['*'])
     {
-        return ScenicOrder::query()->where('status', ScenicOrderStatus::PAID)->find($id, $columns);
+        return ScenicOrder::query()->where('status', ScenicOrderStatus::PAID)->where('id', $id)->first($columns);
     }
 
     public function getApprovedOrderById($id, $columns = ['*'])

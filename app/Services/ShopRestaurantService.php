@@ -35,7 +35,7 @@ class ShopRestaurantService extends BaseService
 
     public function getShopRestaurantById($shopId, $id, $columns = ['*'])
     {
-        return ShopRestaurant::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ShopRestaurant::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getByRestaurantId($shopId, $restaurantId, $columns = ['*'])

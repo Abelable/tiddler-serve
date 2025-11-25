@@ -57,7 +57,7 @@ class MealTicketService extends BaseService
 
     public function getShopTicket($shopId, $id, $columns=['*'])
     {
-        return MealTicket::query()->where('shop_id', $shopId)->find($id, $columns);
+        return MealTicket::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function createTicket($shopId, MealTicketInput $input)

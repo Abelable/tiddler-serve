@@ -19,7 +19,7 @@ class GoodsEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return GoodsEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return GoodsEvaluation::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getEvaluationByOrderId($orderId, $columns = ['*'])

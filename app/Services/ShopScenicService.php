@@ -35,7 +35,7 @@ class ShopScenicService extends BaseService
 
     public function getShopScenicById($shopId, $id, $columns = ['*'])
     {
-        return ShopScenicSpot::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ShopScenicSpot::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getByScenicId($shopId, $scenicId, $columns = ['*'])

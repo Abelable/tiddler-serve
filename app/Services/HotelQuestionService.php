@@ -84,7 +84,7 @@ class HotelQuestionService extends BaseService
 
     public function getUserQuestion($userId, $id, $columns = ['*'])
     {
-        return HotelQuestion::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelQuestion::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createQuestion($userId, $hotelId, $content)

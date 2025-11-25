@@ -50,7 +50,7 @@ class HotelRoomService extends BaseService
 
     public function getShopRoom($shopId, $id, $columns=['*'])
     {
-        return HotelRoom::query()->where('shop_id', $shopId)->find($id, $columns);
+        return HotelRoom::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function createRoom($userId, $providerId, $shopId, HotelRoomInput $input)

@@ -215,12 +215,12 @@ class GoodsService extends BaseService
 
     public function getShopGoods($shopId, $id, $columns = ['*'])
     {
-        return Goods::query()->where('shop_id', $shopId)->find($id, $columns);
+        return Goods::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getOnSaleGoods($id, $columns=['*'])
     {
-        return Goods::query()->where('status', 1)->find($id, $columns);
+        return Goods::query()->where('status', 1)->where('id', $id)->first($columns);
     }
 
     public function getGoodsListByIds($ids, $columns=['*'])

@@ -87,7 +87,7 @@ class SetMealOrderService extends BaseService
 
     public function getShopOrder($shopId, $id, $columns = ['*'])
     {
-        return SetMealOrder::query()->where('shop_id', $shopId)->find($id, $columns);
+        return SetMealOrder::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function searchShopOrderList($shopId, $statusList, $keywords, $columns = ['*'])

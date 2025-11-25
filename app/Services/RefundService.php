@@ -76,7 +76,7 @@ class RefundService extends BaseService
 
     public function getShopRefund($shopId, $id, $columns = ['*'])
     {
-        return Refund::query()->where('shop_id', $shopId)->find($id, $columns);
+        return Refund::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getRefundByUserId($userId, $orderId, $goodsId, $columns = ['*'])

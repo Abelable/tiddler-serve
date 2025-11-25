@@ -56,7 +56,7 @@ class HotelEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return HotelEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelEvaluation::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createEvaluation($userId, HotelEvaluationInput $input)

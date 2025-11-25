@@ -86,7 +86,7 @@ class CateringQuestionService extends BaseService
 
     public function getUserQuestion($userId, $id, $columns = ['*'])
     {
-        return CateringQuestion::query()->where('user_id', $userId)->find($id, $columns);
+        return CateringQuestion::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createQuestion($userId, $restaurantId, $content)

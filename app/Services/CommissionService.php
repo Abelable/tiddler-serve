@@ -707,7 +707,7 @@ class CommissionService extends BaseService
 
     public function getPaidCommissionById($id, $columns = ['*'])
     {
-        return Commission::query()->where('status', 1)->find($id, $columns);
+        return Commission::query()->where('status', 1)->where('id', $id)->first($columns);
     }
 
     public function getCommissionById($id, $columns = ['*'])
@@ -722,7 +722,7 @@ class CommissionService extends BaseService
 
     public function getUserCommissionById($userId, $id, $columns = ['*'])
     {
-        return Commission::query()->where('user_id', $userId)->find($id, $columns);
+        return Commission::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getUserCommissionList($userId, $ids, $columns = ['*'])

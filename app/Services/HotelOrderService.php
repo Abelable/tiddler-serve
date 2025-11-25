@@ -60,7 +60,7 @@ class HotelOrderService extends BaseService
 
     public function getOrderById($userId, $id, $columns = ['*'])
     {
-        return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelOrder::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getUserOrderList($userId, $ids, $columns = ['*'])
@@ -87,12 +87,12 @@ class HotelOrderService extends BaseService
 
     public function getUserOrderById($userId, $id, $columns = ['*'])
     {
-        return HotelOrder::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelOrder::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getShopOrder($shopId, $id, $columns = ['*'])
     {
-        return HotelOrder::query()->where('shop_id', $shopId)->find($id, $columns);
+        return HotelOrder::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function searchShopOrderList($shopId, $statusList, $keywords, $columns = ['*'])
@@ -134,14 +134,14 @@ class HotelOrderService extends BaseService
     {
         return HotelOrder::query()
             ->where('status', HotelOrderStatus::MERCHANT_APPROVED)
-            ->find($id, $columns);
+            ->where('id', $id)->first($columns);
     }
 
     public function getPendingSettleInOrderById($id, $columns = ['*'])
     {
         return HotelOrder::query()
             ->whereIn('status', [HotelOrderStatus::PAID, HotelOrderStatus::MERCHANT_APPROVED])
-            ->find($id, $columns);
+            ->where('id', $id)->first($columns);
     }
 
     // todo 核销有效期

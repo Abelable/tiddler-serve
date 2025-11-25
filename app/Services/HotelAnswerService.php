@@ -18,7 +18,7 @@ class HotelAnswerService extends BaseService
 
     public function getUserAnswer($userId, $id, $columns = ['*'])
     {
-        return HotelAnswer::query()->where('user_id', $userId)->find($id, $columns);
+        return HotelAnswer::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function getUserAnswerByQuestionId($userId, $questionId, $columns = ['*'])

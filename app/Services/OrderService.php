@@ -111,7 +111,7 @@ class OrderService extends BaseService
 
     public function getShopOrder($shopId, $id, $columns = ['*'])
     {
-        return Order::query()->where('shop_id', $shopId)->find($id, $columns);
+        return Order::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getOrder($id, $columns = ['*'])
@@ -424,7 +424,7 @@ class OrderService extends BaseService
                 OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
                 // 同步微信后台订单自提
-                sleep(10); // 延迟10s执行
+                sleep(10); // todo 延迟10s执行（改为延迟任务队列）
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
                 $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
                 $goodsName = $goodsList->pluck('name')->implode('，');
@@ -436,7 +436,6 @@ class OrderService extends BaseService
             }
 
             // todo 通知商家（系统消息）、通知系统后台+管理员（消息、钉钉、邮箱...）
-
 
             return $order;
         });

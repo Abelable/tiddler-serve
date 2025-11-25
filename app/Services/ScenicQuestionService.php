@@ -73,7 +73,7 @@ class ScenicQuestionService extends BaseService
 
     public function getUserQuestion($userId, $id, $columns = ['*'])
     {
-        return ScenicQuestion::query()->where('user_id', $userId)->find($id, $columns);
+        return ScenicQuestion::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createQuestion($userId, $scenicId, $content)

@@ -58,7 +58,7 @@ class CateringEvaluationService extends BaseService
 
     public function getUserEvaluation($userId, $id, $columns = ['*'])
     {
-        return CateringEvaluation::query()->where('user_id', $userId)->find($id, $columns);
+        return CateringEvaluation::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
     public function createEvaluation($userId, CateringEvaluationInput $input)

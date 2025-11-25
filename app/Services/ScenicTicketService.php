@@ -57,7 +57,7 @@ class ScenicTicketService extends BaseService
 
     public function getShopTicket($shopId, $id, $columns=['*'])
     {
-        return ScenicTicket::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ScenicTicket::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function createTicket($shopId, ScenicTicketInput $input)

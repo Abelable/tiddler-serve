@@ -35,7 +35,7 @@ class ShopHotelService extends BaseService
 
     public function getShopHotelById($shopId, $id, $columns = ['*'])
     {
-        return ShopHotel::query()->where('shop_id', $shopId)->find($id, $columns);
+        return ShopHotel::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getByHotelId($shopId, $hotelId, $columns = ['*'])

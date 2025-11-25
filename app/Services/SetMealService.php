@@ -55,7 +55,7 @@ class SetMealService extends BaseService
 
     public function getShopSetMeal($shopId, $id, $columns=['*'])
     {
-        return SetMeal::query()->where('shop_id', $shopId)->find($id, $columns);
+        return SetMeal::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function createSetMeal($shopId, SetMealInput $input)

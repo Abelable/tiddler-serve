@@ -105,7 +105,7 @@ class MealTicketOrderService extends BaseService
 
     public function getShopOrder($shopId, $id, $columns = ['*'])
     {
-        return MealTicketOrder::query()->where('shop_id', $shopId)->find($id, $columns);
+        return MealTicketOrder::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getOrderListByIds(array $ids, $columns = ['*'])
