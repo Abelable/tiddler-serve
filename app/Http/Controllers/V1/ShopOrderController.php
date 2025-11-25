@@ -398,7 +398,7 @@ class ShopOrderController extends Controller
     public function shipOrderCount()
     {
         $shopId = $this->verifyRequiredInteger('shopId');
-        $count = OrderService::getInstance()->getShopOrderCountByStatusList($shopId, [201, 204]);
+        $count = OrderService::getInstance()->getShopOrderCountByStatusList($shopId, [201, 202]);
         return $this->success($count);
     }
 
