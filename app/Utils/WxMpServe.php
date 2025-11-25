@@ -121,19 +121,19 @@ class WxMpServe
 
     public function getQrCode($scene, $page)
     {
-        return  $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
+        return $this->httpPost(sprintf(self::GET_QRCODE_URL, $this->accessToken), ['scene' => $scene, 'page' => $page], false);
     }
 
     public function getURLLink($path = '', $query = '', $expireType = 1, $expireTime = 30, $expireInterval = 30, $envVersion = 'release')
     {
-        return  $this->httpPost(sprintf(self::GET_LINK_URL, $this->accessToken), [
+        return $this->httpPost(sprintf(self::GET_LINK_URL, $this->accessToken), [
             'path' => $path,
             'query' => $query,
             'expire_type' => $expireType,
             'expire_time' => $expireTime,
             'expire_interval' => $expireInterval,
             'env_version' => $envVersion
-        ], false);
+        ]);
     }
 
     public function uploadShippingInfo($openid, Order $order, array $orderPackageList, $isAllDelivered)

@@ -67,8 +67,8 @@ class CommonController extends Controller
 
     public function URLLink()
     {
-        $path = $this->verifyString('path');
-        $query = $this->verifyString('query');
+        $path = $this->verifyString('path', '');
+        $query = $this->verifyString('query', '');
         $URLLink = WxMpServe::new()->getURLLink($path, $query);
         return $this->success($URLLink);
     }
