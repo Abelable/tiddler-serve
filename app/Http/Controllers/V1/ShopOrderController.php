@@ -371,10 +371,9 @@ class ShopOrderController extends Controller
     public function refund()
     {
         $shopId = $this->verifyRequiredInteger('shopId');
-        $orderId = $this->verifyArrayNotEmpty('orderId');
+        $orderId = $this->verifyRequiredInteger('orderId');
 
         $order = OrderService::getInstance()->getShopOrder($shopId, $orderId);
-        dd($order);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
