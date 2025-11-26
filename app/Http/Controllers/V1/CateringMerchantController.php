@@ -37,7 +37,7 @@ class CateringMerchantController extends Controller
                 CateringMerchantService::getInstance()->updateMerchant($merchant, $input);
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::CATERING_MERCHANT_NOTICE, [$merchant->id]);
             });
 
         } else {
@@ -59,7 +59,7 @@ class CateringMerchantController extends Controller
                 }
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::CATERING_MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 

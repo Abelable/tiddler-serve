@@ -5,8 +5,12 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ScenicMerchant;
 use App\Services\ScenicMerchantService;
+use App\Services\SystemTodoService;
+use App\Utils\AliSmsServe;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantPageInput;
+use Illuminate\Support\Facades\DB;
 
 class ScenicMerchantController extends Controller
 {
@@ -46,10 +50,14 @@ class ScenicMerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
 
-        $merchant->status = 1;
-        $merchant->save();
+        DB::transaction(function () use ($merchant) {
+            $merchant->status = 1;
+            $merchant->save();
 
-        // todo：短信通知景区服务商
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::SCENIC_MERCHANT_NOTICE, $merchant->id);
+            // todo 短信通知景区服务商
+            // AliSmsServe::new()->send($merchant, 'order');
+        });
 
         return $this->success();
     }
@@ -64,11 +72,14 @@ class ScenicMerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前景区服务商不存在');
         }
 
-        $merchant->status = 3;
-        $merchant->failure_reason = $reason;
-        $merchant->save();
+        DB::transaction(function () use ($reason, $merchant) {
+            $merchant->status = 3;
+            $merchant->failure_reason = $reason;
+            $merchant->save();
 
-        // todo：短信通知景区服务商
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::SCENIC_MERCHANT_NOTICE, $merchant->id);
+            // todo 短信通知景区服务商
+        });
 
         return $this->success();
     }

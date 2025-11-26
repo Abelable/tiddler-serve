@@ -5,8 +5,11 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\HotelMerchant;
 use App\Services\HotelMerchantService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantPageInput;
+use Illuminate\Support\Facades\DB;
 
 class HotelMerchantController extends Controller
 {
@@ -46,10 +49,13 @@ class HotelMerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店服务商不存在');
         }
 
-        $merchant->status = 1;
-        $merchant->save();
+        DB::transaction(function () use ($merchant) {
+            $merchant->status = 1;
+            $merchant->save();
 
-        // todo：短信通知酒店服务商
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::HOTEL_MERCHANT_NOTICE, $merchant->id);
+            // todo 短信通知酒店服务商
+        });
 
         return $this->success();
     }
@@ -64,11 +70,14 @@ class HotelMerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前酒店服务商不存在');
         }
 
-        $merchant->status = 3;
-        $merchant->failure_reason = $reason;
-        $merchant->save();
+        DB::transaction(function () use ($reason, $merchant) {
+            $merchant->status = 3;
+            $merchant->failure_reason = $reason;
+            $merchant->save();
 
-        // todo：短信通知酒店服务商
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::HOTEL_MERCHANT_NOTICE, $merchant->id);
+            // todo 短信通知酒店服务商
+        });
 
         return $this->success();
     }

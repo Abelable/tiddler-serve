@@ -4,7 +4,11 @@ namespace App\Utils\Enums;
 
 class TodoEnums
 {
-    const MERCHANT_NOTICE = 100;
+    const SCENIC_MERCHANT_NOTICE = 100;
+    const HOTEL_MERCHANT_NOTICE = 101;
+    const CATERING_MERCHANT_NOTICE = 102;
+    const GOODS_MERCHANT_NOTICE = 103;
+
     const AUTH_NOTICE = 200;
     const WITHDRAWAL_NOTICE = 300;
 

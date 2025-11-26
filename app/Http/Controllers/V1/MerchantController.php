@@ -35,7 +35,7 @@ class MerchantController extends Controller
                 MerchantService::getInstance()->updateMerchant($merchant, $input);
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::GOODS_MERCHANT_NOTICE, [$merchant->id]);
             });
 
         } else {
@@ -57,7 +57,7 @@ class MerchantController extends Controller
                 }
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::GOODS_MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 

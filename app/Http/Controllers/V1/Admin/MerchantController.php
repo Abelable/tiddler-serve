@@ -5,8 +5,11 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Merchant;
 use App\Services\MerchantService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantPageInput;
+use Illuminate\Support\Facades\DB;
 
 class MerchantController extends Controller
 {
@@ -48,10 +51,13 @@ class MerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
 
-        $merchant->status = 1;
-        $merchant->save();
+        DB::transaction(function () use ($merchant) {
+            $merchant->status = 1;
+            $merchant->save();
 
-        // todo：短信通知商家
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::GOODS_MERCHANT_NOTICE, $merchant->id);
+            // todo：短信通知商家
+        });
 
         return $this->success();
     }
@@ -66,11 +72,14 @@ class MerchantController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
 
-        $merchant->status = 3;
-        $merchant->failure_reason = $reason;
-        $merchant->save();
+        DB::transaction(function () use ($reason, $merchant) {
+            $merchant->status = 3;
+            $merchant->failure_reason = $reason;
+            $merchant->save();
 
-        // todo：短信通知商家
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::GOODS_MERCHANT_NOTICE, $merchant->id);
+            // todo：短信通知商家
+        });
 
         return $this->success();
     }

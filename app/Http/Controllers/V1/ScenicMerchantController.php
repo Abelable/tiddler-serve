@@ -37,7 +37,7 @@ class ScenicMerchantController extends Controller
                 ScenicMerchantService::getInstance()->updateMerchant($merchant, $input);
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::SCENIC_MERCHANT_NOTICE, [$merchant->id]);
             });
         } else {
             DB::transaction(function () use ($taskId, $inviterId, $input) {
@@ -58,7 +58,7 @@ class ScenicMerchantController extends Controller
                 }
 
                 // todo 商家入驻通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::SCENIC_MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 
