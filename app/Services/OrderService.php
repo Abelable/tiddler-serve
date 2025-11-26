@@ -423,12 +423,12 @@ class OrderService extends BaseService
                 $order->status = OrderStatus::PENDING_VERIFICATION;
                 OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
-                // 同步微信后台订单自提
+                // 同步微信后台非物流订单
                 sleep(10); // todo 延迟10s执行（改为延迟任务队列）
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
                 $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
                 $goodsName = $goodsList->pluck('name')->implode('，');
-                WxMpServe::new()->verify($openid, $order->pay_id, $goodsName);
+                WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $goodsName);
             }
 
             if ($order->cas() == 0) {

@@ -293,10 +293,6 @@ class HotelOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
-        // 同步微信后台订单自提
-        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-        WxMpServe::new()->verify($openid, $order->pay_id);
-
         // 佣金记录状态更新为：已支付待结算
         CommissionService::getInstance()->updateListToOrderPaidStatus([$order->id], ProductType::HOTEL);
 
@@ -324,6 +320,10 @@ class HotelOrderService extends BaseService
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
+
+        // 同步微信后台非物流订单
+        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $order->hotel_name . '房间预定');
 
         return $order;
     }

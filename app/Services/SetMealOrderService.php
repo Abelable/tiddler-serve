@@ -263,10 +263,6 @@ class SetMealOrderService extends BaseService
             $this->throwUpdateFail();
         }
 
-        // 同步微信后台订单自提
-        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-        WxMpServe::new()->verify($openid, $order->pay_id);
-
         // 佣金记录状态更新为：已支付待结算
         CommissionService::getInstance()
             ->updateListToOrderPaidStatus([$order->id], ProductType::SET_MEAL);
@@ -274,6 +270,11 @@ class SetMealOrderService extends BaseService
         // 收益记录状态更新为：已支付待结算
         CateringShopIncomeService::getInstance()
             ->updateListToPaidStatus([$order->id], ProductType::SET_MEAL);
+
+        // 同步微信后台非物流订单
+        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
+        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $order->restaurant_name . '套餐');
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家

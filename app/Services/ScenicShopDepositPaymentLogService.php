@@ -42,9 +42,10 @@ class ScenicShopDepositPaymentLogService extends BaseService
         $log->pay_time = now()->format('Y-m-d\TH:i:s');
         $log->save();
 
-        // 同步微信后台订单自提
+        // 同步微信后台非物流订单
+        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
         $openid = UserService::getInstance()->getUserById($log->user_id)->openid;
-        WxMpServe::new()->verify($openid, $payId);
+        WxMpServe::new()->notifyNoShipment($openid, $payId, '店铺保证金', 3);
 
         return $log;
     }

@@ -172,7 +172,7 @@ class WxMpServe
         );
     }
 
-    public function verify($openid, $payId, $productName)
+    public function notifyNoShipment($openid, $payId, $productName, $logisticsType = 4)
     {
         $result = $this->httpPost(
             sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->accessToken),
@@ -181,7 +181,7 @@ class WxMpServe
                     'order_number_type' => 2,
                     'transaction_id' => $payId
                 ],
-                'logistics_type' => 4,
+                'logistics_type' => $logisticsType,
                 'delivery_mode' => 1,
                 'shipping_list' => [[
                     'item_desc' => $productName,
