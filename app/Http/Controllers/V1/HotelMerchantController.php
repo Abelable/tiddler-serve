@@ -27,13 +27,18 @@ class HotelMerchantController extends Controller
         $merchant = HotelMerchantService::getInstance()->getMerchantByUserId($this->userId());
 
         if (!is_null($merchant)) {
-            if ($merchant->status == 3) {
+            if ($merchant->status != 3) {
+                return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
+            }
+
+            DB::transaction(function () use ($merchant, $input) {
                 $merchant->status = 0;
                 $merchant->failure_reason = '';
                 HotelMerchantService::getInstance()->updateMerchant($merchant, $input);
-            } else {
-                return $this->fail(CodeResponse::DATA_EXISTED, '您已提交店铺申请，请勿重复提交');
-            }
+
+                // todo 商家入驻通知
+                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
+            });
         } else {
             DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = HotelMerchantService::getInstance()->createMerchant($input, $this->userId());

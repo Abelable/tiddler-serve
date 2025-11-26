@@ -62,9 +62,13 @@ class AuthInfoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前实名认证信息不存在');
         }
 
-        $authInfo->status = 2;
-        $authInfo->failure_reason = $reason;
-        $authInfo->save();
+        DB::transaction(function () use ($reason, $authInfo) {
+            $authInfo->status = 2;
+            $authInfo->failure_reason = $reason;
+            $authInfo->save();
+
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::AUTH_NOTICE, $authInfo->id);
+        });
 
         return $this->success();
     }

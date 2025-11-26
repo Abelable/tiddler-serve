@@ -45,7 +45,13 @@ class AuthInfoController extends Controller
         if (is_null($authInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '实名认证信息不存在');
         }
-        AuthInfoService::getInstance()->updateAuthInfo($authInfo, $input);
+
+        DB::transaction(function () use ($authInfo, $input) {
+            AuthInfoService::getInstance()->updateAuthInfo($authInfo, $input);
+
+            // todo 实名认证通知
+            SystemTodoService::getInstance()->createTodo(TodoEnums::AUTH_NOTICE, [$authInfo->id]);
+        });
 
         return $this->success();
     }
