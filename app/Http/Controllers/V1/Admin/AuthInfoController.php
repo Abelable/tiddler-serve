@@ -4,8 +4,11 @@ namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AuthInfoService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\AuthInfoListInput;
+use Illuminate\Support\Facades\DB;
 
 class AuthInfoController extends Controller
 {
@@ -39,8 +42,12 @@ class AuthInfoController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前实名认证信息不存在');
         }
 
-        $authInfo->status = 1;
-        $authInfo->save();
+        DB::transaction(function () use ($authInfo) {
+            $authInfo->status = 1;
+            $authInfo->save();
+
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::AUTH_NOTICE, $authInfo->id);
+        });
 
         return $this->success();
     }
