@@ -79,7 +79,7 @@ class OrderService extends BaseService
             $query = $query->where('mobile', $input->mobile);
         }
         return $query
-            ->orderByRaw("FIELD(status, 201, 202) DESC")
+            ->orderByRaw("FIELD(status, 302, 201, 202) DESC")
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
