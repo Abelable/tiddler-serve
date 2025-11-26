@@ -7,8 +7,10 @@ use App\Services\ShopDepositPaymentLogService;
 use App\Services\MerchantService;
 use App\Services\ShopDepositService;
 use App\Services\ShopService;
+use App\Services\SystemTodoService;
 use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantInput;
 use Illuminate\Support\Facades\DB;
 
@@ -48,6 +50,9 @@ class MerchantController extends Controller
                         $userTask->save();
                     }
                 }
+
+                // todo 商家入驻通知
+                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 

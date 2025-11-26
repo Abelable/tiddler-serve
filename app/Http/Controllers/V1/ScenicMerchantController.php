@@ -7,8 +7,10 @@ use App\Services\ScenicMerchantService;
 use App\Services\ScenicShopDepositPaymentLogService;
 use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
+use App\Services\SystemTodoService;
 use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\ScenicMerchantInput;
 use Illuminate\Support\Facades\DB;
 
@@ -49,6 +51,9 @@ class ScenicMerchantController extends Controller
                         $userTask->save();
                     }
                 }
+
+                // todo 商家入驻通知
+                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 

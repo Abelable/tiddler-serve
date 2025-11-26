@@ -7,8 +7,10 @@ use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
 use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
+use App\Services\SystemTodoService;
 use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\CateringMerchantInput;
 use Illuminate\Support\Facades\DB;
 
@@ -49,6 +51,9 @@ class CateringMerchantController extends Controller
                         $userTask->save();
                     }
                 }
+
+                // todo 商家入驻通知
+                SystemTodoService::getInstance()->createTodo(TodoEnums::MERCHANT_NOTICE, [$merchant->id]);
             });
         }
 

@@ -4,7 +4,7 @@ namespace App\Utils\Enums;
 
 class TodoEnums
 {
-    const ENTERPRISE_NOTICE = 100;
+    const MERCHANT_NOTICE = 100;
     const AUTH_NOTICE = 200;
     const WITHDRAWAL_NOTICE = 300;
 
