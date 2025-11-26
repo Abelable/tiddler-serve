@@ -8,8 +8,10 @@ use App\Services\Mall\Catering\CateringShopIncomeService;
 use App\Services\ScenicShopIncomeService;
 use App\Services\ShopIncomeService;
 use App\Services\IncomeWithdrawalService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MerchantType;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -101,7 +103,7 @@ class IncomeWithdrawalController extends Controller
             }
 
             // todo 管理后台提现通知
-            // ShopTodoService::getInstance()->createTodo(NotificationEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+            SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
         });
 
         return $this->success();

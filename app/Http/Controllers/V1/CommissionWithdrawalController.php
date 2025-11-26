@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\CommissionWithdrawalService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\CommissionWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -69,7 +71,7 @@ class CommissionWithdrawalController extends Controller
                 CommissionService::getInstance()->applyWithdrawal($this->userId(), $input->scene, $withdrawal->id);
 
                 // todo 管理后台提现通知
-                // ShopTodoService::getInstance()->createTodo(NotificationEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
 

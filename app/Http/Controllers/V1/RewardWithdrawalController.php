@@ -5,10 +5,12 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
 use App\Services\RewardWithdrawalService;
+use App\Services\SystemTodoService;
 use App\Services\TaskService;
 use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\RewardWithdrawalInput;
 use Illuminate\Support\Carbon;
@@ -62,7 +64,7 @@ class RewardWithdrawalController extends Controller
                 $userTask->save();
 
                 // todo 管理后台提现通知
-                // ShopTodoService::getInstance()->createTodo(NotificationEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
 
