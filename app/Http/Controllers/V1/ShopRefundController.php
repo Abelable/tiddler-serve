@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Refund;
 use App\Services\ShopRefundAddressService;
 use App\Services\ShopTodoService;
-use App\Services\NotificationService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderService;
 use App\Services\RefundService;
 use App\Services\ShopService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Enums\NotificationEnums;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\ExpressServe;
 use App\Utils\Inputs\RefundPageInput;
 use Illuminate\Support\Facades\DB;
@@ -146,10 +145,14 @@ class ShopRefundController extends Controller
                 $refund->save();
             }
 
-            // 完成后台售后确认代办任务
-            ShopTodoService::getInstance()->finishTodo($shopId, NotificationEnums::REFUND_NOTICE, $refund->id);
-            NotificationService::getInstance()
-                ->addNotification(NotificationEnums::REFUND_NOTICE, '订单售后提醒', '您申请的售后订单已完成退款，请确认', $refund->user_id, $refund->order_id);
+            ShopTodoService::getInstance()->finishTodo($shopId, TodoEnums::REFUND_NOTICE, $refund->id);
+            // todo 消息提醒 - 完成后台售后确认代办任务
+//            NotificationService::getInstance()->addNotification(
+//                NotificationEnums::REFUND_NOTICE,
+//                '订单售后提醒', '您申请的售后订单已完成退款，请确认',
+//                $refund->user_id,
+//                $refund->order_id
+//            );
         });
 
         return $this->success();
@@ -166,31 +169,21 @@ class ShopRefundController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '售后信息不存在');
         }
 
-        DB::transaction(function () use ($refund, $reason) {
+        DB::transaction(function () use ($shopId, $refund, $reason) {
             $refund->status = 4;
             $refund->failure_reason = $reason;
             $refund->save();
 
-            // 完成后台售后确认代办任务
-            ShopTodoService::getInstance()->finishTodo(NotificationEnums::REFUND_NOTICE, $refund->id);
-            NotificationService::getInstance()
-                ->addNotification(NotificationEnums::REFUND_NOTICE, '订单售后驳回', $reason, $refund->user_id, $refund->order_id);
+            ShopTodoService::getInstance()->finishTodo($shopId, TodoEnums::REFUND_NOTICE, $refund->id);
+            // todo 消息提醒 - 完成后台售后确认代办任务
+//            NotificationService::getInstance()->addNotification(
+//                NotificationEnums::REFUND_NOTICE,
+//                '订单售后驳回',
+//                $reason,
+//                $refund->user_id,
+//                $refund->order_id
+//            );
         });
-
-        return $this->success();
-    }
-
-    public function delete()
-    {
-        $shopId = $this->verifyRequiredId('shopId');
-        $id = $this->verifyRequiredId('id');
-
-        $refund = RefundService::getInstance()->getShopRefund($shopId, $id);
-        if (is_null($refund)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '售后信息不存在');
-        }
-
-        $refund->delete();
 
         return $this->success();
     }

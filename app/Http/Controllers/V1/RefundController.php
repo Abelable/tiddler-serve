@@ -72,7 +72,19 @@ class RefundController extends Controller
         if (is_null($refund)) {
             return $this->fail(CodeResponse::NOT_FOUND, '退款信息不存在');
         }
-        RefundService::getInstance()->updateRefund($refund, $input);
+
+        DB::transaction(function () use ($refund, $input) {
+            RefundService::getInstance()->updateRefund($refund, $input);
+
+            OrderService::getInstance()->afterSale($this->userId(), $input->orderId);
+
+            // todo 售后通知
+            if ($refund->shop_id != 0) {
+                ShopTodoService::getInstance()->createTodo($refund->shop_id, TodoEnums::REFUND_NOTICE, [$refund->id]);
+            } else {
+                SystemTodoService::getInstance()->createTodo(TodoEnums::REFUND_NOTICE, [$refund->id]);
+            }
+        });
 
         return $this->success();
     }

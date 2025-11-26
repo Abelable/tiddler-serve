@@ -190,7 +190,6 @@ Route::prefix('shop')->group(function () {
         Route::get('detail', 'ShopRefundController@detail');
         Route::post('approved', 'ShopRefundController@approved');
         Route::post('reject', 'ShopRefundController@reject');
-        Route::post('delete', 'ShopRefundController@delete');
         Route::get('shipping_info', 'ShopRefundController@shippingInfo');
     });
 
