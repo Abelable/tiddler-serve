@@ -64,7 +64,7 @@ class RewardWithdrawalController extends Controller
                 $userTask->save();
 
                 // todo 管理后台提现通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::REWARD_WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
 

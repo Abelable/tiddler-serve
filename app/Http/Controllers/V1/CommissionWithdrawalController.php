@@ -71,7 +71,7 @@ class CommissionWithdrawalController extends Controller
                 CommissionService::getInstance()->applyWithdrawal($this->userId(), $input->scene, $withdrawal->id);
 
                 // todo 管理后台提现通知
-                SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+                SystemTodoService::getInstance()->createTodo(TodoEnums::COMMISSION_WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
 

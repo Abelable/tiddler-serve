@@ -103,7 +103,7 @@ class IncomeWithdrawalController extends Controller
             }
 
             // todo 管理后台提现通知
-            SystemTodoService::getInstance()->createTodo(TodoEnums::WITHDRAWAL_NOTICE, [$withdrawal->id]);
+            SystemTodoService::getInstance()->createTodo(TodoEnums::INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
         });
 
         return $this->success();
