@@ -7,7 +7,7 @@ namespace App\Models;
  *
  * @property int $id
  * @property int $shop_id 店铺id
- * @property int $status 状态：1-待处理，2-已处理
+ * @property int $status 状态：0-待处理，1-已处理
  * @property int $type 类型：1-待发货，2-售后
  * @property string $reference_id 外部参考ID，如订单ID
  * @property \Illuminate\Support\Carbon|null $created_at

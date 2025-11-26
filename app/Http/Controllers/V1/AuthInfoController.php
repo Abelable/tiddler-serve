@@ -5,8 +5,11 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\AuthInfo;
 use App\Services\AuthInfoService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\AuthInfoInput;
+use Illuminate\Support\Facades\DB;
 
 class AuthInfoController extends Controller
 {
@@ -20,7 +23,14 @@ class AuthInfoController extends Controller
     {
         /** @var AuthInfoInput $input */
         $input = AuthInfoInput::new();
-        AuthInfoService::getInstance()->createAuthInfo($this->userId(), $input);
+
+        DB::transaction(function () use ($input) {
+            $authInfo = AuthInfoService::getInstance()->createAuthInfo($this->userId(), $input);
+
+            // todo 实名认证通知
+            SystemTodoService::getInstance()->createTodo(TodoEnums::AUTH_NOTICE, [$authInfo->id]);
+        });
+
         return $this->success();
     }
 

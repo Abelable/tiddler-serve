@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShopTodosTable extends Migration
+class CreateSystemTodosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateShopTodosTable extends Migration
      */
     public function up()
     {
-        Schema::create('shop_todos', function (Blueprint $table) {
+        Schema::create('system_todos', function (Blueprint $table) {
             $table->id();
-            $table->integer('shop_id')->comment('店铺id');
             $table->integer('status')->default(0)->comment('状态：0-待处理，1-已处理');
-            $table->integer('type')->comment('类型：1-待发货，2-售后');
+            $table->integer('type')->comment('类型');
             $table->string('reference_id')->default('')->comment('外部参考ID，如订单ID');
             $table->timestamps();
             $table->softDeletes();
@@ -31,6 +30,6 @@ class CreateShopTodosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('shop_todos');
+        Schema::dropIfExists('system_todos');
     }
 }

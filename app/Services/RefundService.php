@@ -13,7 +13,7 @@ class RefundService extends BaseService
     {
         $refund = Refund::new();
         $refund->user_id = $userId;
-        $refund->shop_id = $input->shopId;
+        $refund->shop_id = $input->shopId ?? 0;
         $refund->order_id = $input->orderId;
         $refund->order_sn = $input->orderSn;
         $refund->coupon_id = $input->couponId ?? 0;

@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Refund;
 use App\Services\OrderService;
 use App\Services\RefundService;
+use App\Services\ShopTodoService;
+use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\RefundInput;
 use Illuminate\Support\Facades\DB;
 
@@ -43,11 +46,16 @@ class RefundController extends Controller
         $refundAmount = OrderService::getInstance()->calcRefundAmount($input->orderId, $input->goodsId, $input->couponId);
 
         DB::transaction(function () use ($refundAmount, $input) {
-            RefundService::getInstance()->createRefund($this->userId(), $input, $refundAmount);
+            $refund = RefundService::getInstance()->createRefund($this->userId(), $input, $refundAmount);
 
             OrderService::getInstance()->afterSale($this->userId(), $input->orderId);
 
             // todo 售后通知
+            if ($refund->shop_id != 0) {
+                ShopTodoService::getInstance()->createTodo($refund->shop_id, TodoEnums::REFUND_NOTICE, [$refund->id]);
+            } else {
+                SystemTodoService::getInstance()->createTodo(TodoEnums::REFUND_NOTICE, [$refund->id]);
+            }
         });
 
         return $this->success();
