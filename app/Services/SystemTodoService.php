@@ -36,4 +36,9 @@ class SystemTodoService extends BaseService
 
         return $todo;
     }
+
+    public function deleteTodo($type, $referenceId)
+    {
+        SystemTodo::query()->where('type', $type)->where('reference_id', $referenceId)->delete();
+    }
 }

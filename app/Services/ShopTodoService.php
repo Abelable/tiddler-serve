@@ -39,4 +39,13 @@ class ShopTodoService extends BaseService
 
         return $todo;
     }
+
+    public function deleteTodo($shopId, $type, $referenceId)
+    {
+        ShopTodo::query()
+            ->where('shop_id', $shopId)
+            ->where('type', $type)
+            ->where('reference_id', $referenceId)
+            ->delete();
+    }
 }

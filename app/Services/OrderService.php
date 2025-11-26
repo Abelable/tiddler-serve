@@ -17,6 +17,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\OrderStatus;
 use App\Utils\Enums\ProductType;
+use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShopOrderPageInput;
@@ -412,6 +413,12 @@ class OrderService extends BaseService
             if ($order->delivery_mode == 1) {
                 $order->status = OrderStatus::PAID;
 
+                if ($order->shop_id != 0) {
+                    ShopTodoService::getInstance()->createTodo($order->shop_id, TodoEnums::ORDER_SHIP_NOTICE, [$order->id]);
+                } else {
+                    SystemTodoService::getInstance()->createTodo(TodoEnums::ORDER_SHIP_NOTICE, [$order->id]);
+                }
+
                 // 待发货短信通知
                 $shopId = $order->shopInfo->id;
                 $cacheKey = "order_sms_{$shopId}";
@@ -626,8 +633,15 @@ class OrderService extends BaseService
             $orderPackage = OrderPackageService::getInstance()->create($order->id, $shipChannel, $shipCode, $shipSn);
             $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
             foreach ($orderGoodsList as $orderGoods) {
-                OrderPackageGoodsService::getInstance()
-                    ->create($order->id, $orderPackage->id, $orderGoods->goods_id, $orderGoods->cover, $orderGoods->name, $orderGoods->selected_sku_name, $orderGoods->number);
+                OrderPackageGoodsService::getInstance()->create(
+                    $order->id,
+                    $orderPackage->id,
+                    $orderGoods->goods_id,
+                    $orderGoods->cover,
+                    $orderGoods->name,
+                    $orderGoods->selected_sku_name,
+                    $orderGoods->number
+                );
             }
 
             // 发货同步小程序后台
@@ -636,7 +650,13 @@ class OrderService extends BaseService
                 WxMpServe::new()->uploadShippingInfo($openid, $order, [$orderPackage], true);
             }
 
-            // todo 待发货通知
+            if ($order->shop_id != 0) {
+                ShopTodoService::getInstance()->finishTodo($order->shop_id, TodoEnums::ORDER_SHIP_NOTICE, $order->id);
+            } else {
+                SystemTodoService::getInstance()->finishTodo(TodoEnums::ORDER_SHIP_NOTICE, $order->id);
+            }
+
+            // todo 已发货通知
         });
 
         return $order;
@@ -651,6 +671,14 @@ class OrderService extends BaseService
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
+
+                if ($order->shop_id != 0) {
+                    ShopTodoService::getInstance()->finishTodo($order->shop_id, TodoEnums::ORDER_SHIP_NOTICE, $order->id);
+                } else {
+                    SystemTodoService::getInstance()->finishTodo(TodoEnums::ORDER_SHIP_NOTICE, $order->id);
+                }
+
+                // todo 已全部发货通知
             }
 
             $orderPackageList = [];
@@ -891,6 +919,12 @@ class OrderService extends BaseService
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
                     $task->status = 2;
                     $task->save();
+                }
+
+                if ($order->shop_id != 0) {
+                    ShopTodoService::getInstance()->deleteTodo($order->shop_id, TodoEnums::ORDER_SHIP_NOTICE, $order->id);
+                } else {
+                    SystemTodoService::getInstance()->deleteTodo(TodoEnums::ORDER_SHIP_NOTICE, $order->id);
                 }
 
                 // todo 通知商家
