@@ -68,6 +68,7 @@ trait OrderStatusTrait
             OrderStatus::PAID,
             OrderStatus::PENDING_VERIFICATION,
             OrderStatus::EXPORTED,
+            OrderStatus::REFUNDING,
         ],
         'agreerefund' => [OrderStatus::REFUNDING],
         'export' => [OrderStatus::PAID],

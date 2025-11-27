@@ -129,8 +129,7 @@ class ShopRefundController extends Controller
         }
 
         DB::transaction(function () use ($shopId, $refund) {
-            if (($refund->status == 0 && $refund->refund_type == 1)
-                || ($refund->status == 2 && $refund->refund_type == 2)) {
+            if (($refund->status == 0 && $refund->refund_type == 1) || ($refund->status == 2 && $refund->refund_type == 2)) {
                 $refund->status = 3;
                 $refund->save();
 

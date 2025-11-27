@@ -1023,7 +1023,9 @@ class OrderService extends BaseService
 
             // todo 通知商家
         } catch (GatewayException $exception) {
-            Log::error('wx_refund_fail', [$exception]);
+            $errMsg = '微信退款失败：' . $exception->getMessage();
+            Log::error($errMsg);
+            $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
     }
 
