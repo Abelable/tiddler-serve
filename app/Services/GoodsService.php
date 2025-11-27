@@ -355,7 +355,7 @@ class GoodsService extends BaseService
         $goods->sku_list = json_encode($input->skuList);
         $goods->delivery_mode = $input->deliveryMode;
         $goods->refund_status = $input->refundStatus;
-        $goods->refund_address_id = $input->refundAddressId;
+        $goods->refund_address_id = $input->refundAddressId ?? 0;
         $goods->save();
 
         return $goods;

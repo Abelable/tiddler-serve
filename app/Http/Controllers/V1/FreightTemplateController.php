@@ -17,7 +17,7 @@ class FreightTemplateController extends Controller
         $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
         $list = FreightTemplateService::getInstance()
-            ->getPageByShopId($shopId, $input, ['id', 'name', 'created_at', 'updated_at']);
+            ->getPageByShopId($shopId, $input, ['id', 'name', 'title', 'created_at', 'updated_at']);
         return $this->successPaginate($list);
     }
 
