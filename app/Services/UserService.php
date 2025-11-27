@@ -2,7 +2,17 @@
 
 namespace App\Services;
 
+use App\Models\Catering\CateringShop;
+use App\Models\Catering\CateringShopManager;
+use App\Models\HotelShop;
+use App\Models\HotelShopManager;
+use App\Models\ScenicShop;
+use App\Models\ScenicShopManager;
+use App\Models\Shop;
+use App\Models\ShopManager;
 use App\Models\User;
+use App\Services\Mall\Catering\CateringShopManagerService;
+use App\Services\Mall\Catering\CateringShopService;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\WxMpRegisterInput;
@@ -117,5 +127,165 @@ class UserService extends BaseService
                 $query->where('nickname', 'like', "%$keywords%")
                     ->orWhere('mobile', $keywords);
             })->get($columns);
+    }
+
+    public function scenicShopOptions(User $user) {
+        $scenicShopId = $user->scenicShop->id ?? 0;
+
+        $scenicShopManagerList = ScenicShopManagerService::getInstance()->getManagerListByUserId($user->id);
+        $shopIds = $scenicShopManagerList->pluck('shop_id')->toArray();
+
+        if ($scenicShopId != 0 && !in_array($scenicShopId, $shopIds)) {
+            $shopIds[] = $scenicShopId;
+        }
+
+        if (empty($shopIds)) {
+            return collect([]);
+        }
+
+        $scenicShopList = ScenicShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+
+        $scenicShopOptions = $scenicShopManagerList->map(function (ScenicShopManager $scenicShopManager) use ($scenicShopList) {
+            /** @var ScenicShop $shopInfo */
+            $shopInfo = $scenicShopList->get($scenicShopManager->shop_id);
+            return [
+                'id' => $scenicShopManager->shop_id,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => $scenicShopManager->role_id,
+            ];
+        });
+
+        if ($scenicShopId != 0) {
+            $shopInfo = $scenicShopList->get($scenicShopId);
+            $scenicShopOptions->prepend([
+                'id' => $scenicShopId,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => 0,
+            ]);
+        }
+
+        return $scenicShopOptions;
+    }
+
+    public function hotelShopOptions(User $user) {
+        $hotelShopId = $user->hotelShop->id ?? 0;
+
+        $hotelShopManagerList = HotelShopManagerService::getInstance()->getManagerListByUserId($user->id);
+        $shopIds = $hotelShopManagerList->pluck('shop_id')->toArray();
+
+        if ($hotelShopId != 0 && !in_array($hotelShopId, $shopIds)) {
+            $shopIds[] = $hotelShopId;
+        }
+
+        if (empty($shopIds)) {
+            return collect([]);
+        }
+
+        $hotelShopList = HotelShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+
+        $hotelShopOptions = $hotelShopManagerList->map(function (HotelShopManager $manager) use ($hotelShopList) {
+            /** @var HotelShop $shopInfo */
+            $shopInfo = $hotelShopList->get($manager->shop_id);
+            return [
+                'id' => $manager->shop_id,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => $manager->role_id,
+            ];
+        });
+
+        if ($hotelShopId != 0) {
+            $shopInfo = $hotelShopList->get($hotelShopId);
+            $hotelShopOptions->prepend([
+                'id' => $hotelShopId,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => 0,
+            ]);
+        }
+
+        return $hotelShopOptions;
+    }
+
+    public function cateringShopOptions(User $user) {
+        $cateringShopId = $user->cateringShop->id ?? 0;
+
+        $cateringShopManagerList = CateringShopManagerService::getInstance()->getManagerListByUserId($user->id);
+        $shopIds = $cateringShopManagerList->pluck('shop_id')->toArray();
+
+        if ($cateringShopId != 0 && !in_array($cateringShopId, $shopIds)) {
+            $shopIds[] = $cateringShopId;
+        }
+
+        if (empty($shopIds)) {
+            return collect([]);
+        }
+
+        $cateringShopList = CateringShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+
+        $cateringShopOptions = $cateringShopManagerList->map(function (CateringShopManager $manager) use ($cateringShopList) {
+            /** @var CateringShop $shopInfo */
+            $shopInfo = $cateringShopList->get($manager->shop_id);
+            return [
+                'id' => $manager->shop_id,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => $manager->role_id,
+            ];
+        });
+
+        if ($cateringShopId != 0) {
+            $shopInfo = $cateringShopList->get($cateringShopId);
+            $cateringShopOptions->prepend([
+                'id' => $cateringShopId,
+                'logo' => $shopInfo->logo ?? '',
+                'name' => $shopInfo->name ?? '',
+                'roleId' => 0,
+            ]);
+        }
+
+        return $cateringShopOptions;
+    }
+
+    public function shopOptions(User $user) {
+        $shopId = $user->shop->id ?? 0;
+
+        $shopManagerList = ShopManagerService::getInstance()->getManagerListByUserId($user->id);
+        $shopIds = $shopManagerList->pluck('shop_id')->toArray();
+
+        if ($shopId != 0 && !in_array($shopId, $shopIds)) {
+            $shopIds[] = $shopId;
+        }
+
+        if (empty($shopIds)) {
+            return collect([]);
+        }
+
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
+
+        $shopOptions = $shopManagerList->map(function (ShopManager $manager) use ($shopList) {
+            /** @var Shop $shopInfo */
+            $shopInfo = $shopList->get($manager->shop_id);
+            return [
+                'id' => $manager->shop_id,
+                'logo'   => $shopInfo->logo ?? '',
+                'name'   => $shopInfo->name ?? '',
+                'roleId' => $manager->role_id,
+            ];
+        });
+
+        if ($shopId != 0) {
+            $shopInfo = $shopList->get($shopId);
+            $shopOptions->prepend([
+                'id' => $shopId,
+                'logo'   => $shopInfo->logo ?? '',
+                'name'   => $shopInfo->name ?? '',
+                'roleId' => 0,
+            ]);
+        }
+
+        return $shopOptions;
     }
 }

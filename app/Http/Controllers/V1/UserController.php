@@ -6,15 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\FanService;
 use App\Services\HotelOrderService;
-use App\Services\HotelShopManagerService;
-use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\MealTicketOrderService;
 use App\Services\Media\MediaService;
 use App\Services\OrderService;
 use App\Services\ScenicOrderService;
-use App\Services\ScenicShopManagerService;
 use App\Services\SetMealOrderService;
-use App\Services\ShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderStatus;
@@ -82,45 +78,26 @@ class UserController extends Controller
             $user['scenicMerchantId'] = $user->scenicMerchant->id;
             $user['scenicMerchantStatus'] = $user->scenicMerchant->status;
         }
-
-        $user['scenicShopId'] = $user->scenicShop->id ?? 0;
-        $scenicShopManagerList = ScenicShopManagerService::getInstance()
-            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
-        $user['scenicShopManagerList'] = $scenicShopManagerList;
-
         if ($user->hotelMerchant) {
             $user['hotelMerchantId'] = $user->hotelMerchant->id;
             $user['hotelMerchantStatus'] = $user->hotelMerchant->status;
         }
-
-        $user['hotelShopId'] = $user->hotelShop->id ?? 0;
-        $hotelShopManagerList = HotelShopManagerService::getInstance()
-            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
-        $user['hotelShopManagerList'] = $hotelShopManagerList;
-
         if ($user->cateringMerchant) {
             $user['cateringMerchantId'] = $user->cateringMerchant->id;
             $user['cateringMerchantStatus'] = $user->cateringMerchant->status;
         }
-
-        $user['cateringShopId'] = $user->cateringShop->id ?? 0;
-        $cateringShopManagerList = CateringShopManagerService::getInstance()
-            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
-        $user['cateringShopManagerList'] = $cateringShopManagerList;
-
         if ($user->merchant) {
             $user['merchantId'] = $user->merchant->id;
             $user['merchantStatus'] = $user->merchant->status;
         }
 
-        $user['shopId'] = $user->shop->id ?? 0;
-        $shopManagerList = ShopManagerService::getInstance()
-            ->getManagerListByUserId($user->id, ['id', 'user_id', 'role_id']);
-        $user['shopManagerList'] = $shopManagerList;
+        $user['scenicShopOptions'] = UserService::getInstance()->scenicShopOptions($user);
+        $user['hotelShopOptions'] = UserService::getInstance()->hotelShopOptions($user);
+        $user['cateringShopOptions'] = UserService::getInstance()->cateringShopOptions($user);
+        $user['goodsShopOptions'] = UserService::getInstance()->shopOptions($user);
 
         unset($user->openid);
         unset($user->authInfo);
-
         unset($user->scenicMerchant);
         unset($user->scenicShop);
         unset($user->hotelMerchant);
@@ -129,7 +106,6 @@ class UserController extends Controller
         unset($user->cateringShop);
         unset($user->merchant);
         unset($user->shop);
-
         unset($user->created_at);
         unset($user->updated_at);
 

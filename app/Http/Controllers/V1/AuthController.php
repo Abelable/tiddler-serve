@@ -4,26 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
-use App\Models\Catering\CateringShop;
-use App\Models\Catering\CateringShopManager;
-use App\Models\HotelShop;
-use App\Models\HotelShopManager;
-use App\Models\ScenicShop;
-use App\Models\ScenicShopManager;
-use App\Models\Shop;
-use App\Models\ShopManager;
-use App\Models\User;
 use App\Services\AccountService;
-use App\Services\HotelShopManagerService;
-use App\Services\HotelShopService;
-use App\Services\Mall\Catering\CateringShopManagerService;
-use App\Services\Mall\Catering\CateringShopService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
-use App\Services\ScenicShopManagerService;
-use App\Services\ScenicShopService;
-use App\Services\ShopManagerService;
-use App\Services\ShopService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\WxMpRegisterInput;
@@ -105,17 +88,17 @@ class AuthController extends Controller
 
         $token = Auth::guard('user')->login($user);
 
-        $scenicShopOptions = $this->scenicShopOptions($user);
-        $hotelShopOptions = $this->hotelShopOptions($user);
-        $cateringShopOptions = $this->cateringShopOptions($user);
-        $shopOptions = $this->shopOptions($user);
+        $scenicShopOptions = UserService::getInstance()->scenicShopOptions($user);
+        $hotelShopOptions = UserService::getInstance()->hotelShopOptions($user);
+        $cateringShopOptions = UserService::getInstance()->cateringShopOptions($user);
+        $goodsShopOptions = UserService::getInstance()->shopOptions($user);
 
         return $this->success([
             'token' => $token,
             'scenicShopOptions' => $scenicShopOptions,
             'hotelShopOptions' => $hotelShopOptions,
             'cateringShopOptions' => $cateringShopOptions,
-            'shopOptions' => $shopOptions,
+            'goodsShopOptions' => $goodsShopOptions,
         ]);
     }
 
@@ -160,165 +143,5 @@ class AuthController extends Controller
         $user->save();
 
         return $this->success();
-    }
-
-    private function scenicShopOptions(User $user) {
-        $scenicShopId = $user->scenicShop->id ?? 0;
-
-        $scenicShopManagerList = ScenicShopManagerService::getInstance()->getManagerListByRoleIds($user->id, [1, 2]);
-        $shopIds = $scenicShopManagerList->pluck('shop_id')->toArray();
-
-        if ($scenicShopId != 0 && !in_array($scenicShopId, $shopIds)) {
-            $shopIds[] = $scenicShopId;
-        }
-
-        if (empty($shopIds)) {
-            return collect([]);
-        }
-
-        $scenicShopList = ScenicShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
-
-        $scenicShopOptions = $scenicShopManagerList->map(function (ScenicShopManager $scenicShopManager) use ($scenicShopList) {
-            /** @var ScenicShop $shopInfo */
-            $shopInfo = $scenicShopList->get($scenicShopManager->shop_id);
-            return [
-                'id' => $scenicShopManager->shop_id,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => $scenicShopManager->role_id,
-            ];
-        });
-
-        if ($scenicShopId != 0) {
-            $shopInfo = $scenicShopList->get($scenicShopId);
-            $scenicShopOptions->push([
-                'id' => $scenicShopId,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => 1,
-            ]);
-        }
-
-        return $scenicShopOptions;
-    }
-
-    private function hotelShopOptions(User $user) {
-        $hotelShopId = $user->hotelShop->id ?? 0;
-
-        $hotelShopManagerList = HotelShopManagerService::getInstance()->getManagerListByRoleIds($user->id, [1, 2]);
-        $shopIds = $hotelShopManagerList->pluck('shop_id')->toArray();
-
-        if ($hotelShopId != 0 && !in_array($hotelShopId, $shopIds)) {
-            $shopIds[] = $hotelShopId;
-        }
-
-        if (empty($shopIds)) {
-            return collect([]);
-        }
-
-        $hotelShopList = HotelShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
-
-        $hotelShopOptions = $hotelShopManagerList->map(function (HotelShopManager $manager) use ($hotelShopList) {
-            /** @var HotelShop $shopInfo */
-            $shopInfo = $hotelShopList->get($manager->shop_id);
-            return [
-                'id' => $manager->shop_id,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => $manager->role_id,
-            ];
-        });
-
-        if ($hotelShopId != 0) {
-            $shopInfo = $hotelShopList->get($hotelShopId);
-            $hotelShopOptions->push([
-                'id' => $hotelShopId,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => 1,
-            ]);
-        }
-
-        return $hotelShopOptions;
-    }
-
-    private function cateringShopOptions(User $user) {
-        $cateringShopId = $user->cateringShop->id ?? 0;
-
-        $cateringShopManagerList = CateringShopManagerService::getInstance()->getManagerListByRoleIds($user->id, [1, 2]);
-        $shopIds = $cateringShopManagerList->pluck('shop_id')->toArray();
-
-        if ($cateringShopId != 0 && !in_array($cateringShopId, $shopIds)) {
-            $shopIds[] = $cateringShopId;
-        }
-
-        if (empty($shopIds)) {
-            return collect([]);
-        }
-
-        $cateringShopList = CateringShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
-
-        $cateringShopOptions = $cateringShopManagerList->map(function (CateringShopManager $manager) use ($cateringShopList) {
-            /** @var CateringShop $shopInfo */
-            $shopInfo = $cateringShopList->get($manager->shop_id);
-            return [
-                'id' => $manager->shop_id,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => $manager->role_id,
-            ];
-        });
-
-        if ($cateringShopId != 0) {
-            $shopInfo = $cateringShopList->get($cateringShopId);
-            $cateringShopOptions->push([
-                'id' => $cateringShopId,
-                'logo' => $shopInfo->logo ?? '',
-                'name' => $shopInfo->name ?? '',
-                'roleId' => 1,
-            ]);
-        }
-
-        return $cateringShopOptions;
-    }
-
-    private function shopOptions(User $user) {
-        $shopId = $user->shop->id ?? 0;
-
-        $shopManagerList = ShopManagerService::getInstance()->getManagerListByRoleIds($user->id, [1, 2]);
-        $shopIds = $shopManagerList->pluck('shop_id')->toArray();
-
-        if ($shopId != 0 && !in_array($shopId, $shopIds)) {
-            $shopIds[] = $shopId;
-        }
-
-        if (empty($shopIds)) {
-            return collect([]);
-        }
-
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds)->keyBy('id');
-
-        $shopOptions = $shopManagerList->map(function (ShopManager $manager) use ($shopList) {
-            /** @var Shop $shopInfo */
-            $shopInfo = $shopList->get($manager->shop_id);
-            return [
-                'id' => $manager->shop_id,
-                'logo'   => $shopInfo->logo ?? '',
-                'name'   => $shopInfo->name ?? '',
-                'roleId' => $manager->role_id,
-            ];
-        });
-
-        if ($shopId != 0) {
-            $shopInfo = $shopList->get($shopId);
-            $shopOptions->push([
-                'id' => $shopId,
-                'logo'   => $shopInfo->logo ?? '',
-                'name'   => $shopInfo->name ?? '',
-                'roleId' => 1,
-            ]);
-        }
-
-        return $shopOptions;
     }
 }
