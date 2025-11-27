@@ -120,7 +120,7 @@ class ShopGoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->status == 0 || $goods->status == 1) {
+        if ($goods->status == 0) {
             return $this->fail(CodeResponse::FORBIDDEN, '当前状态下商品，无法编辑');
         }
 

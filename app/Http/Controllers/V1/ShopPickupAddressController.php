@@ -25,7 +25,7 @@ class ShopPickupAddressController extends Controller
     {
         $id = $this->verifyRequiredId('id');
 
-        $columns = ['id', 'name', 'open_time_list', 'longitude', 'latitude', 'address_detail'];
+        $columns = ['id', 'logo', 'name', 'open_time_list', 'longitude', 'latitude', 'address_detail'];
         $detail = ShopPickupAddressService::getInstance()->getAddressById($id, $columns);
         $detail->open_time_list = json_decode($detail->open_time_list);
 
