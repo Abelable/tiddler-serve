@@ -49,7 +49,7 @@ class ShopPickupAddressService extends BaseService
 
     public function update(ShopPickupAddress $address, ShopPickupAddressInput $input)
     {
-        $address->logo = $input->logo;
+        $address->logo = $input->logo ?? '';
         $address->name = $input->name;
         $address->open_time_list = json_encode($input->openTimeList);
         $address->longitude = $input->longitude;

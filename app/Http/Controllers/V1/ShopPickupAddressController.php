@@ -16,7 +16,7 @@ class ShopPickupAddressController extends Controller
         /** @var PageInput $input */
         $input = PageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'name', 'longitude', 'latitude', 'address_detail', 'created_at', 'updated_at'];
+        $columns = ['id', 'logo', 'name', 'longitude', 'latitude', 'address_detail', 'created_at', 'updated_at'];
         $page = ShopPickupAddressService::getInstance()->getPageByShopId($shopId, $input, $columns);
         return $this->successPaginate($page);
     }
