@@ -99,13 +99,6 @@ class WxMpServe
     {
         $result = $this->httpPost(sprintf(self::GET_PHONE_NUMBER_URL, $this->accessToken), ['code' => $code]);
         if ($result['errcode'] != 0) {
-            // 由于有播+会刷新access_token，就会出现access_token在缓存有效期内失效的问题，
-            // 如果失效，执行下面的重置逻辑即可
-            // if ($result['errcode'] == 40001) {
-            //     Cache::forget(self::ACCESS_TOKEN_KEY);
-            //     $this->accessToken = $this->getAccessToken();
-            //     return $this->getUserPhoneNumber($code);
-            //  }
             throw new \Exception('获取微信小程序用户手机号异常：' . $result['errcode'] . $result['errmsg']);
         }
         return $result['phone_info']['purePhoneNumber'];
@@ -145,14 +138,14 @@ class WxMpServe
             $shippingList[] = [
                 'tracking_no' => $orderPackage->ship_sn,
                 'express_company' => $orderPackage->ship_code,
-                'item_desc' => $orderPackage->goodsList()->pluck('goods_name')->implode('，'),
+                'item_desc' => $orderPackage->goodsList()->pluck('name')->implode('，'),
                 'contact' => [
                     'receiver_contact' => substr($order->mobile,0, 3) . '****' .substr($order->mobile,-4)
                 ]
             ];
         }
 
-        return $this->httpPost(
+        $result =  $this->httpPost(
             sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->stableAccessToken),
             [
                 'order_key' => [
@@ -170,6 +163,10 @@ class WxMpServe
             ],
             3
         );
+        if ($result['errcode'] != 0) {
+            Log::error('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
+            throw new \Exception('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
+        }
     }
 
     public function notifyNoShipment($openid, $payId, $productName, $logisticsType = 4)
@@ -193,6 +190,9 @@ class WxMpServe
             ],
             3
         );
-        Log::info(json_encode($result, JSON_UNESCAPED_UNICODE));
+        if ($result['errcode'] != 0) {
+            Log::error('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
+            throw new \Exception('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
+        }
     }
 }

@@ -299,11 +299,11 @@ class ShopOrderController extends Controller
     public function ship()
     {
         $shopId = $this->verifyRequiredInteger('shopId');
-        $orderId = $this->verifyRequiredInteger('orderId');
+        $id = $this->verifyRequiredInteger('id');
         $isAllDelivered = $this->verifyRequiredInteger('isAllDelivered');
         $packageList = $this->verifyArrayNotEmpty('packageList');
 
-        $order = OrderService::getInstance()->getShopOrder($shopId, $orderId);
+        $order = OrderService::getInstance()->getShopOrder($shopId, $id);
         if (is_null($order)) {
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }

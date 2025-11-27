@@ -71,7 +71,7 @@ trait OrderStatusTrait
         ],
         'agreeRefund' => [OrderStatus::REFUNDING],
         'export' => [OrderStatus::PAID],
-        'ship' => [OrderStatus::PAID],
+        'ship' => [OrderStatus::PAID, OrderStatus::EXPORTED],
         'confirm' => [OrderStatus::SHIPPED, OrderStatus::PENDING_VERIFICATION],
         'comment' => [
             OrderStatus::CONFIRMED,
