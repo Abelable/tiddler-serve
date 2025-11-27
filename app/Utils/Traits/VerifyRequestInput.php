@@ -81,12 +81,19 @@ trait VerifyRequestInput
         return $this->verifyData('excel', null, 'required|file|mimes:xlsx,xls|max:2048', 'file');
     }
 
-    public function verifyData($key, $default, $rule)
+    /**
+     * @throws BusinessException
+     */
+    public function verifyData($key, $default, $rule, $type = 'data')
     {
-        $value = request()->input($key, $default);
+        if ($type == 'file') {
+            $value = request()->file($key, $default);
+        } else {
+            $value = request()->input($key, $default);
+        }
         $validator = Validator::make([$key => $value], [$key => $rule]);
         if (is_null($default) && is_null($value)) {
-            return $value;
+            return null;
         }
         if ($validator->fails()) {
             throw new BusinessException(CodeResponse::PARAM_VALUE_INVALID);
