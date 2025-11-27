@@ -120,9 +120,6 @@ class ShopGoodsController extends Controller
         if (is_null($goods)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
-        if ($goods->status == 0) {
-            return $this->fail(CodeResponse::FORBIDDEN, '当前状态下商品，无法编辑');
-        }
 
         DB::transaction(function () use ($goods, $input, $shopId) {
             GoodsService::getInstance()->updateGoods($goods, $input);
