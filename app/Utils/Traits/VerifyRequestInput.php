@@ -76,6 +76,11 @@ trait VerifyRequestInput
         return $this->verifyData('mobile', null, 'required|regex:/^1[3-9]\d{9}$/');
     }
 
+    public function verifyExcel()
+    {
+        return $this->verifyData('excel', null, 'required|file|mimes:xlsx,xls|max:2048', 'file');
+    }
+
     public function verifyData($key, $default, $rule)
     {
         $value = request()->input($key, $default);
