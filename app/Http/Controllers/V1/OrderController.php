@@ -488,6 +488,8 @@ class OrderController extends Controller
             'shop_id',
             'goods_price',
             'freight_price',
+            'coupon_id',
+            'coupon_denomination',
             'deduction_balance',
             'payment_amount',
             'refund_amount',
