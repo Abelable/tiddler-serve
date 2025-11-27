@@ -35,6 +35,7 @@ class WxMpServe
     public function __construct()
     {
         $this->accessToken = Cache::has(self::ACCESS_TOKEN_KEY) ? Cache::get(self::ACCESS_TOKEN_KEY) : $this->getAccessToken();
+        $this->stableAccessToken = Cache::has(self::STABLE_ACCESS_TOKEN_KEY) ? Cache::get(self::STABLE_ACCESS_TOKEN_KEY) : $this->getStableAccessToken();
     }
 
     private function getAccessToken()
@@ -146,7 +147,7 @@ class WxMpServe
         }
 
         $result =  $this->httpPost(
-            sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->stableAccessToken),
+            sprintf(self::UPLOAD_SHIPPING_INFO_URL, $this->accessToken),
             [
                 'order_key' => [
                     'order_number_type' => 2,
