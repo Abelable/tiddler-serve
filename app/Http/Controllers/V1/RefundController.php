@@ -30,7 +30,7 @@ class RefundController extends Controller
     {
         $orderId = $this->verifyRequiredId('orderId');
         $goodsId = $this->verifyRequiredId('goodsId');
-        $columns = ['id', 'status', 'failure_reason',  'refund_amount', 'refund_type', 'refund_reason', 'image_list', 'ship_code', 'ship_sn'];
+        $columns = ['id', 'status', 'failure_reason', 'refund_amount', 'refund_type', 'refund_reason', 'image_list', 'ship_channel', 'ship_code', 'ship_sn'];
         $refund = RefundService::getInstance()->getRefundByUserId($this->userId(), $orderId, $goodsId, $columns);
         if (!is_null($refund)) {
             $refund->image_list = json_decode($refund->image_list);
@@ -64,8 +64,9 @@ class RefundController extends Controller
     public function edit()
     {
         $id = $this->verifyRequiredId('id');
-        /** @var RefundInput $input */
-        $input = RefundInput::new();
+        $type = $this->verifyRequiredInteger('type');
+        $reason = $this->verifyRequiredString('reason');
+        $imageList = $this->verifyArray('imageList');
 
         /** @var Refund $refund */
         $refund = RefundService::getInstance()->getRefundById($id);
@@ -73,10 +74,8 @@ class RefundController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '退款信息不存在');
         }
 
-        DB::transaction(function () use ($refund, $input) {
-            RefundService::getInstance()->updateRefund($refund, $input);
-
-            OrderService::getInstance()->afterSale($this->userId(), $input->orderId);
+        DB::transaction(function () use ($imageList, $reason, $type, $refund) {
+            RefundService::getInstance()->updateRefund($refund, $type, $reason, $imageList);
 
             // todo 售后通知
             if ($refund->shop_id != 0) {

@@ -940,7 +940,7 @@ class OrderService extends BaseService
         if (is_null($order)) {
             $this->throwBadArgumentValue();
         }
-        if (!$order->canAftersaleHandle()) {
+        if (!$order->canAfterSaleHandle()) {
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '该订单无法申请售后');
         }
         $order->status = OrderStatus::REFUNDING;

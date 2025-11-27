@@ -21,18 +21,18 @@ class RefundService extends BaseService
         $refund->goods_id = $input->goodsId;
         $refund->refund_address_id = $input->refundAddressId ?? 0;
         $refund->refund_amount = $refundAmount;
-        return $this->updateRefund($refund, $input);
+        return $this->updateRefund($refund, $input->type, $input->reason, $input->imageList);
     }
 
-    public function updateRefund(Refund $refund, RefundInput $input)
+    public function updateRefund(Refund $refund, $refundType, $refundReason, $imageList)
     {
-        if ($refund->status == 2) {
+        if ($refund->status == 4) {
             $refund->status = 0;
             $refund->failure_reason = '';
         }
-        $refund->refund_type = $input->type;
-        $refund->refund_reason = $input->reason;
-        $refund->image_list = json_encode($input->imageList);
+        $refund->refund_type = $refundType;
+        $refund->refund_reason = $refundReason;
+        $refund->image_list = json_encode($imageList);
         $refund->save();
 
         return $refund;

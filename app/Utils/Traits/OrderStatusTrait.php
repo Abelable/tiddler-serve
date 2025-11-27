@@ -69,7 +69,7 @@ trait OrderStatusTrait
             OrderStatus::PENDING_VERIFICATION,
             OrderStatus::EXPORTED,
         ],
-        'agreeRefund' => [OrderStatus::REFUNDING],
+        'agreerefund' => [OrderStatus::REFUNDING],
         'export' => [OrderStatus::PAID],
         'ship' => [OrderStatus::PAID, OrderStatus::EXPORTED],
         'confirm' => [OrderStatus::SHIPPED, OrderStatus::PENDING_VERIFICATION],
@@ -83,14 +83,14 @@ trait OrderStatusTrait
             OrderStatus::AUTO_CONFIRMED,
             OrderStatus::ADMIN_CONFIRMED,
         ],
-        'afterSale' => [
+        'aftersale' => [
             OrderStatus::CONFIRMED,
             OrderStatus::AUTO_CONFIRMED,
             OrderStatus::ADMIN_CONFIRMED,
             OrderStatus::FINISHED,
             OrderStatus::AUTO_FINISHED,
         ],
-        'reBuy' => [
+        'rebuy' => [
             OrderStatus::CONFIRMED,
             OrderStatus::AUTO_CONFIRMED,
             OrderStatus::ADMIN_CONFIRMED,
@@ -122,7 +122,7 @@ trait OrderStatusTrait
             'confirm' => $this->canConfirmHandle(),
             'comment' => $this->canCommentHandle(),
             'finish' => $this->canFinishHandle(),
-            'afterSale' => $this->canAftersaleHandle(),
+            'afterSale' => $this->canAfterSaleHandle(),
             'reBuy' => $this->canRebuyHandle(),
         ];
     }
