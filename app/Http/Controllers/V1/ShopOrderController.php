@@ -90,7 +90,16 @@ class ShopOrderController extends Controller
                 $statusList = [OrderStatus::PENDING_VERIFICATION];
                 break;
             case 4:
-                $statusList = [OrderStatus::FINISHED];
+                $statusList = [
+                    OrderStatus::CONFIRMED,
+                    OrderStatus::AUTO_CONFIRMED,
+                    OrderStatus::ADMIN_CONFIRMED,
+                    OrderStatus::FINISHED,
+                    OrderStatus::AUTO_FINISHED
+                ];
+                break;
+            case 5:
+                $statusList = [OrderStatus::REFUNDING, OrderStatus::REFUNDED];
                 break;
             default:
                 $statusList = [
