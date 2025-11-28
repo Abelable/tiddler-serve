@@ -132,6 +132,10 @@ class OrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
 
+        $userInfo = UserService::getInstance()->getUserById($order->user_id, ['id', 'avatar', 'nickname']);
+        $order['userInfo'] = $userInfo;
+        unset($order->user_id);
+
         $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
         $order['goods_list'] = $goodsList;
 
