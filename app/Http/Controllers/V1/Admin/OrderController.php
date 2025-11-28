@@ -16,7 +16,6 @@ use App\Services\OrderPackageService;
 use App\Services\OrderService;
 use App\Services\OrderVerifyService;
 use App\Services\ShopPickupAddressService;
-use App\Services\ShopService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;

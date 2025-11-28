@@ -69,7 +69,7 @@ class OrderService extends BaseService
         if (count($statusList) != 0) {
             $query = $query->whereIn('status', $statusList);
         }
-        if (!empty($input->shopId)) {
+        if (!is_null($input->shopId)) {
             $query = $query->where('shop_id', $input->shopId);
         }
         if (!empty($input->orderSn)) {
