@@ -84,7 +84,8 @@ class ExpressController extends Controller
 
     public function options()
     {
-        $options = ExpressService::getInstance()->getExpressOptions(['id', 'code', 'name']);
+        $name = $this->verifyString('name');
+        $options = ExpressService::getInstance()->getExpressOptions($name, ['id', 'code', 'name']);
         return $this->success($options);
     }
 }
