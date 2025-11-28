@@ -67,10 +67,7 @@ class OrderController extends Controller
             ->getListByOrderIds($orderIds, $goodsListColumns)
             ->groupBy('order_id');
 
-        $shopIds = $orderList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
-
-        $list = $orderList->map(function (Order $order) use ($shopList, $userList, $groupedGoodsList) {
+        $list = $orderList->map(function (Order $order) use ($userList, $groupedGoodsList) {
             $user = $userList->get($order->user_id);
             $order['userInfo'] = $user;
             unset($order->user_id);
@@ -82,17 +79,13 @@ class OrderController extends Controller
                         'id' => $orderGoods->goods_id,
                         'cover' => $orderGoods->cover,
                         'name' => $orderGoods->name,
-                        'skuName' => $orderGoods->selected_sku_name,
+                        'selectedSkuName' => $orderGoods->selected_sku_name,
                         'price' => $orderGoods->price,
                         'number' => $orderGoods->number,
                     ];
                 });
             }
             $order['goodsList'] = $goodsList;
-
-            $shop = $shopList->get($order->shop_id);
-            $order['shopInfo'] = $shop ?? null;
-            unset($order['shop_id']);
 
             return $order;
         });
