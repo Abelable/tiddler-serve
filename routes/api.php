@@ -1087,6 +1087,25 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'GoodsController@options');
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
         Route::get('normal_options', 'GoodsController@normalGoodsOptions');
+
+        Route::prefix('order')->group(function () {
+            Route::get('ship_order_count', 'OrderController@shipOrderCount');
+            Route::get('goods_options', 'OrderController@orderedGoodsOptions');
+            Route::get('user_options', 'OrderController@orderedUserOptions');
+            Route::post('list', 'OrderController@list');
+            Route::get('detail', 'OrderController@detail');
+            Route::post('modify_address_info', 'OrderController@modifyAddressInfo');
+            Route::post('modify_delivery_info', 'OrderController@modifyDeliveryInfo');
+            Route::post('delivery', 'OrderController@delivery');
+            Route::get('shipping_info', 'OrderController@shippingInfo');
+            Route::post('confirm', 'OrderController@confirm');
+            Route::post('cancel', 'OrderController@cancel');
+            Route::post('refund', 'OrderController@refund');
+            Route::post('delete', 'OrderController@delete');
+            Route::post('export', 'OrderController@export');
+            Route::post('import', 'OrderController@import');
+            Route::post('update_order_goods_status', 'OrderController@updateOrderGoodsStatus');
+        });
     });
 
     Route::prefix('gift')->group(function () {

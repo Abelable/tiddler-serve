@@ -20,7 +20,7 @@ use App\Utils\Enums\ProductType;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\ShopOrderPageInput;
+use App\Utils\Inputs\OrderPageInput;
 use App\Utils\WxMpServe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -53,9 +53,25 @@ class OrderService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function getShopOrderPage($shopId, $statusList, ShopOrderPageInput $input, $columns = ['*'])
+    public function getOrderCountByStatusList(array $statusList)
     {
-        $query = Order::query()->where('shop_id', $shopId)->whereIn('status', $statusList);
+        return Order::query()->whereIn('status', $statusList)->count();
+    }
+
+    public function getOrderList($columns = ['*'])
+    {
+        return Order::query()->get($columns);
+    }
+
+    public function getOrderPage(OrderPageInput $input, $statusList = [], $columns = ['*'])
+    {
+        $query = Order::query();
+        if (count($statusList) != 0) {
+            $query = $query->whereIn('status', $statusList);
+        }
+        if (!empty($input->shopId)) {
+            $query = $query->where('shop_id', $input->shopId);
+        }
         if (!empty($input->orderSn)) {
             $query = $query->where('order_sn', $input->orderSn);
         }

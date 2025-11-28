@@ -2,10 +2,11 @@
 
 namespace App\Utils\Inputs;
 
-class ShopOrderPageInput extends PageInput
+class OrderPageInput extends PageInput
 {
-    public $orderSn;
     public $status;
+    public $orderSn;
+    public $shopId;
     public $goodsId;
     public $userId;
     public $deliveryMode;
@@ -17,6 +18,7 @@ class ShopOrderPageInput extends PageInput
         return array_merge(parent::rules(), [
             'status' => 'integer',
             'orderSn' => 'string',
+            'shopId' => 'integer',
             'goodsId' => 'integer',
             'userId' => 'integer',
             'deliveryMode' => 'integer|in:1,2',

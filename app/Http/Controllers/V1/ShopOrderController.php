@@ -21,7 +21,7 @@ use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;
 use App\Utils\ExpressServe;
-use App\Utils\Inputs\ShopOrderPageInput;
+use App\Utils\Inputs\OrderPageInput;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -42,12 +42,11 @@ class ShopOrderController extends Controller
 
     public function list()
     {
-        /** @var ShopOrderPageInput $input */
-        $input = ShopOrderPageInput::new();
-        $shopId = $this->verifyId('shopId');
-
+        /** @var OrderPageInput $input */
+        $input = OrderPageInput::new();
         $statusList = $this->statusList($input->status ?? 0);
-        $page = OrderService::getInstance()->getShopOrderPage($shopId, $statusList, $input);
+
+        $page = OrderService::getInstance()->getOrderPage($input, $statusList);
         $orderList = collect($page->items());
         $list = $this->handleOrderList($orderList);
 
@@ -423,7 +422,7 @@ class ShopOrderController extends Controller
     {
         $shopId = $this->verifyRequiredInteger('shopId');
         $userIds = OrderService::getInstance()
-            ->getShopOrderList($shopId, [201, 202, 301, 302, 401, 402, 403, 501, 502])
+            ->getShopOrderList($shopId, [201, 202, 203, 204, 301, 302, 401, 402, 403, 501, 502])
             ->pluck('user_id')
             ->toArray();
         $userOptions = UserService::getInstance()->getListByIds($userIds, ['id', 'avatar', 'nickname']);

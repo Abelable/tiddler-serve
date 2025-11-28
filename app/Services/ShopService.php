@@ -58,10 +58,9 @@ class ShopService extends BaseService
         return Shop::query()->find($id, $columns);
     }
 
-    public function getShopByMerchantId(int $merchantId, $columns = ['*'])
+    public function getShopListByMerchantId(int $merchantId, $columns = ['*'])
     {
-        // todo 目前一个用户对应一个商家，一个商家对应一个店铺，可以暂时用商户id获取店铺，之后一个商家有多个店铺，该方法需要删除
-        return Shop::query()->where('merchant_id', $merchantId)->first($columns);
+        return Shop::query()->where('merchant_id', $merchantId)->get($columns);
     }
 
     public function getShopListByIds(array $ids, $columns = ['*'])
