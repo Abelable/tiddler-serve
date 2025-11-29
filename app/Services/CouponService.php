@@ -99,7 +99,7 @@ class CouponService extends BaseService
         $coupon->type = $input->type;
         $coupon->num_limit = $input->numLimit ?? 0;
         $coupon->price_limit = $input->priceLimit ?? 0;
-        $coupon->receive_limit = $input->receiveNumLimit ?? 0;
+        $coupon->receive_limit = $input->receiveLimit ?? 0;
         if (!is_null($input->expirationTime)) {
             $coupon->expiration_time = $input->expirationTime;
             dispatch(new CouponExpireJob($coupon->id, $input->expirationTime));
