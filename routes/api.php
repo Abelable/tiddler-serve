@@ -158,6 +158,16 @@ Route::prefix('shop')->group(function () {
         Route::post('delete', 'ShopGoodsController@delete');
     });
 
+    Route::prefix('coupon')->group(function () {
+        Route::post('list', 'ShopCouponController@list');
+        Route::get('detail', 'ShopCouponController@detail');
+        Route::post('add', 'ShopCouponController@add');
+        Route::post('edit', 'ShopCouponController@edit');
+        Route::post('up', 'ShopCouponController@up');
+        Route::post('down', 'ShopCouponController@down');
+        Route::post('delete', 'ShopCouponController@delete');
+    });
+
     Route::prefix('order')->group(function () {
         Route::get('total', 'ShopOrderController@total');
         Route::post('list', 'ShopOrderController@list');
@@ -899,6 +909,17 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'AuthInfoController@delete');
     });
 
+    Route::prefix('promoter')->group(function () {
+        Route::post('list', 'PromoterController@list');
+        Route::get('detail', 'PromoterController@detail');
+        Route::post('add', 'PromoterController@add');
+        Route::post('edit', 'PromoterController@edit');
+        Route::post('delete', 'PromoterController@delete');
+        Route::get('options', 'PromoterController@options');
+        Route::post('top_list', 'PromoterController@topPromoterList');
+        Route::post('update_list', 'PromoterController@updateList');
+    });
+
     Route::prefix('complaint_option')->group(function () {
         Route::post('list', 'ComplaintOptionController@list');
         Route::get('detail', 'ComplaintOptionController@detail');
@@ -938,7 +959,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'TaskController@delete');
     });
 
-    Route::prefix('trip_type')->group(function () {
+    Route::prefix('theme')->group(function () {
         Route::prefix('hot_scenic')->group(function () {
             Route::post('list', 'HotScenicController@list');
             Route::get('detail', 'HotScenicController@detail');
@@ -1002,139 +1023,34 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         });
     });
 
-    Route::prefix('merchant')->group(function () {
-        Route::post('list', 'MerchantController@list');
-        Route::get('detail', 'MerchantController@detail');
-        Route::post('approve', 'MerchantController@approve');
-        Route::post('reject', 'MerchantController@reject');
-        Route::get('options', 'MerchantController@options');
-    });
-
-    Route::prefix('shop')->group(function () {
-        Route::prefix('category')->group(function () {
-            Route::post('list', 'ShopCategoryController@list');
-            Route::get('detail', 'ShopCategoryController@detail');
-            Route::post('add', 'ShopCategoryController@add');
-            Route::post('edit', 'ShopCategoryController@edit');
-            Route::post('delete', 'ShopCategoryController@delete');
-            Route::get('options', 'ShopCategoryController@options');
-            Route::post('edit_sort', 'ShopCategoryController@editSort');
-            Route::post('edit_visible', 'ShopCategoryController@editVisible');
+    Route::prefix('media')->group(function () {
+        Route::prefix('short_video')->group(function () {
+            Route::post('list', 'ShortVideoController@list');
+            Route::get('detail', 'ShortVideoController@detail');
+            Route::post('add', 'ShortVideoController@add');
+            Route::post('edit', 'ShortVideoController@edit');
+            Route::post('edit_views', 'ShortVideoController@editViews');
+            Route::get('options', 'ShortVideoController@options');
+            Route::post('delete', 'ShortVideoController@delete');
         });
 
-        Route::post('list', 'ShopController@list');
-        Route::get('detail', 'ShopController@detail');
-        Route::post('deposit_payment_logs', 'ShopController@depositPaymentLogs');
-        Route::get('options', 'ShopController@options');
-    });
-
-    Route::prefix('express')->group(function () {
-        Route::post('list', 'ExpressController@list');
-        Route::get('detail', 'ExpressController@detail');
-        Route::post('add', 'ExpressController@add');
-        Route::post('edit', 'ExpressController@edit');
-        Route::post('delete', 'ExpressController@delete');
-        Route::get('options', 'ExpressController@options');
-    });
-
-    Route::prefix('freight_template')->group(function () {
-        Route::post('list', 'FreightTemplateController@list');
-        Route::get('detail', 'FreightTemplateController@detail');
-        Route::post('add', 'FreightTemplateController@add');
-        Route::post('edit', 'FreightTemplateController@edit');
-        Route::post('delete', 'FreightTemplateController@delete');
-        Route::get('options', 'FreightTemplateController@options');
-    });
-
-    Route::prefix('refund_address')->group(function () {
-        Route::post('list', 'RefundAddressController@list');
-        Route::get('detail', 'RefundAddressController@detail');
-        Route::post('add', 'RefundAddressController@add');
-        Route::post('edit', 'RefundAddressController@edit');
-        Route::post('delete', 'RefundAddressController@delete');
-        Route::get('options', 'RefundAddressController@options');
-    });
-
-    Route::prefix('pickup_address')->group(function () {
-        Route::post('list', 'PickupAddressController@list');
-        Route::get('detail', 'PickupAddressController@detail');
-        Route::post('add', 'PickupAddressController@add');
-        Route::post('edit', 'PickupAddressController@edit');
-        Route::post('delete', 'PickupAddressController@delete');
-        Route::get('options', 'PickupAddressController@options');
-    });
-
-    Route::prefix('goods')->group(function () {
-        Route::prefix('category')->group(function () {
-            Route::post('list', 'GoodsCategoryController@list');
-            Route::get('detail', 'GoodsCategoryController@detail');
-            Route::post('add', 'GoodsCategoryController@add');
-            Route::post('edit', 'GoodsCategoryController@edit');
-            Route::post('delete', 'GoodsCategoryController@delete');
-            Route::get('options', 'GoodsCategoryController@options');
+        Route::prefix('tourism_note')->group(function () {
+            Route::post('list', 'TourismNoteController@list');
+            Route::get('detail', 'TourismNoteController@detail');
+            Route::post('add', 'TourismNoteController@add');
+            Route::post('edit', 'TourismNoteController@edit');
+            Route::post('edit_views', 'TourismNoteController@editViews');
+            Route::get('options', 'TourismNoteController@options');
+            Route::post('delete', 'TourismNoteController@delete');
         });
 
-        Route::post('list', 'GoodsController@list');
-        Route::get('detail', 'GoodsController@detail');
-        Route::post('add', 'GoodsController@add');
-        Route::post('edit', 'GoodsController@edit');
-        Route::post('edit_commission', 'GoodsController@editCommission');
-        Route::post('edit_views', 'GoodsController@editViews');
-        Route::post('approve', 'GoodsController@approve');
-        Route::post('reject', 'GoodsController@reject');
-        Route::post('down', 'GoodsController@down');
-        Route::post('delete', 'GoodsController@delete');
-        Route::get('options', 'GoodsController@options');
-        Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
-        Route::get('normal_options', 'GoodsController@normalGoodsOptions');
-
-        Route::prefix('order')->group(function () {
-            Route::get('ship_order_count', 'OrderController@shipOrderCount');
-            Route::get('goods_options', 'OrderController@orderedGoodsOptions');
-            Route::get('user_options', 'OrderController@orderedUserOptions');
-            Route::post('list', 'OrderController@list');
-            Route::get('detail', 'OrderController@detail');
-            Route::post('modify_address_info', 'OrderController@modifyAddressInfo');
-            Route::post('modify_delivery_info', 'OrderController@modifyDeliveryInfo');
-            Route::post('delivery', 'OrderController@delivery');
-            Route::get('shipping_info', 'OrderController@shippingInfo');
-            Route::post('confirm', 'OrderController@confirm');
-            Route::post('cancel', 'OrderController@cancel');
-            Route::post('refund', 'OrderController@refund');
-            Route::post('delete', 'OrderController@delete');
-            Route::post('export', 'OrderController@export');
-            Route::post('import', 'OrderController@import');
-            Route::post('update_order_goods_status', 'OrderController@updateOrderGoodsStatus');
+        Route::prefix('top')->group(function () {
+            Route::post('list', 'TopMediaController@list');
+            Route::get('detail', 'TopMediaController@detail');
+            Route::post('add', 'TopMediaController@add');
+            Route::post('edit', 'TopMediaController@edit');
+            Route::post('delete', 'TopMediaController@delete');
         });
-    });
-
-    Route::prefix('gift')->group(function () {
-        Route::prefix('type')->group(function () {
-            Route::post('list', 'GiftTypeController@list');
-            Route::get('detail', 'GiftTypeController@detail');
-            Route::post('add', 'GiftTypeController@add');
-            Route::post('edit', 'GiftTypeController@edit');
-            Route::post('edit_sort', 'GiftTypeController@editSort');
-            Route::post('edit_status', 'GiftTypeController@editStatus');
-            Route::post('delete', 'GiftTypeController@delete');
-            Route::get('options', 'GiftTypeController@options');
-        });
-
-        Route::post('list', 'GiftGoodsController@list');
-        Route::post('add', 'GiftGoodsController@add');
-        Route::post('edit_duration', 'GiftGoodsController@editDuration');
-        Route::post('delete', 'GiftGoodsController@delete');
-    });
-
-    Route::prefix('promoter')->group(function () {
-        Route::post('list', 'PromoterController@list');
-        Route::get('detail', 'PromoterController@detail');
-        Route::post('add', 'PromoterController@add');
-        Route::post('edit', 'PromoterController@edit');
-        Route::post('delete', 'PromoterController@delete');
-        Route::get('options', 'PromoterController@options');
-        Route::post('top_list', 'PromoterController@topPromoterList');
-        Route::post('update_list', 'PromoterController@updateList');
     });
 
     Route::prefix('scenic')->group(function () {
@@ -1315,33 +1231,138 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         });
     });
 
-    Route::prefix('media')->group(function () {
-        Route::prefix('short_video')->group(function () {
-            Route::post('list', 'ShortVideoController@list');
-            Route::get('detail', 'ShortVideoController@detail');
-            Route::post('add', 'ShortVideoController@add');
-            Route::post('edit', 'ShortVideoController@edit');
-            Route::post('edit_views', 'ShortVideoController@editViews');
-            Route::get('options', 'ShortVideoController@options');
-            Route::post('delete', 'ShortVideoController@delete');
+    Route::prefix('goods')->group(function () {
+        Route::prefix('merchant')->group(function () {
+            Route::post('list', 'MerchantController@list');
+            Route::get('detail', 'MerchantController@detail');
+            Route::post('approve', 'MerchantController@approve');
+            Route::post('reject', 'MerchantController@reject');
+            Route::get('options', 'MerchantController@options');
         });
 
-        Route::prefix('tourism_note')->group(function () {
-            Route::post('list', 'TourismNoteController@list');
-            Route::get('detail', 'TourismNoteController@detail');
-            Route::post('add', 'TourismNoteController@add');
-            Route::post('edit', 'TourismNoteController@edit');
-            Route::post('edit_views', 'TourismNoteController@editViews');
-            Route::get('options', 'TourismNoteController@options');
-            Route::post('delete', 'TourismNoteController@delete');
+        Route::prefix('shop')->group(function () {
+            Route::prefix('category')->group(function () {
+                Route::post('list', 'ShopCategoryController@list');
+                Route::get('detail', 'ShopCategoryController@detail');
+                Route::post('add', 'ShopCategoryController@add');
+                Route::post('edit', 'ShopCategoryController@edit');
+                Route::post('delete', 'ShopCategoryController@delete');
+                Route::get('options', 'ShopCategoryController@options');
+                Route::post('edit_sort', 'ShopCategoryController@editSort');
+                Route::post('edit_visible', 'ShopCategoryController@editVisible');
+            });
+
+            Route::post('list', 'ShopController@list');
+            Route::get('detail', 'ShopController@detail');
+            Route::post('deposit_payment_logs', 'ShopController@depositPaymentLogs');
+            Route::get('options', 'ShopController@options');
         });
 
-        Route::prefix('top')->group(function () {
-            Route::post('list', 'TopMediaController@list');
-            Route::get('detail', 'TopMediaController@detail');
-            Route::post('add', 'TopMediaController@add');
-            Route::post('edit', 'TopMediaController@edit');
-            Route::post('delete', 'TopMediaController@delete');
+        Route::prefix('express')->group(function () {
+            Route::post('list', 'ExpressController@list');
+            Route::get('detail', 'ExpressController@detail');
+            Route::post('add', 'ExpressController@add');
+            Route::post('edit', 'ExpressController@edit');
+            Route::post('delete', 'ExpressController@delete');
+            Route::get('options', 'ExpressController@options');
+        });
+
+        Route::prefix('freight_template')->group(function () {
+            Route::post('list', 'FreightTemplateController@list');
+            Route::get('detail', 'FreightTemplateController@detail');
+            Route::post('add', 'FreightTemplateController@add');
+            Route::post('edit', 'FreightTemplateController@edit');
+            Route::post('delete', 'FreightTemplateController@delete');
+            Route::get('options', 'FreightTemplateController@options');
+        });
+
+        Route::prefix('refund_address')->group(function () {
+            Route::post('list', 'RefundAddressController@list');
+            Route::get('detail', 'RefundAddressController@detail');
+            Route::post('add', 'RefundAddressController@add');
+            Route::post('edit', 'RefundAddressController@edit');
+            Route::post('delete', 'RefundAddressController@delete');
+            Route::get('options', 'RefundAddressController@options');
+        });
+
+        Route::prefix('pickup_address')->group(function () {
+            Route::post('list', 'PickupAddressController@list');
+            Route::get('detail', 'PickupAddressController@detail');
+            Route::post('add', 'PickupAddressController@add');
+            Route::post('edit', 'PickupAddressController@edit');
+            Route::post('delete', 'PickupAddressController@delete');
+            Route::get('options', 'PickupAddressController@options');
+        });
+
+        Route::prefix('category')->group(function () {
+            Route::post('list', 'GoodsCategoryController@list');
+            Route::get('detail', 'GoodsCategoryController@detail');
+            Route::post('add', 'GoodsCategoryController@add');
+            Route::post('edit', 'GoodsCategoryController@edit');
+            Route::post('delete', 'GoodsCategoryController@delete');
+            Route::get('options', 'GoodsCategoryController@options');
+        });
+
+        Route::post('list', 'GoodsController@list');
+        Route::get('detail', 'GoodsController@detail');
+        Route::post('add', 'GoodsController@add');
+        Route::post('edit', 'GoodsController@edit');
+        Route::post('edit_commission', 'GoodsController@editCommission');
+        Route::post('edit_views', 'GoodsController@editViews');
+        Route::post('approve', 'GoodsController@approve');
+        Route::post('reject', 'GoodsController@reject');
+        Route::post('down', 'GoodsController@down');
+        Route::post('delete', 'GoodsController@delete');
+        Route::get('options', 'GoodsController@options');
+        Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
+        Route::get('normal_options', 'GoodsController@normalGoodsOptions');
+
+        Route::prefix('gift')->group(function () {
+            Route::prefix('type')->group(function () {
+                Route::post('list', 'GiftTypeController@list');
+                Route::get('detail', 'GiftTypeController@detail');
+                Route::post('add', 'GiftTypeController@add');
+                Route::post('edit', 'GiftTypeController@edit');
+                Route::post('edit_sort', 'GiftTypeController@editSort');
+                Route::post('edit_status', 'GiftTypeController@editStatus');
+                Route::post('delete', 'GiftTypeController@delete');
+                Route::get('options', 'GiftTypeController@options');
+            });
+
+            Route::post('list', 'GiftGoodsController@list');
+            Route::post('add', 'GiftGoodsController@add');
+            Route::post('edit_duration', 'GiftGoodsController@editDuration');
+            Route::post('delete', 'GiftGoodsController@delete');
+        });
+
+        Route::prefix('coupon')->group(function () {
+            Route::post('list', 'CouponController@list');
+            Route::get('detail', 'CouponController@detail');
+            Route::post('add', 'CouponController@add');
+            Route::post('edit', 'CouponController@edit');
+            Route::post('edit_received_num', 'CouponController@editReceivedNum');
+            Route::post('up', 'CouponController@up');
+            Route::post('down', 'CouponController@down');
+            Route::post('delete', 'CouponController@delete');
+        });
+
+        Route::prefix('order')->group(function () {
+            Route::get('ship_order_count', 'OrderController@shipOrderCount');
+            Route::get('goods_options', 'OrderController@orderedGoodsOptions');
+            Route::get('user_options', 'OrderController@orderedUserOptions');
+            Route::post('list', 'OrderController@list');
+            Route::get('detail', 'OrderController@detail');
+            Route::post('modify_address_info', 'OrderController@modifyAddressInfo');
+            Route::post('modify_delivery_info', 'OrderController@modifyDeliveryInfo');
+            Route::post('delivery', 'OrderController@delivery');
+            Route::get('shipping_info', 'OrderController@shippingInfo');
+            Route::post('confirm', 'OrderController@confirm');
+            Route::post('cancel', 'OrderController@cancel');
+            Route::post('refund', 'OrderController@refund');
+            Route::post('delete', 'OrderController@delete');
+            Route::post('export', 'OrderController@export');
+            Route::post('import', 'OrderController@import');
+            Route::post('update_order_goods_status', 'OrderController@updateOrderGoodsStatus');
         });
     });
 });

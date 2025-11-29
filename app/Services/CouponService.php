@@ -11,9 +11,9 @@ use App\Utils\Inputs\CouponPageInput;
 
 class CouponService extends BaseService
 {
-    public function getCouponPage(CouponPageInput $input, $columns = ['*'])
+    public function getCouponPage(CouponPageInput $input, $shopId = 0, $columns = ['*'])
     {
-        $query = Coupon::query();
+        $query = Coupon::query()->where('shop_id', $shopId);
         if (!is_null($input->name)) {
             $query = $query->where('name', 'like', "%$input->name%");
         }
@@ -47,6 +47,11 @@ class CouponService extends BaseService
     public function getCouponById($id, $columns = ['*'])
     {
         return Coupon::query()->find($id, $columns);
+    }
+
+    public function getShopCoupon($shopId, $id, $columns = ['*'])
+    {
+        return Coupon::query()->where('shop_id', $shopId)->where('id', $id)->first($columns);
     }
 
     public function getGoodsCoupon($id, $goodsId, $columns = ['*'])
