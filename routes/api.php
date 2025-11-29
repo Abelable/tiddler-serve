@@ -149,6 +149,7 @@ Route::prefix('shop')->group(function () {
         Route::get('totals', 'ShopGoodsController@totals');
         Route::post('list', 'ShopGoodsController@list');
         Route::get('detail', 'ShopGoodsController@detail');
+        Route::get('options', 'ShopGoodsController@options');
         Route::post('add', 'ShopGoodsController@add');
         Route::post('edit', 'ShopGoodsController@edit');
         Route::post('up', 'ShopGoodsController@up');

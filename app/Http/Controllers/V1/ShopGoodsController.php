@@ -85,6 +85,14 @@ class ShopGoodsController extends Controller
         return $this->success($goods);
     }
 
+    public function options()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $columns = ['id', 'cover', 'name'];
+        $page = GoodsService::getInstance()->getShopGoodsList($shopId, [1], $columns);
+        return $this->successPaginate($page);
+    }
+
     public function add()
     {
         /** @var GoodsInput $input */
