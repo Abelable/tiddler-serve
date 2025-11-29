@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Exceptions\BusinessException;
 use App\Services\PromoterService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -38,8 +37,9 @@ class CreatePromoterJob implements ShouldQueue
     {
         try {
             PromoterService::getInstance()->createPromoterByGift($this->orderGoodsId);
-        } catch (BusinessException $e) {
-            Log::error($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error("create promoter job failed: " . $e->getMessage());
+            throw $e;
         }
     }
 }

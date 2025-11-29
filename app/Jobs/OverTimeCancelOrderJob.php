@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Exceptions\BusinessException;
 use App\Services\OrderService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -40,8 +39,9 @@ class OverTimeCancelOrderJob implements ShouldQueue
     {
         try {
             OrderService::getInstance()->systemAutoCancel($this->userId, $this->orderId);
-        } catch (BusinessException $e) {
-            Log::error($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error("cancel overTime order job failed: " . $e->getMessage());
+            throw $e;
         }
     }
 }

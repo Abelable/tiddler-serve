@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Exceptions\BusinessException;
 use App\Services\CommissionService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -38,8 +37,9 @@ class CommissionConfirmJob implements ShouldQueue
     {
         try {
             CommissionService::getInstance()->updateToOrderConfirmStatus($this->commissionId);
-        } catch (BusinessException $e) {
-            Log::error($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error("commission confirm job failed: " . $e->getMessage());
+            throw $e;
         }
     }
 }

@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Exceptions\BusinessException;
 use App\Services\ShopIncomeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -38,8 +37,9 @@ class ShopIncomeConfirmJob implements ShouldQueue
     {
         try {
             ShopIncomeService::getInstance()->updateIncomeToConfirmStatus($this->incomeId);
-        } catch (BusinessException $e) {
-            Log::error($e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error("shop income confirm job failed: " . $e->getMessage());
+            throw $e;
         }
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Jobs\CouponExpireJob;
 use App\Models\Coupon;
+use App\Models\Goods;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\CouponInput;
 use App\Utils\Inputs\CouponPageInput;
 
 class CouponService extends BaseService
@@ -75,5 +78,35 @@ class CouponService extends BaseService
         $coupon->status = 2;
         $coupon->save();
         return $coupon;
+    }
+
+    public function updateCoupon(Coupon $coupon, CouponInput $input, Goods $goods)
+    {
+        if ($coupon->status == 2) {
+            $coupon->status = 1;
+        }
+        $coupon->denomination = $input->denomination;
+        $coupon->name = $input->name;
+        $coupon->description = $input->description;
+        $coupon->goods_id = $goods->id;
+        $coupon->goods_cover = $goods->cover;
+        $coupon->goods_name = $goods->name;
+        $coupon->type = $input->type;
+        $coupon->num_limit = $input->numLimit ?? 0;
+        $coupon->price_limit = $input->priceLimit ?? 0;
+        $coupon->receive_limit = $input->receiveNumLimit ?? 0;
+        if (!is_null($input->expirationTime)) {
+            $coupon->expiration_time = $input->expirationTime;
+            dispatch(new CouponExpireJob($coupon->id, $input->expirationTime));
+        }
+        $coupon->save();
+    }
+
+    public function handelExpiredCoupons()
+    {
+        return Coupon::query()
+            ->where('status', 1)
+            ->where('expiration_time', '<=', date('Y-m-d H:i:s', time()))
+            ->update(['status' => 2]);
     }
 }
