@@ -881,6 +881,14 @@ class OrderService extends BaseService
                     $this->throwUpdateFail();
                 }
 
+                // 返还库存
+                $this->returnStock($order->id);
+
+                // 恢复优惠券
+                if ($order->coupon_id != 0) {
+                    $this->restoreCoupon($order->user_id, $order->coupon_id);
+                }
+
                 // 退还余额
                 if ($order->deduction_balance != 0) {
                     AccountService::getInstance()->updateBalance(
