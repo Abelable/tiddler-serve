@@ -1301,7 +1301,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('add', 'GoodsCategoryController@add');
             Route::post('edit', 'GoodsCategoryController@edit');
             Route::post('delete', 'GoodsCategoryController@delete');
-            Route::get('options', 'GoodsCategoryController@options');
+            Route::post('options', 'GoodsCategoryController@options');
         });
 
         Route::post('list', 'GoodsController@list');

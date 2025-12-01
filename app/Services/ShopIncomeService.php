@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\ShopIncomeConfirmJob;
+use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\ShopIncome;
@@ -13,31 +14,72 @@ use Illuminate\Support\Facades\DB;
 
 class ShopIncomeService extends BaseService
 {
-    public function createIncome($shopId, $orderId, $orderSn, CartGoods $cartGoods, Coupon $coupon = null)
+    public function createIncome(
+        $shopId,
+        $orderId,
+        $orderSn,
+        $cartGoodsList,
+        Coupon $coupon,
+        $deliveryMode,
+        $freightTemplateList = null,
+        Address $address = null
+    )
     {
-        $couponDenomination = 0;
-        if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
-            $couponDenomination = $coupon->denomination;
+        /** @var CartGoods $cartGoods */
+        foreach ($cartGoodsList as $cartGoods) {
+            // 总价：单价 * 数量
+            $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
+
+            $couponInfo = [
+                'id' => 0,
+                'shop_id' => 0,
+                'denomination' => 0,
+            ];
+            if ($coupon && $coupon->goods_id == $cartGoods->goods_id) {
+                $couponInfo = [
+                    'id' => $coupon->id,
+                    'shop_id' => $coupon->shop_id,
+                    'denomination' => $coupon->denomination,
+                ];
+            }
+
+            // 收入基数：平台券，按商品总价计算
+            $incomeBase = ($couponInfo['shop_id'] == 0)
+                ? $totalPrice
+                : max(0, bcsub($totalPrice, $couponInfo['denomination'], 2));
+
+            // 佣金率
+            $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 4);
+            $salesCommission = bcmul($incomeBase, $salesCommissionRate, 2);
+
+            // 运费
+            $freightPrice = 0;
+            if ($deliveryMode == 1 && $cartGoods->freight_template_id) {
+                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
+                $freightPrice = FreightTemplateService::getInstance()
+                    ->calcFreightPrice($freightTemplate, $address, $totalPrice, $cartGoods->number);
+            }
+
+            // 商家最终收入: 基数 - 平台佣金 + 运费
+            $incomeAmount = max(0, bcadd(bcsub($incomeBase, $salesCommission, 2), $freightPrice, 2));
+
+            // 保存记录
+            $income = ShopIncome::new();
+            $income->shop_id = $shopId;
+            $income->order_id = $orderId;
+            $income->order_sn = $orderSn;
+            $income->goods_id = $cartGoods->goods_id;
+            $income->refund_status = $cartGoods->refund_status;
+            $income->total_price = $totalPrice;
+            $income->coupon_id = $couponInfo['id'];
+            $income->coupon_shop_id = $couponInfo['shop_id'];
+            $income->coupon_denomination = $couponInfo['denomination'];
+            $income->income_base = $incomeBase;
+            $income->sales_commission_rate = $cartGoods->sales_commission_rate;
+            $income->freight_price = $freightPrice;
+            $income->income_amount = $incomeAmount;
+            $income->save();
         }
-        $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
-        $paymentAmount = bcsub($totalPrice, $couponDenomination, 2);
-
-        $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 4);
-        $incomeRate = bcsub('1', $salesCommissionRate, 4);
-        $incomeAmount = bcmul($paymentAmount, $incomeRate, 2);
-
-        $income = ShopIncome::new();
-        $income->shop_id = $shopId;
-        $income->order_id = $orderId;
-        $income->order_sn = $orderSn;
-        $income->goods_id = $cartGoods->goods_id;
-        $income->refund_status = $cartGoods->refund_status;
-        $income->payment_amount = $paymentAmount;
-        $income->sales_commission_rate = $cartGoods->sales_commission_rate;
-        $income->income_amount = $incomeAmount;
-        $income->save();
-
-        return $income;
     }
 
     public function getShopIncomePageByTimeType($shopId, $timeType, array $statusList, PageInput $input, $columns = ['*'])

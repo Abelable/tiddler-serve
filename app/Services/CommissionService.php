@@ -195,6 +195,8 @@ class CommissionService extends BaseService
         $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
         $paymentAmount = bcsub($totalPrice, $couponDenomination, 2);
 
+        $salesCommissionBase = ($couponDenomination != 0 && $coupon->shop_id == 0) ? $totalPrice : $paymentAmount;
+
         $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 2);
         $promotionCommissionRate = bcdiv($cartGoods->promotion_commission_rate, 100, 2);
         $promotionCommissionUpperLimit = $cartGoods->promotion_commission_upper_limit;
@@ -202,7 +204,7 @@ class CommissionService extends BaseService
         $superiorPromotionCommissionUpperLimit = $cartGoods->superior_promotion_commission_upper_limit;
 
         $this->createProductCommission(
-            $paymentAmount,
+            $salesCommissionBase,
             $salesCommissionRate,
             $promotionCommissionRate,
             $promotionCommissionUpperLimit,
@@ -265,7 +267,7 @@ class CommissionService extends BaseService
      * scene = 1 promoter_id = 5 promoter_level = 2 user_id = 4 commission_base = 100 commission_rate = 40% commission_amount = 40
      */
     public function createProductCommission(
-        $paymentAmount,
+        $salesCommissionBase,
         $salesCommissionRate,
         $promotionCommissionRate,
         $promotionCommissionUpperLimit,
@@ -284,22 +286,22 @@ class CommissionService extends BaseService
         $refundStatus = 0
     )
     {
-        $commissionBase = bcmul($paymentAmount, $salesCommissionRate, 2);
+        $commissionBase = bcmul($salesCommissionBase, $salesCommissionRate, 2);
 
         $promotionCommission = bcmul($commissionBase, $promotionCommissionRate, 2);
-        $finalPromotionCommission = $promotionCommissionUpperLimit != 0
-            ? min($promotionCommission, $promotionCommissionUpperLimit)
-            : $promotionCommission;
+        if ($promotionCommissionUpperLimit != 0) {
+            $promotionCommission = min($promotionCommission, $promotionCommissionUpperLimit);
+        }
 
         $superiorPromotionCommission = bcmul($commissionBase, $superiorPromotionCommissionRate, 2);
-        $finalSuperiorPromotionCommission = $superiorPromotionCommissionUpperLimit != 0
-            ? min($superiorPromotionCommission, $superiorPromotionCommissionUpperLimit)
-            : $superiorPromotionCommission;
+        if ($superiorPromotionCommissionUpperLimit != 0) {
+            $superiorPromotionCommission = min($superiorPromotionCommission, $superiorPromotionCommissionUpperLimit);
+        }
 
         $teamCommissionRate = bcdiv($superiorLevel - 1, 10, 2);
-        $teamCommissionAmount = bcmul($finalPromotionCommission, $teamCommissionRate, 2);
+        $teamCommissionAmount = bcmul($promotionCommission, $teamCommissionRate, 2);
         $upperTeamCommissionRate = bcdiv($upperSuperiorLevel - 1, 10, 2);
-        $upperTeamCommissionAmount = bcmul($finalPromotionCommission, $upperTeamCommissionRate, 2);
+        $upperTeamCommissionAmount = bcmul($promotionCommission, $upperTeamCommissionRate, 2);
 
         // 场景2
         if ($userLevel == 0 && $superiorLevel == 1 && $upperSuperiorLevel <= 1) {
@@ -312,10 +314,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $promotionCommissionRate,
-                $finalPromotionCommission,
+                $promotionCommission,
                 $promotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -332,10 +334,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $promotionCommissionRate,
-                $finalPromotionCommission,
+                $promotionCommission,
                 $promotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -348,10 +350,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
-                $finalSuperiorPromotionCommission,
+                $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -364,8 +366,8 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
-                $finalPromotionCommission,
+                $salesCommissionBase,
+                $promotionCommission,
                 $upperTeamCommissionRate,
                 $upperTeamCommissionAmount,
                 0,
@@ -377,7 +379,7 @@ class CommissionService extends BaseService
         if ($userLevel == 0 && $superiorLevel > 1) {
             $commissionRate = bcadd($promotionCommissionRate, $superiorPromotionCommissionRate, 2);
             $commissionLimit = bcadd($promotionCommissionUpperLimit, $superiorPromotionCommissionUpperLimit, 2);
-            $commissionAmount = bcadd($finalPromotionCommission, $finalSuperiorPromotionCommission, 2);
+            $commissionAmount = bcadd($promotionCommission, $superiorPromotionCommission, 2);
             $this->createCommission(
                 CommissionScene::DIRECT_SHARE,
                 $superiorId,
@@ -387,7 +389,7 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
@@ -407,10 +409,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $promotionCommissionRate,
-                $finalPromotionCommission,
+                $promotionCommission,
                 $promotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -427,10 +429,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $promotionCommissionRate,
-                $finalPromotionCommission,
+                $promotionCommission,
                 $promotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -443,10 +445,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
-                $finalSuperiorPromotionCommission,
+                $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -459,8 +461,8 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
-                $finalPromotionCommission,
+                $salesCommissionBase,
+                $promotionCommission,
                 $upperTeamCommissionRate,
                 $upperTeamCommissionAmount,
                 0,
@@ -479,10 +481,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $promotionCommissionRate,
-                $finalPromotionCommission,
+                $promotionCommission,
                 $promotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -495,10 +497,10 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $superiorPromotionCommissionRate,
-                $finalSuperiorPromotionCommission,
+                $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
                 $refundStatus
             );
@@ -511,8 +513,8 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
-                $finalPromotionCommission,
+                $salesCommissionBase,
+                $promotionCommission,
                 $teamCommissionRate,
                 $teamCommissionAmount,
                 0,
@@ -524,7 +526,7 @@ class CommissionService extends BaseService
         if ($userLevel > 1) {
             $commissionRate = bcadd($promotionCommissionRate, $superiorPromotionCommissionRate, 2);
             $commissionLimit = bcadd($promotionCommissionUpperLimit, $superiorPromotionCommissionUpperLimit, 2);
-            $commissionAmount = bcadd($finalPromotionCommission, $finalSuperiorPromotionCommission, 2);
+            $commissionAmount = bcadd($promotionCommission, $superiorPromotionCommission, 2);
             $this->createCommission(
                 CommissionScene::SELF_PURCHASE,
                 $userId,
@@ -534,7 +536,7 @@ class CommissionService extends BaseService
                 $orderSn,
                 $productType,
                 $productId,
-                $paymentAmount,
+                $salesCommissionBase,
                 $commissionBase,
                 $commissionRate,
                 $commissionAmount,
@@ -553,7 +555,7 @@ class CommissionService extends BaseService
         $orderSn,
         $productType,
         $productId,
-        $paymentAmount,
+        $achievement,
         $commissionBase,
         $commissionRate,
         $commissionAmount,
@@ -571,7 +573,7 @@ class CommissionService extends BaseService
         $commission->product_type = $productType;
         $commission->product_id = $productId;
         $commission->refund_status = $refundStatus;
-        $commission->payment_amount = $paymentAmount;
+        $commission->achievement = $achievement;
         $commission->commission_base = $commissionBase;
         $commission->commission_rate = $commissionRate;
         $commission->commission_amount = $commissionAmount;
@@ -877,7 +879,7 @@ class CommissionService extends BaseService
         return $this
             ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
             ->whereIn('status', [2, 3, 4])
-            ->sum('payment_amount');
+            ->sum('achievement');
     }
 
     public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)

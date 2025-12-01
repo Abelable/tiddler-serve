@@ -21,10 +21,14 @@ class GoodsService extends BaseService
             $query = $query->orderByRaw(DB::raw("FIELD(id, " . implode(',', $input->goodsIds) . ") DESC"));
         }
         if (!empty($input->shopCategoryId)) {
-            $query = $query->where('shop_category_id', $input->shopCategoryId);
+            $query->whereHas('categories.shopCategories', function ($q) use ($input) {
+                $q->where('shop_categories.id', $input->shopCategoryId);
+            });
         }
         if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+            $query->whereHas('categories', function ($q) use ($input) {
+                $q->where('goods_categories.id', $input->categoryId);
+            });
         }
         if ($input->sort != 'created_at') {
             $query = $query->orderBy($input->sort, $input->order);
@@ -238,15 +242,21 @@ class GoodsService extends BaseService
             $query = $query->where('status', $input->status);
         }
         if (!empty($input->shopCategoryId)) {
-            $query = $query->where('shop_category_id', $input->shopCategoryId);
+            $query->whereHas('categories.shopCategories', function ($q) use ($input) {
+                $q->where('shop_categories.id', $input->shopCategoryId);
+            });
         }
         if (!empty($input->categoryId)) {
-            $query = $query->where('category_id', $input->categoryId);
+            $query->whereHas('categories', function ($q) use ($input) {
+                $q->where('goods_categories.id', $input->categoryId);
+            });
         }
         if (!empty($input->shopId)) {
             $query = $query->where('shop_id', $input->shopId);
         }
+
         return $query
+            ->with(['categories.shopCategories:id'])
             ->orderByRaw("FIELD(status, 0) DESC")
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -259,7 +269,9 @@ class GoodsService extends BaseService
             $query = $query->whereNotIn('id', $input->goodsIds);
         }
         if (count($input->shopCategoryIds) != 0) {
-            $query = $query->whereIn('shop_category_id', $input->shopCategoryIds);
+            $query->whereHas('categories.shopCategories', function ($q) use ($input) {
+                $q->whereIn('shop_categories.id', $input->shopCategoryIds);
+            });
         }
         return $query
             ->orderBy('sales_commission_rate', 'desc')
@@ -332,8 +344,6 @@ class GoodsService extends BaseService
         if ($goods->shop_id == 0 && $goods->status == 0) {
             $goods->status = 1;
         }
-        $goods->shop_category_id = $input->shopCategoryId;
-        $goods->category_id = $input->categoryId;
         $goods->cover = $input->cover;
         $goods->video = $input->video ?: '';
         $goods->image_list = json_encode($input->imageList);
@@ -357,6 +367,8 @@ class GoodsService extends BaseService
         $goods->refund_status = $input->refundStatus;
         $goods->refund_address_id = $input->refundAddressId ?? 0;
         $goods->save();
+
+        $goods->categories()->sync($input->categoryIds);
 
         return $goods;
     }

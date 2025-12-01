@@ -49,9 +49,9 @@ class GoodsCategoryController extends Controller
 
     public function edit()
     {
-        $id = $this->verifyId('id');
         /** @var GoodsCategoryInput $input */
         $input = GoodsCategoryInput::new();
+        $id = $this->verifyId('id');
 
         $category = GoodsCategoryService::getInstance()->getCategoryById($id);
         if (is_null($category)) {
@@ -76,8 +76,8 @@ class GoodsCategoryController extends Controller
 
     public function options()
     {
-        $shopCategoryId = $this->verifyId('shopCategoryId');
-        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryId);
+        $shopCategoryIds = $this->verifyArray('shopCategoryIds');
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions($shopCategoryIds);
         return $this->success($options);
     }
 }

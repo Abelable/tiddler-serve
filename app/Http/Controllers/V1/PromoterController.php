@@ -98,7 +98,7 @@ class PromoterController extends Controller
             $promoter = $promoterList->get($user->id);
 
             $userCommission = $userCommissionList->get($user->id);
-            $GMV = $userCommission ? $userCommission->sum('payment_amount') : 0;
+            $GMV = $userCommission ? $userCommission->sum('achievement') : 0;
 
             return [
                 'id' => $user->id,

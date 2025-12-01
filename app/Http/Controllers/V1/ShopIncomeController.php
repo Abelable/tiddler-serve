@@ -22,11 +22,11 @@ class ShopIncomeController extends Controller
         $totalIncome = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
         $todayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId);
-        $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
+        $todaySalesVolume = (clone $todayOrderQuery)->sum('income_base');
         $todayOrderCount = (clone $todayOrderQuery)->count();
 
         $yesterdayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
-        $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
+        $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('income_base');
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
         $goodsIds = GoodsService::getInstance()->getShopGoodsList($shopId, [1])->pluck('id')->toArray();
@@ -74,7 +74,7 @@ class ShopIncomeController extends Controller
         $query = ShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
-        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('payment_amount');
+        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('income_base');
         $pendingAmount = (clone $query)->where('status', 1)->sum('income_amount');
         $settledAmount = (clone $query)->whereIn('status', [2, 3, 4])->sum('income_amount');
 

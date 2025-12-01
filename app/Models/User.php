@@ -24,10 +24,10 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $openid 小程序openid
  * @property int $gender 性别：0-未知，1-男，2-女
  * @property string $bg 背景图
- * @property string $birthday 生日
+ * @property string|null $birthday 生日
  * @property string $constellation 星座
  * @property string $career 职业
- * @property string $signature 签名
+ * @property string|null $signature 签名
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at

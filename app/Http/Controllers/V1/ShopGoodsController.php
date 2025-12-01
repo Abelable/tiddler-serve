@@ -25,11 +25,10 @@ class ShopGoodsController extends Controller
         }
 
         $shopCategoryIds = json_decode($shopInfo->category_ids);
-        $options = GoodsCategoryService::getInstance()
-            ->getOptionsByShopCategoryIds(
-                $shopCategoryIds,
-                ['id', 'shop_category_id', 'name', 'min_sales_commission_rate', 'max_sales_commission_rate']
-            );
+        $options = GoodsCategoryService::getInstance()->getCategoryOptions(
+            $shopCategoryIds,
+            ['id', 'name', 'min_sales_commission_rate', 'max_sales_commission_rate']
+        );
 
         return $this->success($options);
     }
@@ -50,21 +49,7 @@ class ShopGoodsController extends Controller
         /** @var StatusPageInput $input */
         $input = StatusPageInput::new();
         $shopId = $this->verifyRequiredId('shopId');
-        $columns = [
-            'id',
-            'status',
-            'failure_reason',
-            'category_id',
-            'cover',
-            'name',
-            'price',
-            'sales_commission_rate',
-            'sales_volume',
-            'stock',
-            'created_at',
-            'updated_at'
-        ];
-        $page = GoodsService::getInstance()->getShopGoodsPage($shopId, $input, $columns);
+        $page = GoodsService::getInstance()->getShopGoodsPage($shopId, $input);
         return $this->successPaginate($page);
     }
 

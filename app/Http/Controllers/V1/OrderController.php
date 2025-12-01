@@ -296,8 +296,20 @@ class OrderController extends Controller
             $shopIds = array_unique($cartGoodsList->pluck('shop_id')->toArray());
             $shopList = ShopService::getInstance()->getShopListByIds($shopIds);
 
-            $orderIds = $shopList
-                ->map(function (Shop $shop) use ($promoterStatus, $upperSuperiorLevel, $upperSuperiorId, $superiorLevel, $superiorId, $userLevel, $input, $userId, $address, $cartGoodsList, $freightTemplateList, $coupon) {
+            $orderIds = $shopList->map(function (Shop $shop) use (
+                $promoterStatus,
+                $upperSuperiorLevel,
+                $upperSuperiorId,
+                $superiorLevel,
+                $superiorId,
+                $userLevel,
+                $input,
+                $userId,
+                $address,
+                $cartGoodsList,
+                $freightTemplateList,
+                $coupon
+            ) {
                 $filterCartGoodsList = $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
                     return $cartGoods->shop_id == $shop->id;
                 });
@@ -307,20 +319,40 @@ class OrderController extends Controller
                     ->createOrder($userId, $filterCartGoodsList, $input, $freightTemplateList, $address, $coupon, $shop);
 
                 // 8.生成订单商品快照
-                OrderGoodsService::getInstance()->createList($filterCartGoodsList, $order->id, $userId, $userLevel, $promoterStatus);
+                OrderGoodsService::getInstance()
+                    ->createList($filterCartGoodsList, $order->id, $userId, $userLevel, $promoterStatus);
 
+                // 9.生成佣金记录
                 foreach ($filterCartGoodsList as $cartGoods) {
-                    // 9.生成佣金记录
                     // 普通商品的购买，一定会执行佣金生成逻辑（逻辑中包含上级判断）
                     // 礼包商品的购买，在特定情况下也会执行（有效身份代言人购买礼包商品）
                     if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
-                        CommissionService::getInstance()
-                            ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                        CommissionService::getInstance()->createGoodsCommission(
+                            $order->id,
+                            $order->order_sn,
+                            $cartGoods,
+                            $userId,
+                            $userLevel,
+                            $superiorId,
+                            $superiorLevel,
+                            $upperSuperiorId,
+                            $upperSuperiorLevel,
+                            $coupon
+                        );
                     }
-
-                    // 10.生成店铺收益
-                    ShopIncomeService::getInstance()->createIncome($shop->id, $order->id, $order->order_sn, $cartGoods, $coupon);
                 }
+
+                // 10.生成店铺收益
+                ShopIncomeService::getInstance()->createIncome(
+                    $shop->id,
+                    $order->id,
+                    $order->order_sn,
+                    $filterCartGoodsList,
+                    $coupon,
+                    $input->deliveryMode,
+                    $freightTemplateList,
+                    $address,
+                );
 
                 return $order->id;
             });
@@ -339,8 +371,18 @@ class OrderController extends Controller
                 foreach ($filterCartGoodsList as $cartGoods) {
                     // 9.生成佣金记录
                     if (!$cartGoods->is_gift || ($cartGoods->is_gift && $userLevel != 0 && $promoterStatus == 1)) {
-                        CommissionService::getInstance()
-                            ->createGoodsCommission($order->id, $order->order_sn, $cartGoods, $userId, $userLevel, $superiorId, $superiorLevel, $upperSuperiorId, $upperSuperiorLevel, $coupon);
+                        CommissionService::getInstance()->createGoodsCommission(
+                            $order->id,
+                            $order->order_sn,
+                            $cartGoods,
+                            $userId,
+                            $userLevel,
+                            $superiorId,
+                            $superiorLevel,
+                            $upperSuperiorId,
+                            $upperSuperiorLevel,
+                            $coupon
+                        );
                     }
                 }
 

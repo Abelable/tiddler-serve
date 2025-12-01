@@ -4,8 +4,7 @@ namespace App\Utils\Inputs;
 
 class GoodsInput extends BaseInput
 {
-    public $shopCategoryId;
-    public $categoryId;
+    public $categoryIds;
     public $cover;
     public $video;
     public $imageList;
@@ -33,8 +32,7 @@ class GoodsInput extends BaseInput
     public function rules()
     {
         return [
-            'shopCategoryId' => 'required|integer|digits_between:1,20',
-            'categoryId' => 'required|integer|digits_between:1,20',
+            'categoryIds' => 'required|array',
             'cover' => 'required|string',
             'video' => 'string',
             'imageList' => 'required|array',

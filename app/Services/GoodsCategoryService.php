@@ -16,8 +16,9 @@ class GoodsCategoryService extends BaseService
 
     public function updateGoodsCategory(GoodsCategory $category, GoodsCategoryInput $input)
     {
-        $category->shop_category_id = $input->shopCategoryId;
+        $category->logo = $input->logo ?? '';
         $category->name = $input->name;
+        $category->description = $input->description ?? '';
         $category->min_sales_commission_rate = $input->minSalesCommissionRate;
         $category->max_sales_commission_rate = $input->maxSalesCommissionRate;
         $category->min_promotion_commission_rate = $input->minPromotionCommissionRate;
@@ -28,14 +29,18 @@ class GoodsCategoryService extends BaseService
         $category->superior_promotion_commission_upper_limit = $input->superiorPromotionCommissionUpperLimit;
         $category->save();
 
+        $category->shopCategories()->sync($input->shopCategoryIds);
+
         return $category;
     }
 
     public function getCategoryList(GoodsCategoryPageInput $input, $columns = ['*'])
     {
-        $query = GoodsCategory::query();
+        $query = GoodsCategory::query()->with('shopCategories:id');
         if (!empty($input->shopCategoryId)) {
-            $query = $query->where('shop_category_id', $input->shopCategoryId);
+            $query->whereHas('shopCategories', function ($q) use ($input) {
+                $q->where('shop_categories.id', $input->shopCategoryId);
+            });
         }
         return $query->orderBy($input->sort, $input->order)->paginate($input->limit, $columns, 'page', $input->page);
     }
@@ -50,17 +55,14 @@ class GoodsCategoryService extends BaseService
         return GoodsCategory::query()->where('name', $name)->first($columns);
     }
 
-    public function getCategoryOptions($shopCategoryId = null, $columns = ['*'])
+    public function getCategoryOptions(array $shopCategoryIds = [], $columns = ['*'])
     {
         $query = GoodsCategory::query();
-        if (!is_null($shopCategoryId)) {
-            $query = $query->where('shop_category_id', $shopCategoryId);
+        if (count($shopCategoryIds) != 0) {
+            $query->whereHas('shopCategories', function ($q) use ($shopCategoryIds) {
+                $q->whereIn('shop_categories.id', $shopCategoryIds);
+            });
         }
         return $query->orderBy('id', 'asc')->get($columns);
-    }
-
-    public function getOptionsByShopCategoryIds(array $shopCategoryIds, $columns = ['*'])
-    {
-        return GoodsCategory::query()->whereIn('shop_category_id', $shopCategoryIds)->get($columns);
     }
 }

@@ -8,7 +8,6 @@ use App\Jobs\RenewPromoterJob;
 use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
-use App\Models\FreightTemplate;
 use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
@@ -280,7 +279,8 @@ class OrderService extends BaseService
                     $freightPrice = 0;
                 } else {
                     $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                    $freightPrice = $this->calcFreightPrice($freightTemplate, $address, $price, $cartGoods->number);
+                    $freightPrice = FreightTemplateService::getInstance()
+                        ->calcFreightPrice($freightTemplate, $address, $price, $cartGoods->number);
                 }
                 $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
             }
@@ -291,7 +291,8 @@ class OrderService extends BaseService
             }
 
             // 商品减库存加销量
-            $row = GoodsService::getInstance()->reduceStock($cartGoods->goods_id, $cartGoods->number, $cartGoods->selected_sku_index);
+            $row = GoodsService::getInstance()
+                ->reduceStock($cartGoods->goods_id, $cartGoods->number, $cartGoods->selected_sku_index);
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
@@ -348,28 +349,6 @@ class OrderService extends BaseService
         // dispatch(new OverTimeCancelOrderJob($userId, $order->id));
 
         return $order;
-    }
-
-    public function calcFreightPrice(FreightTemplate $freightTemplate, Address $address, $totalPrice, $goodsNumber)
-    {
-        if ($freightTemplate->free_quota != 0 && $totalPrice > $freightTemplate->free_quota) {
-            $freightPrice = 0;
-        } else {
-            $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
-            $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
-                return in_array($cityCode, explode(',', $area->pickedCityCodes));
-            });
-            if (is_null($area)) {
-                $freightPrice = 0;
-            } else {
-                if ($freightTemplate->compute_mode == 1) {
-                    $freightPrice = $area->fee;
-                } else {
-                    $freightPrice = bcmul($area->fee, $goodsNumber, 2);
-                }
-            }
-        }
-        return $freightPrice;
     }
 
     public function createWxPayOrder($userId, array $orderIds, $openid)

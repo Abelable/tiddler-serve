@@ -14,7 +14,7 @@ class ShopCategoryInput extends BaseInput
     {
         return [
             'name' => 'required|string',
-            'deposit' => 'required|integer',
+            'deposit' => 'required|numeric',
             'adaptedMerchantTypes' => 'required|array|min:1',
         ];
     }

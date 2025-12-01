@@ -16,10 +16,10 @@ class CreateShopCategoriesTable extends Migration
         Schema::create('shop_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('店铺分类名称');
-            $table->integer('deposit')->comment('店铺保证金');
-            $table->string('adapted_merchant_types')->comment('适配的商家类型：1-个人，2-企业');
-            $table->integer('sort')->default(1)->comment('排序');
-            $table->integer('visible')->default(1)->comment('状态: 0-隐藏,1-显示');
+            $table->unsignedDecimal('deposit', 10, 2)->default(0)->comment('店铺保证金');
+            $table->string('adapted_merchant_types')->default('')->comment('适配的商家类型：1-个人，2-企业');
+            $table->tinyInteger('sort')->default(1)->comment('排序');
+            $table->tinyInteger('visible')->default(1)->comment('状态: 0-隐藏,1-显示');
             $table->timestamps();
             $table->softDeletes();
         });
