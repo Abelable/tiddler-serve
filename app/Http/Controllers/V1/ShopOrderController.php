@@ -7,6 +7,8 @@ use App\Exports\OrdersExport;
 use App\Http\Controllers\Controller;
 use App\Imports\OrdersImport;
 use App\Models\Order;
+use App\Models\OrderGoods;
+use App\Models\OrderPackageGoods;
 use App\Services\ExpressService;
 use App\Services\GoodsService;
 use App\Services\OrderGoodsService;
@@ -252,19 +254,23 @@ class ShopOrderController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
         }
 
-        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id)->toArray();
-        $packageGoodsList = OrderPackageGoodsService::getInstance()->getListByOrderId($order->id)->toArray();
+        $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
+        $packageGoodsList = OrderPackageGoodsService::getInstance()->getListByOrderId($order->id);
 
         $packagedCountMap = [];
-        foreach ($packageGoodsList as $packageGoods) {
-            $goodsId = $packageGoods['goods_id'];
-            $packagedCountMap[$goodsId] = ($packagedCountMap[$goodsId] ?? 0) + $packageGoods['number'];
+        if (count($packageGoodsList) != 0) {
+            /** @var OrderPackageGoods $packageGoods */
+            foreach ($packageGoodsList as $packageGoods) {
+                $goodsId = $packageGoods->goods_id;
+                $packagedCountMap[$goodsId] = ($packagedCountMap[$goodsId] ?? 0) + $packageGoods->number;
+            }
         }
 
         $unshippedGoodsList = [];
+        /** @var OrderGoods $goods */
         foreach ($goodsList as $goods) {
-            $goodsId = $goods['goods_id'];
-            $totalNumber = $goods['number'];
+            $goodsId = $goods->goods_id;
+            $totalNumber = $goods->number;
             $packagedNumber = $packagedCountMap[$goodsId] ?? 0;
             $unshippedNumber = $totalNumber - $packagedNumber;
 
