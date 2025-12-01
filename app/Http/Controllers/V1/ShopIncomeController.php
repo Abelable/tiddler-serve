@@ -22,11 +22,11 @@ class ShopIncomeController extends Controller
         $totalIncome = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
         $todayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId);
-        $todaySalesVolume = (clone $todayOrderQuery)->sum('income_base');
+        $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
         $todayOrderCount = (clone $todayOrderQuery)->count();
 
         $yesterdayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId, 'yesterday');
-        $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('income_base');
+        $yesterdaySalesVolume = (clone $yesterdayOrderQuery)->sum('payment_amount');
         $yesterdayOrderCount = (clone $yesterdayOrderQuery)->count();
 
         $goodsIds = GoodsService::getInstance()->getShopGoodsList($shopId, [1])->pluck('id')->toArray();
