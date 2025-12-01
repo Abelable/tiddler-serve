@@ -22,8 +22,7 @@ class CreateCartGoodsTable extends Migration
             $table->integer('user_id')->comment('用户id');
             $table->integer('goods_id')->comment('商品id');
             $table->integer('shop_id')->comment('商品所属店铺id');
-            $table->integer('shop_category_id')->comment('商品店铺分类id');
-            $table->integer('freight_template_id')->comment('运费模板id');
+            $table->integer('freight_template_id')->default(0)->comment('运费模板id');
             $table->integer('is_gift')->default(0)->comment('是否为礼包商品：0-否，1-是');
             $table->integer('duration')->default(0)->comment('代言时长（天）');
             $table->integer('refund_status')->comment('是否支持7天无理由：0-不支持，1-支持');

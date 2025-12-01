@@ -64,7 +64,6 @@ class CartGoodsService extends BaseService
             $cartGoods->user_id = $userId;
             $cartGoods->goods_id = $goodsId;
             $cartGoods->shop_id = $goods->shop_id;
-            $cartGoods->shop_category_id = $goods->shop_category_id;
             $cartGoods->freight_template_id = $goods->freight_template_id;
             $cartGoods->refund_status = $goods->refund_status;
             $cartGoods->refund_address_id = $goods->refund_address_id;

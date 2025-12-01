@@ -12,7 +12,6 @@ namespace App\Models;
  * @property int $user_id 用户id
  * @property int $goods_id 商品id
  * @property int $shop_id 商品所属店铺id
- * @property int $shop_category_id 商品店铺分类id
  * @property int $freight_template_id 运费模板id
  * @property int $is_gift 是否为礼包商品：0-否，1-是
  * @property int $duration 代言时长（天）
@@ -59,7 +58,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereSelectedSkuIndex($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereSelectedSkuName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereShopCategoryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereStatusDesc($value)
