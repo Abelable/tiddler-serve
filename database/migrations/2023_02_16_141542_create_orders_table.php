@@ -15,8 +15,8 @@ class CreateOrdersTable extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('order_sn')->comment('订单编号');
-            $table->integer('status')->comment('订单状态');
+            $table->string('order_sn')->unique()->comment('订单编号');
+            $table->tinyInteger('status')->comment('订单状态');
             $table->integer('user_id')->comment('用户id');
             $table->integer('delivery_mode')->default(1)->comment('配送方式：1-快递，2-自提');
             $table->string('consignee')->default('')->comment('收件人姓名');
@@ -31,6 +31,7 @@ class CreateOrdersTable extends Migration
             $table->float('goods_price')->comment('商品总价格');
             $table->float('freight_price')->default(0)->comment('运费');
             $table->integer('coupon_id')->default(0)->comment('优惠券id');
+            $table->integer('coupon_shop_id')->default(0)->comment('优惠券店铺id');
             $table->float('coupon_denomination')->default(0)->comment('优惠券抵扣金额');
             $table->float('deduction_balance')->default(0)->comment('余额抵扣金额');
             $table->float('payment_amount')->comment('支付金额');

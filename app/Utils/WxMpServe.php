@@ -184,7 +184,7 @@ class WxMpServe
                 'shipping_list' => [[
                     'item_desc' => $productName,
                 ]],
-                'upload_time' => Carbon::now()->toIso8601String(),
+                'upload_time' => Carbon::now()->format('Y-m-d\TH:i:s.uP'),
                 'payer' => [
                     'openid' => $openid
                 ]

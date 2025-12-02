@@ -21,14 +21,15 @@ class CreateShopIncomesTable extends Migration
             $table->integer('order_id')->index()->comment('订单id');
             $table->string('order_sn')->index()->comment('订单编号');
             $table->integer('goods_id')->index()->comment('商品id');
-            $table->tinyInteger('refund_status')->default(0)->comment('商品7天无理由：0-不支持，1-支持');
             $table->unsignedDecimal('total_price', 10, 2)->default(0)->comment('总价');
+            $table->tinyInteger('refund_status')->default(0)->comment('商品7天无理由：0-不支持，1-支持');
             $table->integer('coupon_id')->default(0)->comment('优惠券id');
             $table->integer('coupon_shop_id')->default(0)->comment('优惠券店铺id');
             $table->unsignedDecimal('coupon_denomination', 10, 2)->default(0)->comment('优惠券抵扣金额');
+            $table->unsignedDecimal('freight_price', 10, 2)->default(0)->comment('运费');
+            $table->unsignedDecimal('sales_amount', 10, 2)->default(0)->comment('销售额');
             $table->unsignedDecimal('income_base', 10, 2)->default(0)->comment('收入计算基数');
             $table->decimal('sales_commission_rate', 5, 2)->default(0)->comment('销售佣金比例');
-            $table->unsignedDecimal('freight_price', 10, 2)->default(0)->comment('运费');
             $table->unsignedDecimal('income_amount', 10, 2)->default(0)->comment('收入金额');
             $table->timestamps();
             $table->softDeletes();
