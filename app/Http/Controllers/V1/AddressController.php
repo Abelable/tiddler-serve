@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Services\AddressService;
+use App\Utils\AddressAnalyzeServe;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\AddressInput;
 
@@ -36,7 +37,7 @@ class AddressController extends Controller
 
         $address = Address::new();
         $address->user_id = $this->userId();
-        $this->updateAddress($address, $input);
+        AddressService::getInstance()->updateAddress($address, $input);
 
         return $this->success();
     }
@@ -50,24 +51,9 @@ class AddressController extends Controller
         if (is_null($address)) {
             return $this->fail(CodeResponse::NOT_FOUND, '收货地址不存在');
         }
-        $this->updateAddress($address, $input);
+        AddressService::getInstance()->updateAddress($address, $input);
 
         return $this->success();
-    }
-
-    private function updateAddress(Address $address, AddressInput $input)
-    {
-        $address->name = $input->name;
-        $address->mobile = $input->mobile;
-        $address->region_desc = $input->regionDesc;
-        $address->region_code_list = $input->regionCodeList;
-        $address->address_detail = $input->addressDetail;
-        if ($input->isDefault == 1 && $address->is_default == 0) {
-            AddressService::getInstance()->resetDefaultAddress($this->userId());
-        }
-        $address->is_default = $input->isDefault;
-        $address->save();
-        return $address;
     }
 
     public function delete()
@@ -79,5 +65,12 @@ class AddressController extends Controller
         }
         $address->delete();
         return $this->success();
+    }
+
+    public function analyze()
+    {
+        $text = $this->verifyRequiredString('text');
+        $result = AddressAnalyzeServe::new()->analyze($text);
+        return $this->success($result);
     }
 }
