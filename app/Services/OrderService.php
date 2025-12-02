@@ -8,6 +8,8 @@ use App\Jobs\RenewPromoterJob;
 use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
+use App\Models\FreightTemplate;
+use App\Models\Goods;
 use App\Models\Order;
 use App\Models\OrderGoods;
 use App\Models\Shop;
@@ -1237,5 +1239,57 @@ class OrderService extends BaseService
     public function getShopOrderCountByStatusList($shopId, array $statusList)
     {
         return Order::query()->where('shop_id', $shopId)->whereIn('status', $statusList)->count();
+    }
+
+    public function modifyAddressInfo($userId, $orderId, $addressId)
+    {
+        $order = OrderService::getInstance()->getUserOrder($userId, $orderId);
+        if (!$order->canExportHandle()) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '非待发货订单，无法修改地址');
+        }
+
+        $address = AddressService::getInstance()->getUserAddressById($userId, $addressId);
+        if (is_null($address)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '地址不存在');
+        }
+
+        // 计算运费
+        $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderId($orderId);
+        $goodsIds = $orderGoodsList->pluck('goods_id')->toArray();
+        $goodsList = GoodsService::getInstance()->getListByIds($goodsIds);
+        $groupedGoodsList = $goodsList->keyBy('id');
+        $freightTemplateIds = $goodsList->pluck('freight_template_id')->toArray();
+        $freightTemplateList = FreightTemplateService::getInstance()
+            ->getListByIds($freightTemplateIds)
+            ->map(function (FreightTemplate $freightTemplate) {
+                $freightTemplate->area_list = json_decode($freightTemplate->area_list);
+                return $freightTemplate;
+            })->keyBy('id');
+        $totalFreightPrice = 0;
+        /** @var OrderGoods $goods */
+        foreach ($orderGoodsList as $orderGoods) {
+            $price = bcmul($orderGoods->price, $orderGoods->number, 2);
+            /** @var Goods $goods */
+            $goods = $groupedGoodsList->get($orderGoods->goods_id);
+            if ($goods->freight_template_id == 0) {
+                $freightPrice = 0;
+            } else {
+                $freightTemplate = $freightTemplateList->get($goods->freight_template_id);
+                $freightPrice = FreightTemplateService::getInstance()->calcFreightPrice($freightTemplate, $address, $price, $orderGoods->number);
+            }
+            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
+        }
+
+        if ($totalFreightPrice > $order->freight_price) {
+            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '当前地址需额外支付运费，请联系客服处理');
+        }
+
+        $order->consignee = $address->name;
+        $order->mobile = $address->mobile;
+        $order->address = $address->region_desc . ' ' . $address->address_detail;
+        if ($order->cas() == 0) {
+            $this->throwUpdateFail();
+        }
+        return $order;
     }
 }

@@ -268,6 +268,8 @@ Route::prefix('order')->group(function () {
     Route::post('refund', 'OrderController@refund');
     Route::post('cancel', 'OrderController@cancel');
     Route::post('delete', 'OrderController@delete');
+    Route::get('waybill_token', 'OrderController@waybillToken');
+    Route::post('modify_address_info', 'OrderController@modifyOrderAddressInfo');
 
     Route::prefix('keyword')->group(function () {
         Route::get('list', 'OrderKeywordController@list');

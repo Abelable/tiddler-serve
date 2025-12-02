@@ -20,6 +20,11 @@ class AddressService extends BaseService
         return Address::query()->where('user_id', $userId)->where('id', $id)->first($columns);
     }
 
+    public function getUserAddressById($userId, $id, $columns=['*'])
+    {
+        return Address::query()->where('user_id', $userId)->where('id', $id)->first($columns);
+    }
+
     public function updateAddress(Address $address, AddressInput $input)
     {
         if ($input->isDefault == 1 && $address->is_default == 0) {

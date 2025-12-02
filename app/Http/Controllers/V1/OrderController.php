@@ -8,6 +8,7 @@ use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\FreightTemplate;
 use App\Models\Order;
+use App\Models\OrderPackageGoods;
 use App\Models\Shop;
 use App\Services\AccountService;
 use App\Services\AddressService;
@@ -31,6 +32,7 @@ use App\Utils\CodeResponse;
 use App\Utils\Enums\OrderStatus;
 use App\Utils\Inputs\CreateOrderInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yansongda\LaravelPay\Facades\Pay;
@@ -624,5 +626,39 @@ class OrderController extends Controller
         $id = $this->verifyRequiredId('id');
         OrderService::getInstance()->userRefund($this->userId(), $id);
         return $this->success();
+    }
+
+    public function waybillToken()
+    {
+        $id = $this->verifyRequiredId('id');
+        $package = OrderPackageService::getInstance()->getPackageById($id);
+
+        $order = OrderService::getInstance()->getOrder($package->order_id);
+        if (is_null($order)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '订单不存在');
+        }
+        $goodsList = $package->goodsList->map(function (OrderPackageGoods $goods) {
+            return (object) [
+                'id' => $goods->goods_id,
+                'cover' => $goods->cover,
+                'name' => $goods->name,
+            ];
+        });
+        $token = WxMpServe::new()->getWaybillToken($this->user()->openid, $package->ship_code, $package->ship_sn, $goodsList, $order);
+
+        return $this->success($token);
+    }
+
+    public function modifyOrderAddressInfo()
+    {
+        $orderId = $this->verifyRequiredInteger('orderId');
+        $addressId = $this->verifyRequiredInteger('addressId');
+        $order = OrderService::getInstance()->modifyAddressInfo($this->userId(), $orderId, $addressId);
+
+        return $this->success([
+            'consignee' => $order->consignee,
+            'mobile' => $order->mobile,
+            'address' => $order->address,
+        ]);
     }
 }
