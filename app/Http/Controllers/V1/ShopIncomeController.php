@@ -74,7 +74,7 @@ class ShopIncomeController extends Controller
         $query = ShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
-        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('income_base');
+        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('sales_volume');
         $pendingAmount = (clone $query)->where('status', 1)->sum('income_amount');
         $settledAmount = (clone $query)->whereIn('status', [2, 3, 4])->sum('income_amount');
 
