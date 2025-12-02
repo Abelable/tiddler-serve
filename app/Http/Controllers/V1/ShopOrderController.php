@@ -275,8 +275,13 @@ class ShopOrderController extends Controller
             $unshippedNumber = $totalNumber - $packagedNumber;
 
             if ($unshippedNumber > 0) {
-                $goods['number'] = $unshippedNumber;
-                $unshippedGoodsList[] = $goods;
+                $unshippedGoodsList[] = [
+                    'goodsId' => $goods->goods_id,
+                    'cover' => $goods->cover,
+                    'name' => $goods->name,
+                    'selectedSkuName' => $goods->selected_sku_name,
+                    'number' => $unshippedNumber,
+                ];
             }
         }
 
