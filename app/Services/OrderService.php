@@ -340,6 +340,7 @@ class OrderService extends BaseService
         $order->goods_price = $totalPrice;
         if (!is_null($coupon)) {
             $order->coupon_id = $coupon->id;
+            $order->coupon_shop_id = $coupon->shop_id;
             $order->coupon_denomination = $couponDenomination;
         }
         $order->deduction_balance = $deductionBalance;
