@@ -7,11 +7,11 @@ use GuzzleHttp\Exception\RequestException;
 
 trait HttpClient
 {
-    public function httpGet($url, $needDecode = true)
+    public function httpGet($url, $needDecode = true, $headers = null)
     {
         $client = new Client();
-        $response = $client->request('GET', $url);
-        return $needDecode ? json_decode((string)$response->getBody(), true) : $response->getBody();
+        $response = !is_null($headers) ?  $client->request('GET', $url, ['headers' => $headers]) : $client->request('GET', $url);
+        return $needDecode ? json_decode((string) $response->getBody(), true) : $response->getBody();
     }
 
     public function httpPost($url, $data, $dataType = 1, $needDecode = true)
