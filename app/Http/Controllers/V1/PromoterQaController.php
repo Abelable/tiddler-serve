@@ -69,7 +69,7 @@ class PromoterQaController extends Controller
         }
 
         $qa->answer = $content;
-        $qa->answer_time = now()->toDateTimeString();
+        $qa->answer_time = now();
         $qa->save();
 
         return $this->success();

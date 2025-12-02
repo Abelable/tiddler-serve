@@ -254,7 +254,7 @@ class MealTicketOrderService extends BaseService
         }
 
         $order->pay_id = $payId;
-        $order->pay_time = now()->toDateTimeString();
+        $order->pay_time = now();
         $order->status = MealTicketOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -290,7 +290,7 @@ class MealTicketOrderService extends BaseService
         }
 
         $order->status = MealTicketOrderStatus::MERCHANT_APPROVED;
-        $order->approve_time = now()->toDateTimeString();
+        $order->approve_time = now();
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -394,7 +394,7 @@ class MealTicketOrderService extends BaseService
                     $order->status = MealTicketOrderStatus::CONFIRMED;
                     break;
             }
-            $order->confirm_time = now()->toDateTimeString();
+            $order->confirm_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -504,7 +504,7 @@ class MealTicketOrderService extends BaseService
                 }
 
                 $order->status = MealTicketOrderStatus::REFUNDED;
-                $order->refund_time = now()->toDateTimeString();
+                $order->refund_time = now();
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }

@@ -64,7 +64,7 @@ class MealTicketVerifyService extends BaseService
         $log->order_id = $verifyCodeInfo->order_id;
         $log->restaurant_id = $verifyCodeInfo->restaurant_id;
         $log->verifier_id = $userId;
-        $log->verify_time = now()->toDateTimeString();
+        $log->verify_time = now();
         $log->save();
     }
 }

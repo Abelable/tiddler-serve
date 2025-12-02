@@ -39,7 +39,7 @@ class ShopDepositPaymentLogService extends BaseService
 
         $log->status = 1;
         $log->pay_id = $payId;
-        $log->pay_time = now()->toDateTimeString();
+        $log->pay_time = now();
         $log->save();
 
         // 同步微信后台非物流订单

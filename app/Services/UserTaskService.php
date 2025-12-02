@@ -45,7 +45,7 @@ class UserTaskService extends BaseService
         $userTask->task_reward = $task->reward_total;
         $userTask->merchant_type = $task->merchant_type;
         $userTask->product_id = $task->product_id;
-        $userTask->pick_time = now()->toDateTimeString();
+        $userTask->pick_time = now();
         $userTask->save();
         return $userTask;
     }

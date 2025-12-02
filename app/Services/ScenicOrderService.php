@@ -245,7 +245,7 @@ class ScenicOrderService extends BaseService
         }
 
         $order->pay_id = $payId;
-        $order->pay_time = now()->toDateTimeString();
+        $order->pay_time = now();
         $order->status = ScenicOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -282,7 +282,7 @@ class ScenicOrderService extends BaseService
         }
 
         $order->status = ScenicOrderStatus::MERCHANT_APPROVED;
-        $order->approve_time = now()->toDateTimeString();
+        $order->approve_time = now();
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -385,7 +385,7 @@ class ScenicOrderService extends BaseService
                     $order->status = ScenicOrderStatus::CONFIRMED;
                     break;
             }
-            $order->confirm_time = now()->toDateTimeString();
+            $order->confirm_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -493,7 +493,7 @@ class ScenicOrderService extends BaseService
                 }
 
                 $order->status = ScenicOrderStatus::REFUNDED;
-                $order->refund_time = now()->toDateTimeString();
+                $order->refund_time = now();
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }

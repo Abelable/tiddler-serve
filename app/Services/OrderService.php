@@ -404,7 +404,7 @@ class OrderService extends BaseService
             if (!is_null($actualPaymentAmount)) {
                 $order->total_payment_amount = $actualPaymentAmount;
             }
-            $order->pay_time = now()->toDateTimeString();
+            $order->pay_time = now();
             if ($order->delivery_mode == 1) {
                 $order->status = OrderStatus::PAID;
 
@@ -515,7 +515,7 @@ class OrderService extends BaseService
                     $order->status = OrderStatus::CANCELED;
                     break;
             }
-            $order->finish_time = now()->toDateTimeString();
+            $order->finish_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -620,7 +620,7 @@ class OrderService extends BaseService
 
         DB::transaction(function () use ($order, $shipChannel, $shipCode, $shipSn) {
             $order->status = OrderStatus::SHIPPED;
-            $order->ship_time = now()->toDateTimeString();
+            $order->ship_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -662,7 +662,7 @@ class OrderService extends BaseService
         DB::transaction(function () use ($order, $packageList, $isAllDelivered) {
             if ($isAllDelivered) {
                 $order->status = OrderStatus::SHIPPED;
-                $order->ship_time = now()->toDateTimeString();
+                $order->ship_time = now();
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -759,7 +759,7 @@ class OrderService extends BaseService
                     $order->status = OrderStatus::CONFIRMED;
                     break;
             }
-            $order->confirm_time = now()->toDateTimeString();
+            $order->confirm_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -876,7 +876,7 @@ class OrderService extends BaseService
                 }
 
                 $order->status = OrderStatus::REFUNDED;
-                $order->refund_time = now()->toDateTimeString();
+                $order->refund_time = now();
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }
@@ -986,7 +986,7 @@ class OrderService extends BaseService
 
             $order->status = OrderStatus::REFUNDED;
             $order->refund_id = $result['refund_id'];
-            $order->refund_time = now()->toDateTimeString();
+            $order->refund_time = now();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
