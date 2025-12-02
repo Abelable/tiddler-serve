@@ -60,10 +60,8 @@ class ShopIncomeService extends BaseService
                     ->calcFreightPrice($freightTemplate, $address, $totalPrice, $cartGoods->number);
             }
 
-            // 销售额：商品总价 - 店铺优惠券金额 + 运费
-            $salesAmount = ($couponInfo['shop_id'] == 0)
-                ? bcadd($totalPrice, $freightPrice, 2)
-                : max(0, bcadd(bcsub($totalPrice, $couponInfo['denomination'], 2), $freightPrice, 2));
+            // 销售额：商品总价 - 优惠券金额 + 运费
+            $salesAmount = max(0, bcadd(bcsub($totalPrice, $couponInfo['denomination'], 2), $freightPrice, 2));
 
             // 商家最终收入: 基数 - 平台佣金 + 运费
             $incomeAmount = max(0, bcadd(bcsub($incomeBase, $salesCommission, 2), $freightPrice, 2));
