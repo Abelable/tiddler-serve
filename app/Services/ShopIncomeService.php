@@ -19,10 +19,10 @@ class ShopIncomeService extends BaseService
         $orderId,
         $orderSn,
         $cartGoodsList,
-        Coupon $coupon,
         $deliveryMode,
         $freightTemplateList = null,
-        Address $address = null
+        Address $address = null,
+        Coupon $coupon = null
     )
     {
         /** @var CartGoods $cartGoods */

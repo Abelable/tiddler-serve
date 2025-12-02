@@ -18,7 +18,7 @@ class CreateOrdersTable extends Migration
 
             // 基础信息
             $table->string('order_sn', 64)->unique()->comment('订单编号');
-            $table->tinyInteger('status')->index()->comment('订单状态');
+            $table->unsignedSmallInteger('status')->index()->comment('订单状态');
 
             // 用户相关
             $table->unsignedBigInteger('user_id')->index()->comment('用户ID');

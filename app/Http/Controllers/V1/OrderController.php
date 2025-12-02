@@ -348,10 +348,10 @@ class OrderController extends Controller
                     $order->id,
                     $order->order_sn,
                     $filterCartGoodsList,
-                    $coupon,
                     $input->deliveryMode,
                     $freightTemplateList,
                     $address,
+                    $coupon,
                 );
 
                 return $order->id;
