@@ -176,6 +176,7 @@ class ShopOrderController extends Controller
             'pickup_mobile',
             'goods_price',
             'freight_price',
+            'coupon_shop_id',
             'coupon_denomination',
             'deduction_balance',
             'payment_amount',
