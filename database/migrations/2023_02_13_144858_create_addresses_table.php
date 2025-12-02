@@ -15,13 +15,16 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('is_default')->default(0)->comment('是否为默认地址');
-            $table->string('name')->comment('联系人姓名');
-            $table->string('mobile')->comment('手机号');
-            $table->string('region_desc')->comment('省市区描述');
-            $table->string('region_code_list')->comment('省市区编码');
-            $table->string('address_detail')->comment('地址详情');
+            $table->unsignedBigInteger('user_id')->index()->comment('用户ID');
+            $table->tinyInteger('is_default')
+                ->default(0)
+                ->index()
+                ->comment('是否为默认地址：0-否 1-是');
+            $table->string('name', 50)->comment('联系人姓名');
+            $table->string('mobile', 20)->comment('手机号');
+            $table->string('region_desc', 255)->comment('省市区描述');
+            $table->json('region_code_list')->comment('省市区编码数组');
+            $table->string('address_detail', 255)->comment('详细地址');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -6,13 +6,13 @@ namespace App\Models;
  * App\Models\Address
  *
  * @property int $id
- * @property int $user_id 用户id
- * @property int $is_default 是否为默认地址
+ * @property int $user_id 用户ID
+ * @property int $is_default 是否为默认地址：0-否 1-是
  * @property string $name 联系人姓名
  * @property string $mobile 手机号
  * @property string $region_desc 省市区描述
- * @property string $region_code_list 省市区编码
- * @property string $address_detail 地址详情
+ * @property mixed $region_code_list 省市区编码数组
+ * @property string $address_detail 详细地址
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
