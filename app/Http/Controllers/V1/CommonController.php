@@ -136,7 +136,7 @@ class CommonController extends Controller
                         $userTask->status = 2;
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
-                        $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
+                        $userTask->finish_time = now()->toDateTimeString();
                         $userTask->save();
 
                         $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -176,7 +176,7 @@ class CommonController extends Controller
                     $userTask->status = 2;
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
-                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
+                    $userTask->finish_time = now()->toDateTimeString();
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -216,7 +216,7 @@ class CommonController extends Controller
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::MEAL_TICKET;
-                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
+                    $userTask->finish_time = now()->toDateTimeString();
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -239,7 +239,7 @@ class CommonController extends Controller
                     $userTask->step = 4;
                     $userTask->order_id = $order->id;
                     $userTask->product_type = ProductType::SET_MEAL;
-                    $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
+                    $userTask->finish_time = now()->toDateTimeString();
                     $userTask->save();
 
                     $task = TaskService::getInstance()->getTaskById($userTask->task_id);
@@ -280,7 +280,7 @@ class CommonController extends Controller
                         $userTask->status = 2;
                         $userTask->step = 4;
                         $userTask->order_id = $order->id;
-                        $userTask->finish_time = now()->format('Y-m-d\TH:i:s');
+                        $userTask->finish_time = now()->toDateTimeString();
                         $userTask->save();
 
                         $task = TaskService::getInstance()->getTaskById($userTask->task_id);

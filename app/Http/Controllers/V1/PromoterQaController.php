@@ -69,7 +69,7 @@ class PromoterQaController extends Controller
         }
 
         $qa->answer = $content;
-        $qa->answer_time = now()->format('Y-m-d\TH:i:s');
+        $qa->answer_time = now()->toDateTimeString();
         $qa->save();
 
         return $this->success();

@@ -287,7 +287,7 @@ class HotelOrderService extends BaseService
         }
 
         $order->pay_id = $payId;
-        $order->pay_time = now()->format('Y-m-d\TH:i:s');
+        $order->pay_time = now()->toDateTimeString();
         $order->status = HotelOrderStatus::PAID;
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
@@ -316,7 +316,7 @@ class HotelOrderService extends BaseService
         }
 
         $order->status = HotelOrderStatus::MERCHANT_APPROVED;
-        $order->approve_time = now()->format('Y-m-d\TH:i:s');
+        $order->approve_time = now()->toDateTimeString();
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
@@ -423,7 +423,7 @@ class HotelOrderService extends BaseService
                     $order->status = HotelOrderStatus::CONFIRMED;
                     break;
             }
-            $order->confirm_time = now()->format('Y-m-d\TH:i:s');
+            $order->confirm_time = now()->toDateTimeString();
             if ($order->cas() == 0) {
                 $this->throwUpdateFail();
             }
@@ -532,7 +532,7 @@ class HotelOrderService extends BaseService
                 }
 
                 $order->status = HotelOrderStatus::REFUNDED;
-                $order->refund_time = now()->format('Y-m-d\TH:i:s');
+                $order->refund_time = now()->toDateTimeString();
                 if ($order->cas() == 0) {
                     $this->throwUpdateFail();
                 }

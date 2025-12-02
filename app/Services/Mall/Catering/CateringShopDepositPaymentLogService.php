@@ -41,7 +41,7 @@ class CateringShopDepositPaymentLogService extends BaseService
 
         $log->status = 1;
         $log->pay_id = $payId;
-        $log->pay_time = now()->format('Y-m-d\TH:i:s');
+        $log->pay_time = now()->toDateTimeString();
         $log->save();
 
         // 同步微信后台非物流订单

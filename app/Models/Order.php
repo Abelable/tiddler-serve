@@ -10,34 +10,35 @@ use App\Utils\Traits\OrderStatusTrait;
  * @property int $id
  * @property string $order_sn 订单编号
  * @property int $status 订单状态
- * @property int $user_id 用户id
+ * @property int $user_id 用户ID
  * @property int $delivery_mode 配送方式：1-快递，2-自提
  * @property string $consignee 收件人姓名
  * @property string $mobile 收件人手机号
  * @property string $address 具体收货地址
  * @property int $pickup_address_id 提货地址id
- * @property string $pickup_time 提货时间
+ * @property string|null $pickup_time 提货时间
  * @property string $pickup_mobile 提货预留手机号
  * @property int $shop_id 店铺id
  * @property string $shop_logo 店铺logo
  * @property string $shop_name 店铺名称
- * @property float $goods_price 商品总价格
- * @property float $freight_price 运费
- * @property int $coupon_id 优惠券id
- * @property float $coupon_denomination 优惠券抵扣金额
- * @property float $deduction_balance 余额抵扣金额
- * @property float $payment_amount 支付金额
- * @property float $total_payment_amount 总支付金额，拆单场景
- * @property string $pay_id 支付id
- * @property string $pay_time 支付时间
- * @property string $ship_time 发货时间
- * @property string $confirm_time 用户确认收货时间
- * @property string $finish_time 订单关闭时间
- * @property float $refund_amount 退款金额
- * @property string $refund_id 微信退款id
- * @property string $refund_type 退款方式
+ * @property string $goods_price 商品总价格
+ * @property string $freight_price 运费
+ * @property int $coupon_id 优惠券ID
+ * @property int $coupon_shop_id 优惠券店铺ID
+ * @property string $coupon_denomination 优惠券抵扣金额
+ * @property string $deduction_balance 余额抵扣金额
+ * @property string $payment_amount 实际支付金额
+ * @property string $total_payment_amount 订单总支付金额(拆单场景)
+ * @property string $pay_id 支付ID
+ * @property string|null $pay_time 支付时间
+ * @property string|null $ship_time 发货时间
+ * @property string|null $confirm_time 用户确认收货时间
+ * @property string|null $finish_time 订单关闭/完成时间
+ * @property string $refund_amount 退款金额
+ * @property string $refund_id 微信退款ID
+ * @property int $refund_type 退款方式：0-无，1-部分，2-全部
  * @property string $refund_remarks 退款备注
- * @property string $refund_time 退款时间
+ * @property string|null $refund_time 退款时间
  * @property string $remarks 订单备注
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -56,6 +57,7 @@ use App\Utils\Traits\OrderStatusTrait;
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereConsignee($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCouponDenomination($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCouponId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Order whereCouponShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeductionBalance($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Order whereDeletedAt($value)

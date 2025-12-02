@@ -37,7 +37,7 @@ class TaskController extends Controller
         DB::transaction(function () use ($userTask, $task) {
             if (!is_null($userTask)) {
                 $userTask->status = 1;
-                $userTask->pick_time = now()->format('Y-m-d\TH:i:s');
+                $userTask->pick_time = now()->toDateTimeString();
                 $userTask->save();
             } else {
                 UserTaskService::getInstance()->createUserTask($this->userId(), $task);

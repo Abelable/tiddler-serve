@@ -58,9 +58,9 @@ class ScenicOrderVerifyService extends BaseService
         $log->order_id = $verifyCodeInfo->order_id;
         $log->scenic_id = $verifyCodeInfo->scenic_id;
         $log->verifier_id = $userId;
-        $log->verify_time = now()->format('Y-m-d\TH:i:s');
+        $log->verify_time = now()->toDateTimeString();
         $log->save();
-        
+
         return $log;
     }
 }
