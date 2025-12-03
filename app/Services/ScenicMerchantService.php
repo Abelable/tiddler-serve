@@ -68,7 +68,7 @@ class ScenicMerchantService extends BaseService
         return ScenicMerchant::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function settled(int $merchantId)
     {
         $merchant = $this->getMerchantById($merchantId);
         if (is_null($merchant)) {

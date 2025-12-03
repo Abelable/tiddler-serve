@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\Mall\Catering\CateringMerchantService;
-use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
 use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\SystemTodoService;
@@ -44,8 +43,6 @@ class CateringMerchantController extends Controller
             DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = CateringMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = CateringShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
-                CateringShopDepositPaymentLogService::getInstance()
-                    ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 CateringShopDepositService::getInstance()->createShopDeposit($shop->id);
 
                 // 邀请商家入驻活动
@@ -69,8 +66,7 @@ class CateringMerchantController extends Controller
     public function status()
     {
         $merchant = CateringMerchantService::getInstance()->getMerchantByUserId($this->userId());
-        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = CateringShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = CateringShopService::getInstance()->getFirstShop($merchant->id);
 
         return $this->success($merchant ? [
             'id' => $merchant->id,
@@ -85,7 +81,7 @@ class CateringMerchantController extends Controller
     {
         $merchant = CateringMerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
-            $shop = CateringShopService::getInstance()->getShopByUserId($this->userId());
+            $shop = CateringShopService::getInstance()->getFirstShop($merchant->id);
             $merchant['shopType'] = $shop->type;
             $merchant['deposit'] = $shop->deposit;
             $merchant['shopBg'] = $shop->bg;

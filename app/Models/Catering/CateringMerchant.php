@@ -66,10 +66,4 @@ use App\Models\BaseModel;
  */
 class CateringMerchant extends BaseModel
 {
-    public function depositInfo()
-    {
-        return $this
-            ->hasOne(CateringShopDepositPaymentLog::class, 'merchant_id')
-            ->where('status', 1);
-    }
 }

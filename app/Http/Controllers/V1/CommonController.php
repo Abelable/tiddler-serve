@@ -6,22 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\ComplaintOptionService;
 use App\Services\EvaluationTagService;
-use App\Services\HotelMerchantService;
 use App\Services\HotelOrderService;
-use App\Services\HotelShopDepositPaymentLogService;
-use App\Services\HotelShopDepositService;
 use App\Services\HotelShopService;
-use App\Services\Mall\Catering\CateringMerchantService;
-use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
-use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketOrderService;
 use App\Services\OrderService;
-use App\Services\ScenicMerchantService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
-use App\Services\ScenicShopDepositPaymentLogService;
-use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketService;
 use App\Services\SetMealOrderService;
@@ -104,17 +95,7 @@ class CommonController extends Controller
         if (strpos($data['attach'], 'scenic_shop_id') !== false) {
             Log::info('scenic_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $log = ScenicShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                ScenicMerchantService::getInstance()->paySuccess($log->merchant_id);
-                ScenicShopService::getInstance()->paySuccess($log->shop_id);
-                ScenicShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()->getByMerchantId(1, $log->merchant_id, 1);
-                if (!is_null($userTask)) {
-                    $userTask->step = 2;
-                    $userTask->save();
-                }
+                ScenicShopService::getInstance()->wxPaySuccess($data);
             });
         }
 
@@ -147,17 +128,7 @@ class CommonController extends Controller
         if (strpos($data['attach'], 'hotel_shop_id') !== false) {
             Log::info('hotel_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $log = HotelShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                HotelMerchantService::getInstance()->paySuccess($log->merchant_id);
-                HotelShopService::getInstance()->paySuccess($log->shop_id);
-                HotelShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()->getByMerchantId(2, $log->merchant_id, 1);
-                if (!is_null($userTask)) {
-                    $userTask->step = 2;
-                    $userTask->save();
-                }
+                HotelShopService::getInstance()->wxPaySuccess($data);
             });
         }
 
@@ -186,17 +157,7 @@ class CommonController extends Controller
         if (strpos($data['attach'], 'catering_shop_id') !== false) {
             Log::info('catering_shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $log = CateringShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                CateringMerchantService::getInstance()->paySuccess($log->merchant_id);
-                CateringShopService::getInstance()->paySuccess($log->shop_id);
-                CateringShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()->getByMerchantId(3, $log->merchant_id, 1);
-                if (!is_null($userTask)) {
-                    $userTask->step = 2;
-                    $userTask->save();
-                }
+                CateringShopService::getInstance()->wxPaySuccess($data);
             });
         }
 

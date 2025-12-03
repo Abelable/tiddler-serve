@@ -20,15 +20,8 @@ class ScenicMerchantController extends Controller
     {
         /** @var MerchantPageInput $input */
         $input = MerchantPageInput::new();
-
         $page = ScenicMerchantService::getInstance()->getMerchantList($input);
-
-        $list = collect($page->items())->map(function (ScenicMerchant $merchant) {
-            $merchant['depositInfo'] = $merchant->depositInfo;
-            return $merchant;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        return $this->successPaginate($page);
     }
 
     public function detail()

@@ -19,9 +19,9 @@ class ScenicShopDepositChangeLogService extends BaseService
     {
         $log = ScenicShopDepositChangeLog::new();
         $log->shop_id = $shopId;
+        $log->change_type = $changeType;
         $log->old_balance = $oldBalance;
         $log->new_balance = $newBalance;
-        $log->change_type = $changeType;
         $log->change_amount = $changeAmount;
         $log->reference_id = $referenceId;
         $log->save();

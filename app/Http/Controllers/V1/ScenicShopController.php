@@ -28,8 +28,9 @@ class ScenicShopController extends Controller
     {
         /** @var ShopInput $input */
         $input = ShopInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = ScenicShopService::getInstance()->getUserShopByShopId($this->userId(), $shopId);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '您非商家，暂无店铺');
         }

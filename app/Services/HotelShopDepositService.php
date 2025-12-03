@@ -6,15 +6,6 @@ use App\Models\HotelShopDeposit;
 
 class HotelShopDepositService extends BaseService
 {
-    public function getShopDeposit($shopId)
-    {
-        $deposit = HotelShopDeposit::query()->where('shop_id', $shopId)->first();
-        if (is_null($deposit)) {
-            $deposit = $this->createShopDeposit($shopId);
-        }
-        return $deposit;
-    }
-
     public function createShopDeposit($shopId)
     {
         $deposit = HotelShopDeposit::new();
@@ -33,5 +24,10 @@ class HotelShopDepositService extends BaseService
 
         HotelShopDepositChangeLogService::getInstance()
             ->createLog($shopId, $oldBalance, $newBalance, $type, $amount, $referenceId);
+    }
+
+    public function getShopDeposit($shopId)
+    {
+        return HotelShopDeposit::query()->where('shop_id', $shopId)->first();
     }
 }

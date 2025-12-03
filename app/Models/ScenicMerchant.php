@@ -60,10 +60,4 @@ namespace App\Models;
  */
 class ScenicMerchant extends BaseModel
 {
-    public function depositInfo()
-    {
-        return $this
-            ->hasOne(ScenicShopDepositPaymentLog::class, 'merchant_id')
-            ->where('status', 1);
-    }
 }

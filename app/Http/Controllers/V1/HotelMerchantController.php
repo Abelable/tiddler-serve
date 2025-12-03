@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\HotelMerchantService;
-use App\Services\HotelShopDepositPaymentLogService;
 use App\Services\HotelShopDepositService;
 use App\Services\HotelShopService;
 use App\Services\SystemTodoService;
@@ -43,8 +42,6 @@ class HotelMerchantController extends Controller
             DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = HotelMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = HotelShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
-                HotelShopDepositPaymentLogService::getInstance()
-                    ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 HotelShopDepositService::getInstance()->createShopDeposit($shop->id);
 
                 // 邀请商家入驻活动
@@ -68,8 +65,7 @@ class HotelMerchantController extends Controller
     public function status()
     {
         $merchant = HotelMerchantService::getInstance()->getMerchantByUserId($this->userId());
-        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = HotelShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = HotelShopService::getInstance()->getFirstShop($merchant);
 
         return $this->success($merchant ? [
             'id' => $merchant->id,
@@ -84,7 +80,7 @@ class HotelMerchantController extends Controller
     {
         $merchant = HotelMerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
-            $shop = HotelShopService::getInstance()->getShopByUserId($this->userId());
+            $shop = HotelShopService::getInstance()->getFirstShop($merchant->id);
             $merchant['shopType'] = $shop->type;
             $merchant['deposit'] = $shop->deposit;
             $merchant['shopBg'] = $shop->bg;

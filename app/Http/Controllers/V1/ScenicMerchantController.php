@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Services\ScenicMerchantService;
-use App\Services\ScenicShopDepositPaymentLogService;
 use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
 use App\Services\SystemTodoService;
@@ -43,8 +42,6 @@ class ScenicMerchantController extends Controller
             DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = ScenicMerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = ScenicShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
-                ScenicShopDepositPaymentLogService::getInstance()
-                    ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 ScenicShopDepositService::getInstance()->createShopDeposit($shop->id);
 
                 // 邀请商家入驻活动
@@ -68,8 +65,7 @@ class ScenicMerchantController extends Controller
     public function status()
     {
         $merchant = ScenicMerchantService::getInstance()->getMerchantByUserId($this->userId());
-        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = ScenicShopService::getInstance()->getFirstShop($merchant->id);
 
         return $this->success($merchant ? [
             'id' => $merchant->id,
@@ -84,7 +80,7 @@ class ScenicMerchantController extends Controller
     {
         $merchant = ScenicMerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
-            $shop = ScenicShopService::getInstance()->getShopByUserId($this->userId());
+            $shop = ScenicShopService::getInstance()->getFirstShop($merchant->id);
             $merchant['shopType'] = $shop->type;
             $merchant['deposit'] = $shop->deposit;
             $merchant['shopBg'] = $shop->bg;

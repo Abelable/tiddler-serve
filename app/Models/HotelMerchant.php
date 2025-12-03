@@ -60,10 +60,4 @@ namespace App\Models;
  */
 class HotelMerchant extends BaseModel
 {
-    public function depositInfo()
-    {
-        return $this
-            ->hasOne(HotelShopDepositPaymentLog::class, 'merchant_id')
-            ->where('status', 1);
-    }
 }

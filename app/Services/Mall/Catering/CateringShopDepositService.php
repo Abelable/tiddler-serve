@@ -7,15 +7,6 @@ use App\Services\BaseService;
 
 class CateringShopDepositService extends BaseService
 {
-    public function getShopDeposit($shopId)
-    {
-        $deposit = CateringShopDeposit::query()->where('shop_id', $shopId)->first();
-        if (is_null($deposit)) {
-            $deposit = $this->createShopDeposit($shopId);
-        }
-        return $deposit;
-    }
-
     public function createShopDeposit($shopId)
     {
         $deposit = CateringShopDeposit::new();
@@ -34,5 +25,10 @@ class CateringShopDepositService extends BaseService
 
         CateringShopDepositChangeLogService::getInstance()
             ->createLog($shopId, $oldBalance, $newBalance, $type, $amount, $referenceId);
+    }
+
+    public function getShopDeposit($shopId)
+    {
+        return CateringShopDeposit::query()->where('shop_id', $shopId)->first();
     }
 }

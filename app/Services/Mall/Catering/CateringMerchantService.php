@@ -4,6 +4,7 @@ namespace App\Services\Mall\Catering;
 
 use App\Models\Catering\CateringMerchant;
 use App\Services\BaseService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringMerchantInput;
 use App\Utils\Inputs\MerchantPageInput;
 
@@ -74,11 +75,14 @@ class CateringMerchantService extends BaseService
         return CateringMerchant::query()->whereIn('id', $ids)->get($columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function settled(int $merchantId)
     {
         $merchant = $this->getMerchantById($merchantId);
         if (is_null($merchant)) {
             $this->throwBadArgumentValue();
+        }
+        if ($merchant->status != 1) {
+            $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
         }
         $merchant->status = 2;
         $merchant->save();

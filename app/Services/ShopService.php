@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Shop;
 use App\Utils\CodeResponse;
+use App\Utils\Enums\MerchantType;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\MerchantInput;
 use App\Utils\Inputs\ShopInput;
@@ -72,7 +73,7 @@ class ShopService extends BaseService
 
     public function getUserShopByShopId($userId, $shopId, $columns = ['*'])
     {
-        return Shop::query()->where('user_id', $userId)->find($shopId, $columns);
+        return Shop::query()->where('user_id', $userId)->where('shop_id', $shopId)->first($columns);
     }
 
     public function getFirstShop(int $merchantId, $columns = ['*'])
@@ -129,7 +130,8 @@ class ShopService extends BaseService
             MerchantService::getInstance()->settled($shop->merchant_id);
 
             // 邀请商家入驻活动
-            $userTask = UserTaskService::getInstance()->getByMerchantId(4, $shop->merchant_id, 1);
+            $userTask = UserTaskService::getInstance()
+                ->getByMerchantId(MerchantType::GOODS, $shop->merchant_id, 1);
             if (!is_null($userTask)) {
                 $userTask->step = 2;
                 $userTask->save();

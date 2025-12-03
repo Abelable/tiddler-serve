@@ -19,15 +19,8 @@ class HotelMerchantController extends Controller
     {
         /** @var MerchantPageInput $input */
         $input = MerchantPageInput::new();
-
         $page = HotelMerchantService::getInstance()->getMerchantList($input);
-
-        $list = collect($page->items())->map(function (HotelMerchant $merchant) {
-            $merchant['depositInfo'] = $merchant->depositInfo;
-            return $merchant;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        return $this->successPaginate($page);
     }
 
     public function detail()

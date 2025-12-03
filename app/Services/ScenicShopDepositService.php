@@ -6,15 +6,6 @@ use App\Models\ScenicShopDeposit;
 
 class ScenicShopDepositService extends BaseService
 {
-    public function getShopDeposit($shopId)
-    {
-        $deposit = ScenicShopDeposit::query()->where('shop_id', $shopId)->first();
-        if (is_null($deposit)) {
-            $deposit = $this->createShopDeposit($shopId);
-        }
-        return $deposit;
-    }
-
     public function createShopDeposit($shopId)
     {
         $deposit = ScenicShopDeposit::new();
@@ -33,5 +24,10 @@ class ScenicShopDepositService extends BaseService
 
         ScenicShopDepositChangeLogService::getInstance()
             ->createLog($shopId, $oldBalance, $newBalance, $type, $amount, $referenceId);
+    }
+
+    public function getShopDeposit($shopId)
+    {
+        return ScenicShopDeposit::query()->where('shop_id', $shopId)->first();
     }
 }
