@@ -34,7 +34,6 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods newQuery()
- * @method static \Illuminate\Database\Query\Builder|CartGoods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereCreatedAt($value)
@@ -63,10 +62,9 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereSuperiorPromotionCommissionUpperLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CartGoods whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|CartGoods withTrashed()
- * @method static \Illuminate\Database\Query\Builder|CartGoods withoutTrashed()
  * @mixin \Eloquent
  */
 class CartGoods extends BaseModel
 {
+    protected static bool $useSoftDeletes = false;
 }

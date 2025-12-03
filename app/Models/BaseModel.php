@@ -3,69 +3,123 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Throwable;
 
 /**
  * App\Models\BaseModel
  *
- * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|BaseModel newQuery()
- * @method static \Illuminate\Database\Query\Builder|BaseModel onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder|BaseModel query()
- * @method static \Illuminate\Database\Query\Builder|BaseModel withTrashed()
- * @method static \Illuminate\Database\Query\Builder|BaseModel withoutTrashed()
+ * @method static Builder|BaseModel newModelQuery()
+ * @method static Builder|BaseModel newQuery()
+ * @method static Builder|BaseModel query()
  * @mixin \Eloquent
  */
 class BaseModel extends Model
 {
-    use SoftDeletes;
+    /**
+     * 是否使用软删除
+     * 子模型可以设置：
+     * protected static bool $useSoftDeletes = false;
+     */
+    protected static bool $useSoftDeletes = true;
 
-    protected $dates = ['deleted_at'];
+    /**
+     * 软删除字段名
+     */
+    public const DELETED_AT = 'deleted_at';
 
+    /**
+     * Booted 方法，动态应用软删除作用域
+     */
+    protected static function booted()
+    {
+        if (static::$useSoftDeletes) {
+            static::addGlobalScope('softDeletes', function (Builder $builder) {
+                // 自动加表前缀，避免 SQL 歧义
+                $builder->whereNull($builder->qualifyColumn(static::DELETED_AT));
+            });
+        }
+    }
+
+    /**
+     * 覆盖 newModelQuery()，在不使用软删除时去掉自定义全局作用域
+     */
+    public function newModelQuery()
+    {
+        $query = parent::newModelQuery();
+
+        if (!static::$useSoftDeletes) {
+            $query->withoutGlobalScope('softDeletes');
+        }
+
+        return $query;
+    }
+
+    /**
+     * 获取 deleted_at 字段名称
+     */
+    public function getDeletedAtColumn(): string
+    {
+        return static::DELETED_AT;
+    }
+
+    /**
+     * 删除模型
+     * 支持可选软删除
+     */
+    public function delete()
+    {
+        if ($this->exists && static::$useSoftDeletes) {
+            $this->{$this->getDeletedAtColumn()} = Carbon::now();
+            return $this->save();
+        }
+
+        return parent::delete();
+    }
+
+    /**
+     * 强制删除（绕过软删除）
+     */
+    public function forceDelete()
+    {
+        return parent::delete();
+    }
+
+    /**
+     * 创建新实例
+     */
     public static function new()
     {
         return new static();
     }
 
     /**
-     * 重写toArray方法，下划线转驼峰
-     * @return array|false
+     * 重写 toArray 方法，下划线转驼峰并过滤 null
      */
     public function toArray()
     {
         $items = parent::toArray();
-        $items = array_filter($items, function ($item) {
-            return !is_null($item);
-        });
-        $keys = array_keys($items);
-        $keys = array_map(function ($key) {
-            // 1.转驼峰: Str::studly
-            // 2.首字母小写: lcfirst
-            return lcfirst(Str::studly($key));
-        }, $keys);
+        $items = array_filter($items, fn($item) => !is_null($item));
+        $keys = array_map(fn($key) => lcfirst(Str::studly($key)), array_keys($items));
         $values = array_values($items);
         return array_combine($keys, $values);
     }
 
     /**
-     * 乐观锁更新 compare and save
+     * 乐观锁更新（compare and save）
      *
      * @return bool|int
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function cas()
     {
-        // 数据不存在时，禁止更新操作
         throw_if(!$this->exists, \Exception::class, 'model not exists when cas');
 
-        // 当内存中跟新数据为空时，禁止更新操作
         $dirty = $this->getDirty();
-        if (empty($dirty)) {
-            return 0;
-        }
+        if (empty($dirty)) return 0;
 
-        // 当模型开启自动更新时间字段时，附上更新时间字段
         if ($this->usesTimestamps()) {
             $this->updateTimestamps();
             $dirty = $this->getDirty();
@@ -74,15 +128,12 @@ class BaseModel extends Model
         $diff = array_diff(array_keys($dirty), array_keys($this->original));
         throw_if(!empty($diff), \Exception::class, 'key [ ' . implode(',', $diff) . ' ] is not exist');
 
-        if ($this->fireModelEvent('casing') === false) {
-            return 0;
-        }
+        if ($this->fireModelEvent('casing') === false) return 0;
 
-        // 使用newModelQuery更新的时候不用带上 delete = 0 的条件
         $query = $this->newModelQuery()->where($this->getKeyName(), $this->getKey());
 
         foreach ($dirty as $key => $value) {
-            $query->where($key, $this->getOriginal($key)); // 判断一下更新的字段值是否有改动
+            $query->where($key, $this->getOriginal($key));
         }
 
         $rows = $query->update($dirty);
@@ -96,10 +147,7 @@ class BaseModel extends Model
     }
 
     /**
-     * Register a casing model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @return void
+     * Register a casing model event
      */
     public static function casing($callback)
     {
@@ -107,10 +155,7 @@ class BaseModel extends Model
     }
 
     /**
-     * Register a cased model event with the dispatcher.
-     *
-     * @param  \Closure|string  $callback
-     * @return void
+     * Register a cased model event
      */
     public static function cased($callback)
     {

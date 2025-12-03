@@ -78,7 +78,6 @@ class LiveRoom extends BaseModel
     {
         return $this
             ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
-            ->whereNull('live_goods.deleted_at')
             ->select('goods.id', 'goods.cover', 'goods.name', 'goods.price', 'goods.market_price', 'goods.stock');
     }
 
@@ -86,7 +85,6 @@ class LiveRoom extends BaseModel
     {
         return $this
             ->belongsToMany(Goods::class, 'live_goods', 'room_id', 'goods_id')
-            ->whereNull('live_goods.deleted_at')
             ->wherePivot('live_goods.is_hot', 1)
             ->select('goods.id', 'goods.cover', 'goods.name', 'goods.price', 'goods.market_price', 'goods.stock')
             ->first();
