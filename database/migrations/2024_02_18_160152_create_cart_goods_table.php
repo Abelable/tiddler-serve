@@ -15,33 +15,49 @@ class CreateCartGoodsTable extends Migration
     {
         Schema::create('cart_goods', function (Blueprint $table) {
             $table->id();
-            $table->integer('scene')->default(1)->comment('场景值：1-添加购物车，2-直接购买');
-            $table->integer('status')->default(1)
-                ->comment('购物车商品状态：1-正常状态，2-所选规格库存为0、所选规格已不存在，3-商品库存为0、商品已下架、商品已删除');
-            $table->string('status_desc')->default('')->comment('购物车商品状态描述');
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('goods_id')->comment('商品id');
-            $table->integer('shop_id')->comment('商品所属店铺id');
-            $table->integer('freight_template_id')->default(0)->comment('运费模板id');
-            $table->integer('is_gift')->default(0)->comment('是否为礼包商品：0-否，1-是');
-            $table->integer('duration')->default(0)->comment('代言时长（天）');
-            $table->integer('refund_status')->comment('是否支持7天无理由：0-不支持，1-支持');
-            $table->integer('refund_address_id')->default(0)->comment('退货地址');
-            $table->integer('delivery_mode')->default(1)->comment('提货方式：1-快递，2-自提，3-快递/自提');
-            $table->string('cover')->comment('商品图片');
-            $table->string('name')->comment('商品名称');
-            $table->string('selected_sku_name')->default('')->comment('选中的规格名称');
+
+            // 场景与状态
+            $table->tinyInteger('scene')->default(1)->comment('场景：1-添加购物车，2-直接购买');
+            $table->tinyInteger('status')->default(1)->comment('购物车商品状态：1-正常，2-SKU失效，3-商品失效');
+            $table->string('status_desc', 200)->default('')->comment('购物车商品状态描述');
+
+            // 用户与商品关联
+            $table->unsignedBigInteger('user_id')->index()->comment('用户id');
+            $table->unsignedBigInteger('shop_id')->default(0)->index()->comment('店铺id');
+            $table->unsignedBigInteger('goods_id')->index()->comment('商品id');
+
+            // 商品属性
+            $table->unsignedBigInteger('freight_template_id')->default(0)->comment('运费模板id');
+            $table->boolean('is_gift')->default(false)->comment('是否为礼包商品');
+            $table->unsignedInteger('duration')->default(0)->comment('代言时长（天）');
+            $table->tinyInteger('refund_status')->default(1)->comment('是否支持7天无理由退货：0-不支持，1-支持');
+            $table->unsignedBigInteger('refund_address_id')->default(0)->comment('退货地址id');
+            $table->tinyInteger('delivery_mode')->default(1)->comment('提货方式：1-快递，2-自提，3-快递/自提');
+
+            // 商品展示信息
+            $table->string('cover', 500)->comment('商品图片');
+            $table->string('name', 200)->comment('商品名称');
+            $table->string('selected_sku_name', 200)->default('')->comment('选中的规格名称');
             $table->integer('selected_sku_index')->default(-1)->comment('选中的规格索引');
-            $table->float('price')->comment('商品价格');
-            $table->float('market_price')->default(0)->comment('市场价格');
-            $table->float('sales_commission_rate')->comment('销售佣金比例%');
-            $table->float('promotion_commission_rate')->comment('推广佣金比例%');
-            $table->float('promotion_commission_upper_limit')->comment('推广佣金上限');
-            $table->float('superior_promotion_commission_rate')->comment('上级推广佣金比例%');
-            $table->float('superior_promotion_commission_upper_limit')->comment('上级推广佣金上限');
-            $table->integer('number')->comment('商品数量');
+
+            // 金额字段
+            $table->unsignedDecimal('price', 10, 2)->comment('商品价格');
+            $table->unsignedDecimal('market_price', 10, 2)->default(0)->comment('市场价格');
+
+            // 佣金字段
+            $table->decimal('sales_commission_rate', 5, 2)->default(0)->comment('销售佣金比例%');
+            $table->decimal('promotion_commission_rate', 5, 2)->default(0)->comment('推广佣金比例%');
+            $table->unsignedDecimal('promotion_commission_upper_limit', 10, 2)->default(0)->comment('推广佣金上限');
+            $table->decimal('superior_promotion_commission_rate', 5, 2)->default(0)->comment('上级推广佣金比例%');
+            $table->unsignedDecimal('superior_promotion_commission_upper_limit', 10, 2)->default(0)->comment('上级推广佣金上限');
+
+            // 数量字段
+            $table->unsignedInteger('number')->default(1)->comment('商品数量');
+
             $table->timestamps();
-            $table->softDeletes();
+
+            // 索引优化
+            $table->index(['user_id', 'goods_id']);
         });
     }
 
