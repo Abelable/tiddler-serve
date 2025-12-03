@@ -166,9 +166,10 @@ class OrderController extends Controller
                 'goodsList' => $cartGoodsList->filter(function (CartGoods $cartGoods) use ($shop) {
                     return $cartGoods->shop_id == $shop->id;
                 })->map(function (CartGoods $cartGoods) {
-                    unset($cartGoods->shop_id);
-                    return $cartGoods;
-                })
+                    $item = $cartGoods->toArray();
+                    unset($item['shop_id']);
+                    return $item;
+                })->values()
             ];
         });
         if (in_array(0, $shopIds)) {
@@ -176,9 +177,10 @@ class OrderController extends Controller
                 'goodsList' => $cartGoodsList->filter(function (CartGoods $cartGoods) {
                     return $cartGoods->shop_id == 0;
                 })->map(function (CartGoods $cartGoods) {
-                    unset($cartGoods->shop_id);
-                    return $cartGoods;
-                })
+                    $item = $cartGoods->toArray();
+                    unset($item['shop_id']);
+                    return $item;
+                })->values()
             ]);
         }
 
