@@ -16,7 +16,6 @@ use App\Services\Mall\Catering\CateringShopDepositPaymentLogService;
 use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\MealTicketOrderService;
-use App\Services\MerchantService;
 use App\Services\OrderService;
 use App\Services\ScenicMerchantService;
 use App\Services\ScenicOrderService;
@@ -26,8 +25,6 @@ use App\Services\ScenicShopDepositService;
 use App\Services\ScenicShopService;
 use App\Services\ScenicTicketService;
 use App\Services\SetMealOrderService;
-use App\Services\ShopDepositPaymentLogService;
-use App\Services\ShopDepositService;
 use App\Services\ShopService;
 use App\Services\TaskService;
 use App\Services\UserTaskService;
@@ -60,9 +57,9 @@ class CommonController extends Controller
 
         return $this->success($qrCode);
 
-//        return response($imageData)
-//            ->header('Content-Type', 'image/png')
-//            ->header('Content-Disposition', 'inline');
+        // return response($imageData)
+        //     ->header('Content-Type', 'image/png')
+        //     ->header('Content-Disposition', 'inline');
     }
 
     public function URLLink()
@@ -252,17 +249,7 @@ class CommonController extends Controller
         if (strpos($data['attach'], 'shop_id') !== false) {
             Log::info('shop_wx_pay_notify', $data);
             DB::transaction(function () use ($data) {
-                $log = ShopDepositPaymentLogService::getInstance()->wxPaySuccess($data);
-                MerchantService::getInstance()->paySuccess($log->merchant_id);
-                ShopService::getInstance()->paySuccess($log->shop_id);
-                ShopDepositService::getInstance()->updateDeposit($log->shop_id, 1, $log->payment_amount);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()->getByMerchantId(4, $log->merchant_id, 1);
-                if (!is_null($userTask)) {
-                    $userTask->step = 2;
-                    $userTask->save();
-                }
+                ShopService::getInstance()->wxPaySuccess($data);
             });
         }
 

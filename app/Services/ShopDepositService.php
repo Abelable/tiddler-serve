@@ -6,15 +6,6 @@ use App\Models\ShopDeposit;
 
 class ShopDepositService extends BaseService
 {
-    public function getShopDeposit($shopId)
-    {
-        $deposit = ShopDeposit::query()->where('shop_id', $shopId)->first();
-        if (is_null($deposit)) {
-            $deposit = $this->createShopDeposit($shopId);
-        }
-        return $deposit;
-    }
-
     public function createShopDeposit($shopId)
     {
         $deposit = ShopDeposit::new();
@@ -33,5 +24,10 @@ class ShopDepositService extends BaseService
 
         ShopDepositChangeLogService::getInstance()
             ->createLog($shopId, $oldBalance, $newBalance, $type, $amount, $referenceId);
+    }
+
+    public function getShopDeposit($shopId, $columns = ['*'])
+    {
+        return ShopDeposit::query()->where('shop_id', $shopId)->first($columns);
     }
 }

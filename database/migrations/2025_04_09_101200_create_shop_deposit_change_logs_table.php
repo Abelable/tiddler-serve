@@ -15,13 +15,20 @@ class CreateShopDepositChangeLogsTable extends Migration
     {
         Schema::create('shop_deposit_change_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('shop_id')->comment('店铺id');
-            $table->float('old_balance')->comment('变更前金额');
-            $table->float('new_balance')->comment('变更后金额');
-            $table->float('change_amount')->comment('变更金额');
-            $table->integer('change_type')->comment('变更类型：1-商家充值，2-平台扣除');
-            $table->string('reference_id')->default('')->comment('外部参考ID，如订单号');
-            $table->string('remark')->default('')->comment('备注');
+            $table->unsignedBigInteger('shop_id')->index()->comment('店铺ID');
+            $table->tinyInteger('change_type')->comment('变更类型：1-商家充值，2-平台扣除');
+
+            $table->unsignedDecimal('old_balance', 10, 2)->default(0)
+                ->comment('变更前金额');
+            $table->unsignedDecimal('new_balance', 10, 2)->default(0)
+                ->comment('变更后金额');
+            $table->unsignedDecimal('change_amount', 10, 2)->default(0)
+                ->comment('变更金额');
+
+            $table->string('reference_id', 64)->default('')
+                ->comment('外部参考ID，例如微信支付单号、订单号');
+            $table->string('remark', 255)->default('')->comment('备注');
+
             $table->timestamps();
             $table->softDeletes();
         });

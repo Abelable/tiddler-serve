@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Merchant;
 use App\Services\MerchantService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
@@ -19,14 +18,8 @@ class MerchantController extends Controller
     {
         /** @var MerchantPageInput $input */
         $input = MerchantPageInput::new();
-
         $page = MerchantService::getInstance()->getMerchantList($input);
-        $list = collect($page->items())->map(function (Merchant $merchant) {
-            $merchant['depositInfo'] = $merchant->depositInfo;
-            return $merchant;
-        });
-
-        return $this->success($this->paginate($page, $list));
+        return $this->successPaginate($page);
     }
 
     public function detail()
@@ -36,9 +29,6 @@ class MerchantController extends Controller
         if (is_null($merchant)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前商家不存在');
         }
-
-        $merchant['depositInfo'] = $merchant->depositInfo;
-
         return $this->success($merchant);
     }
 

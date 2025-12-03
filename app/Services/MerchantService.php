@@ -79,7 +79,7 @@ class MerchantService extends BaseService
         return Merchant::query()->where('status', 1)->get($columns);
     }
 
-    public function paySuccess(int $merchantId)
+    public function settled(int $merchantId)
     {
         $merchant = $this->getMerchantById($merchantId);
         if (is_null($merchant)) {

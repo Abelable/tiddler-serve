@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ShopDepositPaymentLogService;
 use App\Services\MerchantService;
 use App\Services\ShopDepositService;
 use App\Services\ShopService;
@@ -37,13 +36,10 @@ class MerchantController extends Controller
                 // todo 商家入驻通知
                 SystemTodoService::getInstance()->createTodo(TodoEnums::GOODS_MERCHANT_NOTICE, [$merchant->id]);
             });
-
         } else {
             DB::transaction(function () use ($taskId, $inviterId, $input) {
                 $merchant = MerchantService::getInstance()->createMerchant($input, $this->userId());
                 $shop = ShopService::getInstance()->createShop($this->userId(), $merchant->id, $input);
-                ShopDepositPaymentLogService::getInstance()
-                    ->createLog($this->userId(), $merchant->id, $shop->id, $shop->deposit);
                 ShopDepositService::getInstance()->createShopDeposit($shop->id);
 
                 // 邀请商家入驻活动
@@ -56,8 +52,8 @@ class MerchantController extends Controller
                     }
                 }
 
-                // todo 商家入驻通知
                 SystemTodoService::getInstance()->createTodo(TodoEnums::GOODS_MERCHANT_NOTICE, [$merchant->id]);
+                // todo 商家入驻通知
             });
         }
 
@@ -67,8 +63,7 @@ class MerchantController extends Controller
     public function status()
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
-        // todo 目前一个商家对应一个店铺，暂时可以用商家id获取店铺，之后一个商家有多个店铺，需要传入店铺id
-        $shop = ShopService::getInstance()->getShopByUserId($this->userId());
+        $shop = ShopService::getInstance()->getFirstShop($merchant->id);
 
         return $this->success($merchant ? [
             'id' => $merchant->id,
@@ -83,7 +78,7 @@ class MerchantController extends Controller
     {
         $merchant = MerchantService::getInstance()->getMerchantByUserId($this->userId());
         if (!is_null($merchant)) {
-            $shop = ShopService::getInstance()->getShopByUserId($this->userId());
+            $shop = ShopService::getInstance()->getFirstShop($merchant->id);
             $merchant['shopCategoryIds'] = array_map('intval', json_decode($shop->category_ids));
             $merchant['deposit'] = $shop->deposit;
             $merchant['shopBg'] = $shop->bg;

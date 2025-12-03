@@ -7,6 +7,8 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\MerchantInput;
 use App\Utils\Inputs\ShopInput;
+use App\Utils\WxMpServe;
+use Illuminate\Support\Facades\Log;
 
 class ShopService extends BaseService
 {
@@ -73,10 +75,9 @@ class ShopService extends BaseService
         return Shop::query()->where('user_id', $userId)->find($shopId, $columns);
     }
 
-    public function getShopByUserId(int $userId, $columns = ['*'])
+    public function getFirstShop(int $merchantId, $columns = ['*'])
     {
-        // todo 目前一个用户对应一个商家，一个商家对应一个店铺，可以暂时用用户id获取店铺，之后一个商家有多个店铺，该方法需要删除
-        return Shop::query()->where('user_id', $userId)->first($columns);
+        return Shop::query()->where('merchant_id', $merchantId)->first($columns);
     }
 
     public function createWxPayOrder($shopId, $userId, string $openid)
@@ -98,18 +99,50 @@ class ShopService extends BaseService
         ];
     }
 
-    public function paySuccess(int $shopId)
+    public function wxPaySuccess(array $data)
     {
+        $shopId = $data['attach'] ? str_replace('shop_id:', '', $data['attach']) : '';
+        $payId = $data['transaction_id'] ?? '';
+        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
+
         $shop = $this->getShopById($shopId);
         if (is_null($shop)) {
-            $this->throwBadArgumentValue();
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '店铺不存在');
         }
-        if ($shop->status != 0) {
-            $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '店铺保证金已支付，请勿重复操作');
+
+        $shopDeposit = ShopDepositService::getInstance()->getShopDeposit($shopId);
+        $pendingPaymentAmount = bcsub($shop->deposit, $shopDeposit->balance, 2);
+
+        if (bccomp($actualPaymentAmount, $pendingPaymentAmount, 2) != 0) {
+            $errMsg = "支付回调异常，店铺保证金支付金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，待支付金额：{$pendingPaymentAmount}";
+            Log::error($errMsg);
+            $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
-        $shop->status = 1;
-        $shop->save();
-        return $shop;
+
+        // 商家入驻场景
+        if ($shop->status == 0) {
+            // 更新店铺状态
+            $shop->status = 1;
+            $shop->save();
+
+            // 更新商家状态
+            MerchantService::getInstance()->settled($shop->merchant_id);
+
+            // 邀请商家入驻活动
+            $userTask = UserTaskService::getInstance()->getByMerchantId(4, $shop->merchant_id, 1);
+            if (!is_null($userTask)) {
+                $userTask->step = 2;
+                $userTask->save();
+            }
+        }
+
+        // 更新店铺保证金
+        ShopDepositService::getInstance()->updateDeposit($shop->id, 1, $actualPaymentAmount, $payId);
+
+        // 同步微信后台非物流订单
+        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
+        $openid = UserService::getInstance()->getUserById($shop->user_id)->openid;
+        WxMpServe::new()->notifyNoShipment($openid, $payId, '店铺保证金', 3);
     }
 
     public function getOptions($columns = ['*'])

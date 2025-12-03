@@ -50,7 +50,7 @@ class AuthController extends Controller
                 PromoterService::getInstance()->updateSubUserCount($input->superiorId);
             }
 
-            // 创建用户余额
+            // 创建用户余额账户
             AccountService::getInstance()->createUserAccount($user->id);
 
             return Auth::guard('user')->login($user);
