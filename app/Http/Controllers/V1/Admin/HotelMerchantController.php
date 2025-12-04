@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelMerchant;
 use App\Services\HotelMerchantService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;

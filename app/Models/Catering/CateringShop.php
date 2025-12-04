@@ -9,24 +9,23 @@ use App\Models\BaseModel;
  *
  * @property int $id
  * @property int $status 状态：0-未支付保证金，1-已支付保证金
- * @property int $user_id 用户id
- * @property int $merchant_id 服务商id
+ * @property int $user_id 用户ID
+ * @property int $merchant_id 商家ID
  * @property int $type 店铺类型：1-餐饮官方，2-专营店，3-平台自营
- * @property float $deposit 店铺保证金
- * @property string $owner_avatar 店主头像
- * @property string $owner_name 店主姓名
- * @property string $mobile 联系方式
+ * @property string $deposit 店铺初始保证金
  * @property string $bg 店铺背景图
  * @property string $logo 店铺logo
  * @property string $name 店铺名称
+ * @property string $owner_avatar 店主头像
+ * @property string $owner_name 店主姓名
+ * @property string $mobile 联系方式
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Catering\CateringShopManager[] $managerList
  * @property-read int|null $manager_list_count
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop newQuery()
- * @method static \Illuminate\Database\Query\Builder|CateringShop onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop query()
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereBg($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereCreatedAt($value)
@@ -43,8 +42,6 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|CateringShop whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|CateringShop withTrashed()
- * @method static \Illuminate\Database\Query\Builder|CateringShop withoutTrashed()
  * @mixin \Eloquent
  */
 class CateringShop extends BaseModel
