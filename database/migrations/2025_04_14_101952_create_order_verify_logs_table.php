@@ -15,20 +15,11 @@ class CreateOrderVerifyLogsTable extends Migration
     {
         Schema::create('order_verify_logs', function (Blueprint $table) {
             $table->id();
-
-            // 核销相关
-            $table->unsignedBigInteger('verify_code_id')->index()->comment('核销码ID');
-            $table->dateTime('verify_time')->comment('核销时间');
-
-            // 店铺与人员
+            $table->unsignedBigInteger('code_id')->index()->comment('核销码ID');
             $table->unsignedBigInteger('shop_id')->index()->comment('核销店铺ID');
             $table->unsignedBigInteger('verifier_id')->index()->comment('核销人员ID');
-
             $table->timestamps();
             $table->softDeletes();
-
-            // 索引优化
-            $table->index(['verify_code_id', 'shop_id']);
         });
     }
 

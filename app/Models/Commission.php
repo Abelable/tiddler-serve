@@ -16,18 +16,16 @@ namespace App\Models;
  * @property string $order_sn 订单编号
  * @property int $product_type 产品类型：1-景点，2-酒店，4-商品，5-套餐，6-餐券
  * @property int $product_id 产品id
- * @property int $refund_status 产品7天无理由：0-不支持，1-支持
- * @property string $achievement 业绩：平台券场景-订单商品总价，非平台券场景-订单支付金额
+ * @property string $achievement 业绩：平台活动-订单商品总价，非平台活动-订单支付金额
  * @property string $commission_base 佣金基数
  * @property string $commission_rate 佣金比例
  * @property string $commission_limit 佣金上限
  * @property string $commission_amount 佣金金额
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|Commission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Commission newQuery()
- * @method static \Illuminate\Database\Query\Builder|Commission onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Commission query()
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereAchievement($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereCommissionAmount($value)
@@ -43,14 +41,11 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereProductType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePromoterId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission wherePromoterLevel($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Commission whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Commission whereWithdrawalId($value)
- * @method static \Illuminate\Database\Query\Builder|Commission withTrashed()
- * @method static \Illuminate\Database\Query\Builder|Commission withoutTrashed()
  * @mixin \Eloquent
  */
 class Commission extends BaseModel

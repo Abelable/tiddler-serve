@@ -25,9 +25,8 @@ class CreateCommissionsTable extends Migration
             $table->string('order_sn')->index()->comment('订单编号');
             $table->tinyInteger('product_type')->comment('产品类型：1-景点，2-酒店，4-商品，5-套餐，6-餐券');
             $table->integer('product_id')->index()->comment('产品id');
-            $table->tinyInteger('refund_status')->default(0)->comment('产品7天无理由：0-不支持，1-支持');
 
-            $table->unsignedDecimal('achievement', 10, 2)->default(0)->comment('业绩：平台券场景-订单商品总价，非平台券场景-订单支付金额');
+            $table->unsignedDecimal('achievement', 10, 2)->default(0)->comment('业绩：平台活动-订单商品总价，非平台活动-订单支付金额');
             $table->unsignedDecimal('commission_base', 10, 2)->default(0)->comment('佣金基数');
             $table->decimal('commission_rate', 5, 2)->default(0)->comment('佣金比例');
             $table->unsignedDecimal('commission_limit', 10, 2)->default(0)->comment('佣金上限');

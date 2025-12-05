@@ -28,9 +28,8 @@ class CreateShopIncomesTable extends Migration
             $table->string('order_sn', 64)->index()->comment('订单编号');
             $table->unsignedBigInteger('goods_id')->index()->comment('商品id');
 
-            // 金额字段（全部 unsignedDecimal）
+            // 金额
             $table->unsignedDecimal('total_price', 10, 2)->default(0)->comment('总价');
-            $table->tinyInteger('refund_status')->default(0)->comment('商品7天无理由：0-不支持，1-支持');
             $table->unsignedBigInteger('coupon_id')->default(0)->comment('优惠券id');
             $table->unsignedBigInteger('coupon_shop_id')->default(0)->comment('优惠券店铺id');
             $table->unsignedDecimal('coupon_denomination', 10, 2)->default(0)->comment('优惠券抵扣金额');

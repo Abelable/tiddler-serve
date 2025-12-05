@@ -15,11 +15,10 @@ class CreateSetMealVerifyCodesTable extends Migration
     {
         Schema::create('set_meal_verify_codes', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)->comment('核销状态：0-待核销，1-已核销, 2-已失效');
-            $table->integer('order_id')->comment('订单id');
-            $table->integer('restaurant_id')->comment('餐馆id');
-            $table->string('code')->unique()->comment('核销码');
-            $table->string('expiration_time')->default('')->comment('核销码失效时间');
+            $table->tinyInteger('status')->default(0)->comment('核销状态：0-待核销，1-已核销, 2-已失效');
+            $table->unsignedBigInteger('order_id')->index()->comment('订单id');
+            $table->string('code', 32)->unique()->comment('核销码');
+            $table->dateTime('expiration_time')->nullable()->comment('核销码失效时间');
             $table->timestamps();
             $table->softDeletes();
         });

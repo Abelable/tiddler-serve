@@ -15,17 +15,12 @@ class CreateOrderVerifyCodesTable extends Migration
     {
         Schema::create('order_verify_codes', function (Blueprint $table) {
             $table->id();
-
             $table->tinyInteger('status')->default(0)->comment('核销状态：0-待核销，1-已核销, 2-已失效');
             $table->unsignedBigInteger('order_id')->index()->comment('订单ID');
-            $table->string('code', 64)->unique()->comment('核销码');
+            $table->string('code', 32)->unique()->comment('核销码');
             $table->dateTime('expiration_time')->nullable()->comment('核销码失效时间');
-
             $table->timestamps();
             $table->softDeletes();
-
-            // 索引优化
-            $table->index(['status', 'order_id']); // 常用查询组合索引：按订单和状态查询
         });
     }
 

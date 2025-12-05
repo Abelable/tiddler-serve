@@ -13,7 +13,6 @@ namespace App\Models;
  * @property string $order_sn 订单编号
  * @property int $goods_id 商品id
  * @property string $total_price 总价
- * @property int $refund_status 商品7天无理由：0-不支持，1-支持
  * @property int $coupon_id 优惠券id
  * @property int $coupon_shop_id 优惠券店铺id
  * @property string $coupon_denomination 优惠券抵扣金额
@@ -27,7 +26,6 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome newQuery()
- * @method static \Illuminate\Database\Query\Builder|ShopIncome onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome query()
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereCouponDenomination($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereCouponId($value)
@@ -41,7 +39,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereIncomeBase($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereOrderSn($value)
- * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereRefundStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereSalesAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereSalesCommissionRate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereShopId($value)
@@ -49,8 +46,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereTotalPrice($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShopIncome whereWithdrawalId($value)
- * @method static \Illuminate\Database\Query\Builder|ShopIncome withTrashed()
- * @method static \Illuminate\Database\Query\Builder|ShopIncome withoutTrashed()
  * @mixin \Eloquent
  */
 class ShopIncome extends BaseModel

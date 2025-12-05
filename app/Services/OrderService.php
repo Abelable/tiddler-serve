@@ -380,22 +380,51 @@ class OrderService extends BaseService
 
     public function wxPaySuccess(array $data)
     {
-        $orderSnList = $data['attach'] ? json_decode(str_replace('order_sn_list:', '', $data['attach'])) : [];
-        $payId = $data['transaction_id'] ?? '';
-        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
+        // 1. 解析订单号
+        if (empty($data['attach']) || !str_contains($data['attach'], 'order_sn_list:')) {
+            Log::error("支付回调 attach 异常：" . json_encode($data));
+            $this->throwBusinessException(CodeResponse::FAIL, '订单号缺失');
+        }
 
+        $orderSnList = json_decode(str_replace('order_sn_list:', '', $data['attach']), true) ?: [];
+        if (empty($orderSnList)) {
+            Log::error("支付回调订单列表为空：" . json_encode($data));
+            $this->throwBusinessException(CodeResponse::FAIL, '订单号为空');
+        }
+
+        // 2. 解析支付金额
+        $payId = $data['transaction_id'] ?? '';
+        $actualPaymentAmount = isset($data['total_fee'])
+            ? bcdiv($data['total_fee'], 100, 2)
+            : '0.00';
+
+        // 3. 查订单（只查待支付状态）
         $orderList = $this->getUnpaidListBySn($orderSnList);
 
-        $paymentAmount = 0;
-        foreach ($orderList as $order) {
-            $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
+        if ($orderList->isEmpty()) {
+            Log::warning("支付回调未找到待支付订单：" . json_encode($data));
+            $this->throwBusinessException(CodeResponse::FAIL, '订单不存在或已支付');
         }
-        if (bccomp($actualPaymentAmount, $paymentAmount, 2) != 0) {
-            $errMsg = "支付回调，订单{$data['attach']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
+
+        // 4. 计算订单总金额
+        $paymentAmount = bcadd($orderList->sum('payment_amount'), 0, 2);
+
+        // 5. 金额校验
+        if (bccomp($actualPaymentAmount, $paymentAmount, 2) !== 0) {
+            $errMsg = "支付回调金额不一致，SN列表：" . json_encode($orderSnList)
+                . "，支付金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
             Log::error($errMsg);
+
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
 
+        // 6. 并发安全：给订单加行级锁（for update）
+        //    多单支付非常容易重复回调导致重复扣库存等并发问题
+        $orderList = Order::whereIn('order_sn', $orderSnList)
+            ->lockForUpdate()
+            ->get();
+
+        // 7. 执行支付成功逻辑（建议内部再做一次状态判断）
         return $this->paySuccess($orderList, $payId, $actualPaymentAmount);
     }
 

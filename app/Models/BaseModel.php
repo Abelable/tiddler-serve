@@ -18,6 +18,10 @@ use Throwable;
  */
 class BaseModel extends Model
 {
+    protected $casts = [
+        'deleted_at' => 'datetime',
+    ];
+
     /**
      * 是否使用软删除
      * 子模型可以设置：

@@ -15,10 +15,9 @@ class CreateMealTicketVerifyLogsTable extends Migration
     {
         Schema::create('meal_ticket_verify_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('order_id')->comment('订单id');
-            $table->integer('restaurant_id')->comment('核销餐馆id');
-            $table->integer('verifier_id')->comment('核销人员id');
-            $table->string('verify_time')->comment('核销时间');
+            $table->unsignedBigInteger('code_id')->index()->comment('核销码ID');
+            $table->unsignedBigInteger('restaurant_id')->index()->comment('核销餐馆id');
+            $table->unsignedBigInteger('verifier_id')->index()->comment('核销人员id');
             $table->timestamps();
             $table->softDeletes();
         });
