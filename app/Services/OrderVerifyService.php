@@ -7,12 +7,14 @@ use App\Models\OrderVerifyLog;
 
 class OrderVerifyService extends BaseService
 {
-    public function createVerifyCode($orderId, $expirationTime = '')
+    public function createVerifyCode($orderId, $expirationTime = null)
     {
         $verify = OrderVerifyCode::new();
         $verify->order_id = $orderId;
         $verify->code = OrderVerifyCode::generateVerifyCode();
-        $verify->expiration_time = $expirationTime;
+        if ($expirationTime) {
+            $verify->expiration_time = $expirationTime;
+        }
         $verify->save();
         return $verify;
     }
