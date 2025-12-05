@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyNoShipmentJob;
 use App\Models\Catering\CateringShop;
 use App\Models\Catering\MealTicketOrder;
 use App\Models\User;
@@ -269,9 +270,8 @@ class MealTicketOrderService extends BaseService
             ->updateListToPaidStatus([$order->id], ProductType::MEAL_TICKET);
 
         // 同步微信后台非物流订单
-        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
         $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-        WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $order->restaurant_name . '餐券');
+        dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $order->restaurant_name . '餐券'));
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家

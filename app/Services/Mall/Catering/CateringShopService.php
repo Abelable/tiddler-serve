@@ -2,6 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
+use App\Jobs\NotifyNoShipmentJob;
 use App\Models\Catering\CateringShop;
 use App\Services\BaseService;
 use App\Services\UserService;
@@ -136,8 +137,7 @@ class CateringShopService extends BaseService
         CateringShopDepositService::getInstance()->updateDeposit($shop->id, 1, $actualPaymentAmount, $payId);
 
         // 同步微信后台非物流订单
-        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
         $openid = UserService::getInstance()->getUserById($shop->user_id)->openid;
-        WxMpServe::new()->notifyNoShipment($openid, $payId, '店铺保证金', 3);
+        dispatch(new NotifyNoShipmentJob($openid, $payId, '店铺保证金', 3));
     }
 }

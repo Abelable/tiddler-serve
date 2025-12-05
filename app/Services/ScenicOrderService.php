@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyNoShipmentJob;
 use App\Models\ScenicOrder;
 use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
@@ -258,12 +259,11 @@ class ScenicOrderService extends BaseService
         ScenicShopIncomeService::getInstance()->updateListToPaidStatus([$order->id]);
 
         // 同步微信后台非物流订单
-        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
         $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
         $orderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
         $scenicList = json_decode($orderTicket->scenic_list, true);
         $scenicName = $scenicList->pluck('name')->implode('，');
-        WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $scenicName . '门票');
+        dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $scenicName . '门票'));
 
         // todo 通知（邮件或钉钉）管理员、
         // todo 通知（短信、系统消息）商家

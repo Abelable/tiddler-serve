@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyNoShipmentJob;
 use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MerchantType;
@@ -131,8 +132,7 @@ class ScenicShopService extends BaseService
         ScenicShopDepositService::getInstance()->updateDeposit($shop->id, 1, $actualPaymentAmount, $payId);
 
         // 同步微信后台非物流订单
-        sleep(10); // todo 延迟10s执行（改为延迟任务队列）
         $openid = UserService::getInstance()->getUserById($shop->user_id)->openid;
-        WxMpServe::new()->notifyNoShipment($openid, $payId, '店铺保证金', 3);
+        dispatch(new NotifyNoShipmentJob($openid, $payId, '店铺保证金', 3));
     }
 }
