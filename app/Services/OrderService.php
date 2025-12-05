@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyNoShipmentJob;
 use App\Jobs\OverTimeCancelOrderJob;
 use App\Jobs\CreatePromoterJob;
 use App\Jobs\RenewPromoterJob;
@@ -429,11 +430,10 @@ class OrderService extends BaseService
                 OrderVerifyService::getInstance()->createVerifyCode($order->id);
 
                 // 同步微信后台非物流订单
-                sleep(10); // todo 延迟10s执行（改为延迟任务队列）
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
                 $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
                 $goodsName = $goodsList->pluck('name')->implode('，');
-                WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $goodsName);
+                dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $goodsName));
             }
 
             if ($order->cas() == 0) {
