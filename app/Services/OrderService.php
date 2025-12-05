@@ -391,7 +391,7 @@ class OrderService extends BaseService
             $paymentAmount = bcadd($order->payment_amount, $paymentAmount, 2);
         }
         if (bccomp($actualPaymentAmount, $paymentAmount, 2) != 0) {
-            $errMsg = "支付回调，订单{$data['body']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
+            $errMsg = "支付回调，订单{$data['attach']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$paymentAmount}";
             Log::error($errMsg);
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }

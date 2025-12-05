@@ -281,7 +281,7 @@ class HotelOrderService extends BaseService
         $order = $this->getUnpaidOrderBySn($orderSn);
 
         if (bccomp($actualPaymentAmount, $order->payment_amount, 2) != 0) {
-            $errMsg = "支付回调，订单{$data['body']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$order->payment_amount}";
+            $errMsg = "支付回调，订单{$data['attach']}金额不一致，请检查，支付回调金额：{$actualPaymentAmount}，订单总金额：{$order->payment_amount}";
             Log::error($errMsg);
             $this->throwBusinessException(CodeResponse::FAIL, $errMsg);
         }
