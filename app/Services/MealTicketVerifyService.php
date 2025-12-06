@@ -3,17 +3,18 @@
 namespace App\Services;
 
 use App\Models\Catering\MealTicketVerifyCode;
-use App\Models\Catering\MealTicketVerifyLog;
 
 class MealTicketVerifyService extends BaseService
 {
-    public function createVerifyCode($orderId, $restaurantId, $expirationTime = '')
+    public function createVerifyCode($orderId, $shopId, $expirationTime = null)
     {
         $verify = MealTicketVerifyCode::new();
         $verify->order_id = $orderId;
-        $verify->restaurant_id = $restaurantId;
+        $verify->shop_id = $shopId;
         $verify->code = MealTicketVerifyCode::generateVerifyCode();
-        $verify->expiration_time = $expirationTime;
+        if ($expirationTime) {
+            $verify->expiration_time = $expirationTime;
+        }
         $verify->save();
         return $verify;
     }
@@ -58,13 +59,9 @@ class MealTicketVerifyService extends BaseService
     public function verify(MealTicketVerifyCode $verifyCodeInfo, $userId)
     {
         $verifyCodeInfo->status = 1;
+        $verifyCodeInfo->verifier_id = $userId;
+        $verifyCodeInfo->verify_time = now();
         $verifyCodeInfo->save();
-
-        $log = MealTicketVerifyLog::new();
-        $log->order_id = $verifyCodeInfo->order_id;
-        $log->restaurant_id = $verifyCodeInfo->restaurant_id;
-        $log->verifier_id = $userId;
-        $log->verify_time = now();
-        $log->save();
+        return $verifyCodeInfo;
     }
 }

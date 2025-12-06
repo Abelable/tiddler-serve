@@ -8,7 +8,7 @@ use App\Models\ScenicOrderTicket;
 use App\Services\ScenicManagerService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
-use App\Services\ScenicOrderVerifyService;
+use App\Services\ScenicVerifyService;
 use App\Services\ScenicShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -221,7 +221,7 @@ class ScenicShopOrderController extends Controller
     {
         $code = $this->verifyRequiredString('code');
 
-        $verifyCodeInfo = ScenicOrderVerifyService::getInstance()->getByCode($code);
+        $verifyCodeInfo = ScenicVerifyService::getInstance()->getByCode($code);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
         }
@@ -240,9 +240,9 @@ class ScenicShopOrderController extends Controller
         }
 
         DB::transaction(function () use ($verifyCodeInfo, $order) {
-            ScenicOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
+            ScenicVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
 
-            if (!ScenicOrderVerifyService::getInstance()->hasUnverifiedCodes($verifyCodeInfo->order_id)) {
+            if (!ScenicVerifyService::getInstance()->hasUnverifiedCodes($verifyCodeInfo->order_id)) {
                 ScenicOrderService::getInstance()->userConfirm($order->user_id, $order->id);
             }
         });

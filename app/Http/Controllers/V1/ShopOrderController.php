@@ -15,7 +15,7 @@ use App\Services\OrderGoodsService;
 use App\Services\OrderPackageGoodsService;
 use App\Services\OrderPackageService;
 use App\Services\OrderService;
-use App\Services\OrderVerifyService;
+use App\Services\GoodsVerifyService;
 use App\Services\RefundService;
 use App\Services\ShopManagerService;
 use App\Services\ShopPickupAddressService;
@@ -211,7 +211,7 @@ class ShopOrderController extends Controller
             $order['pickup_address'] = $pickupAddress;
             unset($order['pickup_address_id']);
 
-            $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
+            $verifyInfo = GoodsVerifyService::getInstance()->getByOrderId($order->id);
             $order['verify_code'] = $verifyInfo->code ?: null;
         }
 
@@ -222,7 +222,7 @@ class ShopOrderController extends Controller
     {
         $code = $this->verifyRequiredString('code');
 
-        $verifyCodeInfo = OrderVerifyService::getInstance()->getByCode($code);
+        $verifyCodeInfo = GoodsVerifyService::getInstance()->getByCode($code);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
         }
@@ -232,13 +232,14 @@ class ShopOrderController extends Controller
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '订单不存在');
         }
 
-        $managerIds = ShopManagerService::getInstance()->getManagerList($order->shop_id)->pluck('user_id')->toArray();
+        $managerIds = ShopManagerService::getInstance()
+            ->getManagerList($verifyCodeInfo->shop_id)->pluck('user_id')->toArray();
         if ($order->shop_id != $this->user()->shop->id && !in_array($this->userId(), $managerIds)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '非当前商家核销员，无法核销');
         }
 
         DB::transaction(function () use ($verifyCodeInfo, $order) {
-            OrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId(), $order->shop_id);
+            GoodsVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
             OrderService::getInstance()->userConfirm($order->user_id, $order->id);
         });
 

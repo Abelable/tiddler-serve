@@ -14,7 +14,7 @@ use App\Services\OrderGoodsService;
 use App\Services\OrderPackageGoodsService;
 use App\Services\OrderPackageService;
 use App\Services\OrderService;
-use App\Services\OrderVerifyService;
+use App\Services\GoodsVerifyService;
 use App\Services\ShopPickupAddressService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -151,7 +151,7 @@ class OrderController extends Controller
             $order['pickup_address'] = $pickupAddress;
             unset($order['pickup_address_id']);
 
-            $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
+            $verifyInfo = GoodsVerifyService::getInstance()->getByOrderId($order->id);
             $order['verify_code'] = $verifyInfo->verify_code ?: null;
         }
 

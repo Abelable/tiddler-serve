@@ -456,7 +456,7 @@ class OrderService extends BaseService
                 });
             } else {
                 $order->status = OrderStatus::PENDING_VERIFICATION;
-                OrderVerifyService::getInstance()->createVerifyCode($order->id);
+                GoodsVerifyService::getInstance()->createVerifyCode($order->id, $order->shop_id);
 
                 // 同步微信后台非物流订单
                 $openid = UserService::getInstance()->getUserById($order->user_id)->openid;

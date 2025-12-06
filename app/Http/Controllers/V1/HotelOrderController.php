@@ -9,7 +9,7 @@ use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\HotelOrderRoomService;
 use App\Services\HotelOrderService;
-use App\Services\HotelOrderVerifyService;
+use App\Services\HotelVerifyService;
 use App\Services\HotelRoomService;
 use App\Services\HotelRoomTypeService;
 use App\Services\HotelService;
@@ -144,7 +144,7 @@ class HotelOrderController extends Controller
             );
 
             // 生成核销码
-            HotelOrderVerifyService::getInstance()->createVerifyCode($order->id, $room->hotel_id);
+            HotelVerifyService::getInstance()->createVerifyCode($order->id, $room->hotel_id);
 
             // 生成佣金记录
             CommissionService::getInstance()->createHotelCommission(
@@ -345,7 +345,7 @@ class HotelOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $hotelId = $this->verifyRequiredId('hotelId');
 
-        $verifyCodeInfo = HotelOrderVerifyService::getInstance()->getVerifyCodeInfo($orderId, $hotelId);
+        $verifyCodeInfo = HotelVerifyService::getInstance()->getVerifyCodeInfo($orderId, $hotelId);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
         }

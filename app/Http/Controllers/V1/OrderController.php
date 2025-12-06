@@ -20,7 +20,7 @@ use App\Services\Mall\Goods\CartGoodsService;
 use App\Services\OrderGoodsService;
 use App\Services\OrderPackageService;
 use App\Services\OrderService;
-use App\Services\OrderVerifyService;
+use App\Services\GoodsVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ShopIncomeService;
@@ -574,7 +574,7 @@ class OrderController extends Controller
             unset($order['pickup_address_id']);
 
             if ($order->status !== OrderStatus::CREATED) {
-                $verifyInfo = OrderVerifyService::getInstance()->getByOrderId($order->id);
+                $verifyInfo = GoodsVerifyService::getInstance()->getByOrderId($order->id);
                 $order['verify_code'] = $verifyInfo->code ?: null;
             }
         }
@@ -586,7 +586,7 @@ class OrderController extends Controller
     {
         $orderId = $this->verifyRequiredId('orderId');
 
-        $verifyCodeInfo = OrderVerifyService::getInstance()->getByOrderId($orderId);
+        $verifyCodeInfo = GoodsVerifyService::getInstance()->getByOrderId($orderId);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
         }

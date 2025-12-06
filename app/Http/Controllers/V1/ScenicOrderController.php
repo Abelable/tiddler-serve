@@ -12,7 +12,7 @@ use App\Services\PromoterService;
 use App\Services\RelationService;
 use App\Services\ScenicOrderService;
 use App\Services\ScenicOrderTicketService;
-use App\Services\ScenicOrderVerifyService;
+use App\Services\ScenicVerifyService;
 use App\Services\ScenicService;
 use App\Services\ScenicShopIncomeService;
 use App\Services\ScenicShopManagerService;
@@ -129,7 +129,7 @@ class ScenicOrderController extends Controller
 
             // 生成景点对应核销码
             foreach ($ticketScenicIds as $scenicId) {
-                ScenicOrderVerifyService::getInstance()->createVerifyCode($order->id, $scenicId);
+                ScenicVerifyService::getInstance()->createVerifyCode($order->id, $scenicId);
             }
 
             // 生成佣金记录
@@ -348,7 +348,7 @@ class ScenicOrderController extends Controller
         $orderId = $this->verifyRequiredId('orderId');
         $scenicId = $this->verifyRequiredId('scenicId');
 
-        $verifyCodeInfo = ScenicOrderVerifyService::getInstance()->getVerifyCodeInfo($orderId, $scenicId);
+        $verifyCodeInfo = ScenicVerifyService::getInstance()->getVerifyCodeInfo($orderId, $scenicId);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::NOT_FOUND, '核销信息不存在');
         }

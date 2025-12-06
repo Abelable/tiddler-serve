@@ -8,7 +8,7 @@ use App\Models\HotelOrderRoom;
 use App\Services\HotelManagerService;
 use App\Services\HotelOrderService;
 use App\Services\HotelOrderRoomService;
-use App\Services\HotelOrderVerifyService;
+use App\Services\HotelVerifyService;
 use App\Services\HotelShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
@@ -199,7 +199,7 @@ class HotelShopOrderController extends Controller
     {
         $code = $this->verifyRequiredString('code');
 
-        $verifyCodeInfo = HotelOrderVerifyService::getInstance()->getByCode($code);
+        $verifyCodeInfo = HotelVerifyService::getInstance()->getByCode($code);
         if (is_null($verifyCodeInfo)) {
             return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, '无效核销码');
         }
@@ -218,7 +218,7 @@ class HotelShopOrderController extends Controller
         }
 
         DB::transaction(function () use ($verifyCodeInfo, $order) {
-            HotelOrderVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
+            HotelVerifyService::getInstance()->verify($verifyCodeInfo, $this->userId());
             HotelOrderService::getInstance()->userConfirm($order->user_id, $order->id);
         });
 
