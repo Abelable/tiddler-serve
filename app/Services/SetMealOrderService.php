@@ -408,7 +408,7 @@ class SetMealOrderService extends BaseService
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
         CommissionService::getInstance()
-            ->updateListToOrderConfirmStatus($orderIds, ProductType::SET_MEAL, $role);
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::SET_MEAL);
 
         // 收益记录变更为待提现
         CateringShopIncomeService::getInstance()

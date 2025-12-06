@@ -435,7 +435,7 @@ class HotelOrderService extends BaseService
 
         // 佣金记录变更为待提现
         CommissionService::getInstance()
-            ->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL, $role);
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::HOTEL);
 
         // 收益记录变更为待提现
         HotelShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);

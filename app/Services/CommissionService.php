@@ -220,7 +220,6 @@ class CommissionService extends BaseService
             $orderSn,
             ProductType::GOODS,
             $cartGoods->goods_id,
-            $cartGoods->refund_status
         );
     }
 
@@ -282,8 +281,7 @@ class CommissionService extends BaseService
         $orderId,
         $orderSn,
         $productType,
-        $productId,
-        $refundStatus = 0
+        $productId
     )
     {
         $commissionBase = bcmul($salesCommissionBase, $salesCommissionRate, 2);
@@ -319,7 +317,6 @@ class CommissionService extends BaseService
                 $promotionCommissionRate,
                 $promotionCommission,
                 $promotionCommissionUpperLimit,
-                $refundStatus
             );
         }
 
@@ -339,7 +336,6 @@ class CommissionService extends BaseService
                 $promotionCommissionRate,
                 $promotionCommission,
                 $promotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -355,7 +351,6 @@ class CommissionService extends BaseService
                 $superiorPromotionCommissionRate,
                 $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::DIRECT_TEAM,
@@ -370,8 +365,6 @@ class CommissionService extends BaseService
                 $promotionCommission,
                 $upperTeamCommissionRate,
                 $upperTeamCommissionAmount,
-                0,
-                $refundStatus
             );
         }
 
@@ -394,7 +387,6 @@ class CommissionService extends BaseService
                 $commissionRate,
                 $commissionAmount,
                 $commissionLimit,
-                $refundStatus
             );
         }
 
@@ -414,7 +406,6 @@ class CommissionService extends BaseService
                 $promotionCommissionRate,
                 $promotionCommission,
                 $promotionCommissionUpperLimit,
-                $refundStatus
             );
         }
 
@@ -434,7 +425,6 @@ class CommissionService extends BaseService
                 $promotionCommissionRate,
                 $promotionCommission,
                 $promotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -450,7 +440,6 @@ class CommissionService extends BaseService
                 $superiorPromotionCommissionRate,
                 $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_TEAM,
@@ -465,8 +454,6 @@ class CommissionService extends BaseService
                 $promotionCommission,
                 $upperTeamCommissionRate,
                 $upperTeamCommissionAmount,
-                0,
-                $refundStatus
             );
         }
 
@@ -486,7 +473,6 @@ class CommissionService extends BaseService
                 $promotionCommissionRate,
                 $promotionCommission,
                 $promotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::INDIRECT_SHARE,
@@ -502,7 +488,6 @@ class CommissionService extends BaseService
                 $superiorPromotionCommissionRate,
                 $superiorPromotionCommission,
                 $superiorPromotionCommissionUpperLimit,
-                $refundStatus
             );
             $this->createCommission(
                 CommissionScene::DIRECT_TEAM,
@@ -517,8 +502,6 @@ class CommissionService extends BaseService
                 $promotionCommission,
                 $teamCommissionRate,
                 $teamCommissionAmount,
-                0,
-                $refundStatus
             );
         }
 
@@ -541,7 +524,6 @@ class CommissionService extends BaseService
                 $commissionRate,
                 $commissionAmount,
                 $commissionLimit,
-                $refundStatus
             );
         }
     }
@@ -559,8 +541,7 @@ class CommissionService extends BaseService
         $commissionBase,
         $commissionRate,
         $commissionAmount,
-        $commissionLimit = 0,
-        $refundStatus = 0
+        $commissionLimit = 0
     )
     {
         $commission = Commission::new();
@@ -572,7 +553,6 @@ class CommissionService extends BaseService
         $commission->order_sn = $orderSn;
         $commission->product_type = $productType;
         $commission->product_id = $productId;
-        $commission->refund_status = $refundStatus;
         $commission->achievement = $achievement;
         $commission->commission_base = $commissionBase;
         $commission->commission_rate = $commissionRate;
@@ -631,6 +611,16 @@ class CommissionService extends BaseService
             ->get($columns);
     }
 
+    public function getPaidCommission($orderId, $productType, $productId, $columns = ['*'])
+    {
+        return Commission::query()
+            ->where('status', 1)
+            ->where('order_id', $orderId)
+            ->where('product_type', $productType)
+            ->where('product_id', $productId)
+            ->first($columns);
+    }
+
     public function getListByOrderIds(array $orderIds, $productType, $columns = ['*'])
     {
         return Commission::query()
@@ -639,29 +629,38 @@ class CommissionService extends BaseService
             ->get($columns);
     }
 
-    public function updateListToOrderConfirmStatus($orderIds, $productType, $role = 'user')
+    public function updateListToOrderConfirmStatus($orderIds, $productType)
     {
         $commissionList = $this->getPaidListByOrderIds($orderIds, $productType);
-        return $commissionList->map(function (Commission $commission) use ($productType, $role) {
-            if ($productType == ProductType::GOODS && $commission->refund_status == 1 && $role == 'user') {
+        return $commissionList->map(function (Commission $commission) {
+            $commission->status = 2;
+            $commission->save();
+            return $commission;
+        });
+    }
+
+    public function updateGoodsCommissionToConfirmStatus($orderId, $goodsId, $deliveryMode, $refundStatus)
+    {
+        $commission = $this->getPaidCommission($orderId, ProductType::GOODS, $goodsId);
+        if (!is_null($commission)) {
+            if ($deliveryMode == 1 && $refundStatus == 1) {
                 // 7天无理由商品：确认收货7天后更新佣金状态
                 dispatch(new CommissionConfirmJob($commission->id));
             } else {
                 $commission->status = 2;
                 $commission->save();
             }
-            return $commission;
-        });
+        }
+        return $commission;
     }
 
     public function updateToOrderConfirmStatus($id)
     {
         $commission = $this->getPaidCommissionById($id);
-        if (is_null($commission)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '佣金记录不存在或已删除');
+        if (!is_null($commission)) {
+            $commission->status = 2;
+            $commission->save();
         }
-        $commission->status = 2;
-        $commission->save();
         return $commission;
     }
 

@@ -396,7 +396,7 @@ class ScenicOrderService extends BaseService
         // 佣金记录变更为待提现
         $orderIds = $orderList->pluck('id')->toArray();
         CommissionService::getInstance()
-            ->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC, $role);
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::SCENIC);
 
         // 收益记录变更为待提现
         ScenicShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);

@@ -406,7 +406,7 @@ class MealTicketOrderService extends BaseService
 
         // 佣金记录变更为待提现
         CommissionService::getInstance()
-            ->updateListToOrderConfirmStatus($orderIds, ProductType::MEAL_TICKET, $role);
+            ->updateListToOrderConfirmStatus($orderIds, ProductType::MEAL_TICKET);
 
         // 收益记录变更为待提现
         CateringShopIncomeService::getInstance()

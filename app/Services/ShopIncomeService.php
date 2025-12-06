@@ -7,7 +7,6 @@ use App\Models\Address;
 use App\Models\CartGoods;
 use App\Models\Coupon;
 use App\Models\ShopIncome;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +71,6 @@ class ShopIncomeService extends BaseService
             $income->order_id = $orderId;
             $income->order_sn = $orderSn;
             $income->goods_id = $cartGoods->goods_id;
-            $income->refund_status = $cartGoods->refund_status;
             $income->total_price = $totalPrice;
             $income->coupon_id = $couponInfo['id'];
             $income->coupon_shop_id = $couponInfo['shop_id'];
@@ -243,35 +241,36 @@ class ShopIncomeService extends BaseService
             ->update(['status' => 1]);
     }
 
-    public function updateListToConfirmStatus($orderIds, $role = 'user')
+    public function updateToConfirmStatus($orderId, $goodsId, $deliveryMode, $refundStatus)
     {
-        $incomeList = $this->getPaidListByOrderIds($orderIds);
-        return $incomeList->map(function (ShopIncome $income) use ($role) {
-            if ($income->refund_status == 1 && $role == 'user') {
-                // 7天无理由商品：确认收货7天后更新收益状态
-                dispatch(new ShopIncomeConfirmJob($income->id));
-            } else {
-                $income->status = 2;
-                $income->save();
-            }
-            return $income;
-        });
+        $income = $this->getPaidIncome($orderId, $goodsId);
+        if ($deliveryMode == 1 && $refundStatus == 1) {
+            // 7天无理由商品：确认收货7天后更新收益状态
+            dispatch(new ShopIncomeConfirmJob($income->id));
+        } else {
+            $income->status = 2;
+            $income->save();
+        }
+        return $income;
     }
 
     public function updateIncomeToConfirmStatus($id)
     {
         $income = $this->getPaidIncomeById($id);
-        if (is_null($income)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '收益记录不存在或已删除');
+        if (!is_null($income)) {
+            $income->status = 2;
+            $income->save();
         }
-        $income->status = 2;
-        $income->save();
         return $income;
     }
 
-    public function getPaidListByOrderIds(array $orderIds, $columns = ['*'])
+    public function getPaidIncome($orderId, $goodsId, $columns = ['*'])
     {
-        return ShopIncome::query()->whereIn('order_id', $orderIds)->where('status', 1)->get($columns);
+        return ShopIncome::query()
+            ->where('status', 1)
+            ->where('order_id', $orderId)
+            ->where('goods_id', $goodsId)
+            ->first($columns);
     }
 
     public function getPaidIncomeById($id, $columns = ['*'])

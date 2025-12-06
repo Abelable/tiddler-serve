@@ -349,8 +349,8 @@ class OrderService extends BaseService
         $order->refund_amount = $paymentAmount;
         $order->save();
 
-        // todo 设置订单支付超时任务
-        // dispatch(new OverTimeCancelOrderJob($userId, $order->id));
+        // 设置订单支付超时任务
+        dispatch(new OverTimeCancelOrderJob($userId, $order->id));
 
         return $order;
     }
@@ -532,57 +532,51 @@ class OrderService extends BaseService
 
     public function cancel($orderList, $role = 'user')
     {
-        $orderList = $orderList->map(function (Order $order) use ($role) {
-            if ($order->status != OrderStatus::CREATED) {
-                $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单不能取消');
-            }
-            switch ($role) {
-                case 'system':
-                    $order->status = OrderStatus::AUTO_CANCELED;
-                    break;
-                case 'admin':
-                    $order->status = OrderStatus::ADMIN_CANCELED;
-                    break;
-                case 'user':
-                    $order->status = OrderStatus::CANCELED;
-                    break;
-            }
-            $order->finish_time = now();
-            if ($order->cas() == 0) {
-                $this->throwUpdateFail();
-            }
+        return $orderList->map(function (Order $order) use ($role) {
+            if ($order->status == OrderStatus::CREATED) {
+                switch ($role) {
+                    case 'system':
+                        $order->status = OrderStatus::AUTO_CANCELED;
+                        break;
+                    case 'admin':
+                        $order->status = OrderStatus::ADMIN_CANCELED;
+                        break;
+                    case 'user':
+                        $order->status = OrderStatus::CANCELED;
+                        break;
+                }
+                $order->finish_time = now();
+                if ($order->cas() == 0) {
+                    $this->throwUpdateFail();
+                }
 
-            // 返还库存
-            $this->returnStock($order->id);
+                // 返还库存
+                $this->returnStock($order->id);
 
-            // 恢复优惠券
-            if ($order->coupon_id != 0) {
-                $this->restoreCoupon($order->user_id, $order->coupon_id);
+                // 恢复优惠券
+                if ($order->coupon_id != 0) {
+                    $this->restoreCoupon($order->user_id, $order->coupon_id);
+                }
+
+                // 退还余额
+                if ($order->deduction_balance != 0) {
+                    AccountService::getInstance()->updateBalance(
+                        $order->user_id,
+                        AccountChangeType::REFUND,
+                        $order->deduction_balance,
+                        $order->order_sn,
+                        ProductType::GOODS
+                    );
+                }
+
+                // 删除佣金记录
+                CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::GOODS);
+
+                // 删除收益记录
+                ShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 0);
             }
-
-            // 退还余额
-            if ($order->deduction_balance != 0) {
-                AccountService::getInstance()->updateBalance(
-                    $order->user_id,
-                    AccountChangeType::REFUND,
-                    $order->deduction_balance,
-                    $order->order_sn,
-                    ProductType::GOODS
-                );
-            }
-
             return $order;
         });
-
-        $orderIds = $orderList->pluck('id')->toArray();
-
-        // 删除佣金记录
-        CommissionService::getInstance()->deleteUnpaidListByOrderIds($orderIds, ProductType::GOODS);
-
-        // 删除收益记录
-        ShopIncomeService::getInstance()->deleteListByOrderIds($orderIds, 0);
-
-        return $orderList;
     }
 
     public function returnStock($orderId)
@@ -774,9 +768,9 @@ class OrderService extends BaseService
         // 订单确认时，如果存在普通用户购买礼包的逻辑，需要执行生成代言人的逻辑
         // 如果是用户手动确认，则需根据订单商品是否支持7天无理由，延迟生成代言人身份（佣金逻辑同理）
         $orderIds = $orderList->pluck('id')->toArray();
-        $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds)->keyBy('order_id');
+        $groupedOrderGoodsList = OrderGoodsService::getInstance()->getListByOrderIds($orderIds)->groupBy('order_id');
 
-        $orderList = $orderList->map(function (Order $order) use ($role, $orderGoodsList) {
+        $orderList = $orderList->map(function (Order $order) use ($role, $groupedOrderGoodsList) {
             if (!$order->canConfirmHandle()) {
                 $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '订单无法确认');
             }
@@ -796,36 +790,47 @@ class OrderService extends BaseService
                 $this->throwUpdateFail();
             }
 
+            $orderGoodsLit = $groupedOrderGoodsList->get($order->id);
             /** @var OrderGoods $orderGoods */
-            $orderGoods = $orderGoodsList->get($order->id);
-            if ($orderGoods->is_gift == 1 && ($orderGoods->user_level == 0 || $orderGoods->promoter_status == 2)) {
-                if ($orderGoods->refund_status == 1 && $role == 'user') {
-                    // 7天无理由商品：确认收货7天后生成代言人身份/更新身份有效期
-                    if ($orderGoods->user_level == 0) {
-                        dispatch(new CreatePromoterJob($orderGoods->id));
-                    }
-                    if ($orderGoods->promoter_status == 2) {
-                        dispatch(new RenewPromoterJob($orderGoods->id));
-                    }
-                } else {
-                    if ($orderGoods->user_level == 0) {
-                        PromoterService::getInstance()->createPromoterByGift($orderGoods->id);
-                    }
-                    if ($orderGoods->promoter_status == 2) {
-                        PromoterService::getInstance()->renewPromoterByGift($orderGoods->id);
+            foreach ($orderGoodsLit as $orderGoods) {
+                if ($orderGoods->is_gift == 1 && ($orderGoods->user_level == 0 || $orderGoods->promoter_status == 2)) {
+                    if ($order->delivery_mode == 1 && $orderGoods->refund_status == 1) {
+                        // 7天无理由商品：确认收货7天后生成代言人身份/更新身份有效期
+                        if ($orderGoods->user_level == 0) {
+                            dispatch(new CreatePromoterJob($orderGoods->id));
+                        }
+                        if ($orderGoods->promoter_status == 2) {
+                            dispatch(new RenewPromoterJob($orderGoods->id));
+                        }
+                    } else {
+                        if ($orderGoods->user_level == 0) {
+                            PromoterService::getInstance()->createPromoterByGift($orderGoods->id);
+                        }
+                        if ($orderGoods->promoter_status == 2) {
+                            PromoterService::getInstance()->renewPromoterByGift($orderGoods->id);
+                        }
                     }
                 }
+
+                // 收益记录变更为待提现
+                ShopIncomeService::getInstance()->updateToConfirmStatus(
+                    $order->id,
+                    $orderGoods->goods_id,
+                    $order->delivery_mode,
+                    $orderGoods->refund_status
+                );
+
+                // 佣金记录变更为待提现
+                CommissionService::getInstance()->updateGoodsCommissionToConfirmStatus(
+                    $order->id,
+                    $orderGoods->goods_id,
+                    $order->delivery_mode,
+                    $orderGoods->refund_status
+                );
             }
 
             return $order;
         });
-
-        // 佣金记录变更为待提现
-        CommissionService::getInstance()
-            ->updateListToOrderConfirmStatus($orderIds, ProductType::GOODS, $role);
-
-        // 收益记录变更为待提现
-        ShopIncomeService::getInstance()->updateListToConfirmStatus($orderIds);
 
         return $orderList;
     }
