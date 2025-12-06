@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Jobs\CouponExpireJob;
 use App\Models\Coupon;
 use App\Models\Goods;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\CouponInput;
 use App\Utils\Inputs\CouponPageInput;
 
@@ -77,11 +76,10 @@ class CouponService extends BaseService
     public function expireCoupon($id)
     {
         $coupon = $this->getCouponById($id);
-        if (is_null($coupon)) {
-            $this->throwBusinessException(CodeResponse::NOT_FOUND, '优惠券不存在');
+        if (!is_null($coupon)) {
+            $coupon->status = 2;
+            $coupon->save();
         }
-        $coupon->status = 2;
-        $coupon->save();
         return $coupon;
     }
 

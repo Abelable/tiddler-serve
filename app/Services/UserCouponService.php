@@ -81,12 +81,12 @@ class UserCouponService extends BaseService
     {
         $couponList = $this->getListByCouponId($couponId);
         foreach ($couponList as $coupon) {
-            if (is_null($coupon)) {
-                $this->throwBusinessException(CodeResponse::NOT_FOUND, '用户领取的优惠券不存在');
+            if (!is_null($coupon)) {
+                $coupon->status = 3;
+                $coupon->save();
             }
-            $coupon->status = 3;
-            $coupon->save();
         }
+        return $couponList;
     }
 
     public function getListByCouponId($couponId, $columns = ['*'])
