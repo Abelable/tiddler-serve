@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\NotifyNoShipmentJob;
+use App\Jobs\OverTimeCancelOrderJob;
 use App\Models\Catering\CateringShop;
 use App\Models\Catering\SetMealOrder;
 use App\Models\User;
@@ -12,7 +13,6 @@ use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Enums\SetMealOrderStatus;
 use App\Utils\Inputs\PageInput;
-use App\Utils\WxMpServe;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -220,7 +220,7 @@ class SetMealOrderService extends BaseService
         $order->save();
 
         // 设置订单支付超时任务
-        // dispatch(new OverTimeCancelOrder($userId, $order->id));
+        dispatch(new OverTimeCancelOrderJob(ProductType::SET_MEAL, $user->id, $order->id));
 
         return $order;
     }

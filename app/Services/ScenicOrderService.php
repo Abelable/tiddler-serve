@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\NotifyNoShipmentJob;
+use App\Jobs\OverTimeCancelOrderJob;
 use App\Models\ScenicOrder;
 use App\Models\ScenicShop;
 use App\Utils\CodeResponse;
@@ -11,7 +12,6 @@ use App\Utils\Enums\ProductType;
 use App\Utils\Enums\ScenicOrderStatus;
 use App\Utils\Inputs\ScenicOrderInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\WxMpServe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -208,7 +208,7 @@ class ScenicOrderService extends BaseService
         $order->save();
 
         // 设置订单支付超时任务
-        // dispatch(new OverTimeCancelOrder($userId, $order->id));
+        dispatch(new OverTimeCancelOrderJob(ProductType::SCENIC, $userId, $order->id));
 
         return $order;
     }

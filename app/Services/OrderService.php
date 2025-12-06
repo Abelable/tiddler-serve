@@ -350,7 +350,7 @@ class OrderService extends BaseService
         $order->save();
 
         // 设置订单支付超时任务
-        dispatch(new OverTimeCancelOrderJob($userId, $order->id));
+        dispatch(new OverTimeCancelOrderJob(ProductType::GOODS, $userId, $order->id));
 
         return $order;
     }

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Jobs\NotifyNoShipmentJob;
+use App\Jobs\OverTimeCancelOrderJob;
 use App\Models\Hotel;
 use App\Models\HotelOrder;
 use App\Models\HotelShop;
@@ -11,7 +13,6 @@ use App\Utils\Enums\HotelOrderStatus;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\HotelOrderInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\WxMpServe;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -215,7 +216,7 @@ class HotelOrderService extends BaseService
         $order->save();
 
         // 设置订单支付超时任务
-        // dispatch(new OverTimeCancelOrder($userId, $order->id));
+        dispatch(new OverTimeCancelOrderJob(ProductType::HOTEL, $userId, $order->id));
 
         return $order;
     }
@@ -323,7 +324,7 @@ class HotelOrderService extends BaseService
 
         // 同步微信后台非物流订单
         $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
-        WxMpServe::new()->notifyNoShipment($openid, $order->pay_id, $order->hotel_name . '房间预定');
+        dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $order->hotel_name . '房间预定'));
 
         return $order;
     }
