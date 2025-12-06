@@ -6,6 +6,7 @@ use App\Models\ShopIncomeWithdrawal;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\IncomeWithdrawalInput;
+use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
 class IncomeWithdrawalService extends BaseService
@@ -14,14 +15,8 @@ class IncomeWithdrawalService extends BaseService
     {
         $withdrawal = ShopIncomeWithdrawal::new();
 
-        if ($input->path == 3) { // 提现至余额
-            $handlingFee = 0;
-            $actualAmount = $withdrawAmount;
-            $withdrawal->status = 1;
-        } else {
-            $handlingFee = bcmul($withdrawAmount, '0.006', 2);
-            $actualAmount = bcsub($withdrawAmount, $handlingFee, 2);
-        }
+        $handlingFee = MathTool::bcRound(bcmul($withdrawAmount, '0.006', 10));
+        $actualAmount = bcsub($withdrawAmount, $handlingFee, 2);
 
         $withdrawal->merchant_type = $merchantType;
         $withdrawal->shop_id = $shopId;

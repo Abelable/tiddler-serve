@@ -6,6 +6,7 @@ use App\Models\TaskRewardWithdrawal;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\WithdrawalPageInput;
 use App\Utils\Inputs\RewardWithdrawalInput;
+use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
 class RewardWithdrawalService extends BaseService
@@ -20,8 +21,8 @@ class RewardWithdrawalService extends BaseService
             $actualAmount = $input->amount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = bcmul($input->amount, 0.06, 2);
-            $handlingFee = bcmul($input->amount, 0.006, 2);
+            $taxFee = MathTool::bcRound(bcmul($input->amount, '0.06', 10));
+            $handlingFee = MathTool::bcRound(bcmul($input->amount, '0.006', 10));
             $actualAmount = bcsub(bcsub($input->amount, $taxFee, 2), $handlingFee, 2);
         }
 

@@ -6,6 +6,7 @@ use App\Models\CommissionWithdrawal;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\WithdrawalPageInput;
 use App\Utils\Inputs\CommissionWithdrawalInput;
+use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
 class CommissionWithdrawalService extends BaseService
@@ -20,8 +21,8 @@ class CommissionWithdrawalService extends BaseService
             $actualAmount = $withdrawAmount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = $input->scene == 1 ? 0 : bcmul($withdrawAmount, 0.06, 2);
-            $handlingFee = bcmul($withdrawAmount, 0.006, 2);
+            $taxFee = $input->scene == 1 ? 0 : MathTool::bcRound(bcmul($withdrawAmount, '0.06', 10));
+            $handlingFee = MathTool::bcRound(bcmul($withdrawAmount, '0.006', 10));
             $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
         }
 
