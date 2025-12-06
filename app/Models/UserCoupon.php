@@ -14,7 +14,6 @@ namespace App\Models;
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon newQuery()
- * @method static \Illuminate\Database\Query\Builder|UserCoupon onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon query()
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon whereCouponId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon whereCreatedAt($value)
@@ -23,8 +22,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|UserCoupon whereUserId($value)
- * @method static \Illuminate\Database\Query\Builder|UserCoupon withTrashed()
- * @method static \Illuminate\Database\Query\Builder|UserCoupon withoutTrashed()
  * @mixin \Eloquent
  */
 class UserCoupon extends BaseModel

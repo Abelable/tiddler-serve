@@ -9,23 +9,22 @@ namespace App\Models;
  * @property int $shop_id 店铺id
  * @property int $status 优惠券状态：1-有效，2-过期，3-下架
  * @property string $name 优惠券名称
- * @property float $denomination 优惠券面额
- * @property string $description 优惠券说明
+ * @property string|null $description 优惠券说明
  * @property int $type 优惠券类型：1-无门槛，2-商品数量满减，3-价格满减
+ * @property string $denomination 优惠券面额
  * @property int $num_limit 优惠券商品数量门槛
- * @property float $price_limit 优惠券价格门槛
- * @property string $expiration_time 优惠券失效时间
- * @property int $goods_id 商品id
- * @property string $goods_cover 商品图片
- * @property string $goods_name 商品名称
+ * @property string $price_limit 优惠券价格门槛
+ * @property string|null $expiration_time 优惠券失效时间
  * @property int $receive_limit 优惠券领取数量限制
  * @property int $received_num 优惠券领取数量
+ * @property int|null $goods_id 商品id
+ * @property string|null $goods_cover 商品图片
+ * @property string|null $goods_name 商品名称
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon newQuery()
- * @method static \Illuminate\Database\Query\Builder|Coupon onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon query()
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereDeletedAt($value)
@@ -45,8 +44,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Coupon whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|Coupon withTrashed()
- * @method static \Illuminate\Database\Query\Builder|Coupon withoutTrashed()
  * @mixin \Eloquent
  */
 class Coupon extends BaseModel
