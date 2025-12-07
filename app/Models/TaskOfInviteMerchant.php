@@ -8,20 +8,19 @@ namespace App\Models;
  * @property int $id
  * @property int $status 任务状态：1-进行中，2-已领取，3-已完成，4-已下架
  * @property int $merchant_type 商家类型：1-景点，2-酒店，3-餐饮，4-电商
- * @property int $product_id 产品id
+ * @property int|null $product_id 产品id
  * @property string $merchant_name 商家名称
- * @property string $tel 联系电话
- * @property string $address 具体地址
- * @property string $longitude 经度
- * @property string $latitude 纬度
- * @property float $reward_total 任务奖励总和
- * @property string $reward_list 任务阶段奖励
+ * @property string|null $tel 联系电话
+ * @property string|null $address 具体地址
+ * @property string|null $longitude 经度
+ * @property string|null $latitude 纬度
+ * @property string $reward_total 任务奖励总和
+ * @property mixed $reward_list 任务阶段奖励
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant newQuery()
- * @method static \Illuminate\Database\Query\Builder|TaskOfInviteMerchant onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant query()
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant whereAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant whereCreatedAt($value)
@@ -37,8 +36,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant whereTel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|TaskOfInviteMerchant whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|TaskOfInviteMerchant withTrashed()
- * @method static \Illuminate\Database\Query\Builder|TaskOfInviteMerchant withoutTrashed()
  * @mixin \Eloquent
  */
 class TaskOfInviteMerchant extends BaseModel
