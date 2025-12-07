@@ -28,7 +28,7 @@ class CreateGoodsTable extends Migration
             $table->integer('freight_template_id')->default(0)->comment('运费模板id：0-包邮');
 
             // 金额字段
-            $table->unsignedDecimal('price', 10, 2)->comment('商品价格');
+            $table->unsignedDecimal('price', 10, 2)->default(0)->comment('商品价格');
             $table->unsignedDecimal('market_price', 10, 2)->default(0)->comment('市场价格');
 
             // 佣金字段

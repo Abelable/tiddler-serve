@@ -6,10 +6,11 @@ namespace App\Models;
  * App\Models\OrderPackage
  *
  * @property int $id
+ * @property int $status 包裹状态：0-待发货，1-已发货，2-运输中，3-已签收
  * @property int $order_id 订单id
- * @property string $ship_channel 快递公司
+ * @property string $ship_channel 快递公司名称
  * @property string $ship_code 快递公司编号
- * @property string $ship_sn 快递编号
+ * @property string $ship_sn 快递单号
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -18,7 +19,6 @@ namespace App\Models;
  * @property-read \App\Models\Order|null $order
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage newQuery()
- * @method static \Illuminate\Database\Query\Builder|OrderPackage onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereDeletedAt($value)
@@ -27,9 +27,8 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereShipChannel($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereShipCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereShipSn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackage whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|OrderPackage withTrashed()
- * @method static \Illuminate\Database\Query\Builder|OrderPackage withoutTrashed()
  * @mixin \Eloquent
  */
 class OrderPackage extends BaseModel

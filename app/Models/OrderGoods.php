@@ -14,17 +14,17 @@ namespace App\Models;
  * @property int $shop_id 店铺id
  * @property int $goods_id 商品id
  * @property int $is_gift 是否为礼包商品：0-否，1-是
- * @property int $duration 代言时长（天）
+ * @property int|null $duration 代言时长（天）
  * @property int $refund_status 是否支持7天无理由：0-不支持，1-支持
- * @property int $refund_address_id 退货地址
+ * @property int|null $refund_address_id 退货地址
  * @property string $cover 商品图片
  * @property string $name 商品名称
- * @property float $price 商品价格
- * @property float $sales_commission_rate 销售佣金比例%
- * @property float $promotion_commission_rate 推广佣金比例%
- * @property float $promotion_commission_upper_limit 推广佣金上限
- * @property float $superior_promotion_commission_rate 上级推广佣金比例%
- * @property float $superior_promotion_commission_upper_limit 上级推广佣金上限
+ * @property string $price 商品价格
+ * @property string $sales_commission_rate 销售佣金比例%
+ * @property string $promotion_commission_rate 推广佣金比例%
+ * @property string $promotion_commission_upper_limit 推广佣金上限
+ * @property string $superior_promotion_commission_rate 上级推广佣金比例%
+ * @property string $superior_promotion_commission_upper_limit 上级推广佣金上限
  * @property string $selected_sku_name 选中的规格名称
  * @property int $selected_sku_index 选中的规格索引
  * @property int $number 商品数量
@@ -34,7 +34,6 @@ namespace App\Models;
  * @property-read \App\Models\Order|null $order
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods newQuery()
- * @method static \Illuminate\Database\Query\Builder|OrderGoods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereCreatedAt($value)
@@ -62,8 +61,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderGoods whereUserLevel($value)
- * @method static \Illuminate\Database\Query\Builder|OrderGoods withTrashed()
- * @method static \Illuminate\Database\Query\Builder|OrderGoods withoutTrashed()
  * @mixin \Eloquent
  */
 class OrderGoods extends BaseModel

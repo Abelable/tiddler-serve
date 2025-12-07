@@ -15,28 +15,35 @@ class CreateOrderGoodsTable extends Migration
     {
         Schema::create('order_goods', function (Blueprint $table) {
             $table->id();
-            $table->integer('status')->default(0)->comment('状态：0-待付款，1-已付款，2-已退款');
-            $table->integer('user_id')->comment('用户id');
-            $table->integer('user_level')->comment('用户等级');
-            $table->integer('promoter_status')->comment('用户代言人身份状态');
-            $table->integer('order_id')->comment('订单id');
-            $table->integer('shop_id')->default(0)->comment('店铺id');
-            $table->integer('goods_id')->comment('商品id');
-            $table->integer('is_gift')->default(0)->comment('是否为礼包商品：0-否，1-是');
-            $table->integer('duration')->default(0)->comment('代言时长（天）');
-            $table->integer('refund_status')->comment('是否支持7天无理由：0-不支持，1-支持');
-            $table->integer('refund_address_id')->default(0)->comment('退货地址');
-            $table->string('cover')->comment('商品图片');
-            $table->string('name')->comment('商品名称');
-            $table->float('price')->comment('商品价格');
-            $table->float('sales_commission_rate')->comment('销售佣金比例%');
-            $table->float('promotion_commission_rate')->comment('推广佣金比例%');
-            $table->float('promotion_commission_upper_limit')->comment('推广佣金上限');
-            $table->float('superior_promotion_commission_rate')->comment('上级推广佣金比例%');
-            $table->float('superior_promotion_commission_upper_limit')->comment('上级推广佣金上限');
-            $table->string('selected_sku_name')->comment('选中的规格名称');
-            $table->integer('selected_sku_index')->comment('选中的规格索引');
-            $table->integer('number')->comment('商品数量');
+            $table->tinyInteger('status')->default(0)->comment('状态：0-待付款，1-已付款，2-已退款');
+
+            $table->unsignedBigInteger('user_id')->index()->comment('用户id');
+            $table->tinyInteger('user_level')->comment('用户等级');
+            $table->tinyInteger('promoter_status')->comment('用户代言人身份状态');
+
+            $table->unsignedBigInteger('order_id')->index()->comment('订单id');
+            $table->unsignedBigInteger('shop_id')->default(0)->index()->comment('店铺id');
+            $table->unsignedBigInteger('goods_id')->index()->comment('商品id');
+
+            $table->tinyInteger('is_gift')->default(0)->comment('是否为礼包商品：0-否，1-是');
+            $table->unsignedInteger('duration')->nullable()->comment('代言时长（天）');
+            $table->tinyInteger('refund_status')->comment('是否支持7天无理由：0-不支持，1-支持');
+            $table->unsignedBigInteger('refund_address_id')->nullable()->comment('退货地址');
+
+            $table->string('cover', 500)->comment('商品图片');
+            $table->string('name', 200)->comment('商品名称');
+
+            $table->unsignedDecimal('price', 10, 2)->default(0)->comment('商品价格');
+            $table->decimal('sales_commission_rate', 5, 2)->default(0)->comment('销售佣金比例%');
+            $table->decimal('promotion_commission_rate', 5, 2)->default(0)->comment('推广佣金比例%');
+            $table->unsignedDecimal('promotion_commission_upper_limit', 10, 2)->default(0)->comment('推广佣金上限');
+            $table->decimal('superior_promotion_commission_rate', 5, 2)->default(0)->comment('上级推广佣金比例%');
+            $table->unsignedDecimal('superior_promotion_commission_upper_limit', 10, 2)->default(0)->comment('上级推广佣金上限');
+
+            $table->string('selected_sku_name', 200)->default('')->comment('选中的规格名称');
+            $table->unsignedInteger('selected_sku_index')->default(0)->comment('选中的规格索引');
+            $table->unsignedInteger('number')->default(1)->comment('商品数量');
+
             $table->timestamps();
             $table->softDeletes();
         });

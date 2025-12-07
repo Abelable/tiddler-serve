@@ -6,12 +6,12 @@ namespace App\Models;
  * App\Models\OrderPackageGoods
  *
  * @property int $id
- * @property int $order_id 订单id
- * @property int $package_id 包裹id
- * @property int $goods_id 商品id
+ * @property int $order_id 订单ID
+ * @property int $package_id 包裹ID
+ * @property int $goods_id 商品ID
  * @property string $cover 商品图片
  * @property string $name 商品名称
- * @property string $selected_sku_name 商品规格
+ * @property string $selected_sku_name 规格名称
  * @property int $number 商品数量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -19,7 +19,6 @@ namespace App\Models;
  * @property-read \App\Models\OrderPackage|null $package
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods newQuery()
- * @method static \Illuminate\Database\Query\Builder|OrderPackageGoods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods whereCreatedAt($value)
@@ -32,8 +31,6 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods wherePackageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods whereSelectedSkuName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderPackageGoods whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|OrderPackageGoods withTrashed()
- * @method static \Illuminate\Database\Query\Builder|OrderPackageGoods withoutTrashed()
  * @mixin \Eloquent
  */
 class OrderPackageGoods extends BaseModel

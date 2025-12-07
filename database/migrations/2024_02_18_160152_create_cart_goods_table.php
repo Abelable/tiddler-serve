@@ -41,7 +41,7 @@ class CreateCartGoodsTable extends Migration
             $table->integer('selected_sku_index')->default(-1)->comment('选中的规格索引');
 
             // 金额字段
-            $table->unsignedDecimal('price', 10, 2)->comment('商品价格');
+            $table->unsignedDecimal('price', 10, 2)->default(0)->comment('商品价格');
             $table->unsignedDecimal('market_price', 10, 2)->default(0)->comment('市场价格');
 
             // 佣金字段
