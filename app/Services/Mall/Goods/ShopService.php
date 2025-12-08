@@ -26,7 +26,7 @@ class ShopService extends BaseService
         $shop->category_ids = json_encode($input->shopCategoryIds);
         $shop->logo = $input->shopLogo;
         $shop->name = $input->shopName;
-        $shop->bg = $input->shopBg;
+        $shop->bg = $input->shopBg ?? '';
         $shop->save();
         return $shop;
     }
