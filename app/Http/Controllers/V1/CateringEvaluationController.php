@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\CateringEvaluation;
+use App\Models\Mall\Catering\CateringEvaluation;
 use App\Services\Mall\Catering\CateringEvaluationService;
-use App\Services\MealTicketOrderService;
-use App\Services\RestaurantService;
-use App\Services\SetMealOrderService;
+use App\Services\Mall\Catering\MealTicketOrderService;
+use App\Services\Mall\Catering\RestaurantService;
+use App\Services\Mall\Catering\SetMealOrderService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CateringEvaluationInput;

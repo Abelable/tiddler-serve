@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\Restaurant;
 use App\Models\Goods;
 use App\Models\Hotel;
+use App\Models\Mall\Catering\Restaurant;
 use App\Models\ScenicSpot;
 use App\Services\GoodsService;
 use App\Services\HotelService;
-use App\Services\RestaurantService;
+use App\Services\Mall\Catering\RestaurantService;
 use App\Services\ScenicService;
 use App\Utils\AiServe;
 use Illuminate\Support\Facades\Log;

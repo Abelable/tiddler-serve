@@ -3,7 +3,7 @@
 namespace App\Services\Mall\Catering;
 
 use App\Jobs\NotifyNoShipmentJob;
-use App\Models\Catering\CateringShop;
+use App\Models\Mall\Catering\CateringShop;
 use App\Services\BaseService;
 use App\Services\UserService;
 use App\Services\UserTaskService;
@@ -12,7 +12,6 @@ use App\Utils\Enums\MerchantType;
 use App\Utils\Inputs\Admin\ShopPageInput;
 use App\Utils\Inputs\CateringMerchantInput;
 use App\Utils\Inputs\ShopInput;
-use App\Utils\WxMpServe;
 use Illuminate\Support\Facades\Log;
 
 class CateringShopService extends BaseService

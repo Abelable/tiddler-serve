@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\CateringMerchant;
-use App\Models\Catering\CateringShop;
-use App\Models\Catering\Restaurant;
+use App\Models\Mall\Catering\CateringMerchant;
+use App\Models\Mall\Catering\CateringShop;
+use App\Models\Mall\Catering\Restaurant;
 use App\Models\ShopRestaurant;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
-use App\Services\RestaurantService;
+use App\Services\Mall\Catering\RestaurantService;
 use App\Services\ShopRestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;

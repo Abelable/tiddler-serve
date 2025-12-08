@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Catering\CateringShop;
-use App\Models\Catering\CateringShopManager;
 use App\Models\HotelShop;
 use App\Models\HotelShopManager;
+use App\Models\Mall\Catering\CateringShop;
+use App\Models\Mall\Catering\CateringShopManager;
 use App\Models\ScenicShop;
 use App\Models\ScenicShopManager;
 use App\Models\Shop;

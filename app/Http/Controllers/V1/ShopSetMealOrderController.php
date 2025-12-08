@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\OrderSetMeal;
-use App\Models\Catering\SetMealOrder;
+use App\Models\Mall\Catering\OrderSetMeal;
+use App\Models\Mall\Catering\SetMealOrder;
 use App\Services\Mall\Catering\CateringShopManagerService;
+use App\Services\Mall\Catering\OrderSetMealService;
 use App\Services\Mall\Catering\RestaurantManagerService;
-use App\Services\OrderSetMealService;
-use App\Services\SetMealOrderService;
-use App\Services\SetMealVerifyService;
+use App\Services\Mall\Catering\SetMealOrderService;
+use App\Services\Mall\Catering\SetMealVerifyService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\SetMealOrderStatus;

@@ -3,13 +3,12 @@
 namespace App\Jobs;
 
 use App\Services\HotelOrderService;
-use App\Services\MealTicketOrderService;
+use App\Services\Mall\Catering\MealTicketOrderService;
+use App\Services\Mall\Catering\SetMealOrderService;
 use App\Services\OrderService;
 use App\Services\ScenicOrderService;
-use App\Services\SetMealOrderService;
 use App\Utils\Enums\ProductType;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;

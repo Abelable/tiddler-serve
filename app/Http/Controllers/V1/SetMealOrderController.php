@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\OrderSetMeal;
-use App\Models\Catering\SetMealOrder;
+use App\Models\Mall\Catering\OrderSetMeal;
+use App\Models\Mall\Catering\SetMealOrder;
 use App\Services\AccountService;
 use App\Services\CommissionService;
 use App\Services\Mall\Catering\CateringShopIncomeService;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\Mall\Catering\CateringShopService;
-use App\Services\OrderSetMealService;
+use App\Services\Mall\Catering\OrderSetMealService;
+use App\Services\Mall\Catering\RestaurantService;
+use App\Services\Mall\Catering\SetMealOrderService;
+use App\Services\Mall\Catering\SetMealService;
+use App\Services\Mall\Catering\SetMealVerifyService;
 use App\Services\PromoterService;
 use App\Services\RelationService;
-use App\Services\RestaurantService;
-use App\Services\SetMealOrderService;
-use App\Services\SetMealService;
-use App\Services\SetMealVerifyService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Enums\SetMealOrderStatus;

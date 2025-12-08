@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\SetMeal;
+use App\Models\Mall\Catering\SetMeal;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
-use App\Services\SetMealService;
+use App\Services\Mall\Catering\SetMealService;
 use App\Services\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;

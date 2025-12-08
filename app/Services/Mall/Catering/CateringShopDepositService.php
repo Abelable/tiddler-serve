@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\Catering\CateringShopDeposit;
+use App\Models\Mall\Catering\CateringShopDeposit;
 use App\Services\BaseService;
 
 class CateringShopDepositService extends BaseService

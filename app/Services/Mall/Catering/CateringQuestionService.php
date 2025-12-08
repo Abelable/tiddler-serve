@@ -2,8 +2,8 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\Catering\CateringAnswer;
-use App\Models\Catering\CateringQuestion;
+use App\Models\Mall\Catering\CateringAnswer;
+use App\Models\Mall\Catering\CateringQuestion;
 use App\Services\BaseService;
 use App\Services\UserService;
 use App\Utils\Inputs\PageInput;

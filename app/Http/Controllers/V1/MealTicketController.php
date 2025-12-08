@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Catering\MealTicket;
-use App\Services\MealTicketRestaurantService;
-use App\Services\MealTicketService;
+use App\Models\Mall\Catering\MealTicket;
+use App\Services\Mall\Catering\MealTicketRestaurantService;
+use App\Services\Mall\Catering\MealTicketService;
 use App\Utils\CodeResponse;
 
 class MealTicketController extends Controller

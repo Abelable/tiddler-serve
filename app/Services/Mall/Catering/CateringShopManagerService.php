@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\Catering\CateringShopManager;
+use App\Models\Mall\Catering\CateringShopManager;
 use App\Models\User;
 use App\Services\BaseService;
 use App\Utils\Inputs\ManagerInput;

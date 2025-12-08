@@ -2,7 +2,7 @@
 
 namespace App\Services\Mall\Catering;
 
-use App\Models\Catering\RestaurantManager;
+use App\Models\Mall\Catering\RestaurantManager;
 use App\Services\BaseService;
 
 class RestaurantManagerService extends BaseService
