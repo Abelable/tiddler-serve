@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicTicket;
-use App\Services\ScenicShopManagerService;
-use App\Services\ScenicTicketService;
-use App\Services\TicketScenicService;
-use App\Services\TicketSpecService;
+use App\Models\Mall\Scenic\ScenicTicket;
+use App\Services\Mall\Scenic\ScenicShopManagerService;
+use App\Services\Mall\Scenic\ScenicTicketService;
+use App\Services\Mall\Scenic\TicketScenicService;
+use App\Services\Mall\Scenic\TicketSpecService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ScenicTicketInput;
 use App\Utils\Inputs\StatusPageInput;

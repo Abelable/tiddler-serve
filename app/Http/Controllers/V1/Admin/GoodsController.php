@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\GiftGoodsService;
-use App\Services\GoodsPickupAddressService;
-use App\Services\GoodsService;
-use App\Services\MerchantService;
-use App\Services\ShopService;
-use App\Services\UserTaskService;
+use App\Services\Mall\Goods\GiftGoodsService;
+use App\Services\Mall\Goods\GoodsPickupAddressService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\MerchantService;
+use App\Services\Mall\Goods\ShopService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
-use App\Utils\Inputs\GoodsPageInput;
 use App\Utils\Inputs\GoodsInput;
+use App\Utils\Inputs\GoodsPageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelOrder;
-use App\Models\HotelOrderRoom;
-use App\Services\HotelManagerService;
-use App\Services\HotelOrderService;
-use App\Services\HotelOrderRoomService;
-use App\Services\HotelVerifyService;
-use App\Services\HotelShopManagerService;
+use App\Models\Mall\Hotel\HotelOrder;
+use App\Models\Mall\Hotel\HotelOrderRoom;
+use App\Services\Mall\Hotel\HotelManagerService;
+use App\Services\Mall\Hotel\HotelOrderRoomService;
+use App\Services\Mall\Hotel\HotelOrderService;
+use App\Services\Mall\Hotel\HotelShopManagerService;
+use App\Services\Mall\Hotel\HotelVerifyService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\HotelOrderStatus;

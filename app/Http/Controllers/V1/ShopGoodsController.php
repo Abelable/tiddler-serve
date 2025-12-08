@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\GoodsCategoryService;
-use App\Services\GoodsPickupAddressService;
-use App\Services\GoodsService;
-use App\Services\ShopManagerService;
-use App\Services\ShopService;
+use App\Services\Mall\Goods\GoodsCategoryService;
+use App\Services\Mall\Goods\GoodsPickupAddressService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\ShopManagerService;
+use App\Services\Mall\Goods\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsInput;
 use App\Utils\Inputs\StatusPageInput;

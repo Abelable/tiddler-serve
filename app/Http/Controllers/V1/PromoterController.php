@@ -4,10 +4,10 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\CommissionService;
-use App\Services\OrderService;
-use App\Services\PromoterChangeLogService;
-use App\Services\PromoterService;
+use App\Services\Mall\CommissionService;
+use App\Services\Mall\Goods\OrderService;
+use App\Services\Promoter\PromoterChangeLogService;
+use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
 use App\Utils\Inputs\SearchPageInput;

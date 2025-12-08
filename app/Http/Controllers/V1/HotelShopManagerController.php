@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\HotelManagerService;
-use App\Services\HotelShopManagerService;
+use App\Services\Mall\Hotel\HotelManagerService;
+use App\Services\Mall\Hotel\HotelShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;

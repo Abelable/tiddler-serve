@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Services\OrderService;
+use App\Services\Mall\Goods\OrderService;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

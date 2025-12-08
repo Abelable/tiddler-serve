@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\AdminRole;
+use App\Models\Admin\AdminRole;
 use App\Services\Admin\RoleService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;

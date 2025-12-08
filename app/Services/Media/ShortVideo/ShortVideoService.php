@@ -2,10 +2,10 @@
 
 namespace App\Services\Media\ShortVideo;
 
-use App\Models\MediaProduct;
-use App\Models\ShortVideo;
+use App\Models\Media\MediaProduct;
+use App\Models\Media\ShortVideo\ShortVideo;
 use App\Services\BaseService;
-use App\Services\MediaProductService;
+use App\Services\Media\MediaProductService;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\Admin\MediaPageInput;

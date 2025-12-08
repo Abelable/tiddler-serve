@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\MediaProduct;
-use App\Models\ShortVideo;
+use App\Models\Media\MediaProduct;
+use App\Models\Media\ShortVideo\ShortVideo;
+use App\Services\Media\MediaProductService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoCommentService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
-use App\Services\MediaProductService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;

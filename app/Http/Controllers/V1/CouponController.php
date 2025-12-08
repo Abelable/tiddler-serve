@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Coupon;
-use App\Models\UserCoupon;
-use App\Services\CouponService;
-use App\Services\UserCouponService;
+use App\Models\Mall\Coupon;
+use App\Models\Mall\UserCoupon;
+use App\Services\Mall\CouponService;
+use App\Services\Mall\UserCouponService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 use Illuminate\Support\Facades\DB;

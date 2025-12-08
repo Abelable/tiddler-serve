@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicMerchant;
-use App\Models\ScenicShop;
-use App\Models\ShopScenicSpot;
-use App\Models\ScenicSpot;
-use App\Services\ScenicMerchantService;
-use App\Services\ScenicShopService;
-use App\Services\ShopScenicService;
-use App\Services\ScenicService;
+use App\Models\Mall\Scenic\ScenicMerchant;
+use App\Models\Mall\Scenic\ScenicShop;
+use App\Models\Mall\Scenic\ScenicSpot;
+use App\Models\Mall\Scenic\ShopScenicSpot;
+use App\Services\Mall\Scenic\ScenicMerchantService;
+use App\Services\Mall\Scenic\ScenicService;
+use App\Services\Mall\Scenic\ScenicShopService;
+use App\Services\Mall\Scenic\ShopScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 

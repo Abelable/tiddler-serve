@@ -2,11 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Services\HotelOrderService;
 use App\Services\Mall\Catering\MealTicketOrderService;
 use App\Services\Mall\Catering\SetMealOrderService;
-use App\Services\OrderService;
-use App\Services\ScenicOrderService;
+use App\Services\Mall\Goods\OrderService;
+use App\Services\Mall\Hotel\HotelOrderService;
+use App\Services\Mall\Scenic\ScenicOrderService;
 use App\Utils\Enums\ProductType;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

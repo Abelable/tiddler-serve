@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\FreightTemplate;
-use App\Services\FreightTemplateService;
+use App\Models\Mall\Goods\FreightTemplate;
+use App\Services\Mall\Goods\FreightTemplateService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\FreightTemplateInput;
 use App\Utils\Inputs\PageInput;

@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\Note;
 
-use App\Models\TourismNoteCollection;
+use App\Models\Media\Note\TourismNoteCollection;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 

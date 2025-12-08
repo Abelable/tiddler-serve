@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\LakeHomestayService;
+use App\Services\Theme\LakeHomestayService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\LakeHomestayInput;
 use App\Utils\Inputs\PageInput;

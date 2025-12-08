@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\LakeCycleMediaService;
 use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoService;
+use App\Services\Theme\LakeCycleMediaService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\PageInput;

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\LiveGoods;
-use App\Models\LiveRoom;
+use App\Models\Media\Live\LiveGoods;
+use App\Models\Media\Live\LiveRoom;
 use App\Services\FanService;
-use App\Services\GoodsService;
+use App\Services\Mall\Goods\GoodsService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;

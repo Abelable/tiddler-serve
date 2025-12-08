@@ -4,9 +4,9 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mall\Catering\Restaurant;
-use App\Models\ShopRestaurant;
+use App\Models\Mall\Catering\ShopRestaurant;
 use App\Services\Mall\Catering\RestaurantService;
-use App\Services\ShopRestaurantService;
+use App\Services\Mall\Catering\ShopRestaurantService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 

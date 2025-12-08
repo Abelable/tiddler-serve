@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\TaskOfInviteMerchant;
-use App\Services\TaskService;
+use App\Models\Task\TaskOfInviteMerchant;
+use App\Services\Task\TaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\TaskInput;
 use App\Utils\Inputs\TaskPageInput;

@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Commission;
-use App\Services\CommissionService;
-use App\Services\HotelOrderRoomService;
+use App\Models\Mall\Commission;
 use App\Services\Mall\Catering\OrderMealTicketService;
 use App\Services\Mall\Catering\OrderSetMealService;
-use App\Services\OrderGoodsService;
-use App\Services\PromoterChangeLogService;
-use App\Services\PromoterService;
+use App\Services\Mall\CommissionService;
+use App\Services\Mall\Goods\OrderGoodsService;
+use App\Services\Mall\Hotel\HotelOrderRoomService;
+use App\Services\Mall\Scenic\ScenicOrderTicketService;
+use App\Services\Promoter\PromoterChangeLogService;
+use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
-use App\Services\ScenicOrderTicketService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;

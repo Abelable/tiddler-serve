@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopCategory;
-use App\Services\ExpressService;
-use App\Services\ShopCategoryService;
-use App\Services\ShopService;
+use App\Models\Mall\Goods\ShopCategory;
+use App\Services\Mall\Goods\ExpressService;
+use App\Services\Mall\Goods\ShopCategoryService;
+use App\Services\Mall\Goods\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ShopInput;
 

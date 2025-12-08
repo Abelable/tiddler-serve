@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicOrder;
-use App\Models\ScenicOrderTicket;
-use App\Services\ScenicManagerService;
-use App\Services\ScenicOrderService;
-use App\Services\ScenicOrderTicketService;
-use App\Services\ScenicVerifyService;
-use App\Services\ScenicShopManagerService;
+use App\Models\Mall\Scenic\ScenicOrder;
+use App\Models\Mall\Scenic\ScenicOrderTicket;
+use App\Services\Mall\Scenic\ScenicManagerService;
+use App\Services\Mall\Scenic\ScenicOrderService;
+use App\Services\Mall\Scenic\ScenicOrderTicketService;
+use App\Services\Mall\Scenic\ScenicShopManagerService;
+use App\Services\Mall\Scenic\ScenicVerifyService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ScenicOrderStatus;

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ShopDepositChangeLogService;
-use App\Services\ShopDepositService;
-use App\Services\ShopService;
+use App\Services\Mall\Goods\ShopDepositChangeLogService;
+use App\Services\Mall\Goods\ShopDepositService;
+use App\Services\Mall\Goods\ShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Yansongda\LaravelPay\Facades\Pay;

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicShopIncome;
-use App\Services\ProductHistoryService;
-use App\Services\ScenicOrderService;
-use App\Services\ScenicOrderTicketService;
-use App\Services\ScenicShopIncomeService;
-use App\Services\ShopScenicService;
+use App\Models\Mall\Scenic\ScenicShopIncome;
+use App\Services\Mall\ProductHistoryService;
+use App\Services\Mall\Scenic\ScenicOrderService;
+use App\Services\Mall\Scenic\ScenicOrderTicketService;
+use App\Services\Mall\Scenic\ScenicShopIncomeService;
+use App\Services\Mall\Scenic\ShopScenicService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;

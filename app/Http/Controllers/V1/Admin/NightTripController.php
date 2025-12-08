@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\NightTripService;
+use App\Services\Theme\NightTripService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\NightTripInput;
 use App\Utils\Inputs\PageInput;

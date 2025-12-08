@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\HotelMerchantService;
-use App\Services\HotelShopDepositService;
-use App\Services\HotelShopService;
+use App\Services\Mall\Hotel\HotelMerchantService;
+use App\Services\Mall\Hotel\HotelShopDepositService;
+use App\Services\Mall\Hotel\HotelShopService;
 use App\Services\SystemTodoService;
-use App\Services\UserTaskService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\HotelMerchantInput;

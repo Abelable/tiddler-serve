@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\PromoterQa;
-use App\Services\PromoterQaService;
+use App\Models\Promoter\PromoterQa;
+use App\Services\Promoter\PromoterQaService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;

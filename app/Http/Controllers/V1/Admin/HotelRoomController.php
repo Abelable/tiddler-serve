@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Hotel;
-use App\Models\HotelRoom;
-use App\Models\HotelRoomType;
-use App\Services\HotelMerchantService;
-use App\Services\HotelRoomTypeService;
-use App\Services\HotelService;
-use App\Services\HotelRoomService;
-use App\Services\HotelShopService;
-use App\Services\UserTaskService;
+use App\Models\Mall\Hotel\Hotel;
+use App\Models\Mall\Hotel\HotelRoom;
+use App\Models\Mall\Hotel\HotelRoomType;
+use App\Services\Mall\Hotel\HotelMerchantService;
+use App\Services\Mall\Hotel\HotelRoomService;
+use App\Services\Mall\Hotel\HotelRoomTypeService;
+use App\Services\Mall\Hotel\HotelService;
+use App\Services\Mall\Hotel\HotelShopService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\HotelRoomListInput;

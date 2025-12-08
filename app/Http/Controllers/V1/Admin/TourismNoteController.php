@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\MediaProduct;
-use App\Models\TourismNote;
+use App\Models\Media\MediaProduct;
+use App\Models\Media\Note\TourismNote;
+use App\Services\Media\MediaProductService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteCommentService;
 use App\Services\Media\Note\TourismNoteLikeService;
 use App\Services\Media\Note\TourismNoteService;
-use App\Services\MediaProductService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MediaType;
 use App\Utils\Enums\ProductType;

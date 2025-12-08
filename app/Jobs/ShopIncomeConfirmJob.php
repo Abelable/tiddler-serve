@@ -2,9 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Services\ShopIncomeService;
+use App\Services\Mall\Goods\ShopIncomeService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Hotel;
-use App\Models\HotelMerchant;
-use App\Models\HotelShop;
-use App\Models\ShopHotel;
-use App\Services\HotelMerchantService;
-use App\Services\HotelService;
-use App\Services\HotelShopService;
-use App\Services\ShopHotelService;
+use App\Models\Mall\Hotel\Hotel;
+use App\Models\Mall\Hotel\HotelMerchant;
+use App\Models\Mall\Hotel\HotelShop;
+use App\Models\Mall\Hotel\ShopHotel;
+use App\Services\Mall\Hotel\HotelMerchantService;
+use App\Services\Mall\Hotel\HotelService;
+use App\Services\Mall\Hotel\HotelShopService;
+use App\Services\Mall\Hotel\ShopHotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 

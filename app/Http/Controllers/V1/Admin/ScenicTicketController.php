@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicTicket;
-use App\Services\ScenicMerchantService;
-use App\Services\ScenicShopService;
-use App\Services\ScenicTicketService;
-use App\Services\UserTaskService;
+use App\Models\Mall\Scenic\ScenicTicket;
+use App\Services\Mall\Scenic\ScenicMerchantService;
+use App\Services\Mall\Scenic\ScenicShopService;
+use App\Services\Mall\Scenic\ScenicTicketService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\ScenicTicketListInput;

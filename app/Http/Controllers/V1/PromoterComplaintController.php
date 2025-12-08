@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\PromoterComplaintService;
+use App\Services\Promoter\PromoterComplaintService;
 use App\Utils\Inputs\ComplaintInput;
 
 class PromoterComplaintController extends Controller

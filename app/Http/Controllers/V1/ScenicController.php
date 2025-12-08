@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicSpot;
-use App\Services\HotelService;
-use App\Services\ProductHistoryService;
-use App\Services\ScenicEvaluationService;
-use App\Services\ScenicQuestionService;
-use App\Services\ShopScenicService;
-use App\Services\ScenicCategoryService;
-use App\Services\ScenicService;
+use App\Models\Mall\Scenic\ScenicSpot;
+use App\Services\Mall\Hotel\HotelService;
+use App\Services\Mall\ProductHistoryService;
+use App\Services\Mall\Scenic\ScenicCategoryService;
+use App\Services\Mall\Scenic\ScenicEvaluationService;
+use App\Services\Mall\Scenic\ScenicQuestionService;
+use App\Services\Mall\Scenic\ScenicService;
+use App\Services\Mall\Scenic\ShopScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;

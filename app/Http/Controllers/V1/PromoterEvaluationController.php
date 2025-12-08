@@ -4,15 +4,15 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\EvaluationTag;
-use App\Models\PromoterEvaluation;
-use App\Models\PromoterEvaluationTag;
+use App\Models\Promoter\PromoterEvaluation;
+use App\Models\Promoter\PromoterEvaluationTag;
 use App\Services\EvaluationTagService;
-use App\Services\PromoterEvaluationService;
-use App\Services\PromoterEvaluationTagService;
+use App\Services\Promoter\PromoterEvaluationService;
+use App\Services\Promoter\PromoterEvaluationTagService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\PromoterEvaluationInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\PromoterEvaluationInput;
 use Illuminate\Support\Facades\DB;
 
 class PromoterEvaluationController extends Controller

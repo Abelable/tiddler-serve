@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopCategory;
-use App\Services\ShopCategoryService;
+use App\Models\Mall\Goods\ShopCategory;
+use App\Services\Mall\Goods\ShopCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopCategoryInput;
 use App\Utils\Inputs\PageInput;

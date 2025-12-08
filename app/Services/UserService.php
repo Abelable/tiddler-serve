@@ -2,17 +2,23 @@
 
 namespace App\Services;
 
-use App\Models\HotelShop;
-use App\Models\HotelShopManager;
 use App\Models\Mall\Catering\CateringShop;
 use App\Models\Mall\Catering\CateringShopManager;
-use App\Models\ScenicShop;
-use App\Models\ScenicShopManager;
-use App\Models\Shop;
-use App\Models\ShopManager;
+use App\Models\Mall\Goods\Shop;
+use App\Models\Mall\Goods\ShopManager;
+use App\Models\Mall\Hotel\HotelShop;
+use App\Models\Mall\Hotel\HotelShopManager;
+use App\Models\Mall\Scenic\ScenicShop;
+use App\Models\Mall\Scenic\ScenicShopManager;
 use App\Models\User;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\Mall\Catering\CateringShopService;
+use App\Services\Mall\Goods\ShopManagerService;
+use App\Services\Mall\Goods\ShopService;
+use App\Services\Mall\Hotel\HotelShopManagerService;
+use App\Services\Mall\Hotel\HotelShopService;
+use App\Services\Mall\Scenic\ScenicShopManagerService;
+use App\Services\Mall\Scenic\ScenicShopService;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\SearchPageInput;
 use App\Utils\Inputs\WxMpRegisterInput;

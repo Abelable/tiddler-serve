@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelShopIncome;
-use App\Services\HotelOrderRoomService;
-use App\Services\HotelOrderService;
-use App\Services\ProductHistoryService;
-use App\Services\HotelShopIncomeService;
-use App\Services\ShopHotelService;
+use App\Models\Mall\Hotel\HotelShopIncome;
+use App\Services\Mall\Hotel\HotelOrderRoomService;
+use App\Services\Mall\Hotel\HotelOrderService;
+use App\Services\Mall\Hotel\HotelShopIncomeService;
+use App\Services\Mall\Hotel\ShopHotelService;
+use App\Services\Mall\ProductHistoryService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;

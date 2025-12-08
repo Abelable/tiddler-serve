@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelEvaluation;
-use App\Services\HotelEvaluationService;
-use App\Services\HotelOrderService;
-use App\Services\HotelService;
+use App\Models\Mall\Hotel\HotelEvaluation;
+use App\Services\Mall\Hotel\HotelEvaluationService;
+use App\Services\Mall\Hotel\HotelOrderService;
+use App\Services\Mall\Hotel\HotelService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelEvaluationInput;

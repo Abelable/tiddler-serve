@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ScenicManagerService;
-use App\Services\ScenicShopManagerService;
+use App\Services\Mall\Scenic\ScenicManagerService;
+use App\Services\Mall\Scenic\ScenicShopManagerService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ManagerInput;

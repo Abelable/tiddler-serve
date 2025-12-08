@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelRoom;
-use App\Models\HotelRoomType;
-use App\Services\HotelRoomTypeService;
-use App\Services\HotelRoomService;
-use App\Services\HotelShopManagerService;
+use App\Models\Mall\Hotel\HotelRoom;
+use App\Models\Mall\Hotel\HotelRoomType;
+use App\Services\Mall\Hotel\HotelRoomService;
+use App\Services\Mall\Hotel\HotelRoomTypeService;
+use App\Services\Mall\Hotel\HotelShopManagerService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\HotelRoomInput;
 use App\Utils\Inputs\StatusPageInput;

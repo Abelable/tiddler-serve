@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
-use App\Services\PromoterService;
+use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;

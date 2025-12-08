@@ -2,10 +2,10 @@
 
 namespace App\Services\Mall;
 
-use App\Models\Goods;
-use App\Models\Hotel;
 use App\Models\Mall\Catering\Restaurant;
-use App\Models\ScenicSpot;
+use App\Models\Mall\Goods\Goods;
+use App\Models\Mall\Hotel\Hotel;
+use App\Models\Mall\Scenic\ScenicSpot;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;

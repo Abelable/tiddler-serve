@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
+use App\Models\Admin\Admin;
 use App\Services\Admin\AdminService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\AdminAddInput;

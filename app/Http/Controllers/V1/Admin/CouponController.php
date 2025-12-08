@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Coupon;
-use App\Services\GoodsService;
-use App\Services\CouponService;
-use App\Services\UserCouponService;
+use App\Models\Mall\Coupon;
+use App\Services\Mall\CouponService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\UserCouponService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\CouponPageInput;
 use App\Utils\Inputs\CouponInput;
+use App\Utils\Inputs\CouponPageInput;
 use Illuminate\Support\Facades\DB;
 
 class CouponController extends Controller

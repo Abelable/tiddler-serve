@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopHotel;
-use App\Models\Hotel;
-use App\Services\HotelService;
-use App\Services\ShopHotelService;
+use App\Models\Mall\Hotel\Hotel;
+use App\Models\Mall\Hotel\ShopHotel;
+use App\Services\Mall\Hotel\HotelService;
+use App\Services\Mall\Hotel\ShopHotelService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 

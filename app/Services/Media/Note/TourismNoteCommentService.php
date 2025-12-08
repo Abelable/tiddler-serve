@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\Note;
 
-use App\Models\TourismNoteComment;
+use App\Models\Media\Note\TourismNoteComment;
 use App\Services\BaseService;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;

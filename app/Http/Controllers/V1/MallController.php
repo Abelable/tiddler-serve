@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
-use App\Models\Hotel;
 use App\Models\Mall\Catering\Restaurant;
-use App\Models\ScenicSpot;
-use App\Services\GiftGoodsService;
-use App\Services\GoodsService;
-use App\Services\HotelService;
+use App\Models\Mall\Goods\Goods;
+use App\Models\Mall\Hotel\Hotel;
+use App\Models\Mall\Scenic\ScenicSpot;
 use App\Services\Mall\Catering\RestaurantService;
+use App\Services\Mall\Goods\GiftGoodsService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\ShopService;
+use App\Services\Mall\Hotel\HotelService;
 use App\Services\Mall\MallService;
-use App\Services\ScenicService;
-use App\Services\ShopService;
+use App\Services\Mall\Scenic\ScenicService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\NearbyPageInput;
 use App\Utils\Inputs\PageInput;

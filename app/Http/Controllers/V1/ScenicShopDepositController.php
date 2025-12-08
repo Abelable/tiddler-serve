@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ScenicShopDepositChangeLogService;
-use App\Services\ScenicShopDepositService;
-use App\Services\ScenicShopService;
+use App\Services\Mall\Scenic\ScenicShopDepositChangeLogService;
+use App\Services\Mall\Scenic\ScenicShopDepositService;
+use App\Services\Mall\Scenic\ScenicShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Yansongda\LaravelPay\Facades\Pay;

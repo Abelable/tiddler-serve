@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\LakeTripService;
+use App\Services\Theme\LakeTripService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\LakeTripInput;
 use App\Utils\Inputs\PageInput;

@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\Live;
 
-use App\Models\LiveRoom;
+use App\Models\Media\Live\LiveRoom;
 use App\Services\BaseService;
 use App\Utils\Enums\LiveStatus;
 use App\Utils\Inputs\LiveRoomInput;

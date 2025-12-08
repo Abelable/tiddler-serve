@@ -2,8 +2,8 @@
 
 namespace App\Utils;
 
-use App\Models\Order;
-use App\Models\OrderPackage;
+use App\Models\Mall\Goods\Order;
+use App\Models\Mall\Goods\OrderPackage;
 use App\Utils\Traits\HttpClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;

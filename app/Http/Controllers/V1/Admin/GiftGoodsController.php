@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\GiftGoodsService;
-use App\Services\GoodsService;
+use App\Services\Mall\Goods\GiftGoodsService;
+use App\Services\Mall\Goods\GoodsService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GiftGoodsInput;
 use App\Utils\Inputs\GiftGoodsPageInput;

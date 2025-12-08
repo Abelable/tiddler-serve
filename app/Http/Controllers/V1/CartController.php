@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\CartGoods;
-use App\Models\Goods;
-use App\Models\Shop;
-use App\Services\GoodsService;
+use App\Models\Mall\Goods\CartGoods;
+use App\Models\Mall\Goods\Goods;
+use App\Models\Mall\Goods\Shop;
 use App\Services\Mall\Goods\CartGoodsService;
-use App\Services\OrderGoodsService;
-use App\Services\ShopService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\OrderGoodsService;
+use App\Services\Mall\Goods\ShopService;
 use App\Utils\Inputs\CartGoodsEditInput;
 use App\Utils\Inputs\CartGoodsInput;
 

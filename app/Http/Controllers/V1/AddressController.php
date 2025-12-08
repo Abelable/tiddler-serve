@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Address;
-use App\Services\AddressService;
+use App\Models\Mall\Goods\Address;
+use App\Services\Mall\Goods\AddressService;
 use App\Utils\AddressAnalyzeServe;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\AddressInput;

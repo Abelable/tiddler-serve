@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Services\OrderService;
+use App\Services\Mall\Goods\OrderService;
 use Maatwebsite\Excel\Concerns\ToModel;
 
 class OrdersImport implements ToModel

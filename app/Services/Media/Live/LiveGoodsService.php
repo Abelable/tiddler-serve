@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\Live;
 
-use App\Models\LiveGoods;
+use App\Models\Media\Live\LiveGoods;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 

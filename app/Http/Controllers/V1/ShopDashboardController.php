@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ShopTodoService;
-use App\Services\GoodsService;
-use App\Services\OrderGoodsService;
-use App\Services\OrderService;
-use App\Services\ProductHistoryService;
-use App\Services\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\OrderGoodsService;
+use App\Services\Mall\Goods\OrderService;
+use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\ProductHistoryService;
+use App\Services\Mall\ShopTodoService;
 use App\Utils\Enums\ProductType;
 
 class ShopDashboardController extends Controller

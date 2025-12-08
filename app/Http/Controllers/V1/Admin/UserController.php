@@ -5,7 +5,7 @@ namespace App\Http\Controllers\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Relation;
 use App\Models\User;
-use App\Services\PromoterService;
+use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;

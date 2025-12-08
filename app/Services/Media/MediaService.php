@@ -2,13 +2,13 @@
 
 namespace App\Services\Media;
 
-use App\Models\LiveRoom;
-use App\Models\ShortVideo;
-use App\Models\ShortVideoCollection;
-use App\Models\ShortVideoLike;
-use App\Models\TourismNote;
-use App\Models\TourismNoteCollection;
-use App\Models\TourismNoteLike;
+use App\Models\Media\Live\LiveRoom;
+use App\Models\Media\Note\TourismNote;
+use App\Models\Media\Note\TourismNoteCollection;
+use App\Models\Media\Note\TourismNoteLike;
+use App\Models\Media\ShortVideo\ShortVideo;
+use App\Models\Media\ShortVideo\ShortVideoCollection;
+use App\Models\Media\ShortVideo\ShortVideoLike;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Pagination\LengthAwarePaginator;

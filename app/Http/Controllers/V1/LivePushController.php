@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Goods;
-use App\Models\LiveRoom;
-use App\Services\GoodsService;
+use App\Models\Mall\Goods\Goods;
+use App\Models\Media\Live\LiveRoom;
+use App\Services\Mall\Goods\GoodsService;
 use App\Services\Media\Live\LiveGoodsService;
 use App\Services\Media\Live\LiveRoomService;
 use App\Utils\CodeResponse;

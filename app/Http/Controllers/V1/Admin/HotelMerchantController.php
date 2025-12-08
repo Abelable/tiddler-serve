@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\HotelMerchantService;
+use App\Services\Mall\Hotel\HotelMerchantService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;

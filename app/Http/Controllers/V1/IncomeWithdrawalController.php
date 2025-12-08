@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\HotelShopIncomeService;
 use App\Services\Mall\Catering\CateringShopIncomeService;
-use App\Services\ScenicShopIncomeService;
-use App\Services\ShopIncomeService;
-use App\Services\IncomeWithdrawalService;
+use App\Services\Mall\Goods\IncomeWithdrawalService;
+use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Hotel\HotelShopIncomeService;
+use App\Services\Mall\Scenic\ScenicShopIncomeService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MerchantType;
 use App\Utils\Enums\TodoEnums;
-use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\IncomeWithdrawalInput;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

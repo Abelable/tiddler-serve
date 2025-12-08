@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\TopMediaService;
+use App\Services\Media\TopMediaService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;

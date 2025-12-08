@@ -2,11 +2,8 @@
 
 namespace App\Services\Mall\Goods;
 
-use App\Models\CartGoods;
+use App\Models\Mall\Goods\CartGoods;
 use App\Services\BaseService;
-use App\Services\GiftGoodsService;
-use App\Services\GoodsService;
-use App\Services\OrderGoodsService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\CartGoodsEditInput;
 use App\Utils\Inputs\CartGoodsInput;

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopRefundAddress;
-use App\Services\ShopRefundAddressService;
+use App\Models\Mall\Goods\ShopRefundAddress;
+use App\Services\Mall\Goods\ShopRefundAddressService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ShopRefundAddressInput;

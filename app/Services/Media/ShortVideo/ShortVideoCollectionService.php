@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\ShortVideo;
 
-use App\Models\ShortVideoCollection;
+use App\Models\Media\ShortVideo\ShortVideoCollection;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 

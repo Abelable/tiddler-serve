@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\LakeCycleService;
+use App\Services\Theme\LakeCycleService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\LakeCycleInput;
 use App\Utils\Inputs\PageInput;

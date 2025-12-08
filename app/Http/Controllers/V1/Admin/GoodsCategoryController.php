@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\GoodsCategoryService;
+use App\Services\Mall\Goods\GoodsCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\GoodsCategoryInput;
 use App\Utils\Inputs\Admin\GoodsCategoryPageInput;

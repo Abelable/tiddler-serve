@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\HotelShopService;
+use App\Services\Mall\Hotel\HotelShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 

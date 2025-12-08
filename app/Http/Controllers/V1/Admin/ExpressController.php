@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Express;
-use App\Services\ExpressService;
+use App\Models\Mall\Goods\Express;
+use App\Services\Mall\Goods\ExpressService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\ExpressPageInput;
 

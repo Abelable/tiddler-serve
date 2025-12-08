@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\GoodsEvaluation;
-use App\Services\GoodsEvaluationService;
-use App\Services\OrderService;
+use App\Models\Mall\Goods\GoodsEvaluation;
+use App\Services\Mall\Goods\GoodsEvaluationService;
+use App\Services\Mall\Goods\OrderService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GoodsEvaluationInput;

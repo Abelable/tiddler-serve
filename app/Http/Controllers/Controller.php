@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Admin;
+use App\Models\Admin\Admin;
 use App\Models\User;
 use App\Utils\CodeResponse;
 use App\Utils\Traits\VerifyRequestInput;

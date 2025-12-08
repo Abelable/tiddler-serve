@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopScenicSpot;
-use App\Models\ScenicSpot;
-use App\Services\ShopScenicService;
-use App\Services\ScenicService;
+use App\Models\Mall\Scenic\ScenicSpot;
+use App\Models\Mall\Scenic\ShopScenicSpot;
+use App\Services\Mall\Scenic\ScenicService;
+use App\Services\Mall\Scenic\ShopScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\StatusPageInput;
 

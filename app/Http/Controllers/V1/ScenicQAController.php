@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicAnswer;
-use App\Models\ScenicQuestion;
-use App\Services\ScenicAnswerService;
-use App\Services\ScenicQuestionService;
+use App\Models\Mall\Scenic\ScenicAnswer;
+use App\Models\Mall\Scenic\ScenicQuestion;
+use App\Services\Mall\Scenic\ScenicAnswerService;
+use App\Services\Mall\Scenic\ScenicQuestionService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;

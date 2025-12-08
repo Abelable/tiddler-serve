@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\GiftGoods;
-use App\Services\GiftGoodsService;
-use App\Services\GiftTypeService;
-use App\Services\GoodsService;
+use App\Models\Mall\Goods\GiftGoods;
+use App\Services\Mall\Goods\GiftGoodsService;
+use App\Services\Mall\Goods\GiftTypeService;
+use App\Services\Mall\Goods\GoodsService;
 use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsController extends Controller

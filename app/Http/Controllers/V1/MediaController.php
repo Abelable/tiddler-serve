@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\MediaProduct;
-use App\Models\ShortVideo;
-use App\Models\TopMedia;
-use App\Models\TourismNote;
+use App\Models\Media\MediaProduct;
+use App\Models\Media\Note\TourismNote;
+use App\Models\Media\ShortVideo\ShortVideo;
+use App\Models\Media\TopMedia;
 use App\Services\FanService;
-use App\Services\GoodsService;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Media\MediaProductService;
 use App\Services\Media\MediaService;
 use App\Services\Media\Note\TourismNoteCollectionService;
 use App\Services\Media\Note\TourismNoteLikeService;
@@ -16,13 +17,12 @@ use App\Services\Media\Note\TourismNoteService;
 use App\Services\Media\ShortVideo\ShortVideoCollectionService;
 use App\Services\Media\ShortVideo\ShortVideoLikeService;
 use App\Services\Media\ShortVideo\ShortVideoService;
-use App\Services\MediaProductService;
-use App\Services\TopMediaService;
+use App\Services\Media\TopMediaService;
 use App\Services\UserService;
 use App\Utils\Enums\MediaType;
 use App\Utils\Inputs\NearbyPageInput;
-use App\Utils\Inputs\ProductMediaPageInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ProductMediaPageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 

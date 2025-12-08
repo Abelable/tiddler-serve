@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicSpot;
-use App\Services\ScenicService;
+use App\Models\Mall\Scenic\ScenicSpot;
+use App\Services\Mall\Scenic\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ScenicPageInput;
 use App\Utils\Inputs\ScenicInput;

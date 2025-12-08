@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ShopOrderKeywordService;
+use App\Services\Mall\ShopOrderKeywordService;
 
 class ShopOrderKeywordController extends Controller
 {

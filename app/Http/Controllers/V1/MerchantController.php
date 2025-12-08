@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\MerchantService;
-use App\Services\ShopDepositService;
-use App\Services\ShopService;
+use App\Services\Mall\Goods\MerchantService;
+use App\Services\Mall\Goods\ShopDepositService;
+use App\Services\Mall\Goods\ShopService;
 use App\Services\SystemTodoService;
-use App\Services\UserTaskService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantInput;

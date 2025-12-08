@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicEvaluation;
-use App\Services\ScenicEvaluationService;
-use App\Services\ScenicOrderService;
-use App\Services\TicketScenicService;
-use App\Services\UserService;
+use App\Services\Mall\Scenic\ScenicEvaluationService;
+use App\Services\Mall\Scenic\ScenicOrderService;
+use App\Services\Mall\Scenic\TicketScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\ScenicEvaluationInput;

@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopPickupAddress;
-use App\Services\ShopPickupAddressService;
+use App\Models\Mall\Goods\ShopPickupAddress;
+use App\Services\Mall\Goods\ShopPickupAddressService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\ShopPickupAddressInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\ShopPickupAddressInput;
 
 class PickupAddressController extends Controller
 {

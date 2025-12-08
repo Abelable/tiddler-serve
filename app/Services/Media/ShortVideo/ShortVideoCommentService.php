@@ -2,7 +2,7 @@
 
 namespace App\Services\Media\ShortVideo;
 
-use App\Models\ShortVideoComment;
+use App\Models\Media\ShortVideo\ShortVideoComment;
 use App\Services\BaseService;
 use App\Utils\Inputs\CommentInput;
 use App\Utils\Inputs\CommentListInput;

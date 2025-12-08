@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelRoomType;
-use App\Services\HotelRoomTypeService;
+use App\Models\Mall\Hotel\HotelRoomType;
+use App\Services\Mall\Hotel\HotelRoomTypeService;
 use App\Utils\Inputs\HotelRoomTypeInput;
 use App\Utils\Inputs\PageInput;
 

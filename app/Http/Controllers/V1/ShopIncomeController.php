@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\ShopIncome;
-use App\Services\GoodsService;
-use App\Services\ProductHistoryService;
-use App\Services\ShopIncomeService;
-use App\Services\OrderGoodsService;
-use App\Services\OrderService;
+use App\Models\Mall\Goods\ShopIncome;
+use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\OrderGoodsService;
+use App\Services\Mall\Goods\OrderService;
+use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\ProductHistoryService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;

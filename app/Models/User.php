@@ -4,6 +4,13 @@ namespace App\Models;
 
 use App\Models\Mall\Catering\CateringMerchant;
 use App\Models\Mall\Catering\CateringShop;
+use App\Models\Mall\Goods\Merchant;
+use App\Models\Mall\Goods\Shop;
+use App\Models\Mall\Hotel\HotelMerchant;
+use App\Models\Mall\Hotel\HotelShop;
+use App\Models\Mall\Scenic\ScenicMerchant;
+use App\Models\Mall\Scenic\ScenicShop;
+use App\Models\Promoter\Promoter;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -34,15 +41,15 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read CateringMerchant|null $cateringMerchant
  * @property-read CateringShop|null $cateringShop
- * @property-read \App\Models\HotelMerchant|null $hotelMerchant
- * @property-read \App\Models\HotelShop|null $hotelShop
- * @property-read \App\Models\Merchant|null $merchant
+ * @property-read \App\Models\Mall\Hotel\HotelMerchant|null $hotelMerchant
+ * @property-read \App\Models\Mall\Hotel\HotelShop|null $hotelShop
+ * @property-read \App\Models\Mall\Goods\Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
- * @property-read \App\Models\Promoter|null $promoterInfo
- * @property-read \App\Models\ScenicMerchant|null $scenicMerchant
- * @property-read \App\Models\ScenicShop|null $scenicShop
- * @property-read \App\Models\Shop|null $shop
+ * @property-read \App\Models\Promoter\Promoter|null $promoterInfo
+ * @property-read \App\Models\Mall\Scenic\ScenicMerchant|null $scenicMerchant
+ * @property-read \App\Models\Mall\Scenic\ScenicShop|null $scenicShop
+ * @property-read \App\Models\Mall\Goods\Shop|null $shop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()

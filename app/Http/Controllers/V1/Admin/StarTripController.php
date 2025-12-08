@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\StarTripService;
+use App\Services\Theme\StarTripService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\StarTripInput;
 use App\Utils\Inputs\PageInput;

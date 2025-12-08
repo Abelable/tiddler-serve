@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Refund;
-use App\Services\ShopRefundAddressService;
-use App\Services\ShopTodoService;
-use App\Services\OrderGoodsService;
-use App\Services\OrderService;
-use App\Services\RefundService;
-use App\Services\ShopService;
+use App\Models\Mall\Goods\Refund;
+use App\Services\Mall\Goods\OrderGoodsService;
+use App\Services\Mall\Goods\OrderService;
+use App\Services\Mall\Goods\RefundService;
+use App\Services\Mall\Goods\ShopRefundAddressService;
+use App\Services\Mall\Goods\ShopService;
+use App\Services\Mall\ShopTodoService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;

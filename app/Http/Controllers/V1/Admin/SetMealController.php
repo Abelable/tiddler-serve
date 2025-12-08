@@ -7,7 +7,7 @@ use App\Models\Mall\Catering\SetMeal;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\Mall\Catering\SetMealService;
-use App\Services\UserTaskService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\CommissionInput;
 use App\Utils\Inputs\Admin\SetMealListInput;

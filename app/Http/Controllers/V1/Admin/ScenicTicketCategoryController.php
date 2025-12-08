@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicTicketCategory;
-use App\Services\ScenicTicketCategoryService;
+use App\Models\Mall\Scenic\ScenicTicketCategory;
+use App\Services\Mall\Scenic\ScenicTicketCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 

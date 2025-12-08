@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\ScenicMerchant;
-use App\Services\ScenicMerchantService;
+use App\Services\Mall\Scenic\ScenicMerchantService;
 use App\Services\SystemTodoService;
-use App\Utils\AliSmsServe;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\MerchantPageInput;

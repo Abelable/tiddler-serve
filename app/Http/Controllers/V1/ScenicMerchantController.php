@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\ScenicMerchantService;
-use App\Services\ScenicShopDepositService;
-use App\Services\ScenicShopService;
+use App\Services\Mall\Scenic\ScenicMerchantService;
+use App\Services\Mall\Scenic\ScenicShopDepositService;
+use App\Services\Mall\Scenic\ScenicShopService;
 use App\Services\SystemTodoService;
-use App\Services\UserTaskService;
+use App\Services\Task\UserTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\ScenicMerchantInput;

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Hotel;
-use App\Services\HotelCategoryService;
-use App\Services\HotelEvaluationService;
-use App\Services\HotelQuestionService;
-use App\Services\HotelService;
-use App\Services\ProductHistoryService;
-use App\Services\ShopHotelService;
-use App\Services\ScenicService;
+use App\Services\Mall\Hotel\HotelCategoryService;
+use App\Services\Mall\Hotel\HotelEvaluationService;
+use App\Services\Mall\Hotel\HotelQuestionService;
+use App\Services\Mall\Hotel\HotelService;
+use App\Services\Mall\Hotel\ShopHotelService;
+use App\Services\Mall\ProductHistoryService;
+use App\Services\Mall\Scenic\ScenicService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\CommonPageInput;

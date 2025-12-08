@@ -2,7 +2,7 @@
 
 namespace App\Services\Admin;
 
-use App\Models\Admin;
+use App\Models\Admin\Admin;
 use App\Services\BaseService;
 use App\Utils\Inputs\Admin\AdminListInput;
 

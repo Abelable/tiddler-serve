@@ -2,7 +2,7 @@
 
 namespace App\Services\Admin;
 
-use App\Models\AdminRole;
+use App\Models\Admin\AdminRole;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
 

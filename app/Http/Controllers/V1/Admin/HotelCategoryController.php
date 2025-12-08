@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\HotelCategory;
-use App\Services\HotelCategoryService;
+use App\Models\Mall\Hotel\HotelCategory;
+use App\Services\Mall\Hotel\HotelCategoryService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Promoter;
+use App\Models\Promoter\Promoter;
 use App\Models\User;
-use App\Services\CommissionService;
-use App\Services\PromoterChangeLogService;
-use App\Services\PromoterService;
+use App\Services\Mall\CommissionService;
+use App\Services\Mall\CommissionWithdrawalService;
+use App\Services\Promoter\PromoterChangeLogService;
+use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
-use App\Services\CommissionWithdrawalService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\UserPageInput;
 use App\Utils\Inputs\PageInput;

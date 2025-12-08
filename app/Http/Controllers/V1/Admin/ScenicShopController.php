@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\ScenicShopService;
+use App\Services\Mall\Scenic\ScenicShopService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\ShopPageInput;
 
