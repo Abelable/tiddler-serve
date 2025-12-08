@@ -13,6 +13,7 @@ use App\Services\Mall\Scenic\ScenicOrderTicketService;
 use App\Services\Promoter\PromoterChangeLogService;
 use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
+use App\Utils\CodeResponse;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
