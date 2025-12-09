@@ -89,9 +89,12 @@ class UserCouponService extends BaseService
         return $couponList;
     }
 
-    public function getListByCouponId($couponId, $columns = ['*'])
+    public function getListByCouponId($couponId, $status = 1, $columns = ['*'])
     {
-        return UserCoupon::query()->where('coupon_id', $couponId)->get($columns);
+        return UserCoupon::query()
+            ->where('coupon_id', $couponId)
+            ->where('status', $status)
+            ->get($columns);
     }
 
     public function getReceivedCount($userId, $couponId)
