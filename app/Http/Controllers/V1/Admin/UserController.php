@@ -10,6 +10,7 @@ use App\Services\RelationService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Admin\UserPageInput;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -108,12 +109,18 @@ class UserController extends Controller
         $superiorId = $this->verifyRequiredId('superiorId');
 
         $relation = RelationService::getInstance()->getRelationByFanId($userId);
-        if (!is_null($relation)) {
-            $relation->superior_id = $superiorId;
-            $relation->save();
-        } else {
-            RelationService::getInstance()->banding($superiorId, $userId);
-        }
+
+        DB::transaction(function () use ($userId, $relation, $superiorId) {
+            if (!is_null($relation)) {
+                PromoterService::getInstance()->updateSubUserCount($relation->superior_id, -1);
+
+                $relation->superior_id = $superiorId;
+                $relation->save();
+            } else {
+                RelationService::getInstance()->banding($superiorId, $userId);
+            }
+            PromoterService::getInstance()->updateSubUserCount($superiorId);
+        });
 
         return $this->success();
     }
@@ -126,7 +133,13 @@ class UserController extends Controller
         if (is_null($relation)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前上级不存在');
         }
-        $relation->delete();
+
+        DB::transaction(function () use ($relation) {
+            $relation->delete();
+
+            PromoterService::getInstance()->updateSubUserCount($relation->superior_id, -1);
+        });
+
         return $this->success();
     }
 }
