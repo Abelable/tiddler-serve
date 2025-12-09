@@ -879,7 +879,12 @@ class CommissionService extends BaseService
         return $this
             ->getUserCommissionQueryByTimeType([$userId], $timeType, $startTime)
             ->whereIn('status', [2, 3, 4])
-            ->sum('achievement');
+            ->groupBy('order_id', 'product_type', 'product_id')
+            ->selectRaw('SUM(achievement) as total_achievement')
+            ->get()
+            ->sum(function ($items) {
+                return $items->max('achievement');
+            });
     }
 
     public function getUserCommissionQueryByTimeType(array $userIds, $timeType, $startTime = null)
