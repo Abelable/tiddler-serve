@@ -178,6 +178,8 @@ class CartController extends Controller
                 }
             }
 
+            $cartGoods['shopCategoryIds'] = $goods->shop_category_ids;
+
             return $cartGoods;
         });
 
