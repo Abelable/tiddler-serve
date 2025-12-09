@@ -53,6 +53,19 @@ class GoodsController extends Controller
         return $this->success($this->paginate($page, $list));
     }
 
+    public function shopList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $shopId = $this->verifyRequiredId('shopId');
+        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
+
+        $page = GoodsService::getInstance()->getShopOnSaleGoodsList($shopId, $input, $columns);
+        $list = GoodsService::getInstance()->handleList($page);
+
+        return $this->success($this->paginate($page, $list));
+    }
+
     public function detail()
     {
         $id = $this->verifyRequiredId('id');
@@ -163,18 +176,6 @@ class GoodsController extends Controller
         }
 
         return $this->success($goods);
-    }
-
-    public function shopList()
-    {
-        /** @var PageInput $input */
-        $input = PageInput::new();
-        $shopId = $this->verifyRequiredId('shopId');
-        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
-
-        $list = GoodsService::getInstance()->getShopOnSaleGoodsList($shopId, $input, $columns);
-
-        return $this->successPaginate($list);
     }
 
     public function purchasedList()
