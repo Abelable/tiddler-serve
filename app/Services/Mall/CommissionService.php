@@ -612,14 +612,14 @@ class CommissionService extends BaseService
             ->get($columns);
     }
 
-    public function getPaidCommission($orderId, $productType, $productId, $columns = ['*'])
+    public function getPaidCommissionList($orderId, $productType, $productId, $columns = ['*'])
     {
         return Commission::query()
             ->where('status', 1)
             ->where('order_id', $orderId)
             ->where('product_type', $productType)
             ->where('product_id', $productId)
-            ->first($columns);
+            ->get($columns);
     }
 
     public function getListByOrderIds(array $orderIds, $productType, $columns = ['*'])
@@ -642,8 +642,8 @@ class CommissionService extends BaseService
 
     public function updateGoodsCommissionToConfirmStatus($orderId, $goodsId, $deliveryMode, $refundStatus)
     {
-        $commission = $this->getPaidCommission($orderId, ProductType::GOODS, $goodsId);
-        if (!is_null($commission)) {
+        $commissionList = $this->getPaidCommissionList($orderId, ProductType::GOODS, $goodsId);
+        foreach ($commissionList as $commission) {
             if ($deliveryMode == 1 && $refundStatus == 1) {
                 // 7天无理由商品：确认收货7天后更新佣金状态
                 dispatch(new CommissionConfirmJob($commission->id));
@@ -652,7 +652,7 @@ class CommissionService extends BaseService
                 $commission->save();
             }
         }
-        return $commission;
+        return $commissionList;
     }
 
     public function updateToOrderConfirmStatus($id)
