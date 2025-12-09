@@ -29,7 +29,7 @@ class MerchantService extends BaseService
         $merchant->address_detail = $input->addressDetail;
         $merchant->name = $input->name;
         $merchant->mobile = $input->mobile;
-        $merchant->email = $input->email;
+        $merchant->email = $input->email ?? '';
         $merchant->id_card_number = $input->idCardNumber;
         $merchant->id_card_front_photo = $input->idCardFrontPhoto;
         $merchant->id_card_back_photo = $input->idCardBackPhoto;
