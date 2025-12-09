@@ -43,9 +43,9 @@ class ShopController extends Controller
     {
         /** @var ShopInput $input */
         $input = ShopInput::new();
-        $id = $this->verifyRequiredId('id');
+        $shopId = $this->verifyRequiredId('shopId');
 
-        $shop = ShopService::getInstance()->getShopById($id);
+        $shop = ShopService::getInstance()->getShopById($shopId);
         if (is_null($shop)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前店铺不存在');
         }

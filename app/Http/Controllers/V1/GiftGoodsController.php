@@ -4,9 +4,11 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mall\Goods\GiftGoods;
+use App\Models\Mall\Goods\Goods;
 use App\Services\Mall\Goods\GiftGoodsService;
 use App\Services\Mall\Goods\GiftTypeService;
 use App\Services\Mall\Goods\GoodsService;
+use App\Services\Mall\Goods\ShopService;
 use App\Utils\Inputs\GiftGoodsPageInput;
 
 class GiftGoodsController extends Controller
@@ -28,13 +30,23 @@ class GiftGoodsController extends Controller
         $giftGoodsList = collect($page->items());
 
         $goodsIds = $giftGoodsList->pluck('goods_id')->toArray();
-        $columns = ['id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
+        $columns = ['id', 'shop_id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
         $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $columns)->keyBy('id');
 
-        $list = $giftGoodsList->map(function (GiftGoods $giftGoods) use ($goodsList) {
+        $shopIds = $goodsList->pluck('shop_id')->toArray();
+        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
+
+        $list = $giftGoodsList->map(function (GiftGoods $giftGoods) use ($shopList, $goodsList) {
+            /** @var Goods $goods */
             $goods = $goodsList->get($giftGoods->goods_id);
+
+            $shopInfo = $shopList->get($goods->shop_id);
+            $goods['shopInfo'] = $shopInfo;
+            unset($goods['shop_id']);
+
             $goods['isGift'] = 1;
             $goods['giftDuration'] = $giftGoods->duration;
+
             return $goods;
         });
 

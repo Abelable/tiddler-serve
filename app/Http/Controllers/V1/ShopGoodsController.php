@@ -105,7 +105,7 @@ class ShopGoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
             return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
