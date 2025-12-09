@@ -247,7 +247,14 @@ class CommissionController extends Controller
         }
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
-        $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('achievement');
+        $salesVolume = (clone $query)
+            ->whereIn('status', [1, 2, 3, 4])
+            ->groupBy('order_id', 'product_type', 'product_id')
+            ->selectRaw('SUM(achievement) as total_achievement')
+            ->get()
+            ->sum(function ($items) {
+                return $items->max('achievement');
+            });
         $pendingAmount = (clone $query)->where('status', 1)->sum('commission_amount');
         $settledAmount = (clone $query)->whereIn('status', [2, 3, 4])->sum('commission_amount');
 
