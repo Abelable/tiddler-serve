@@ -81,8 +81,12 @@ class ProductHistoryService extends BaseService
             ->where('product_type', $productType)
             ->whereIn('product_id', $productIds)
             ->whereBetween('updated_at', [$startDate, $endDate])
-            ->select(DB::raw('DATE(updated_at) as updated_at'), DB::raw('COUNT(*) as count'))
+            ->select(
+                DB::raw('DATE(updated_at) as updated_at'),
+                DB::raw('SUM(count) as count')
+            )
             ->groupBy(DB::raw('DATE(updated_at)'))
+            ->orderBy(DB::raw('DATE(updated_at)'), 'asc')
             ->get();
     }
 
