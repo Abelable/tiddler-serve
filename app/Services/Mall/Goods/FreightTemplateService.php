@@ -7,6 +7,7 @@ use App\Models\Mall\Goods\FreightTemplate;
 use App\Services\BaseService;
 use App\Utils\Inputs\FreightTemplateInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\MathTool;
 
 class FreightTemplateService extends BaseService
 {
@@ -67,23 +68,34 @@ class FreightTemplateService extends BaseService
 
     public function calcFreightPrice(FreightTemplate $freightTemplate, Address $address, $totalPrice, $goodsNumber)
     {
-        if ($freightTemplate->free_quota != 0 && $totalPrice > $freightTemplate->free_quota) {
-            $freightPrice = 0;
-        } else {
-            $cityCode = substr(json_decode($address->region_code_list)[1], 0, 4);
-            $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
-                return in_array($cityCode, explode(',', $area->pickedCityCodes));
-            });
-            if (is_null($area)) {
-                $freightPrice = 0;
-            } else {
-                if ($freightTemplate->compute_mode == 1) {
-                    $freightPrice = $area->fee;
-                } else {
-                    $freightPrice = bcmul($area->fee, $goodsNumber, 2);
-                }
-            }
+        // 包邮额度：大于 free_quota 就免费
+        if ($freightTemplate->free_quota != 0 && bccomp($totalPrice, $freightTemplate->free_quota, 2) === 1) {
+            return '0.00';
         }
-        return $freightPrice;
+
+        // 区域匹配：取城市码前 4 位
+        $regionCodes = json_decode($address->region_code_list, true) ?? [];
+        $cityCode = isset($regionCodes[1]) ? substr($regionCodes[1], 0, 4) : null;
+        if (is_null($cityCode)) {
+            return '0.00';
+        }
+
+        // 找到匹配的区域规则
+        $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+            $codes = array_map('trim', explode(',', $area->pickedCityCodes));
+            return in_array($cityCode, $codes);
+        });
+
+        if (is_null($area)) {
+            return '0.00';
+        }
+
+        // 固定运费
+        if ($freightTemplate->compute_mode == 1) {
+            return MathTool::bcRound($area->fee);
+        }
+
+        // 按件数计算
+        return MathTool::bcRound(bcmul($area->fee, $goodsNumber, 4));
     }
 }

@@ -9,6 +9,7 @@ use App\Models\Mall\Goods\CartGoods;
 use App\Models\Mall\Goods\ShopIncome;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
+use App\Utils\MathTool;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,7 @@ class ShopIncomeService extends BaseService
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             // 总价：单价 * 数量
-            $totalPrice = bcmul($cartGoods->price, $cartGoods->number, 2);
+            $totalPrice = MathTool::bcRound(bcmul($cartGoods->price, $cartGoods->number, 4));
 
             $couponInfo = [
                 'id' => 0,
@@ -46,25 +47,27 @@ class ShopIncomeService extends BaseService
             // 收入基数：平台券，按商品总价计算
             $incomeBase = ($couponInfo['shop_id'] == 0)
                 ? $totalPrice
-                : max(0, bcsub($totalPrice, $couponInfo['denomination'], 2));
+                : MathTool::bcRound(bcsub($totalPrice, $couponInfo['denomination'], 4));
 
             // 佣金率
-            $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 4);
-            $salesCommission = bcmul($incomeBase, $salesCommissionRate, 2);
+            $salesCommissionRate = bcdiv($cartGoods->sales_commission_rate, 100, 6);
+            $salesCommission = MathTool::bcRound(bcmul($incomeBase, $salesCommissionRate, 6));
 
             // 运费
-            $freightPrice = 0;
+            $freightPrice = '0.00';
             if ($deliveryMode == 1 && $cartGoods->freight_template_id) {
-                $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                $freightPrice = FreightTemplateService::getInstance()
-                    ->calcFreightPrice($freightTemplate, $address, $totalPrice, $cartGoods->number);
+                $freightTemplate = $freightTemplateList ? $freightTemplateList->get($cartGoods->freight_template_id) : null;
+                if ($freightTemplate) {
+                    $freightPrice = FreightTemplateService::getInstance()
+                        ->calcFreightPrice($freightTemplate, $address, $totalPrice, $cartGoods->number);
+                }
             }
 
             // 销售额：商品总价 - 优惠券金额 + 运费
-            $salesAmount = max(0, bcadd(bcsub($totalPrice, $couponInfo['denomination'], 2), $freightPrice, 2));
+            $salesAmount = MathTool::bcRound(bcadd(bcsub($totalPrice, $couponInfo['denomination'], 4), $freightPrice, 4));
 
             // 商家最终收入: 基数 - 平台佣金 + 运费
-            $incomeAmount = max(0, bcadd(bcsub($incomeBase, $salesCommission, 2), $freightPrice, 2));
+            $incomeAmount = MathTool::bcRound(bcadd(bcsub($incomeBase, $salesCommission, 4), $freightPrice, 4));
 
             // 保存记录
             $income = ShopIncome::new();
