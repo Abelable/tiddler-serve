@@ -7,7 +7,7 @@ use Mrgoon\AliSms\AliSms;
 class AliSmsServe
 {
     private $templateCode = [
-        'order' => 'SMS_498755041',
+        'order' => 'SMS_499150104',
     ];
 
     public static function new()
