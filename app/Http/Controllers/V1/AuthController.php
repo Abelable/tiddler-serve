@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
+use App\Services\Promoter\PromoterChangeLogService;
 use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
 use App\Services\UserService;
@@ -52,6 +53,13 @@ class AuthController extends Controller
 
             // 创建用户余额账户
             AccountService::getInstance()->createUserAccount($user->id);
+
+            // todo 注册送身份（180天代言人）
+            $promoter = PromoterService::getInstance()->adminCreate($user->id, 1, 100, 180);
+            PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
+            if (!empty($input->superiorId)) {
+                PromoterService::getInstance()->updateSubPromoterCount($input->superiorId);
+            }
 
             return Auth::guard('user')->login($user);
         });
