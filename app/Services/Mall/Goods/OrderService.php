@@ -461,7 +461,7 @@ class OrderService extends BaseService
                 // 待发货短信通知
                 $shopId = $order->shopInfo->id;
                 $cacheKey = "order_sms_{$shopId}";
-                Cache::remember($cacheKey, now()->addHours(3), function () use ($order) {
+                Cache::remember($cacheKey, now()->addMinutes(5), function () use ($order) {
                     AliSmsServe::new()->send($order->shopInfo->merchantInfo->mobile, 'order');
                     return 'sent';
                 });
