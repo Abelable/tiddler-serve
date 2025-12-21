@@ -20,6 +20,7 @@ class GiftGoodsService extends BaseService
             $query = $query->where('goods_id', $input->goodsId);
         }
         return $query
+            ->orderBy('sort', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
