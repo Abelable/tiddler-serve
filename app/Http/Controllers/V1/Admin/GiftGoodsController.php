@@ -48,6 +48,14 @@ class GiftGoodsController extends Controller
         return $this->success();
     }
 
+    public function editSort()
+    {
+        $id = $this->verifyRequiredId('id');
+        $sort = $this->verifyRequiredInteger('sort');
+        GiftGoodsService::getInstance()->updateSort($id, $sort);
+        return $this->success();
+    }
+
     public function delete()
     {
         $id = $this->verifyRequiredId('id');

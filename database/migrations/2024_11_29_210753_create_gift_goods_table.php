@@ -20,6 +20,7 @@ class CreateGiftGoodsTable extends Migration
             $table->string('goods_cover')->comment('商品图片');
             $table->string('goods_name')->comment('商品名称');
             $table->integer('duration')->comment('代言时长（天）');
+            $table->integer('sort')->default(1)->comment('排序');
             $table->timestamps();
             $table->softDeletes();
         });

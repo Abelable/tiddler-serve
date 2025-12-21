@@ -1335,6 +1335,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('list', 'GiftGoodsController@list');
             Route::post('add', 'GiftGoodsController@add');
             Route::post('edit_duration', 'GiftGoodsController@editDuration');
+            Route::post('edit_sort', 'GiftGoodsController@editSort');
             Route::post('delete', 'GiftGoodsController@delete');
         });
 

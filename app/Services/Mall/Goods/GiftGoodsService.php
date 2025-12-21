@@ -64,4 +64,9 @@ class GiftGoodsService extends BaseService
     {
         GiftGoods::query()->where('id', $id)->update(['duration' => $duration]);
     }
+
+    public function updateSort($id, $sort)
+    {
+        GiftGoods::query()->where('id', $id)->update(['sort' => $sort]);
+    }
 }

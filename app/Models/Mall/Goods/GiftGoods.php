@@ -5,7 +5,7 @@ namespace App\Models\Mall\Goods;
 use App\Models\BaseModel;
 
 /**
- * App\Models\GiftGoods
+ * App\Models\Mall\Goods\GiftGoods
  *
  * @property int $id
  * @property int $type_id 类型id
@@ -13,12 +13,12 @@ use App\Models\BaseModel;
  * @property string $goods_cover 商品图片
  * @property string $goods_name 商品名称
  * @property int $duration 代言时长（天）
+ * @property int $sort 排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods newQuery()
- * @method static \Illuminate\Database\Query\Builder|GiftGoods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods query()
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereDeletedAt($value)
@@ -27,10 +27,9 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereGoodsName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|GiftGoods whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|GiftGoods withTrashed()
- * @method static \Illuminate\Database\Query\Builder|GiftGoods withoutTrashed()
  * @mixin \Eloquent
  */
 class GiftGoods extends BaseModel
