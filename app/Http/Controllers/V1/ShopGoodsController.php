@@ -85,8 +85,8 @@ class ShopGoodsController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限上传商品');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         DB::transaction(function () use ($input, $shopId) {
@@ -128,8 +128,8 @@ class ShopGoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法上架商品');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -151,8 +151,8 @@ class ShopGoodsController extends Controller
         $id = $this->verifyRequiredId('id');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法下架商品');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -175,8 +175,8 @@ class ShopGoodsController extends Controller
         $salesCommissionRate = $this->verifyRequiredNumeric('salesCommissionRate');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品佣金');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -197,8 +197,8 @@ class ShopGoodsController extends Controller
         $stock = $this->verifyRequiredInteger('stock');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品库存');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
@@ -219,8 +219,8 @@ class ShopGoodsController extends Controller
         $sort = $this->verifyRequiredInteger('sort');
 
         $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
-        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
-            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品库存');
+        if (!in_array($this->userId(), $shopManagerIds) && ($this->user()->shop && $shopId != $this->user()->shop->id)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无权限编辑商品');
         }
 
         $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);

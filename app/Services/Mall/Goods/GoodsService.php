@@ -105,6 +105,7 @@ class GoodsService extends BaseService
         return Goods::query()
             ->where('status', 1)
             ->where('shop_id', $shopId)
+            ->orderBy('sort', 'desc')
             ->orderBy('views', 'desc')
             ->orderBy('sales_volume', 'desc')
             ->orderBy('sales_commission_rate', 'desc')
