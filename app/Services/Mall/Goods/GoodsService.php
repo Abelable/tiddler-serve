@@ -55,9 +55,10 @@ class GoodsService extends BaseService
             $query = $query->orderBy($input->sort, $input->order);
         } else {
             $query = $query
+                ->orderBy('views', 'desc')
+                ->orderBy('sales_volume', 'desc')
                 ->orderBy('sales_commission_rate', 'desc')
                 ->orderBy('score', 'desc')
-                ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc');
         }
         return $query->paginate($input->limit,'page', $input->page);
@@ -75,9 +76,10 @@ class GoodsService extends BaseService
             $query = $query->whereNotIn('id', $goodsIds);
         }
         return $query
+                ->orderBy('views', 'desc')
+                ->orderBy('sales_volume', 'desc')
                 ->orderBy('sales_commission_rate', 'desc')
                 ->orderBy('score', 'desc')
-                ->orderBy('sales_volume', 'desc')
                 ->orderBy('created_at', 'desc')
                 ->take($limit)
                 ->get($columns);
@@ -89,9 +91,10 @@ class GoodsService extends BaseService
             ->where('status', 1)
             ->where('shop_id', $shopId)
             ->where('id', '!=', $goodsId)
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
             ->orderBy('sales_commission_rate', 'desc')
             ->orderBy('score', 'desc')
-            ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->take($limit)
             ->get($columns);
@@ -102,9 +105,10 @@ class GoodsService extends BaseService
         return Goods::query()
             ->where('status', 1)
             ->where('shop_id', $shopId)
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
             ->orderBy('sales_commission_rate', 'desc')
             ->orderBy('score', 'desc')
-            ->orderBy('sales_volume', 'desc')
             ->orderBy('created_at', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -118,6 +122,10 @@ class GoodsService extends BaseService
         }
         return $query
             ->where('shop_id', $shopId)
+            ->orderBy('sort', 'desc')
+            ->orderBy('views', 'desc')
+            ->orderBy('sales_volume', 'desc')
+            ->orderBy('score', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

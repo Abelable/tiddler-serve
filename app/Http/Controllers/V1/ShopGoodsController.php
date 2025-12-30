@@ -212,6 +212,28 @@ class ShopGoodsController extends Controller
         return $this->success();
     }
 
+    public function editSort()
+    {
+        $shopId = $this->verifyRequiredId('shopId');
+        $id = $this->verifyRequiredId('id');
+        $sort = $this->verifyRequiredInteger('sort');
+
+        $shopManagerIds = ShopManagerService::getInstance()->getManagerList($shopId)->pluck('user_id')->toArray();
+        if ($shopId != $this->user()->shop->id && !in_array($this->userId(), $shopManagerIds)) {
+            return $this->fail(CodeResponse::FORBIDDEN, '您不是当前店铺商家或管理员，无法编辑商品库存');
+        }
+
+        $goods = GoodsService::getInstance()->getShopGoods($shopId, $id);
+        if (is_null($goods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        $goods->sort = $sort;
+        $goods->save();
+
+        return $this->success();
+    }
+
     public function delete()
     {
         $shopId = $this->verifyRequiredId('shopId');
