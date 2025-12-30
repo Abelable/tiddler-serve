@@ -4,12 +4,12 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mall\Goods\GiftGoods;
-use App\Models\Mall\Goods\Goods;
 use App\Services\Mall\Goods\GiftGoodsService;
 use App\Services\Mall\Goods\GiftTypeService;
 use App\Services\Mall\Goods\GoodsService;
 use App\Services\Mall\Goods\ShopService;
 use App\Utils\Inputs\GiftGoodsPageInput;
+use Illuminate\Support\Facades\Cache;
 
 class GiftGoodsController extends Controller
 {
@@ -26,30 +26,58 @@ class GiftGoodsController extends Controller
         /** @var GiftGoodsPageInput $input */
         $input = GiftGoodsPageInput::new();
 
+        $typeId = $input->typeId ?: 0;
+
+        if ($input->page == 1) {
+            $cacheKey = 'gift_goods_type_' . $typeId;
+
+            $result = Cache::remember($cacheKey, 1440, function () use ($input) {
+                return $this->giftGoodsPage($input);
+            });
+        } else {
+            $result = $this->giftGoodsPage($input);
+        }
+
+        return $this->success($result);
+    }
+
+    private function giftGoodsPage(GiftGoodsPageInput $input)
+    {
         $page = GiftGoodsService::getInstance()->getPage($input);
         $giftGoodsList = collect($page->items());
 
+        if ($giftGoodsList->isEmpty()) {
+            return $this->paginate($page, []);
+        }
+
         $goodsIds = $giftGoodsList->pluck('goods_id')->toArray();
         $columns = ['id', 'shop_id', 'cover', 'name', 'price', 'market_price', 'sales_volume'];
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($goodsIds, $columns)->keyBy('id');
 
-        $shopIds = $goodsList->pluck('shop_id')->toArray();
-        $shopList = ShopService::getInstance()->getShopListByIds($shopIds, ['id', 'logo', 'name'])->keyBy('id');
+        $goodsList = GoodsService::getInstance()
+            ->getGoodsListByIds($goodsIds, $columns)
+            ->keyBy('id');
+
+        $shopIds = $goodsList->pluck('shop_id')->unique()->toArray();
+        $shopList = ShopService::getInstance()
+            ->getShopListByIds($shopIds, ['id', 'logo', 'name'])
+            ->keyBy('id');
 
         $list = $giftGoodsList->map(function (GiftGoods $giftGoods) use ($shopList, $goodsList) {
-            /** @var Goods $goods */
             $goods = $goodsList->get($giftGoods->goods_id);
 
-            $shopInfo = $shopList->get($goods->shop_id);
-            $goods['shopInfo'] = $shopInfo;
+            if (!$goods) {
+                return null;
+            }
+
+            $goods['shopInfo'] = $shopList->get($goods->shop_id);
             unset($goods['shop_id']);
 
             $goods['isGift'] = 1;
             $goods['giftDuration'] = $giftGoods->duration;
 
             return $goods;
-        });
+        })->filter()->values();
 
-        return $this->success($this->paginate($page, $list));
+        return $this->paginate($page, $list);
     }
 }

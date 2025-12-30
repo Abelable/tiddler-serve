@@ -71,6 +71,7 @@ class OrderController extends Controller
         $cartGoodsList = CartGoodsService::getInstance()->getCartGoodsListByIds($this->userId(), $cartGoodsIds, $cartGoodsListColumns);
 
         $address = null;
+        $freightTemplateList = collect();
         if ($deliveryMode == 1) {
             $addressColumns = ['id', 'name', 'mobile', 'region_code_list', 'region_desc', 'address_detail'];
             if (is_null($addressId)) {
@@ -103,23 +104,43 @@ class OrderController extends Controller
             if (is_null($couponId)) {
                 $couponDenomination = $couponList->first()->denomination;
             } else if ($couponId != 0) {
-                $couponDenomination = $couponList->keyBy('id')->get($couponId)->denomination;
+                $coupon = $couponList->keyBy('id')->get($couponId);
+                if ($coupon) {
+                    $couponDenomination = $coupon->denomination;
+                }
             }
         }
 
         foreach ($cartGoodsList as $cartGoods) {
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
-            $totalNumber = $totalNumber + $cartGoods->number;
+            $totalNumber += $cartGoods->number;
+        }
 
-            // 计算运费
-            if ($deliveryMode == 1) {
-                if (is_null($address) || $cartGoods->freight_template_id == 0) {
+        // 计算运费
+        if ($deliveryMode == 1) {
+            $cartGoodsGroupByGoods = $cartGoodsList->groupBy('goods_id');
+            foreach ($cartGoodsGroupByGoods as $goodsId => $goodsItems) {
+
+                /** @var CartGoods $firstGoods */
+                $firstGoods = $goodsItems->first();
+
+                // 商品总价（所有规格）
+                $goodsTotalPrice = $goodsItems->reduce(function ($carry, CartGoods $item) {
+                    return bcadd($carry, bcmul($item->price, $item->number, 2), 2);
+                }, 0);
+
+                // 商品总数量
+                $goodsTotalNumber = $goodsItems->sum('number');
+
+                if (is_null($address) || $firstGoods->freight_template_id == 0) {
                     $freightPrice = 0;
                 } else {
                     /** @var FreightTemplate $freightTemplate */
-                    $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                    if ($freightTemplate->free_quota != 0 && $price > $freightTemplate->free_quota) {
+                    $freightTemplate = $freightTemplateList->get($firstGoods->freight_template_id);
+
+                    // 满额包邮
+                    if ($freightTemplate->free_quota != 0 && $goodsTotalPrice > $freightTemplate->free_quota) {
                         $freightPrice = 0;
                     } else {
                         $cityCode = json_decode($address->region_code_list)[1];
@@ -130,19 +151,24 @@ class OrderController extends Controller
                             $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
                                 return in_array(substr($cityCode, 0, 4), explode(',', $area->pickedCityCodes));
                             });
+
                             if (is_null($area)) {
-                                $errMsg = '商品"' . $cartGoods->name . '"暂不支持配送至当前地址，请更换收货地址';
+                                $errMsg = '商品"' . $firstGoods->name . '"暂不支持配送至当前地址，请更换收货地址';
                                 $freightPrice = 0;
                             } else {
+                                // 计费方式
                                 if ($freightTemplate->compute_mode == 1) {
+                                    // 按商品计费
                                     $freightPrice = $area->fee;
                                 } else {
-                                    $freightPrice = bcmul($area->fee, $cartGoods->number, 2);
+                                    // 按件计费（所有规格数量）
+                                    $freightPrice = bcmul($area->fee, $goodsTotalNumber, 2);
                                 }
                             }
                         }
                     }
                 }
+
                 $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
             }
         }

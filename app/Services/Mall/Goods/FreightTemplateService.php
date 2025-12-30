@@ -8,6 +8,7 @@ use App\Services\BaseService;
 use App\Utils\Inputs\FreightTemplateInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\MathTool;
+use Illuminate\Support\Collection;
 
 class FreightTemplateService extends BaseService
 {
@@ -64,6 +65,68 @@ class FreightTemplateService extends BaseService
     public function getSelfOptions($columns = ['*'])
     {
         return FreightTemplate::query()->where('shop_id', 0)->orderBy('id', 'asc')->get($columns);
+    }
+
+    /**
+     * 根据购物车商品列表计算总运费
+     *
+     * @param Collection $cartGoodsList Collection<CartGoods>
+     * @param Collection $freightTemplateList Collection<FreightTemplate>
+     * @param Address $address
+     * @return string 运费金额
+     */
+    public function calcFreightPriceByCartGoods(
+        Collection $cartGoodsList,
+        Collection $freightTemplateList,
+        Address $address
+    ): string {
+        $totalFreightPrice = '0.00';
+
+        if ($cartGoodsList->isEmpty()) {
+            return $totalFreightPrice;
+        }
+
+        // ⚠️ 按 goods_id + freight_template_id 分组（更安全）
+        $groupedGoods = $cartGoodsList->groupBy(function ($item) {
+            return $item->goods_id . '_' . $item->freight_template_id;
+        });
+
+        foreach ($groupedGoods as $goodsItems) {
+
+            /** @var CartGoods $firstGoods */
+            $firstGoods = $goodsItems->first();
+
+            // 无运费模板，直接跳过
+            if ($firstGoods->freight_template_id == 0) {
+                continue;
+            }
+
+            /** @var FreightTemplate|null $freightTemplate */
+            $freightTemplate = $freightTemplateList->get($firstGoods->freight_template_id);
+            if (is_null($freightTemplate)) {
+                continue;
+            }
+
+            // 商品总价（所有规格）
+            $goodsTotalPrice = $goodsItems->reduce(function ($carry, $item) {
+                return bcadd($carry, bcmul($item->price, $item->number, 2), 2);
+            }, '0.00');
+
+            // 商品总数量
+            $goodsTotalNumber = $goodsItems->sum('number');
+
+            // 调用你已有的运费计算方法
+            $freightPrice = $this->calcFreightPrice(
+                $freightTemplate,
+                $address,
+                $goodsTotalPrice,
+                $goodsTotalNumber
+            );
+
+            $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
+        }
+
+        return $totalFreightPrice;
     }
 
     public function calcFreightPrice(FreightTemplate $freightTemplate, Address $address, $totalPrice, $goodsNumber)

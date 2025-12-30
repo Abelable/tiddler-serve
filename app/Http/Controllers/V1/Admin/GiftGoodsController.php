@@ -8,6 +8,7 @@ use App\Services\Mall\Goods\GoodsService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\GiftGoodsInput;
 use App\Utils\Inputs\GiftGoodsPageInput;
+use Illuminate\Support\Facades\Cache;
 
 class GiftGoodsController extends Controller
 {
@@ -37,6 +38,8 @@ class GiftGoodsController extends Controller
             GiftGoodsService::getInstance()->create($input, $goods);
         }
 
+        Cache::forget('gift_goods_type_' . $input->typeId);
+
         return $this->success();
     }
 
@@ -52,7 +55,15 @@ class GiftGoodsController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $sort = $this->verifyRequiredInteger('sort');
+
+        $giftGoods = GiftGoodsService::getInstance()->getGoodsById($id);
+        if (is_null($giftGoods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
         GiftGoodsService::getInstance()->updateSort($id, $sort);
+        Cache::forget('gift_goods_type_' . $giftGoods->type_id);
+
         return $this->success();
     }
 

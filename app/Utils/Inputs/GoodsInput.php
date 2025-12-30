@@ -52,7 +52,7 @@ class GoodsInput extends BaseInput
             'specList' => 'required|array',
             'skuList' => 'required|array',
             'deliveryMode' => 'required|integer|in:1,2,3',
-            'freightTemplateId' => 'required|integer|digits_between:1,20',
+            'freightTemplateId' => 'integer|digits_between:1,20',
             'pickupAddressIds' => 'array',
             'refundStatus' => 'required|integer|in:0,1',
             'refundAddressId' => 'integer|digits_between:1,20',

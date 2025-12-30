@@ -142,8 +142,9 @@ class UserController extends Controller
     public function timLoginInfo()
     {
         $timServe = TimServe::new();
-        $timServe->updateUserInfo($this->userId(), $this->user()->nickname, $this->user()->avatar);
-        $loginInfo = $timServe->getLoginInfo($this->userId());
+        $user = UserService::getInstance()->getUserById(1);
+        $timServe->updateUserInfo(1, $user->nickname, $user->avatar);
+        $loginInfo = $timServe->getLoginInfo(1);
         return $this->success($loginInfo);
     }
 

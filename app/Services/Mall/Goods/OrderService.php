@@ -287,18 +287,6 @@ class OrderService extends BaseService
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
 
-            // 计算运费
-            if ($input->deliveryMode == 1) {
-                if ($cartGoods->freight_template_id == 0) {
-                    $freightPrice = 0;
-                } else {
-                    $freightTemplate = $freightTemplateList->get($cartGoods->freight_template_id);
-                    $freightPrice = FreightTemplateService::getInstance()
-                        ->calcFreightPrice($freightTemplate, $address, $price, $cartGoods->number);
-                }
-                $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
-            }
-
             // 优惠券
             if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
                 $couponDenomination = $coupon->denomination;
@@ -310,6 +298,12 @@ class OrderService extends BaseService
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
+        }
+
+        // 计算运费
+        if ($input->deliveryMode == 1) {
+            $totalFreightPrice = FreightTemplateService::getInstance()
+                ->calcFreightPriceByCartGoods($cartGoodsList, $freightTemplateList, $address);
         }
 
         $paymentAmount = bcadd($totalPrice, $totalFreightPrice, 2);
@@ -1299,11 +1293,12 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::NOT_FOUND, '地址不存在');
         }
 
-        // 计算运费
+        // 获取订单商品
         $orderGoodsList = OrderGoodsService::getInstance()->getListByOrderId($orderId);
         $goodsIds = $orderGoodsList->pluck('goods_id')->toArray();
-        $goodsList = GoodsService::getInstance()->getListByIds($goodsIds);
-        $groupedGoodsList = $goodsList->keyBy('id');
+        $goodsList = GoodsService::getInstance()->getListByIds($goodsIds)->keyBy('id');
+
+        // 获取运费模板
         $freightTemplateIds = $goodsList->pluck('freight_template_id')->toArray();
         $freightTemplateList = FreightTemplateService::getInstance()
             ->getListByIds($freightTemplateIds)
@@ -1311,18 +1306,49 @@ class OrderService extends BaseService
                 $freightTemplate->area_list = json_decode($freightTemplate->area_list);
                 return $freightTemplate;
             })->keyBy('id');
+
+        // 按商品分组计算运费
+        $orderGoodsGroupByGoods = $orderGoodsList->groupBy('goods_id');
         $totalFreightPrice = 0;
-        /** @var OrderGoods $goods */
-        foreach ($orderGoodsList as $orderGoods) {
-            $price = bcmul($orderGoods->price, $orderGoods->number, 2);
+        foreach ($orderGoodsGroupByGoods as $goodsId => $goodsItems) {
+            /** @var OrderGoods $firstGoods */
+            $firstGoods = $goodsItems->first();
             /** @var Goods $goods */
-            $goods = $groupedGoodsList->get($orderGoods->goods_id);
+            $goods = $goodsList->get($goodsId);
+
+            // 商品总价和总数量
+            $goodsTotalPrice = $goodsItems->reduce(function ($carry, OrderGoods $item) {
+                return bcadd($carry, bcmul($item->price, $item->number, 2), 2);
+            }, 0);
+            $goodsTotalNumber = $goodsItems->sum('number');
+
             if ($goods->freight_template_id == 0) {
                 $freightPrice = 0;
             } else {
+                /** @var FreightTemplate $freightTemplate */
                 $freightTemplate = $freightTemplateList->get($goods->freight_template_id);
-                $freightPrice = FreightTemplateService::getInstance()->calcFreightPrice($freightTemplate, $address, $price, $orderGoods->number);
+
+                // 满额包邮
+                if ($freightTemplate->free_quota != 0 && $goodsTotalPrice > $freightTemplate->free_quota) {
+                    $freightPrice = 0;
+                } else {
+                    $cityCode = json_decode($address->region_code_list)[1];
+                    $area = collect($freightTemplate->area_list)->first(function ($area) use ($cityCode) {
+                        return in_array(substr($cityCode, 0, 4), explode(',', $area->pickedCityCodes));
+                    });
+
+                    if (is_null($area)) {
+                        $freightPrice = 0;
+                    } else {
+                        if ($freightTemplate->compute_mode == 1) {
+                            $freightPrice = $area->fee;
+                        } else {
+                            $freightPrice = bcmul($area->fee, $goodsTotalNumber, 2);
+                        }
+                    }
+                }
             }
+
             $totalFreightPrice = bcadd($totalFreightPrice, $freightPrice, 2);
         }
 
@@ -1330,12 +1356,15 @@ class OrderService extends BaseService
             $this->throwBusinessException(CodeResponse::ORDER_INVALID_OPERATION, '当前地址需额外支付运费，请联系客服处理');
         }
 
+        // 更新订单地址
         $order->consignee = $address->name;
         $order->mobile = $address->mobile;
         $order->address = $address->region_desc . ' ' . $address->address_detail;
+
         if ($order->cas() == 0) {
             $this->throwUpdateFail();
         }
+
         return $order;
     }
 }
