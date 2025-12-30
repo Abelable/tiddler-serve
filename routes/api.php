@@ -156,6 +156,7 @@ Route::prefix('shop')->group(function () {
         Route::post('down', 'ShopGoodsController@down');
         Route::post('edit_commission', 'ShopGoodsController@editCommission');
         Route::post('edit_stock', 'ShopGoodsController@editStock');
+        Route::post('edit_sort', 'ShopGoodsController@editSort');
         Route::post('delete', 'ShopGoodsController@delete');
     });
 
