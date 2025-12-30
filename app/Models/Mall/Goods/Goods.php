@@ -6,7 +6,7 @@ use App\Models\BaseModel;
 use Laravel\Scout\Searchable;
 
 /**
- * App\Models\Goods
+ * App\Models\Mall\Goods\Goods
  *
  * @property int $id
  * @property int $status 申请状态：0-待审核，1-审核通过，2-审核未通过，3-下架
@@ -37,6 +37,7 @@ use Laravel\Scout\Searchable;
  * @property int $sales_volume 销量
  * @property string $score 评分
  * @property int $views 点击率
+ * @property int $sort 店铺排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -50,7 +51,6 @@ use Laravel\Scout\Searchable;
  * @property-read \App\Models\Mall\Goods\Shop|null $shopInfo
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods newQuery()
- * @method static \Illuminate\Database\Query\Builder|Goods onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods query()
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCover($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereCreatedAt($value)
@@ -76,6 +76,7 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereShopId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSkuList($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereSpecList($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereStock($value)
@@ -84,8 +85,6 @@ use Laravel\Scout\Searchable;
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereVideo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Goods whereViews($value)
- * @method static \Illuminate\Database\Query\Builder|Goods withTrashed()
- * @method static \Illuminate\Database\Query\Builder|Goods withoutTrashed()
  * @mixin \Eloquent
  */
 class Goods extends BaseModel

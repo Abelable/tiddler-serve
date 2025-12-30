@@ -55,6 +55,7 @@ class CreateGoodsTable extends Migration
             $table->integer('sales_volume')->default(0)->comment('销量');
             $table->decimal('score', 3, 2)->default(0)->comment('评分');
             $table->integer('views')->default(0)->comment('点击率');
+            $table->integer('sort')->default(1)->comment('店铺排序');
 
             // 时间
             $table->timestamps();
