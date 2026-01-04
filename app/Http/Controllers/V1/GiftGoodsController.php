@@ -17,7 +17,10 @@ class GiftGoodsController extends Controller
 
     public function typeOptions()
     {
-        $options = GiftTypeService::getInstance()->getTypeOptions(['id', 'name']);
+        $cacheKey = 'gift_type_options';
+        $options = Cache::remember($cacheKey, 1440, function () {
+            return GiftTypeService::getInstance()->getTypeOptions(['id', 'name']);
+        });
         return $this->success($options);
     }
 
