@@ -44,7 +44,13 @@ class MallController extends Controller
     {
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
+
+        if ($input->longitude == 0 || $input->latitude == 0) {
+            return $this->successPaginate([]);
+        }
+
         $page = $this->page($input, 2, $input->longitude, $input->latitude);
+
         return $this->success($page);
     }
 

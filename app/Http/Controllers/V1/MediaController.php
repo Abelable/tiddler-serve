@@ -100,7 +100,20 @@ class MediaController extends Controller
     {
         /** @var NearbyPageInput $input */
         $input = NearbyPageInput::new();
-        return $this->getMediaList($input, null, false, '', 3, $input->longitude, $input->latitude);
+
+        if ($input->longitude == 0 || $input->latitude == 0) {
+            return $this->successPaginate([]);
+        }
+
+        return $this->getMediaList(
+            $input,
+            null,
+            false,
+            '',
+            3,
+            $input->longitude,
+            $input->latitude
+        );
     }
 
     public function followList()
