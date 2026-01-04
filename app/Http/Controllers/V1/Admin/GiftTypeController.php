@@ -7,6 +7,7 @@ use App\Models\Mall\Goods\GiftType;
 use App\Services\Mall\Goods\GiftTypeService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 
 class GiftTypeController extends Controller
 {
@@ -39,6 +40,8 @@ class GiftTypeController extends Controller
             return $this->fail(CodeResponse::DATA_EXISTED, '当前礼包类型已存在');
         }
 
+        Cache::forget('gift_type_options');
+
         $category = GiftType::new();
         $category->name = $name;
         $category->save();
@@ -56,6 +59,8 @@ class GiftTypeController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前礼包类型不存在');
         }
 
+        Cache::forget('gift_type_options');
+
         $category->name = $name;
         $category->save();
 
@@ -70,6 +75,8 @@ class GiftTypeController extends Controller
         if (is_null($category)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前礼包类型不存在');
         }
+
+        Cache::forget('gift_type_options');
 
         $category->sort = $sort;
         $category->save();
@@ -86,6 +93,8 @@ class GiftTypeController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前礼包类型不存在');
         }
 
+        Cache::forget('gift_type_options');
+
         $category->status = $status;
         $category->save();
 
@@ -95,11 +104,16 @@ class GiftTypeController extends Controller
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
+
         $category = GiftTypeService::getInstance()->getTypeById($id);
         if (is_null($category)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前礼包类型不存在');
         }
+
+        Cache::forget('gift_type_options');
+
         $category->delete();
+
         return $this->success();
     }
 
