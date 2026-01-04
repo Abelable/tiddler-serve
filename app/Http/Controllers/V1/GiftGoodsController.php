@@ -33,7 +33,6 @@ class GiftGoodsController extends Controller
 
         if ($input->page == 1) {
             $cacheKey = 'gift_goods_type_' . $typeId;
-
             $result = Cache::remember($cacheKey, 1440, function () use ($input) {
                 return $this->giftGoodsPage($input);
             });
