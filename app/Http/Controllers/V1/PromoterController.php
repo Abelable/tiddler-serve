@@ -23,7 +23,7 @@ class PromoterController extends Controller
             ->created_at;
         $achievement = CommissionService::getInstance()->getUserAchievement($this->userId(), $levelChangeTime);
 
-        return $this->success((float) $achievement);
+        return $this->success(round($achievement, 2));
     }
 
     public function customerData()
