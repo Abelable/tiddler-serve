@@ -91,7 +91,8 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      * @var array<int, string>
      */
     protected $hidden = [
-        'openid'
+        'openid',
+        'password'
     ];
 
     /**

@@ -24,15 +24,15 @@ use App\Utils\TimServe;
 
 class UserController extends Controller
 {
-    protected $except = ['userInfo', 'authorInfo', 'search', 'options', 'addTempUser'];
+    protected $except = ['userBaseInfo', 'userInfo', 'authorInfo', 'search', 'options', 'addTempUser'];
 
-    public function myInfo()
+    public function baseInfo()
     {
-        $userInfo = $this->handelUserInfo($this->user());
+        $userInfo = $this->handleBaseInfo($this->user());
         return $this->success($userInfo);
     }
 
-    public function userInfo()
+    public function userBaseInfo()
     {
         $userId = $this->verifyRequiredId('userId');
 
@@ -41,75 +41,69 @@ class UserController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '用户不存在');
         }
 
-        $userInfo = $this->handelUserInfo($user);
+        $userInfo = $this->handleBaseInfo($user);
 
         return $this->success($userInfo);
     }
 
-    private function handelUserInfo(User $user)
+    private function handleBaseInfo(User $user)
     {
-        $beLikedTimes = MediaService::getInstance()->beLikedTimes($user->id);
-        $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($user->id);
-        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($user->id);
-        $fansNumber = FanService::getInstance()->fansNumber($user->id);
-        $user['beLikedTimes'] = $beLikedTimes;
-        $user['beCollectedTimes'] = $beCollectedTimes;
-        $user['followedAuthorNumber'] = $followedAuthorNumbers;
-        $user['fansNumber'] = $fansNumber;
+        $user->setAttribute('authInfoId', $user->authInfo->id ?? 0);
 
-        $promoterInfo = $user->promoterInfo;
-        $user['promoterInfo'] = $promoterInfo ? [
-            'id' => $promoterInfo->id,
-            'status' => $promoterInfo->status,
-            'level' => $promoterInfo->level,
-            'subUserCount' => $promoterInfo->sub_user_number,
-            'subPromoterCount' => $promoterInfo->sub_promoter_number,
-            'selfCommissionSum' => $promoterInfo->self_commission_sum,
-            'shareCommissionSum' => $promoterInfo->share_commission_sum,
-            'teamCommissionSum' => $promoterInfo->team_commission_sum,
-            'expirationTime' => $promoterInfo->expiration_time,
-        ] : null;
-
-        $user['superiorId'] = $user->superiorId() ?? 0;
-
-        $user['authInfoId'] = $user->authInfo->id ?? 0;
-
-        if ($user->scenicMerchant) {
-            $user['scenicMerchantId'] = $user->scenicMerchant->id;
-            $user['scenicMerchantStatus'] = $user->scenicMerchant->status;
-        }
-        if ($user->hotelMerchant) {
-            $user['hotelMerchantId'] = $user->hotelMerchant->id;
-            $user['hotelMerchantStatus'] = $user->hotelMerchant->status;
-        }
-        if ($user->cateringMerchant) {
-            $user['cateringMerchantId'] = $user->cateringMerchant->id;
-            $user['cateringMerchantStatus'] = $user->cateringMerchant->status;
-        }
-        if ($user->merchant) {
-            $user['merchantId'] = $user->merchant->id;
-            $user['merchantStatus'] = $user->merchant->status;
+        $user->loadMissing('promoterInfo');
+        if ($user->promoterInfo) {
+            $user->promoterInfo->makeHidden(['user_id']);
         }
 
-        $user['scenicShopOptions'] = UserService::getInstance()->scenicShopOptions($user);
-        $user['hotelShopOptions'] = UserService::getInstance()->hotelShopOptions($user);
-        $user['cateringShopOptions'] = UserService::getInstance()->cateringShopOptions($user);
-        $user['goodsShopOptions'] = UserService::getInstance()->shopOptions($user);
-
-        unset($user->openid);
-        unset($user->authInfo);
-        unset($user->scenicMerchant);
-        unset($user->scenicShop);
-        unset($user->hotelMerchant);
-        unset($user->hotelShop);
-        unset($user->cateringMerchant);
-        unset($user->cateringShop);
-        unset($user->merchant);
-        unset($user->shop);
-        unset($user->created_at);
-        unset($user->updated_at);
+        $user->setAttribute('superiorId', $user->superiorId() ?? 0);
 
         return $user;
+    }
+
+    public function socialStats()
+    {
+        $userId = $this->user()->id;
+
+        $beLikedTimes = MediaService::getInstance()->beLikedTimes($userId);
+        $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($userId);
+        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($userId);
+        $fansNumber = FanService::getInstance()->fansNumber($userId);
+
+        return $this->success([
+            'beLikedTimes' => $beLikedTimes,
+            'beCollectedTimes' => $beCollectedTimes,
+            'followedAuthorNumbers' => $followedAuthorNumbers,
+            'fansNumber' => $fansNumber,
+        ]);
+    }
+
+    public function merchantInfo()
+    {
+        $user = $this->user();
+
+        if ($user->scenicMerchant) {
+            $data['scenicMerchantId'] = $user->scenicMerchant->id;
+            $data['scenicMerchantStatus'] = $user->scenicMerchant->status;
+        }
+        if ($user->hotelMerchant) {
+            $data['hotelMerchantId'] = $user->hotelMerchant->id;
+            $data['hotelMerchantStatus'] = $user->hotelMerchant->status;
+        }
+        if ($user->cateringMerchant) {
+            $data['cateringMerchantId'] = $user->cateringMerchant->id;
+            $data['cateringMerchantStatus'] = $user->cateringMerchant->status;
+        }
+        if ($user->merchant) {
+            $data['goodsMerchantId'] = $user->merchant->id;
+            $data['goodsMerchantStatus'] = $user->merchant->status;
+        }
+
+        $data['scenicShopOptions'] = UserService::getInstance()->scenicShopOptions($user);
+        $data['hotelShopOptions'] = UserService::getInstance()->hotelShopOptions($user);
+        $data['cateringShopOptions'] = UserService::getInstance()->cateringShopOptions($user);
+        $data['goodsShopOptions'] = UserService::getInstance()->shopOptions($user);
+
+        return $this->success($data);
     }
 
     public function updateUserInfo()
@@ -141,8 +135,8 @@ class UserController extends Controller
 
     public function timLoginInfo()
     {
-        $timServe = TimServe::new();
         // todo 及时通讯
+        $timServe = TimServe::new();
         $user = UserService::getInstance()->getUserById(1);
         $timServe->updateUserInfo(1, $user->nickname, $user->avatar);
         $loginInfo = $timServe->getLoginInfo(1);

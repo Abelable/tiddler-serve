@@ -33,10 +33,12 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('user')->group(function () {
-    Route::get('me', 'UserController@myInfo');
-    Route::get('info', 'UserController@userInfo');
+    Route::get('me', 'UserController@baseInfo');
+    Route::get('info', 'UserController@userBaseInfo');
     Route::post('update', 'UserController@updateUserInfo');
     Route::get('tim_login_info', 'UserController@timLoginInfo');
+    Route::get('social_stats', 'UserController@socialStats');
+    Route::get('merchant_info', 'UserController@merchantInfo');
     Route::get('author_info', 'UserController@authorInfo');
     Route::get('search', 'UserController@search');
     Route::get('options', 'UserController@options');
