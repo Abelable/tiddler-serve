@@ -66,13 +66,13 @@ class UserController extends Controller
 
         $beLikedTimes = MediaService::getInstance()->beLikedTimes($userId);
         $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($userId);
-        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($userId);
+        $followedAuthorNumber = FanService::getInstance()->followedAuthorNumber($userId);
         $fansNumber = FanService::getInstance()->fansNumber($userId);
 
         return $this->success([
             'beLikedTimes' => $beLikedTimes,
             'beCollectedTimes' => $beCollectedTimes,
-            'followedAuthorNumbers' => $followedAuthorNumbers,
+            'followedAuthorNumber' => $followedAuthorNumber,
             'fansNumber' => $fansNumber,
         ]);
     }
@@ -159,12 +159,12 @@ class UserController extends Controller
 
         $beLikedTimes = MediaService::getInstance()->beLikedTimes($authorId);
         $beCollectedTimes = MediaService::getInstance()->beCollectedTimes($authorId);
-        $followedAuthorNumbers = FanService::getInstance()->followedAuthorNumber($authorId);
+        $followedAuthorNumber = FanService::getInstance()->followedAuthorNumber($authorId);
         $fansNumber = FanService::getInstance()->fansNumber($authorId);
 
         $authorInfo['be_liked_times'] = $beLikedTimes;
         $authorInfo['be_collected_times'] = $beCollectedTimes;
-        $authorInfo['followed_author_number'] = $followedAuthorNumbers;
+        $authorInfo['followed_author_number'] = $followedAuthorNumber;
         $authorInfo['fans_number'] = $fansNumber;
 
         return $this->success($authorInfo);
