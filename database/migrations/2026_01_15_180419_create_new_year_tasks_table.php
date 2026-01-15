@@ -24,7 +24,7 @@ class CreateNewYearTasksTable extends Migration
             $table->integer('luck_score')->comment('任务福气值');
 
             $table->tinyInteger('type')->comment('任务类型：1-页面跳转, 2-加群');
-            $table->string('param')->comment('任务参数，例如页面路径');
+            $table->string('param')->default('')->comment('任务参数，例如页面路径');
 
             $table->timestamps();
             $table->softDeletes();
