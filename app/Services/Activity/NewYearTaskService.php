@@ -17,6 +17,14 @@ class NewYearTaskService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getList($columns = ['*'])
+    {
+        return NewYearTask::query()
+            ->orderBy('sort', 'desc')
+            ->orderBy('id', 'asc')
+            ->get($columns);
+    }
+
     public function updateTask(NewYearTask $task, NewYearTaskInput $input)
     {
         $task->icon = $input->icon;

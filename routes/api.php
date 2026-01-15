@@ -702,6 +702,12 @@ Route::prefix('task')->group(function () {
     Route::get('status', 'TaskController@status');
 });
 
+Route::prefix('activity')->group(function () {
+    Route::prefix('new_year')->group(function () {
+        Route::get('task_list', 'NewYearController@taskList');
+    });
+});
+
 Route::prefix('trip_type')->group(function () {
     Route::get('hot_scenic_list', 'TripTypeController@hotScenicList');
     Route::get('lake_trip_list', 'TripTypeController@lakeTripList');
