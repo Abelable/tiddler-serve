@@ -5,9 +5,18 @@ namespace App\Services\Activity;
 use App\Models\Activity\NewYearTask;
 use App\Services\BaseService;
 use App\Utils\Inputs\Activity\NewYearTaskInput;
+use App\Utils\Inputs\PageInput;
 
 class NewYearTaskService extends BaseService
 {
+    public function getPage(PageInput $input, $columns = ['*'])
+    {
+        return NewYearTask::query()
+            ->orderBy('sort', 'desc')
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
     public function addTask(NewYearTaskInput $input)
     {
         $task = NewYearTask::new();
@@ -20,5 +29,15 @@ class NewYearTaskService extends BaseService
         $task->param = $input->param ?? '';
         $task->save();
         return $task;
+    }
+
+    public function getTaskById($id, $columns = ['*'])
+    {
+        return NewYearTask::query()->find($id, $columns);
+    }
+
+    public function updateSort($id, $sort)
+    {
+        NewYearTask::query()->where('id', $id)->update(['sort' => $sort]);
     }
 }

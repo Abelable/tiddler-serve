@@ -26,6 +26,8 @@ class CreateNewYearTasksTable extends Migration
             $table->tinyInteger('type')->comment('任务类型：1-页面跳转, 2-加群');
             $table->string('param')->default('')->comment('任务参数，例如页面路径');
 
+            $table->integer('sort')->default(1)->comment('排序');
+
             $table->timestamps();
             $table->softDeletes();
         });

@@ -966,6 +966,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'TaskController@delete');
     });
 
+    Route::prefix('new_year')->group(function () {
+        Route::prefix('task')->group(function () {
+            Route::post('list', 'NewYearTaskController@list');
+            Route::post('add', 'NewYearTaskController@add');
+            Route::post('edit_sort', 'NewYearTaskController@editSort');
+            Route::post('delete', 'NewYearTaskController@delete');
+        });
+    });
+
     Route::prefix('theme')->group(function () {
         Route::prefix('hot_scenic')->group(function () {
             Route::post('list', 'HotScenicController@list');
