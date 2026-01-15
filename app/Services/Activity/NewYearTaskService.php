@@ -17,9 +17,8 @@ class NewYearTaskService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
-    public function addTask(NewYearTaskInput $input)
+    public function updateTask(NewYearTask $task, NewYearTaskInput $input)
     {
-        $task = NewYearTask::new();
         $task->icon = $input->icon;
         $task->name = $input->name;
         $task->desc = $input->desc;

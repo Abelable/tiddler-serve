@@ -969,7 +969,9 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
     Route::prefix('new_year')->group(function () {
         Route::prefix('task')->group(function () {
             Route::post('list', 'NewYearTaskController@list');
+            Route::get('detail', 'NewYearTaskController@detail');
             Route::post('add', 'NewYearTaskController@add');
+            Route::post('edit', 'NewYearTaskController@edit');
             Route::post('edit_sort', 'NewYearTaskController@editSort');
             Route::post('delete', 'NewYearTaskController@delete');
         });
