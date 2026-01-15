@@ -55,11 +55,11 @@ class AuthController extends Controller
             AccountService::getInstance()->createUserAccount($user->id);
 
             // todo 注册送身份（100天代言人）
-            $promoter = PromoterService::getInstance()->adminCreate($user->id, 1, 100, 100);
-            PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
-            if (!empty($input->superiorId)) {
-                PromoterService::getInstance()->updateSubPromoterCount($input->superiorId);
-            }
+//            $promoter = PromoterService::getInstance()->adminCreate($user->id, 1, 100, 100);
+//            PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
+//            if (!empty($input->superiorId)) {
+//                PromoterService::getInstance()->updateSubPromoterCount($input->superiorId);
+//            }
 
             return Auth::guard('user')->login($user);
         });
