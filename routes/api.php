@@ -983,6 +983,16 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('down', 'NewYearTaskController@down');
             Route::post('delete', 'NewYearTaskController@delete');
         });
+
+        Route::prefix('goods')->group(function () {
+            Route::post('list', 'NewYearGoodsController@list');
+            Route::post('add', 'NewYearGoodsController@add');
+            Route::post('edit_luck_score', 'NewYearGoodsController@editLuckScore');
+            Route::post('edit_sort', 'NewYearGoodsController@editSort');
+            Route::post('up', 'NewYearGoodsController@up');
+            Route::post('down', 'NewYearGoodsController@down');
+            Route::post('delete', 'NewYearGoodsController@delete');
+        });
     });
 
     Route::prefix('theme')->group(function () {

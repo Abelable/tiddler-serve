@@ -8,6 +8,7 @@ use App\Models\BaseModel;
  * App\Models\Activity\NewYearGoods
  *
  * @property int $id
+ * @property int $status 状态：1-上架中；2-已下架
  * @property int $goods_id 商品id
  * @property string $cover 图片
  * @property string $name 名称
@@ -27,6 +28,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereLuckScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereSort($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereUpdatedAt($value)
  * @mixin \Eloquent
  */

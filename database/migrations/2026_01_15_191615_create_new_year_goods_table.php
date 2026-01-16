@@ -15,6 +15,7 @@ class CreateNewYearGoodsTable extends Migration
     {
         Schema::create('new_year_goods', function (Blueprint $table) {
             $table->id();
+            $table->integer('status')->default(1)->comment('状态：1-上架中；2-已下架');
 
             $table->integer('goods_id')->comment('商品id');
             $table->string('cover')->comment('图片');
