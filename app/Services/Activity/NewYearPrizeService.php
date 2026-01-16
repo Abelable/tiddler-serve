@@ -43,6 +43,11 @@ class NewYearPrizeService extends BaseService
         return NewYearPrize::query()->find($id, $columns);
     }
 
+    public function updateIsBig($id, $isBig)
+    {
+        NewYearPrize::query()->where('id', $id)->update(['is_big' => $isBig]);
+    }
+
     public function updateSort($id, $sort)
     {
         NewYearPrize::query()->where('id', $id)->update(['sort' => $sort]);

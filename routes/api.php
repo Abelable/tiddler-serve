@@ -991,6 +991,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::get('detail', 'NewYearPrizeController@detail');
             Route::post('add', 'NewYearPrizeController@add');
             Route::post('edit', 'NewYearPrizeController@edit');
+            Route::post('edit_is_big', 'NewYearPrizeController@editIsBig');
             Route::post('edit_sort', 'NewYearPrizeController@editSort');
             Route::post('up', 'NewYearPrizeController@up');
             Route::post('down', 'NewYearPrizeController@down');

@@ -63,6 +63,23 @@ class NewYearPrizeController extends Controller
         return $this->success();
     }
 
+    public function editIsBig()
+    {
+        $id = $this->verifyRequiredId('id');
+        $isBig = $this->verifyRequiredInteger('isBig');
+
+        $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
+        if (is_null($prize)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+        }
+
+        NewYearPrizeService::getInstance()->updateIsBig($id, $isBig);
+
+        Cache::forget('new_year_prize_list');
+
+        return $this->success();
+    }
+
     public function editSort()
     {
         $id = $this->verifyRequiredId('id');
