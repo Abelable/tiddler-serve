@@ -15,6 +15,7 @@ use App\Models\BaseModel;
  * @property int $is_big 是否是大奖：0-否，1-是
  * @property string $cover 奖品图片
  * @property string $name 奖品名称
+ * @property int $sort 排序值
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -29,6 +30,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereIsBig($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereUpdatedAt($value)

@@ -25,6 +25,8 @@ class CreateNewYearPrizesTable extends Migration
             $table->string('cover', 500)->comment('奖品图片');
             $table->string('name', 100)->comment('奖品名称');
 
+            $table->integer('sort')->default(1)->comment('排序');
+
             $table->timestamps();
             $table->softDeletes();
         });
