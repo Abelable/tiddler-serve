@@ -8,6 +8,7 @@ use App\Services\Activity\NewYearTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Activity\NewYearTaskInput;
 use App\Utils\Inputs\PageInput;
+use Illuminate\Support\Facades\Cache;
 
 class NewYearTaskController extends Controller
 {
@@ -39,6 +40,8 @@ class NewYearTaskController extends Controller
         $task = NewYearTask::new();
         NewYearTaskService::getInstance()->updateTask($task, $input);
 
+        Cache::forget('new_year_task_list');
+
         return $this->success();
     }
 
@@ -55,6 +58,8 @@ class NewYearTaskController extends Controller
 
         NewYearTaskService::getInstance()->updateTask($task, $input);
 
+        Cache::forget('new_year_task_list');
+
         return $this->success();
     }
 
@@ -70,17 +75,57 @@ class NewYearTaskController extends Controller
 
         NewYearTaskService::getInstance()->updateSort($id, $sort);
 
+        Cache::forget('new_year_task_list');
+
+        return $this->success();
+    }
+
+    public function up()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $task = NewYearTaskService::getInstance()->getTaskById($id);
+        if (is_null($task)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前任务不存在');
+        }
+
+        $task->status = 1;
+        $task->save();
+
+        Cache::forget('new_year_task_list');
+
+        return $this->success();
+    }
+
+    public function down()
+    {
+        $id = $this->verifyRequiredId('id');
+
+        $task = NewYearTaskService::getInstance()->getTaskById($id);
+        if (is_null($task)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前任务不存在');
+        }
+
+        $task->status = 2;
+        $task->save();
+
+        Cache::forget('new_year_task_list');
+
         return $this->success();
     }
 
     public function delete()
     {
         $id = $this->verifyRequiredId('id');
+
         $task = NewYearTaskService::getInstance()->getTaskById($id);
         if (is_null($task)) {
             return $this->fail(CodeResponse::NOT_FOUND, '当前任务不存在');
         }
         $task->delete();
+
+        Cache::forget('new_year_task_list');
+
         return $this->success();
     }
 }

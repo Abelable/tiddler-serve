@@ -8,6 +8,7 @@ use App\Models\BaseModel;
  * App\Models\Activity\NewYearTask
  *
  * @property int $id
+ * @property int $status 状态：1-进行中；2-已下架
  * @property string $icon 任务图标
  * @property string $name 任务名称
  * @property string $desc 任务描述
@@ -32,6 +33,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereParam($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereSort($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereUpdatedAt($value)
  * @mixin \Eloquent

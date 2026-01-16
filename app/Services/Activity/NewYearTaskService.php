@@ -20,6 +20,7 @@ class NewYearTaskService extends BaseService
     public function getList($columns = ['*'])
     {
         return NewYearTask::query()
+            ->where('status', 1)
             ->orderBy('sort', 'desc')
             ->orderBy('id', 'asc')
             ->get($columns);

@@ -979,6 +979,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('add', 'NewYearTaskController@add');
             Route::post('edit', 'NewYearTaskController@edit');
             Route::post('edit_sort', 'NewYearTaskController@editSort');
+            Route::post('up', 'NewYearTaskController@up');
+            Route::post('down', 'NewYearTaskController@down');
             Route::post('delete', 'NewYearTaskController@delete');
         });
     });

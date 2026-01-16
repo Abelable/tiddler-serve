@@ -15,6 +15,7 @@ class CreateNewYearTasksTable extends Migration
     {
         Schema::create('new_year_tasks', function (Blueprint $table) {
             $table->id();
+            $table->integer('status')->default(1)->comment('状态：1-进行中；2-已下架');
 
             $table->string('icon', 500)->comment('任务图标');
             $table->string('name', 200)->comment('任务名称');
