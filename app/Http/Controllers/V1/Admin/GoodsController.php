@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Activity\NewYearGoodsService;
 use App\Services\Mall\Goods\GiftGoodsService;
 use App\Services\Mall\Goods\GoodsPickupAddressService;
 use App\Services\Mall\Goods\GoodsService;
@@ -246,9 +247,16 @@ class GoodsController extends Controller
         return $this->success($options);
     }
 
-    public function normalGoodsOptions()
+    public function giftFilterGoodsOptions()
     {
         $giftGoodsIds = GiftGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
+        $options = GoodsService::getInstance()->getFilterGoodsList($giftGoodsIds, ['id', 'name', 'cover']);
+        return $this->success($options);
+    }
+
+    public function newYearFilterGoodsOptions()
+    {
+        $giftGoodsIds = NewYearGoodsService::getInstance()->getList()->pluck('goods_id')->toArray();
         $options = GoodsService::getInstance()->getFilterGoodsList($giftGoodsIds, ['id', 'name', 'cover']);
         return $this->success($options);
     }

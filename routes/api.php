@@ -1350,7 +1350,8 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::post('delete', 'GoodsController@delete');
         Route::get('options', 'GoodsController@options');
         Route::get('self_options', 'GoodsController@selfSupportGoodsOptions');
-        Route::get('normal_options', 'GoodsController@normalGoodsOptions');
+        Route::get('gift_filter_options', 'GoodsController@giftFilterGoodsOptions');
+        Route::get('new_year_filter_options', 'GoodsController@newYearFilterGoodsOptions');
 
         Route::prefix('gift')->group(function () {
             Route::prefix('type')->group(function () {
