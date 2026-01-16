@@ -705,6 +705,7 @@ Route::prefix('task')->group(function () {
 Route::prefix('activity')->group(function () {
     Route::prefix('new_year')->group(function () {
         Route::get('task_list', 'NewYearController@taskList');
+        Route::get('prize_list', 'NewYearController@prizeList');
         Route::get('goods_list', 'NewYearController@goodsList');
     });
 });
@@ -983,6 +984,17 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('up', 'NewYearTaskController@up');
             Route::post('down', 'NewYearTaskController@down');
             Route::post('delete', 'NewYearTaskController@delete');
+        });
+
+        Route::prefix('prize')->group(function () {
+            Route::post('list', 'NewYearPrizeController@list');
+            Route::get('detail', 'NewYearPrizeController@detail');
+            Route::post('add', 'NewYearPrizeController@add');
+            Route::post('edit', 'NewYearPrizeController@edit');
+            Route::post('edit_sort', 'NewYearPrizeController@editSort');
+            Route::post('up', 'NewYearPrizeController@up');
+            Route::post('down', 'NewYearPrizeController@down');
+            Route::post('delete', 'NewYearPrizeController@delete');
         });
 
         Route::prefix('goods')->group(function () {

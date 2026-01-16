@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Utils\Inputs;
+namespace App\Utils\Inputs\Activity;
+
+use App\Utils\Inputs\BaseInput;
 
 class NewYearGoodsInput extends BaseInput
 {

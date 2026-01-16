@@ -15,6 +15,7 @@ class CreateNewYearPrizesTable extends Migration
     {
         Schema::create('new_year_prizes', function (Blueprint $table) {
             $table->id();
+            $table->integer('status')->default(1)->comment('状态：1-上架中；2-已下架');
 
             $table->tinyInteger('type')->comment('类型：1-福气值，2-优惠券，3-商品');
             $table->unsignedBigInteger('coupon_id')->default(0)->comment('优惠券id');

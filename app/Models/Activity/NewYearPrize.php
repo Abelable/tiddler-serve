@@ -8,6 +8,7 @@ use App\Models\BaseModel;
  * App\Models\Activity\NewYearPrize
  *
  * @property int $id
+ * @property int $status 状态：1-上架中；2-已下架
  * @property int $type 类型：1-福气值，2-优惠券，3-商品
  * @property int $coupon_id 优惠券id
  * @property int $goods_id 商品id
@@ -28,6 +29,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereIsBig($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearPrize whereUpdatedAt($value)
  * @mixin \Eloquent

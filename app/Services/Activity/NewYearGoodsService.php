@@ -5,7 +5,7 @@ namespace App\Services\Activity;
 use App\Models\Activity\NewYearGoods;
 use App\Models\Mall\Goods\Goods;
 use App\Services\BaseService;
-use App\Utils\Inputs\NewYearGoodsInput;
+use App\Utils\Inputs\Activity\NewYearGoodsInput;
 use App\Utils\Inputs\PageInput;
 
 class NewYearGoodsService extends BaseService

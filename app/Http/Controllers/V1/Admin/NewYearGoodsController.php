@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Activity\NewYearGoodsService;
 use App\Services\Mall\Goods\GoodsService;
 use App\Utils\CodeResponse;
-use App\Utils\Inputs\NewYearGoodsInput;
+use App\Utils\Inputs\Activity\NewYearGoodsInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 
