@@ -54,13 +54,20 @@ class RelationService extends BaseService
 
     public function getTodayCountBySuperiorId($superiorId)
     {
-        return Relation::query()->whereDate('created_at', Carbon::today())->where('superior_id', $superiorId)->count();
+        $start = Carbon::today()->startOfDay();
+        $end   = Carbon::today()->endOfDay();
+        return Relation::query()
+            ->whereBetween('created_at', [$start, $end])
+            ->where('superior_id', $superiorId)
+            ->count();
     }
 
     public function getTodayListBySuperiorId($superiorId, $columns = ['*'])
     {
+        $start = Carbon::today()->startOfDay();
+        $end   = Carbon::today()->endOfDay();
         return Relation::query()
-            ->whereDate('created_at', Carbon::today())
+            ->whereBetween('created_at', [$start, $end])
             ->where('superior_id', $superiorId)
             ->get($columns);
     }

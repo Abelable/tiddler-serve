@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Services\AccountService;
+use App\Services\Activity\NewYearTaskService;
 use App\Services\Promoter\PromoterChangeLogService;
 use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
@@ -49,6 +50,9 @@ class AuthController extends Controller
 
                 // 增加上级邀请用户数量
                 PromoterService::getInstance()->updateSubUserCount($input->superiorId);
+
+                // todo 团圆家乡年 - 邀请任务
+                NewYearTaskService::getInstance()->finishInviteTask($input->superiorId);
             }
 
             // 创建用户余额账户
