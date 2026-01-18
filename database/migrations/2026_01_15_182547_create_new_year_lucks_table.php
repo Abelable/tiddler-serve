@@ -17,7 +17,7 @@ class CreateNewYearLucksTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->comment('用户id');
             $table->unsignedBigInteger('task_id')->default(0)->comment('任务id');
-            $table->date('task_date')->comment('任务日期（用于唯一约束）');
+            $table->date('task_date')->nullable()->comment('任务日期（用于唯一约束）');
 
             $table->string('desc', 200)->comment('描述');
             $table->tinyInteger('type')->comment('类型：1-获取，2-消耗');

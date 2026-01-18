@@ -28,7 +28,7 @@ class NewYearLuckService extends BaseService
             ->first($columns);
     }
 
-    public function createLuck($userId, $desc, $type, $score, $taskId = 0)
+    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 1)
     {
         $luck = NewYearLuck::new();
         $luck->user_id = $userId;
@@ -38,7 +38,9 @@ class NewYearLuckService extends BaseService
         $luck->score = $score;
 
         // 用于唯一索引生成（防并发、防重复）
-        $luck->task_date = Carbon::today()->toDateString();
+        if ($taskType != 3) {
+            $luck->task_date = Carbon::today()->toDateString();
+        }
 
         $luck->save();
     }

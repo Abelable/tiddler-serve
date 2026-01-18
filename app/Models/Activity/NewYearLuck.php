@@ -10,7 +10,7 @@ use App\Models\BaseModel;
  * @property int $id
  * @property int $user_id 用户id
  * @property int $task_id 任务id
- * @property string $task_date 任务日期（用于唯一约束）
+ * @property string|null $task_date 任务日期（用于唯一约束）
  * @property string $desc 描述
  * @property int $type 类型：1-获取，2-消耗
  * @property int $score 福气值

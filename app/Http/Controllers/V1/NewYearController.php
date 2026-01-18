@@ -76,7 +76,8 @@ class NewYearController extends Controller
                     $task->name,
                     1,
                     $task->luck_score,
-                    $task->id
+                    $task->id,
+                    $task->type,
                 );
             });
         } catch (\Throwable $e) {
