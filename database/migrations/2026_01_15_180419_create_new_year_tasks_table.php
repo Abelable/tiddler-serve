@@ -16,6 +16,7 @@ class CreateNewYearTasksTable extends Migration
         Schema::create('new_year_tasks', function (Blueprint $table) {
             $table->id();
             $table->integer('status')->default(1)->comment('状态：1-进行中；2-已下架');
+            $table->tinyInteger('type')->default(1)->comment('任务类型：1-单次任务，2-每日任务，3-重复任务');
 
             $table->string('icon', 500)->comment('任务图标');
             $table->string('name', 200)->comment('任务名称');
@@ -24,8 +25,8 @@ class CreateNewYearTasksTable extends Migration
 
             $table->integer('luck_score')->comment('任务福气值');
 
-            $table->tinyInteger('type')->comment('任务类型：1-页面跳转, 2-加群');
-            $table->string('param')->default('')->comment('任务参数，例如页面路径');
+            $table->tinyInteger('scene')->comment('场景：1-页面跳转, 2-加群');
+            $table->string('param')->default('')->comment('参数，例如页面路径');
 
             $table->integer('sort')->default(1)->comment('排序');
 

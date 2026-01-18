@@ -52,7 +52,7 @@ class AuthController extends Controller
                 PromoterService::getInstance()->updateSubUserCount($input->superiorId);
 
                 // todo 团圆家乡年 - 邀请任务
-                NewYearTaskService::getInstance()->finishInviteTask($input->superiorId);
+                // NewYearTaskService::getInstance()->finishInviteTask($input->superiorId);
             }
 
             // 创建用户余额账户
