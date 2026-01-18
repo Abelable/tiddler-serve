@@ -8,6 +8,7 @@ use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -83,5 +84,22 @@ class NewYearController extends Controller
         }
 
         return $this->success();
+    }
+
+    public function luckScore()
+    {
+        $luckScore = NewYearLuckService::getInstance()->getUserLuckScore($this->userId());
+        return $this->success($luckScore);
+    }
+
+    public function luckList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+
+        $columns = ['id', 'desc', 'type', 'score', 'created_at'];
+        $page = NewYearLuckService::getInstance()->getUserLuckList($this->userId(), $input, $columns);
+
+        return $this->successPaginate($page);
     }
 }

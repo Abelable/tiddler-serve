@@ -4,6 +4,7 @@ namespace App\Services\Activity;
 
 use App\Models\Activity\NewYearLuck;
 use App\Services\BaseService;
+use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 
 class NewYearLuckService extends BaseService
@@ -40,5 +41,18 @@ class NewYearLuckService extends BaseService
         $luck->task_date = Carbon::today()->toDateString();
 
         $luck->save();
+    }
+
+    public function getUserLuckScore($userId)
+    {
+        return NewYearLuck::query()->where('user_id', $userId)->sum('score');
+    }
+
+    public function getUserLuckList($userId, PageInput $input, $columns = ['*'])
+    {
+        return NewYearLuck::query()
+            ->where('user_id', $userId)
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 }

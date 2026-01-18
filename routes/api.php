@@ -704,10 +704,12 @@ Route::prefix('task')->group(function () {
 
 Route::prefix('activity')->group(function () {
     Route::prefix('new_year')->group(function () {
-        Route::get('task_list', 'NewYearController@taskList');
         Route::get('prize_list', 'NewYearController@prizeList');
         Route::get('goods_list', 'NewYearController@goodsList');
+        Route::get('task_list', 'NewYearController@taskList');
         Route::post('finish_task', 'NewYearController@finishTask');
+        Route::get('luck_score', 'NewYearController@luckScore');
+        Route::get('luck_list', 'NewYearController@luckList');
     });
 });
 
