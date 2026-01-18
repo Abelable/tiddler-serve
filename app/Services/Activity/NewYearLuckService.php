@@ -3,7 +3,6 @@
 namespace App\Services\Activity;
 
 use App\Models\Activity\NewYearLuck;
-use App\Models\Activity\NewYearUserLuck;
 use App\Services\BaseService;
 use Illuminate\Support\Carbon;
 
@@ -41,23 +40,5 @@ class NewYearLuckService extends BaseService
         $luck->task_date = Carbon::today()->toDateString();
 
         $luck->save();
-    }
-
-    public function updateUserLuck($userId, $score)
-    {
-        $userLuck = $this->getUserLuck($userId);
-        $userLuck->score = bcadd($userLuck->score, $score);
-        $userLuck->save();
-    }
-
-    public function getUserLuck($userId, $columns = ['*'])
-    {
-        $userLuck = NewYearUserLuck::query()->where('user_id', $userId)->first($columns);
-        if (is_null($userLuck)) {
-            $userLuck = NewYearUserLuck::new();
-            $userLuck->user_id = $userId;
-            $userLuck->save();
-        }
-        return $userLuck;
     }
 }

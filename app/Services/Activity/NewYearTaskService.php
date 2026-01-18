@@ -61,7 +61,6 @@ class NewYearTaskService extends BaseService
         if ($todayNewComerCount >= 4 && is_null($todayLuck)) {
             try {
                 NewYearLuckService::getInstance()->createLuck($superiorId, '成功邀请新人助力', 1, 80);
-                NewYearLuckService::getInstance()->updateUserLuck($superiorId, 80);
             } catch (\Exception $e) {
                 // 23000 = MySQL 唯一约束冲突
                 if ($e->getCode() === '23000') {

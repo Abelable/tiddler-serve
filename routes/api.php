@@ -707,6 +707,7 @@ Route::prefix('activity')->group(function () {
         Route::get('task_list', 'NewYearController@taskList');
         Route::get('prize_list', 'NewYearController@prizeList');
         Route::get('goods_list', 'NewYearController@goodsList');
+        Route::post('finish_task', 'NewYearController@finishTask');
     });
 });
 

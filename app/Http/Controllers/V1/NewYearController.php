@@ -13,13 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class NewYearController extends Controller
 {
-    public function taskList()
-    {
-        $list = Cache::remember('new_year_task_list', 10080, function () {
-            return NewYearTaskService::getInstance()->getList();
-        });
-        return $this->success($list);
-    }
+    protected $except = ['prizeList', 'goodsList'];
 
     public function prizeList()
     {
@@ -37,9 +31,17 @@ class NewYearController extends Controller
         return $this->success($list);
     }
 
+    public function taskList()
+    {
+        $list = Cache::remember('new_year_task_list', 10080, function () {
+            return NewYearTaskService::getInstance()->getList();
+        });
+        return $this->success($list);
+    }
+
     public function finishTask()
     {
-        $taskId = $this->verifyRequiredId('id');
+        $taskId = $this->verifyRequiredId('taskId');
 
         $task = NewYearTaskService::getInstance()->getTaskById($taskId);
         if (!$task || $task->status != 1) {
@@ -69,12 +71,8 @@ class NewYearController extends Controller
                     $userId,
                     $task->name,
                     1,
-                    $task->luck_score
-                );
-
-                NewYearLuckService::getInstance()->updateUserLuck(
-                    $userId,
-                    $task->luck_score
+                    $task->luck_score,
+                    $task->id
                 );
             });
         } catch (\Throwable $e) {
