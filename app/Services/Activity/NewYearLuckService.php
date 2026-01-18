@@ -28,7 +28,7 @@ class NewYearLuckService extends BaseService
             ->first($columns);
     }
 
-    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 1)
+    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2)
     {
         $luck = NewYearLuck::new();
         $luck->user_id = $userId;
@@ -50,11 +50,16 @@ class NewYearLuckService extends BaseService
         return NewYearLuck::query()->where('user_id', $userId)->sum('score');
     }
 
-    public function getUserLuckList($userId, PageInput $input, $columns = ['*'])
+    public function getUserLuckPage($userId, PageInput $input, $columns = ['*'])
     {
         return NewYearLuck::query()
             ->where('user_id', $userId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
+    }
+
+    public function getUserLuckList($userId, $columns = ['*'])
+    {
+        return NewYearLuck::query()->where('user_id', $userId)->get($columns);
     }
 }
