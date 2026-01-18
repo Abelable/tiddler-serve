@@ -103,6 +103,8 @@ class NewYearController extends Controller
             $shouldGrant = is_null($luck);
         } elseif ($task->type == 2) {
             $shouldGrant = is_null($todayLuck);
+        } elseif ($task->type == 3) {
+            $shouldGrant = true;
         }
 
         if (!$shouldGrant) {

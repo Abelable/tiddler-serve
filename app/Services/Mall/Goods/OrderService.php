@@ -15,6 +15,7 @@ use App\Models\Mall\Goods\Order;
 use App\Models\Mall\Goods\OrderGoods;
 use App\Models\Mall\Goods\Shop;
 use App\Services\AccountService;
+use App\Services\Activity\NewYearLuckService;
 use App\Services\BaseService;
 use App\Services\Mall\CommissionService;
 use App\Services\Mall\CouponService;
@@ -740,6 +741,17 @@ class OrderService extends BaseService
 
     public function userConfirm($userId, $orderId)
     {
+        // todo 团圆家乡年
+        NewYearLuckService::getInstance()->createLuck(
+            $userId,
+            '选购家乡好物',
+            1,
+            80,
+            3,
+            3,
+            $orderId
+        );
+
         $orderList = $this->getUserOrderList($userId, [$orderId]);
         if (count($orderList) == 0) {
             $this->throwBadArgumentValue();

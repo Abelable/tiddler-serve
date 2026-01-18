@@ -39,8 +39,10 @@ class NewYearLuckService extends BaseService
         $luck->reference_id = $referenceId;
 
         // 用于唯一索引生成（防并发、防重复）
-        if ($taskType != 3) {
-            $luck->task_date = Carbon::today()->toDateString();
+        if ($taskType == 3) {
+            $luck->task_date = Carbon::now()->toDateTimeString();
+        } else {
+            $luck->task_date = Carbon::today()->toDateTimeString();
         }
 
         $luck->save();
