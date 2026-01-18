@@ -45,12 +45,18 @@ class NewYearController extends Controller
         $luckList = NewYearLuckService::getInstance()->getUserLuckList($this->userId())->keyBy('task_id');
 
         $list = $taskList->map(function (NewYearTask $task) use ($avatar, $luckList) {
-            if ($task->id == 5 && $avatar && strpos($avatar, 'default_avatar') === false) {
-                return null;
-            }
-
             /** @var NewYearLuck $luck */
             $luck = $luckList->get($task->id);
+
+            if ($task->id == 5) {
+                if (!is_null($luck) && Carbon::parse($luck->created_at)->isToday()) {
+                    $task['status'] = 2;
+                    return $task;
+                }
+                if ($avatar && strpos($avatar, 'default_avatar') === false) {
+                    return null;
+                }
+            }
 
             if (!is_null($luck) && $task->type == 1) {
                 if (Carbon::parse($luck->created_at)->isToday()) {
