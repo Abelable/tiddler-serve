@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class NewYearController extends Controller
 {
-    protected $except = ['prizeList', 'goodsList'];
+    protected $except = ['prizeList', 'goodsList', 'finishTask'];
 
     public function prizeList()
     {
@@ -43,13 +43,16 @@ class NewYearController extends Controller
     public function finishTask()
     {
         $taskId = $this->verifyRequiredId('taskId');
+        $userId = $this->verifyId('userId');
+
+        if (empty($userId)) {
+            $userId = $this->userId();
+        }
 
         $task = NewYearTaskService::getInstance()->getTaskById($taskId);
         if (!$task || $task->status != 1) {
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在');
         }
-
-        $userId = $this->userId();
 
         $luck = NewYearLuckService::getInstance()->getLuckByUserId($userId, $taskId);
         $todayLuck = NewYearLuckService::getInstance()->getTodayLuckByUserId($userId, $taskId);
