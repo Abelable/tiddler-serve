@@ -28,7 +28,7 @@ class NewYearLuckService extends BaseService
             ->first($columns);
     }
 
-    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2)
+    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2, $referenceId = '')
     {
         $luck = NewYearLuck::new();
         $luck->user_id = $userId;
@@ -36,6 +36,7 @@ class NewYearLuckService extends BaseService
         $luck->desc = $desc;
         $luck->type = $type;
         $luck->score = $score;
+        $luck->reference_id = $referenceId;
 
         // 用于唯一索引生成（防并发、防重复）
         if ($taskType != 3) {

@@ -14,6 +14,7 @@ use App\Models\BaseModel;
  * @property string $desc 描述
  * @property int $type 类型：1-获取，2-消耗
  * @property int $score 福气值
+ * @property string $reference_id 外部参考ID，例如订单号
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -24,6 +25,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereDesc($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereReferenceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereTaskDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearLuck whereTaskId($value)

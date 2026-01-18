@@ -23,6 +23,8 @@ class CreateNewYearLucksTable extends Migration
             $table->tinyInteger('type')->comment('类型：1-获取，2-消耗');
             $table->integer('score')->comment('福气值');
 
+            $table->string('reference_id', 64)->default('')->comment('外部参考ID，例如订单号');
+
             $table->timestamps();
             $table->softDeletes();
 

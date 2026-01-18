@@ -13,7 +13,6 @@ use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class NewYearController extends Controller
 {
@@ -37,20 +36,23 @@ class NewYearController extends Controller
 
     public function taskList()
     {
-        // 单次任务ID：1-逛家乡好物，4-加群，5-设置头像，6-逛首页，8-AI互动，9-逛景点，12-逛酒店，15-逛餐饮
-        // 每日任务ID：2-分享好物，7-分享游记，10-分享景点，13-分享酒店，16-分享餐饮
-
         $taskList = Cache::remember('new_year_task_list', 10080, function () {
             return NewYearTaskService::getInstance()->getList();
         });
 
+        $avatar = $this->user()->avatar;
+
         $luckList = NewYearLuckService::getInstance()->getUserLuckList($this->userId())->keyBy('task_id');
 
-        $list = $taskList->map(function (NewYearTask $task) use ($luckList) {
+        $list = $taskList->map(function (NewYearTask $task) use ($avatar, $luckList) {
+            if ($task->id == 5 && $avatar && strpos($avatar, 'default_avatar') === false) {
+                return null;
+            }
+
             /** @var NewYearLuck $luck */
             $luck = $luckList->get($task->id);
 
-            if (!is_null($luck) && in_array($task->id, [1, 4, 5, 6, 8, 9, 12, 15])) {
+            if (!is_null($luck) && $task->type == 1) {
                 if (Carbon::parse($luck->created_at)->isToday()) {
                     $task['status'] = 2;
                     return $task;
@@ -59,7 +61,7 @@ class NewYearController extends Controller
                 return null;
             }
 
-            if (!is_null($luck) && in_array($task->id, [2, 7, 10, 13, 16])) {
+            if (!is_null($luck) && $task->type == 2 && Carbon::parse($luck->created_at)->isToday()) {
                 $task['status'] = 2;
                 return $task;
             }
@@ -75,6 +77,7 @@ class NewYearController extends Controller
     {
         $taskId = $this->verifyRequiredId('taskId');
         $userId = $this->verifyId('userId');
+        $referenceId = $this->verifyString('referenceId', '');
 
         if (empty($userId)) {
             $userId = $this->userId();
@@ -100,23 +103,15 @@ class NewYearController extends Controller
             return $this->success(); // 幂等
         }
 
-        try {
-            DB::transaction(function () use ($userId, $task) {
-                NewYearLuckService::getInstance()->createLuck(
-                    $userId,
-                    $task->name,
-                    1,
-                    $task->luck_score,
-                    $task->id,
-                    $task->type,
-                );
-            });
-        } catch (\Throwable $e) {
-            if ((int)$e->getCode() === 23000) {
-                return $this->success();
-            }
-            throw $e;
-        }
+        NewYearLuckService::getInstance()->createLuck(
+            $userId,
+            $task->name,
+            1,
+            $task->luck_score,
+            $task->id,
+            $task->type,
+            $referenceId
+        );
 
         return $this->success();
     }
