@@ -50,10 +50,6 @@ class CommonController extends Controller
         $qrCode = 'data:image/png;base64,' . base64_encode($imageData);
 
         return $this->success($qrCode);
-
-        // return response($imageData)
-        //     ->header('Content-Type', 'image/png')
-        //     ->header('Content-Disposition', 'inline');
     }
 
     public function URLLink()
@@ -68,7 +64,6 @@ class CommonController extends Controller
     {
         $remark = $this->verifyString('remark', '小程序加群');
 
-        // 1️⃣ 获取企业微信群列表，并缓存 24 小时
         $chatIdList = Cache::remember('wecom_group_chat_list', 24*3600, function() {
             return WxMpServe::new()->getWeComGroupChatList();
         });
@@ -77,24 +72,13 @@ class CommonController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前没有可用的企业微信群');
         }
 
-        // 2️⃣ 生成缓存 key，考虑 chat_id 和 remark
-        $cacheKey = 'wecom_group_' . md5(implode(',', $chatIdList) . $remark);
+        $scene = 'user_' . $this->userId();
+        $qrData = WxMpServe::new()->createWeComGroupJoinWay($chatIdList, $scene, $remark);
 
-        // 3️⃣ 使用并发锁，防止重复生成活码
-        $qrData = Cache::lock($cacheKey, 10)->get(function() use ($cacheKey, $chatIdList, $remark) {
-            $result = WxMpServe::new()->createWeComGroupJoinWay($chatIdList, $remark);
-
-            // 4️⃣ 缓存结果 24 小时
-            Cache::put($cacheKey, $result, 24*3600);
-
-            return $result;
-        });
-
-        // 5️⃣ 返回前端 JSON
         return $this->success([
-            'qr_code'   => $qrData['qr_code'],   // 活码 URL
-            'config_id' => $qrData['config_id'], // 活码唯一 ID，可用于后续管理
-            'chat_id_list' => $chatIdList       // 前端可选展示或调试用
+            'qr_code'   => $qrData['qr_code'],
+            'config_id' => $qrData['config_id'],
+            'chat_id_list' => $chatIdList
         ]);
     }
 

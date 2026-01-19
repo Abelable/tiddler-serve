@@ -283,12 +283,12 @@ class WxMpServe
     /**
      * 创建企业微信群活码
      */
-    public function createWeComGroupJoinWay(array $chatIdList, $remark = '小程序进群')
+    public function createWeComGroupJoinWay(array $chatIdList, $scene, $remark = '小程序进群')
     {
         $result = $this->httpPost(
             sprintf(self::ADD_GROUP_JOIN_WAY_URL, $this->wecomAccessToken),
             [
-                'scene' => 2, // 群聊
+                'scene' => $scene,
                 'remark' => $remark,
                 'chat_id_list' => $chatIdList,
             ]
@@ -300,7 +300,7 @@ class WxMpServe
 
         return [
             'config_id' => $result['config_id'],
-            'qr_code'   => $result['qr_code'], // 直接给小程序展示
+            'qr_code'   => $result['qr_code'],
         ];
     }
 

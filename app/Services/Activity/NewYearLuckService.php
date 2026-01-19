@@ -97,4 +97,9 @@ class NewYearLuckService extends BaseService
             ->get($columns)
             ->keyBy('task_id');
     }
+
+    public function deleteLuck($userId, $taskId)
+    {
+        NewYearLuck::query()->where('user_id', $userId)->where('task_id', $taskId)->delete();
+    }
 }
