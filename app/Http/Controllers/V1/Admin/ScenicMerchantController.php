@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Activity\NewYearLuckService;
+use App\Services\Activity\NewYearTaskService;
 use App\Services\Mall\Scenic\ScenicMerchantService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
@@ -44,6 +46,9 @@ class ScenicMerchantController extends Controller
         DB::transaction(function () use ($merchant) {
             $merchant->status = 1;
             $merchant->save();
+
+            // todo 团圆家乡年
+            NewYearTaskService::getInstance()->finishMerchantInviteTask(11, $merchant->id);
 
             SystemTodoService::getInstance()->finishTodo(TodoEnums::SCENIC_MERCHANT_NOTICE, $merchant->id);
             // todo 短信通知景区服务商

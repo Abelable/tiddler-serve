@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\Activity\NewYearTaskService;
 use App\Services\Mall\Hotel\HotelMerchantService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
@@ -44,6 +45,9 @@ class HotelMerchantController extends Controller
         DB::transaction(function () use ($merchant) {
             $merchant->status = 1;
             $merchant->save();
+
+            // todo 团圆家乡年
+            NewYearTaskService::getInstance()->finishMerchantInviteTask(14, $merchant->id);
 
             SystemTodoService::getInstance()->finishTodo(TodoEnums::HOTEL_MERCHANT_NOTICE, $merchant->id);
             // todo 短信通知酒店服务商

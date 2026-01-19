@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\Activity\NewYearTaskService;
 use App\Services\Mall\Scenic\ScenicMerchantService;
 use App\Services\Mall\Scenic\ScenicShopDepositService;
 use App\Services\Mall\Scenic\ScenicShopService;
@@ -52,6 +53,9 @@ class ScenicMerchantController extends Controller
                         $userTask->merchant_id = $merchant->id;
                         $userTask->save();
                     }
+
+                    // todo 团圆家乡年
+                    NewYearTaskService::getInstance()->createUserTask($inviterId, 11, $merchant->id);
                 }
 
                 // todo 商家入驻通知

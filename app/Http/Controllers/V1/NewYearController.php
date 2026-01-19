@@ -102,42 +102,7 @@ class NewYearController extends Controller
             $userId = $this->userId();
         }
 
-        $task = NewYearTaskService::getInstance()->getTaskById($taskId);
-        if (!$task || $task->status != 1) {
-            return $this->fail(CodeResponse::NOT_FOUND, '任务不存在');
-        }
-
-        $luckCount = NewYearLuckService::getInstance()->getLuckCount($userId, $taskId);
-        if ($task->time_limit != 0 && $luckCount >= $task->time_limit) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '超任务次数限制了');
-        }
-
-        $luck = NewYearLuckService::getInstance()->getLuckByUserId($userId, $taskId);
-        $todayLuck = NewYearLuckService::getInstance()->getTodayLuckByUserId($userId, $taskId);
-
-        $shouldGrant = false;
-
-        if ($task->type == 1) {
-            $shouldGrant = is_null($luck);
-        } elseif ($task->type == 2) {
-            $shouldGrant = is_null($todayLuck);
-        } elseif ($task->type == 3) {
-            $shouldGrant = true;
-        }
-
-        if (!$shouldGrant) {
-            return $this->success(); // 幂等
-        }
-
-        NewYearLuckService::getInstance()->createLuck(
-            $userId,
-            $task->name,
-            1,
-            $task->luck_score,
-            $task->id,
-            $task->type,
-            $referenceId
-        );
+        NewYearTaskService::getInstance()->finishTask($userId, $taskId, $referenceId);
 
         return $this->success();
     }

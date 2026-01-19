@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\Activity\NewYearTaskService;
 use App\Services\Mall\Catering\CateringMerchantService;
 use App\Services\Mall\Catering\CateringShopDepositService;
 use App\Services\Mall\Catering\CateringShopService;
@@ -53,6 +54,9 @@ class CateringMerchantController extends Controller
                         $userTask->merchant_id = $merchant->id;
                         $userTask->save();
                     }
+
+                    // todo 团圆家乡年
+                    NewYearTaskService::getInstance()->createUserTask($inviterId, 17, $merchant->id);
                 }
 
                 // todo 商家入驻通知
