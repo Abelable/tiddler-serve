@@ -66,6 +66,7 @@ Route::prefix('wx')->group(function () {
     Route::post('pay_notify', 'CommonController@wxPayNotify');
     Route::get('qr_code', 'CommonController@wxQrCode');
     Route::get('url_link', 'CommonController@URLLink');
+    Route::get('wecom_group_qr_code', 'CommonController@wecomGroupQrCode');
 });
 
 Route::prefix('fan')->group(function () {

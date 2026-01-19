@@ -24,8 +24,18 @@ class WxMpServe
     const GET_LINK_URL = 'https://api.weixin.qq.com/wxa/generate_urllink?access_token=%s';
     const UPLOAD_SHIPPING_INFO_URL = 'https://api.weixin.qq.com/wxa/sec/order/upload_shipping_info?access_token=%s';
 
+    // ========== 企业微信（WeCom） ==========
+    const WECOM_ACCESS_TOKEN_KEY = 'wecom_access_token';
+    const GET_WECOM_ACCESS_TOKEN_URL = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=%s&corpsecret=%s';
+
+    // 客户群
+    const ADD_GROUP_JOIN_WAY_URL = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/add_join_way?access_token=%s';
+    const GET_GROUP_CHAT_URL = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/get?access_token=%s';
+    const GET_GROUP_CHAT_LIST_URL = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/groupchat/list?access_token=%s';
+
     protected $accessToken;
     protected $stableAccessToken;
+    protected $wecomAccessToken;
 
     public static function new()
     {
@@ -34,8 +44,17 @@ class WxMpServe
 
     public function __construct()
     {
-        $this->accessToken = Cache::has(self::ACCESS_TOKEN_KEY) ? Cache::get(self::ACCESS_TOKEN_KEY) : $this->getAccessToken();
-        $this->stableAccessToken = Cache::has(self::STABLE_ACCESS_TOKEN_KEY) ? Cache::get(self::STABLE_ACCESS_TOKEN_KEY) : $this->getStableAccessToken();
+        $this->accessToken = Cache::has(self::ACCESS_TOKEN_KEY)
+            ? Cache::get(self::ACCESS_TOKEN_KEY)
+            : $this->getAccessToken();
+
+        $this->stableAccessToken = Cache::has(self::STABLE_ACCESS_TOKEN_KEY)
+            ? Cache::get(self::STABLE_ACCESS_TOKEN_KEY)
+            : $this->getStableAccessToken();
+
+        $this->wecomAccessToken = Cache::has(self::WECOM_ACCESS_TOKEN_KEY)
+            ? Cache::get(self::WECOM_ACCESS_TOKEN_KEY)
+            : $this->getWeComAccessToken();
     }
 
     private function getAccessToken()
@@ -62,6 +81,27 @@ class WxMpServe
         $stableAccessToken = $result['access_token'];
         Cache::put(self::STABLE_ACCESS_TOKEN_KEY, $stableAccessToken, now()->addSeconds($result['expires_in'] - 300));
         return $stableAccessToken;
+    }
+
+    private function getWeComAccessToken()
+    {
+        $result = $this->httpGet(sprintf(
+            self::GET_WECOM_ACCESS_TOKEN_URL,
+            env('WECOM_CORP_ID'),
+            env('WECOM_CORP_SECRET')
+        ));
+
+        if (!empty($result['errcode'])) {
+            throw new \Exception('获取企业微信access_token异常：' . $result['errcode'] . $result['errmsg']);
+        }
+
+        Cache::put(
+            self::WECOM_ACCESS_TOKEN_KEY,
+            $result['access_token'],
+            now()->addSeconds($result['expires_in'] - 300)
+        );
+
+        return $result['access_token'];
     }
 
     public function getWaybillToken($openid, $shipCode, $shipSn, $packageGoodsList, Order $order)
@@ -195,5 +235,101 @@ class WxMpServe
             Log::error('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
             throw new \Exception('同步微信后台发货信息异常：' . $result['errcode'] . $result['errmsg']);
         }
+    }
+
+    /**
+     * 获取企业微信群列表
+     *
+     * @param int $statusFilter 0-所有群 1-离职待继承 2-离职继承完成
+     * @param int $limit        每次拉取数量，最大100
+     * @return array
+     */
+    public function getWeComGroupChatList(int $statusFilter = 0, int $limit = 100): array
+    {
+        $chatIdList = [];
+        $cursor = '';
+
+        do {
+            $payload = [
+                'status_filter' => $statusFilter,
+                'limit' => $limit,
+            ];
+
+            if ($cursor) {
+                $payload['cursor'] = $cursor;
+            }
+
+            $result = $this->httpPost(
+                sprintf(self::GET_GROUP_CHAT_LIST_URL, $this->wecomAccessToken),
+                $payload
+            );
+
+            if ($result['errcode'] != 0) {
+                throw new \Exception(
+                    '获取企业微信群列表失败：' . $result['errcode'] . ' ' . $result['errmsg']
+                );
+            }
+
+            foreach ($result['group_chat_list'] as $item) {
+                $chatIdList[] = $item['chat_id'];
+            }
+
+            $cursor = $result['next_cursor'] ?? '';
+        } while (!empty($cursor));
+
+        return $chatIdList;
+    }
+
+    /**
+     * 创建企业微信群活码
+     */
+    public function createWeComGroupJoinWay(array $chatIdList, $remark = '小程序进群')
+    {
+        $result = $this->httpPost(
+            sprintf(self::ADD_GROUP_JOIN_WAY_URL, $this->wecomAccessToken),
+            [
+                'scene' => 2, // 群聊
+                'remark' => $remark,
+                'chat_id_list' => $chatIdList,
+            ]
+        );
+
+        if ($result['errcode'] != 0) {
+            throw new \Exception('创建企业微信群活码失败：' . $result['errcode'] . $result['errmsg']);
+        }
+
+        return [
+            'config_id' => $result['config_id'],
+            'qr_code'   => $result['qr_code'], // 直接给小程序展示
+        ];
+    }
+
+    /**
+     * 判断 external_userid 是否在指定企业微信群
+     */
+    public function isUserInWeComGroup(string $chatId, string $externalUserId): bool
+    {
+        $result = $this->httpPost(
+            sprintf(self::GET_GROUP_CHAT_URL, $this->wecomAccessToken),
+            [
+                'chat_id' => $chatId
+            ]
+        );
+
+        if ($result['errcode'] != 0) {
+            throw new \Exception('获取企业微信群信息失败：' . $result['errcode'] . $result['errmsg']);
+        }
+
+        foreach ($result['group_chat']['member_list'] as $member) {
+            if (
+                $member['type'] == 2 &&
+                isset($member['external_userid']) &&
+                $member['external_userid'] === $externalUserId
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
