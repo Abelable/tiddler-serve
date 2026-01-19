@@ -10,6 +10,7 @@ use App\Models\BaseModel;
  * @property int $id
  * @property int $status 状态：1-上架；2-下架
  * @property int $type 任务类型：1-单次任务，2-每日任务，3-重复任务
+ * @property int $time_limit 次数限制
  * @property string $icon 任务图标
  * @property string $name 任务名称
  * @property string $desc 任务描述
@@ -36,6 +37,7 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereScene($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereTimeLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearTask whereUpdatedAt($value)
  * @mixin \Eloquent

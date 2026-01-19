@@ -7,6 +7,7 @@ use App\Utils\Inputs\BaseInput;
 class NewYearTaskInput extends BaseInput
 {
     public $type;
+    public $timeLimit;
     public $icon;
     public $name;
     public $desc;
@@ -19,6 +20,7 @@ class NewYearTaskInput extends BaseInput
     {
         return [
             'type' => 'required|integer|in:1,2,3',
+            'timeLimit' => 'integer',
             'icon' => 'required|string',
             'name' => 'required|string',
             'desc' => 'required|string',

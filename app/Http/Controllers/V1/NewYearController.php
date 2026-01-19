@@ -39,12 +39,16 @@ class NewYearController extends Controller
         $taskList = Cache::remember('new_year_task_list', 10080, function () {
             return NewYearTaskService::getInstance()->getList();
         });
-
+        $luckCountMap = NewYearLuckService::getInstance()->getLuckCountMap($this->userId());
+        $luckList = NewYearLuckService::getInstance()->getUserLatestLuckList($this->userId());
         $avatar = $this->user()->avatar;
 
-        $luckList = NewYearLuckService::getInstance()->getUserLuckList($this->userId())->keyBy('task_id');
+        $list = $taskList->map(function (NewYearTask $task) use ($luckCountMap, $luckList, $avatar) {
+            $luckCount = $luckCountMap->get($task->id, 0);
+            if ($task->time_limit != 0 && $luckCount >= $task->time_limit) {
+                return null;
+            }
 
-        $list = $taskList->map(function (NewYearTask $task) use ($avatar, $luckList) {
             /** @var NewYearLuck $luck */
             $luck = $luckList->get($task->id);
 
@@ -92,6 +96,11 @@ class NewYearController extends Controller
         $task = NewYearTaskService::getInstance()->getTaskById($taskId);
         if (!$task || $task->status != 1) {
             return $this->fail(CodeResponse::NOT_FOUND, '任务不存在');
+        }
+
+        $luckCount = NewYearLuckService::getInstance()->getLuckCount($userId, $taskId);
+        if ($task->time_limit != 0 && $luckCount >= $task->time_limit) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '超任务次数限制了');
         }
 
         $luck = NewYearLuckService::getInstance()->getLuckByUserId($userId, $taskId);

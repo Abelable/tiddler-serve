@@ -28,6 +28,14 @@ class NewYearLuckService extends BaseService
             ->first($columns);
     }
 
+    public function getLuckCount($userId, $taskId)
+    {
+        return NewYearLuck::query()
+            ->where('user_id', $userId)
+            ->where('task_id', $taskId)
+            ->count();
+    }
+
     public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2, $referenceId = '')
     {
         // 活动截止时间2026.02.24
@@ -70,5 +78,23 @@ class NewYearLuckService extends BaseService
     public function getUserLuckList($userId, $columns = ['*'])
     {
         return NewYearLuck::query()->where('user_id', $userId)->get($columns);
+    }
+
+    public function getLuckCountMap(int $userId)
+    {
+        return NewYearLuck::query()
+            ->selectRaw('task_id, COUNT(*) as count')
+            ->where('user_id', $userId)
+            ->groupBy('task_id')
+            ->pluck('count', 'task_id');
+    }
+
+    public function getUserLatestLuckList($userId, $columns = ['*'])
+    {
+        return NewYearLuck::query()
+            ->where('user_id', $userId)
+            ->orderBy('created_at', 'asc')
+            ->get($columns)
+            ->keyBy('task_id');
     }
 }

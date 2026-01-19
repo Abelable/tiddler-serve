@@ -17,6 +17,7 @@ class CreateNewYearTasksTable extends Migration
             $table->id();
             $table->integer('status')->default(1)->comment('状态：1-进行中；2-已下架');
             $table->tinyInteger('type')->default(1)->comment('任务类型：1-单次任务，2-每日任务，3-重复任务');
+            $table->integer('time_limit')->default(0)->comment('次数限制');
 
             $table->string('icon', 500)->comment('任务图标');
             $table->string('name', 200)->comment('任务名称');

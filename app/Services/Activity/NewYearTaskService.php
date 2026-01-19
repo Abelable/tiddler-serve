@@ -7,7 +7,6 @@ use App\Services\BaseService;
 use App\Services\RelationService;
 use App\Utils\Inputs\Activity\NewYearTaskInput;
 use App\Utils\Inputs\PageInput;
-use Illuminate\Support\Facades\Log;
 
 class NewYearTaskService extends BaseService
 {
@@ -32,6 +31,7 @@ class NewYearTaskService extends BaseService
     public function updateTask(NewYearTask $task, NewYearTaskInput $input)
     {
         $task->type = $input->type;
+        $task->time_limit = $input->timeLimit ?? 0;
         $task->icon = $input->icon;
         $task->name = $input->name;
         $task->desc = $input->desc;
