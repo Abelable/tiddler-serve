@@ -20,6 +20,7 @@ use App\Services\Mall\Scenic\ScenicTicketService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
 use App\Utils\AliOssServe;
+use App\Utils\Enums\MerchantType;
 use App\Utils\Enums\ProductType;
 use App\Utils\ExpressServe;
 use App\Utils\WxMpServe;
@@ -78,7 +79,8 @@ class CommonController extends Controller
         return $this->success($traces);
     }
 
-    private function fileToBase64($file){
+    private function fileToBase64($file)
+    {
         $base64_file = '';
         if(file_exists($file)){
             $mime_type= mime_content_type($file);
@@ -106,7 +108,7 @@ class CommonController extends Controller
 
                 // 邀请商家入驻活动
                 $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(1, $order->shopInfo->merchant_id, 3);
+                    ->getByMerchantId(MerchantType::SCENIC, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask)) {
                     $scenicOrderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
                     $scenicTicket = ScenicTicketService::getInstance()->getTicketById($scenicOrderTicket->ticket_id);
@@ -139,7 +141,7 @@ class CommonController extends Controller
 
                 // 邀请商家入驻活动
                 $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(2, $order->shopInfo->merchant_id, 3);
+                    ->getByMerchantId(MerchantType::HOTEL, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
                     $userTask->status = 2;
                     $userTask->step = 4;
@@ -168,7 +170,7 @@ class CommonController extends Controller
 
                 // 邀请商家入驻活动
                 $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
+                    ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
                     $userTask->status = 2;
                     $userTask->step = 4;
@@ -191,7 +193,7 @@ class CommonController extends Controller
 
                 // 邀请商家入驻活动
                 $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(3, $order->shopInfo->merchant_id, 3);
+                    ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
                 if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
                     $userTask->status = 2;
                     $userTask->step = 4;
@@ -223,7 +225,7 @@ class CommonController extends Controller
                 foreach ($orderList as $order) {
                     // 邀请商家入驻活动
                     $userTask = UserTaskService::getInstance()
-                        ->getByMerchantId(4, $order->shopInfo->merchant_id, 3);
+                        ->getByMerchantId(MerchantType::GOODS, $order->shopInfo->merchant_id, 3);
                     if (!is_null($userTask)) {
                         $userTask->status = 2;
                         $userTask->step = 4;
