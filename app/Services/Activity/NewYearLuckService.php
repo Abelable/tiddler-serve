@@ -30,7 +30,7 @@ class NewYearLuckService extends BaseService
 
     public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2, $referenceId = '')
     {
-        // 团圆家乡年 活动截止时间2026.02.24
+        // 活动截止时间2026.02.24
         if (Carbon::now()->greaterThan(Carbon::create(2026, 2, 24, 23, 59, 59))) {
             return false;
         }
