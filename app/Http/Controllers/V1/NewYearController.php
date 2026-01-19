@@ -44,14 +44,21 @@ class NewYearController extends Controller
         $avatar = $this->user()->avatar;
 
         $list = $taskList->map(function (NewYearTask $task) use ($luckCountMap, $luckList, $avatar) {
+            /** @var NewYearLuck $luck */
+            $luck = $luckList->get($task->id);
             $luckCount = $luckCountMap->get($task->id, 0);
+
+            // 超次数限制
             if ($task->time_limit != 0 && $luckCount >= $task->time_limit) {
+                if (!is_null($luck) && Carbon::parse($luck->created_at)->isToday()) {
+                    $task['status'] = 2;
+                    return $task;
+                }
+
                 return null;
             }
 
-            /** @var NewYearLuck $luck */
-            $luck = $luckList->get($task->id);
-
+            // 特殊任务：设置头像昵称
             if ($task->id == 5) {
                 if (!is_null($luck) && Carbon::parse($luck->created_at)->isToday()) {
                     $task['status'] = 2;
@@ -62,6 +69,7 @@ class NewYearController extends Controller
                 }
             }
 
+            // 单次任务
             if (!is_null($luck) && $task->type == 1) {
                 if (Carbon::parse($luck->created_at)->isToday()) {
                     $task['status'] = 2;
@@ -71,6 +79,7 @@ class NewYearController extends Controller
                 return null;
             }
 
+            // 每日任务
             if (!is_null($luck) && $task->type == 2 && Carbon::parse($luck->created_at)->isToday()) {
                 $task['status'] = 2;
                 return $task;
