@@ -9,7 +9,6 @@ use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
-use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
