@@ -8,6 +8,7 @@ use App\Services\Activity\NewYearTaskService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Activity\NewYearTaskInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\TypePageInput;
 use Illuminate\Support\Facades\Cache;
 
 class NewYearTaskController extends Controller
@@ -16,8 +17,8 @@ class NewYearTaskController extends Controller
 
     public function list()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
+        /** @var TypePageInput $input */
+        $input = TypePageInput::new();
         $list = NewYearTaskService::getInstance()->getPage($input);
         return $this->successPaginate($list);
     }

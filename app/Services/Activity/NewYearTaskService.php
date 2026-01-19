@@ -7,12 +7,17 @@ use App\Services\BaseService;
 use App\Services\RelationService;
 use App\Utils\Inputs\Activity\NewYearTaskInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\TypePageInput;
 
 class NewYearTaskService extends BaseService
 {
-    public function getPage(PageInput $input, $columns = ['*'])
+    public function getPage(TypePageInput $input, $columns = ['*'])
     {
-        return NewYearTask::query()
+        $query = NewYearTask::query();
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
+        }
+        return $query
             ->orderByRaw('status = 1 DESC')
             ->orderBy('sort', 'desc')
             ->orderBy($input->sort, $input->order)
