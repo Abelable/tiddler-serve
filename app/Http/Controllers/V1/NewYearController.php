@@ -248,6 +248,6 @@ class NewYearController extends Controller
         $input = PageInput::new();
         $columns = ['id', 'status', 'prize_id', 'prize_type', 'cover', 'name', 'coupon_id', 'goods_id', 'created_at'];
         $page = NewYearPrizeService::getInstance()->getUserPrizePage($this->userId(), $input, $columns);
-        return $this->success($page);
+        return $this->successPaginate($page);
     }
 }
