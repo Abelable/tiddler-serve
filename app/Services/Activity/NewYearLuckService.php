@@ -95,7 +95,7 @@ class NewYearLuckService extends BaseService
             ->where('user_id', $userId)
             ->orderBy('created_at', 'asc')
             ->get($columns)
-            ->keyBy('task_id');
+            ->groupBy('task_id');
     }
 
     public function deleteLuck($userId, $taskId)

@@ -39,12 +39,12 @@ class NewYearController extends Controller
             return NewYearTaskService::getInstance()->getList();
         });
         $luckCountMap = NewYearLuckService::getInstance()->getLuckCountMap($this->userId());
-        $luckList = NewYearLuckService::getInstance()->getUserLatestLuckList($this->userId());
+        $luckListGroup = NewYearLuckService::getInstance()->getUserLatestLuckList($this->userId());
         $avatar = $this->user()->avatar;
 
-        $list = $taskList->map(function (NewYearTask $task) use ($luckCountMap, $luckList, $avatar) {
-            /** @var NewYearLuck $luck */
-            $luck = $luckList->get($task->id);
+        $list = $taskList->map(function (NewYearTask $task) use ($luckCountMap, $luckListGroup, $avatar) {
+            $luckList = $luckListGroup->get($task->id, collect());
+            $luck = $luckList->last();
             $luckCount = $luckCountMap->get($task->id, 0);
 
             // 超次数限制
@@ -57,7 +57,22 @@ class NewYearController extends Controller
                 return null;
             }
 
-            // 特殊任务：设置头像昵称
+            // 分享 - 如果有3次记录都是分享给同一个人，提前结束任务
+            if (in_array($task->id, [2, 7, 10, 13, 16])) {
+                $referenceCounts = $luckList->countBy('reference_id');
+                if ($referenceCounts->contains(function ($count) {
+                    return $count >= 3;
+                })) {
+                    if (!is_null($luck) && Carbon::parse($luck->created_at)->isToday()) {
+                        $task['status'] = 2;
+                        return $task;
+                    }
+
+                    return null;
+                }
+            }
+
+            // 设置头像昵称
             if ($task->id == 5) {
                 if (!is_null($luck) && Carbon::parse($luck->created_at)->isToday()) {
                     $task['status'] = 2;
