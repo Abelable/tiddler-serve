@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity\NewYearPrize;
 use App\Models\Activity\NewYearTask;
 use App\Services\Activity\NewYearDrawLogService;
 use App\Services\Activity\NewYearGoodsService;
@@ -15,6 +14,7 @@ use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 
 class NewYearController extends Controller
 {
@@ -151,7 +151,8 @@ class NewYearController extends Controller
         $drawPrizeList = NewYearPrizeService::getInstance()->getDrawList($this->userId());
 
         $hitPrize = DB::transaction(function () use ($drawPrizeList) {
-            NewYearLuckService::getInstance()->createLuck($this->userId(), '福气抽奖', 2, -20);
+            NewYearLuckService::getInstance()
+                ->createLuck($this->userId(), '福气抽奖', 2, -20, 0, 3);
 
             // 没有抽奖列表
             if (count($drawPrizeList) == 0) {
@@ -200,15 +201,28 @@ class NewYearController extends Controller
             $totalCostKey = 'new_year:total_cost';
             $hitCost = (int) ($hitPrize->cost ?? 0);
             $maxTotal = 300;
-            $newTotal = Cache::store('redis')->eval(
-                file_get_contents(storage_path('lua/increment_cost.lua')),
-                1,
-                $totalCostKey,
-                $hitCost,
-                $maxTotal
-            );
+
+            // Lua 脚本
+            $lua = <<<LUA
+            local current = redis.call("GET", KEYS[1])
+            if not current then
+                current = 0
+            end
+            current = tonumber(current)
+            local hitCost = tonumber(ARGV[1])
+            local maxTotal = tonumber(ARGV[2])
+            if current + hitCost > maxTotal then
+                return -1
+            else
+                local newTotal = redis.call("INCRBY", KEYS[1], hitCost)
+                redis.call("EXPIRE", KEYS[1], 86400)
+                return newTotal
+            end
+            LUA;
+
+            $newTotal = Redis::eval($lua, 1, $totalCostKey, $hitCost, $maxTotal);
             if ($newTotal === -1) {
-                // 超额，扣奖/降级处理
+                // 超额处理
                 NewYearDrawLogService::getInstance()->createLog($this->userId());
                 return null;
             }
@@ -216,7 +230,7 @@ class NewYearController extends Controller
             // 中奖记录
             if ($hitPrize->type == 1) {
                 NewYearLuckService::getInstance()
-                    ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score);
+                    ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
             } else {
                 NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
             }

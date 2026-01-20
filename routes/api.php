@@ -714,6 +714,7 @@ Route::prefix('activity')->group(function () {
         Route::post('finish_task', 'NewYearController@finishTask');
         Route::get('luck_score', 'NewYearController@luckScore');
         Route::get('luck_list', 'NewYearController@luckList');
+        Route::post('draw', 'NewYearController@draw');
     });
 });
 
