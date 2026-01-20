@@ -6,6 +6,7 @@ use App\Models\Activity\NewYearPrize;
 use App\Models\Activity\NewYearUserPrize;
 use App\Services\BaseService;
 use App\Utils\Inputs\Activity\NewYearPrizeInput;
+use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\TypePageInput;
 
 class NewYearPrizeService extends BaseService
@@ -159,12 +160,13 @@ class NewYearPrizeService extends BaseService
         return $userPrize;
     }
 
-    public function getUserPrizeList($userId, $statusList = [0, 1], $columns = ['*'])
+    public function getUserPrizePage($userId, PageInput $input, $statusList = [0, 1], $columns = ['*'])
     {
         return NewYearUserPrize::query()
             ->where('user_id', $userId)
             ->whereIn('status', $statusList)
-            ->get($columns);
+            ->orderBy($input->sort, $input->order)
+            ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
     public function getUserPrizeCount($userId, $prizeIds, $statusList = [0, 1])

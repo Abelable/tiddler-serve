@@ -241,4 +241,13 @@ class NewYearController extends Controller
 
         return $this->success($hitPrize->id ?? 0);
     }
+
+    public function userPrizeList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $columns = ['id', 'status', 'prize_id', 'prize_type', 'cover', 'name', 'coupon_id', 'goods_id', 'created_at'];
+        $page = NewYearPrizeService::getInstance()->getUserPrizePage($this->userId(), $input, $columns);
+        return $this->success($page);
+    }
 }
