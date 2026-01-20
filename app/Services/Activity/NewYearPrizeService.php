@@ -5,13 +5,17 @@ namespace App\Services\Activity;
 use App\Models\Activity\NewYearPrize;
 use App\Services\BaseService;
 use App\Utils\Inputs\Activity\NewYearPrizeInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\TypePageInput;
 
 class NewYearPrizeService extends BaseService
 {
-    public function getPage(PageInput $input, $columns = ['*'])
+    public function getPage(TypePageInput $input, $columns = ['*'])
     {
-        return NewYearPrize::query()
+        $query = NewYearPrize::query();
+        if (!empty($input->type)) {
+            $query = $query->where('type', $input->type);
+        }
+        return $query
             ->orderBy('sort', 'desc')
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);

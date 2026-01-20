@@ -7,7 +7,7 @@ use App\Models\Activity\NewYearPrize;
 use App\Services\Activity\NewYearPrizeService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\Activity\NewYearPrizeInput;
-use App\Utils\Inputs\PageInput;
+use App\Utils\Inputs\TypePageInput;
 use Illuminate\Support\Facades\Cache;
 
 class NewYearPrizeController extends Controller
@@ -16,8 +16,8 @@ class NewYearPrizeController extends Controller
 
     public function list()
     {
-        /** @var PageInput $input */
-        $input = PageInput::new();
+        /** @var TypePageInput $input */
+        $input = TypePageInput::new();
         $list = NewYearPrizeService::getInstance()->getPage($input);
         return $this->successPaginate($list);
     }
