@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity\NewYearLuck;
 use App\Models\Activity\NewYearTask;
 use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
