@@ -1000,6 +1000,7 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('edit', 'NewYearPrizeController@edit');
             Route::post('edit_is_big', 'NewYearPrizeController@editIsBig');
             Route::post('edit_sort', 'NewYearPrizeController@editSort');
+            Route::post('edit_stock', 'NewYearPrizeController@editStock');
             Route::post('up', 'NewYearPrizeController@up');
             Route::post('down', 'NewYearPrizeController@down');
             Route::post('delete', 'NewYearPrizeController@delete');

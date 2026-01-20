@@ -27,7 +27,7 @@ class NewYearPrizeController extends Controller
         $id = $this->verifyRequiredId('id');
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
         return $this->success($prize);
     }
@@ -53,7 +53,7 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
 
         NewYearPrizeService::getInstance()->updatePrize($prize, $input);
@@ -70,7 +70,7 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
 
         NewYearPrizeService::getInstance()->updateIsBig($id, $isBig);
@@ -87,10 +87,28 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
 
         NewYearPrizeService::getInstance()->updateSort($id, $sort);
+
+        Cache::forget('new_year_prize_list');
+
+        return $this->success();
+    }
+
+    public function editStock()
+    {
+        $id = $this->verifyRequiredId('id');
+        $stock = $this->verifyRequiredInteger('stock');
+
+        $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
+        if (!$prize) {
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
+        }
+
+        $prize->stock = $stock;
+        $prize->save();
 
         Cache::forget('new_year_prize_list');
 
@@ -103,7 +121,7 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
 
         $prize->status = 1;
@@ -120,7 +138,7 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
 
         $prize->status = 2;
@@ -137,7 +155,7 @@ class NewYearPrizeController extends Controller
 
         $prize = NewYearPrizeService::getInstance()->getPrizeById($id);
         if (is_null($prize)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '当前奖品不存在');
+            return $this->fail(CodeResponse::NOT_FOUND, '奖品不存在');
         }
         $prize->delete();
 

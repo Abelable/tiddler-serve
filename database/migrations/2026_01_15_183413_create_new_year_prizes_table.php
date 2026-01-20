@@ -25,6 +25,16 @@ class CreateNewYearPrizesTable extends Migration
             $table->string('cover', 500)->comment('奖品图片');
             $table->string('name', 100)->comment('奖品名称');
 
+            $table->decimal('rate', 8, 6)->default(0)->comment('抽奖概率，0~1');
+            $table->integer('stock')->default(-1)->comment('库存：-1不限，0售罄');
+            $table->integer('luck_value')->default(0)->comment('福气值数量，仅 type=1 有效');
+            $table->decimal('cost', 8, 2)->default(0)->comment('单次命中真实成本');
+
+            $table->integer('limit_per_user')->default(0)->comment('单用户最多命中次数，0不限');
+            $table->timestamp('start_at')->nullable()->comment('生效开始时间');
+            $table->timestamp('end_at')->nullable()->comment('生效结束时间');
+            $table->unsignedBigInteger('fallback_prize_id')->default(0)->comment('库存不足降级奖品');
+
             $table->integer('sort')->default(1)->comment('排序');
 
             $table->timestamps();

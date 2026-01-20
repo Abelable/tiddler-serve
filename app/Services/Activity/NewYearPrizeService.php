@@ -28,13 +28,31 @@ class NewYearPrizeService extends BaseService
 
     public function updatePrize(NewYearPrize $prize, NewYearPrizeInput $input)
     {
+        $prize->status = $input->status ?? $prize->status;
         $prize->type = $input->type;
         $prize->coupon_id = $input->couponId ?? 0;
         $prize->goods_id = $input->goodsId ?? 0;
         $prize->is_big = $input->isBig ?? 0;
         $prize->cover = $input->cover;
         $prize->name = $input->name;
+        $prize->sort = $input->sort ?? $prize->sort;
+
+        // 抽奖核心字段
+        $prize->rate = $input->rate ?? $prize->rate;
+        $prize->stock = $input->stock ?? $prize->stock;
+        $prize->luck_value = $input->luckValue ?? $prize->luck_value;
+        $prize->cost = $input->cost ?? $prize->cost;
+
+        // 风控字段
+        $prize->limit_per_user = $input->limitPerUser ?? $prize->limit_per_user;
+        $prize->fallback_prize_id = $input->fallbackPrizeId ?? $prize->fallback_prize_id;
+
+        // 时间控制
+        $prize->start_at = $input->startAt ?? $prize->start_at;
+        $prize->end_at = $input->endAt ?? $prize->end_at;
+
         $prize->save();
+
         return $prize;
     }
 
