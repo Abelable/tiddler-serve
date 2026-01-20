@@ -36,7 +36,7 @@ class NewYearLuckService extends BaseService
             ->count();
     }
 
-    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 2, $referenceId = '')
+    public function createLuck($userId, $desc, $type, $score, $taskId = 0, $taskType = 1, $referenceId = '')
     {
         // 活动截止时间2026.02.24
         if (Carbon::now()->greaterThan(Carbon::create(2026, 2, 24, 23, 59, 59))) {
@@ -45,10 +45,10 @@ class NewYearLuckService extends BaseService
 
         $luck = NewYearLuck::new();
         $luck->user_id = $userId;
-        $luck->task_id = $taskId;
         $luck->desc = $desc;
         $luck->type = $type;
         $luck->score = $score;
+        $luck->task_id = $taskId;
         $luck->reference_id = $referenceId;
 
         // 用于唯一索引生成（防并发、防重复）

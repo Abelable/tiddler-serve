@@ -44,7 +44,7 @@ class NewYearPrizeService extends BaseService
         // 抽奖核心字段
         $prize->rate = $input->rate ?? $prize->rate;
         $prize->stock = $input->stock ?? $prize->stock;
-        $prize->luck_value = $input->luckValue ?? $prize->luck_value;
+        $prize->luck_score = $input->luckScore ?? $prize->luck_score;
         $prize->cost = $input->cost ?? $prize->cost;
 
         // 风控字段

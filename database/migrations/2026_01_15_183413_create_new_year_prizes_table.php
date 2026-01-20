@@ -27,7 +27,7 @@ class CreateNewYearPrizesTable extends Migration
 
             $table->decimal('rate', 8, 6)->default(0)->comment('抽奖概率，0~1');
             $table->integer('stock')->default(-1)->comment('库存：-1不限，0售罄');
-            $table->integer('luck_value')->default(0)->comment('福气值数量，仅 type=1 有效');
+            $table->integer('luck_score')->default(0)->comment('福气值数量，仅 type=1 有效');
             $table->decimal('cost', 8, 2)->default(0)->comment('单次命中真实成本');
 
             $table->integer('limit_per_user')->default(0)->comment('单用户最多命中次数，0不限');

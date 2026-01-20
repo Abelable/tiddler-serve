@@ -62,10 +62,11 @@ class NewYearTaskService extends BaseService
     public function finishInviteTask($userId)
     {
         $todayNewComerCount = RelationService::getInstance()->getTodayCountBySuperiorId($userId);
-        $todayLuck = NewYearLuckService::getInstance()->getTodayLuckByUserId($userId, 0);
+        $todayLuck = NewYearLuckService::getInstance()->getTodayLuckByUserId($userId, 100);
 
         if ($todayNewComerCount >= 4 && is_null($todayLuck)) {
-            NewYearLuckService::getInstance()->createLuck($userId, '成功邀请新人助力', 1, 80);
+            NewYearLuckService::getInstance()
+                ->createLuck($userId, '成功邀请新人助力', 1, 80, 100, 2);
         }
     }
 

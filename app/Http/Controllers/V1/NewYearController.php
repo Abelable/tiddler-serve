@@ -8,9 +8,11 @@ use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class NewYearController extends Controller
 {
@@ -135,5 +137,19 @@ class NewYearController extends Controller
         $page = NewYearLuckService::getInstance()->getUserLuckPage($this->userId(), $input, $columns);
 
         return $this->successPaginate($page);
+    }
+
+    public function draw()
+    {
+        $luckScore = NewYearLuckService::getInstance()->getUserLuckScore($this->userId());
+        if ($luckScore < 20) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '福气值不足，无法抽奖');
+        }
+
+        DB::transaction(function () {
+            NewYearLuckService::getInstance()->createLuck($this->userId(), '福气抽奖', 2, -20);
+        });
+
+        return $this->success();
     }
 }

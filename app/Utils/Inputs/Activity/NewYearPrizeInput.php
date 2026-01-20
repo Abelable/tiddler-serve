@@ -19,7 +19,7 @@ class NewYearPrizeInput extends BaseInput
     // 抽奖 & 成本核心字段
     public $rate;
     public $stock;
-    public $luckValue;
+    public $luckScore;
     public $cost;
 
     // 风控字段
@@ -46,7 +46,7 @@ class NewYearPrizeInput extends BaseInput
             // 抽奖核心
             'rate' => 'required|numeric|min:0|max:1',
             'stock' => 'required|integer|min:-1',
-            'luckValue' => 'integer|min:0',
+            'luckScore' => 'integer|min:0',
             'cost' => 'numeric|min:0',
 
             // 风控
