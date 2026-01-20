@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Activity\NewYearPrize;
 use App\Models\Activity\NewYearTask;
+use App\Services\Activity\NewYearDrawLogService;
 use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
@@ -146,10 +148,83 @@ class NewYearController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '福气值不足，无法抽奖');
         }
 
-        DB::transaction(function () {
+        $drawPrizeList = NewYearPrizeService::getInstance()->getDrawList($this->userId());
+
+        $hitPrize = DB::transaction(function () use ($drawPrizeList) {
             NewYearLuckService::getInstance()->createLuck($this->userId(), '福气抽奖', 2, -20);
+
+            // 没有抽奖列表
+            if (count($drawPrizeList) == 0) {
+                NewYearDrawLogService::getInstance()->createLog($this->userId());
+                return null;
+            }
+
+            // 累计分布
+            $rand = mt_rand()/mt_getrandmax();
+            $hitPrize = collect($drawPrizeList)->first(function($prize) use ($rand) {
+                return $rand <= $prize->cumulative_rate;
+            });
+
+            // 未中奖
+            if (is_null($hitPrize)) {
+                NewYearDrawLogService::getInstance()->createLog($this->userId());
+                return null;
+            }
+
+            // 库存检查（并发场景必要）
+            if ($hitPrize->stock != -1) {
+                $success = NewYearPrizeService::getInstance()->decreaseStock($hitPrize->id);
+                if (!$success) {
+                    // 库存不足降级奖品
+                    $hitPrize = collect($drawPrizeList)->firstWhere('id', $hitPrize->fallback_prize_id) ?? null;
+                    if (is_null($hitPrize)) {
+                        NewYearDrawLogService::getInstance()->createLog($this->userId());
+                        return null;
+                    }
+                }
+            }
+
+            // 成本熔断（Redis 原子累加）
+            //            $totalCostKey = 'new_year:total_cost';
+            //            $hitCost = (int) ($hitPrize->cost ?? 0);
+            //            Cache::add($totalCostKey, 0, 86400); // 1天
+            //            $newTotal = Cache::increment($totalCostKey, $hitCost);
+            //            if ($newTotal > 300) {
+            //                Cache::decrement($totalCostKey, $hitCost);
+            //
+            //                NewYearDrawLogService::getInstance()->createLog($this->userId());
+            //                return null;
+            //            }
+
+            // 成本熔断（Lua脚本 原子性控制）
+            $totalCostKey = 'new_year:total_cost';
+            $hitCost = (int) ($hitPrize->cost ?? 0);
+            $maxTotal = 300;
+            $newTotal = Cache::store('redis')->eval(
+                file_get_contents(storage_path('lua/increment_cost.lua')),
+                1,
+                $totalCostKey,
+                $hitCost,
+                $maxTotal
+            );
+            if ($newTotal === -1) {
+                // 超额，扣奖/降级处理
+                NewYearDrawLogService::getInstance()->createLog($this->userId());
+                return null;
+            }
+
+            // 中奖记录
+            if ($hitPrize->type == 1) {
+                NewYearLuckService::getInstance()
+                    ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score);
+            } else {
+                NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
+            }
+
+            NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);
+            return $hitPrize;
         });
 
-        return $this->success();
+        return $this->success($hitPrize->id ?? 0);
     }
 }

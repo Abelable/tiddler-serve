@@ -3,6 +3,7 @@
 namespace App\Services\Activity;
 
 use App\Models\Activity\NewYearPrize;
+use App\Models\Activity\NewYearUserPrize;
 use App\Services\BaseService;
 use App\Utils\Inputs\Activity\NewYearPrizeInput;
 use App\Utils\Inputs\TypePageInput;
@@ -28,6 +29,49 @@ class NewYearPrizeService extends BaseService
             ->orderBy('sort', 'desc')
             ->orderBy('id', 'asc')
             ->get($columns);
+    }
+
+    public function getDrawList(int $userId)
+    {
+        $now = now();
+
+        $prizeList = NewYearPrize::query()->where('status', 1)->get();
+
+        $prizeIds = $prizeList->pluck('id')->toArray();
+        $countMap = $this->getUserPrizeCountMap($userId, $prizeIds);
+
+        $cumulative = 0;
+        $prizeList = $prizeList->filter(function (NewYearPrize $prize) use ($userId, $now, $countMap) {
+            // 时间窗口
+            if ($prize->start_at && $prize->start_at->gt($now)) {
+                return false;
+            }
+            if ($prize->end_at && $prize->end_at->lt($now)) {
+                return false;
+            }
+
+            // 库存
+            if ($prize->stock === 0) {
+                return false;
+            }
+
+            // 单人上线
+            if ($prize->limit_per_user > 0) {
+                $count = $countMap[$prize->id] ?? 0;
+                if ($count >= $prize->limit_per_user) {
+                    return false;
+                }
+            }
+
+            return true;
+        })->values();
+
+        foreach ($prizeList as $prize) {
+            $cumulative += $prize->rate;
+            $prize->cumulative_rate = $cumulative;
+        }
+
+        return $prizeList;
     }
 
     public function updatePrize(NewYearPrize $prize, NewYearPrizeInput $input)
@@ -73,5 +117,74 @@ class NewYearPrizeService extends BaseService
     public function updateSort($id, $sort)
     {
         NewYearPrize::query()->where('id', $id)->update(['sort' => $sort]);
+    }
+
+    public function decreaseStock(int $prizeId): bool
+    {
+        $prize = NewYearPrize::query()
+            ->select(['id', 'stock'])
+            ->where('id', $prizeId)
+            ->first();
+
+        if (!$prize) {
+            return false;
+        }
+
+        // 无限库存，直接成功
+        if ((int) $prize->stock === -1) {
+            return true;
+        }
+
+        // 原子扣减，防止并发超卖
+        $affected = NewYearPrize::query()
+            ->where('id', $prizeId)
+            ->where('stock', '>', 0)
+            ->decrement('stock', 1);
+
+        return $affected === 1;
+    }
+
+    public function createUserPrize($userId, NewYearPrize $prize)
+    {
+        $userPrize = NewYearUserPrize::new();
+        $userPrize->user_id = $userId;
+        $userPrize->prize_id = $prize->id;
+        $userPrize->prize_type = $prize->type;
+        $userPrize->cover = $prize->cover;
+        $userPrize->name = $prize->name;
+        $userPrize->coupon_id = $prize->coupon_id;
+        $userPrize->goods_id = $prize->goods_id;
+        $userPrize->save();
+
+        return $userPrize;
+    }
+
+    public function getUserPrizeList($userId, $statusList = [0, 1], $columns = ['*'])
+    {
+        return NewYearUserPrize::query()
+            ->where('user_id', $userId)
+            ->whereIn('status', $statusList)
+            ->get($columns);
+    }
+
+    public function getUserPrizeCount($userId, $prizeIds, $statusList = [0, 1])
+    {
+        return NewYearUserPrize::query()
+            ->where('user_id', $userId)
+            ->whereIn('prize_id', $prizeIds)
+            ->whereIn('status', $statusList)
+            ->count();
+    }
+
+    public function getUserPrizeCountMap($userId, array $prizeIds, array $statusList = [0, 1])
+    {
+        return NewYearUserPrize::query()
+            ->selectRaw('prize_id, COUNT(*) as cnt')
+            ->where('user_id', $userId)
+            ->whereIn('prize_id', $prizeIds)
+            ->whereIn('status', $statusList)
+            ->groupBy('prize_id')
+            ->pluck('cnt', 'prize_id')
+            ->toArray();
     }
 }
