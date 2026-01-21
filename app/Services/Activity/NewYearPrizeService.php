@@ -36,7 +36,10 @@ class NewYearPrizeService extends BaseService
     {
         $now = now();
 
-        $prizeList = NewYearPrize::query()->where('status', 1)->get();
+        $prizeList = NewYearPrize::query()
+            ->where('status', 1)
+            ->orderBy('rate', 'asc')
+            ->get();
 
         $prizeIds = $prizeList->pluck('id')->toArray();
         $countMap = $this->getUserPrizeCountMap($userId, $prizeIds);
@@ -56,7 +59,7 @@ class NewYearPrizeService extends BaseService
                 return false;
             }
 
-            // 单人上线
+            // 单人上限
             if ($prize->limit_per_user > 0) {
                 $count = $countMap[$prize->id] ?? 0;
                 if ($count >= $prize->limit_per_user) {

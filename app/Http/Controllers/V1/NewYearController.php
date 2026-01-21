@@ -168,6 +168,19 @@ class NewYearController extends Controller
 
             // 未中奖
             if (is_null($hitPrize)) {
+                // 新用户连续3次没中，第四次必中20福气值
+                $userDrawCount = NewYearDrawLogService::getInstance()->getUserDrawCount($this->userId());
+                $loseCount = NewYearDrawLogService::getInstance()->getContinuousLoseCount($this->userId(), 3);
+                if ($userDrawCount == 3 && $loseCount == 3) {
+                    $hitPrize = NewYearPrizeService::getInstance()->getPrizeById(1);
+                    if (!is_null($hitPrize) && $hitPrize->status == 1) {
+                        NewYearLuckService::getInstance()
+                            ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
+                        NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);
+                        return $hitPrize;
+                    }
+                }
+
                 NewYearDrawLogService::getInstance()->createLog($this->userId());
                 return null;
             }
@@ -184,18 +197,6 @@ class NewYearController extends Controller
                     }
                 }
             }
-
-            // 成本熔断（Redis 原子累加）
-            //            $totalCostKey = 'new_year:total_cost';
-            //            $hitCost = (int) ($hitPrize->cost ?? 0);
-            //            Cache::add($totalCostKey, 0, 86400); // 1天
-            //            $newTotal = Cache::increment($totalCostKey, $hitCost);
-            //            if ($newTotal > 300) {
-            //                Cache::decrement($totalCostKey, $hitCost);
-            //
-            //                NewYearDrawLogService::getInstance()->createLog($this->userId());
-            //                return null;
-            //            }
 
             // 成本熔断（Lua脚本 原子性控制）
             $totalCostKey = 'new_year:total_cost';
@@ -233,6 +234,8 @@ class NewYearController extends Controller
                     ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
             } else {
                 NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
+                // todo type == 2 发放优惠券
+                // todo type == 3 生成待领取商品奖品
             }
 
             NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);

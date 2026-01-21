@@ -23,4 +23,28 @@ class NewYearDrawLogService extends BaseService
 
         return $log;
     }
+
+    public function getUserDrawCount($userId)
+    {
+        return NewYearDrawLog::query()->where('user_id', $userId)->count();
+    }
+
+    public function getContinuousLoseCount($userId, $limit)
+    {
+        $logs = NewYearDrawLog::query()
+            ->where('user_id', $userId)
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get();
+
+        $count = 0;
+        foreach ($logs as $log) {
+            if ($log->prize_id !== null) {
+                break;
+            }
+            $count++;
+        }
+
+        return $count;
+    }
 }
