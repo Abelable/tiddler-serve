@@ -152,7 +152,7 @@ class NewYearController extends Controller
 
         $hitPrize = DB::transaction(function () use ($drawPrizeList) {
             NewYearLuckService::getInstance()
-                ->createLuck($this->userId(), '福气抽奖', 2, -20, 0, 3);
+                ->createLuck($this->userId(), '福气抽奖', 2, -20, 99, 3);
 
             // 没有抽奖列表
             if (count($drawPrizeList) == 0) {
@@ -229,11 +229,11 @@ class NewYearController extends Controller
             }
 
             // 中奖记录
+            NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
             if ($hitPrize->type == 1) {
                 NewYearLuckService::getInstance()
                     ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
             } else {
-                NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
                 // todo type == 2 发放优惠券
                 // todo type == 3 生成待领取商品奖品
             }

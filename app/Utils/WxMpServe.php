@@ -52,9 +52,9 @@ class WxMpServe
             ? Cache::get(self::STABLE_ACCESS_TOKEN_KEY)
             : $this->getStableAccessToken();
 
-        $this->wecomAccessToken = Cache::has(self::WECOM_ACCESS_TOKEN_KEY)
-            ? Cache::get(self::WECOM_ACCESS_TOKEN_KEY)
-            : $this->getWeComAccessToken();
+//        $this->wecomAccessToken = Cache::has(self::WECOM_ACCESS_TOKEN_KEY)
+//            ? Cache::get(self::WECOM_ACCESS_TOKEN_KEY)
+//            : $this->getWeComAccessToken();
     }
 
     private function getAccessToken()
