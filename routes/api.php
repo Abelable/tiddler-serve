@@ -1426,4 +1426,15 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
             Route::post('update_order_goods_status', 'OrderController@updateOrderGoodsStatus');
         });
     });
+
+    Route::prefix('finance')->group(function () {
+        Route::prefix('commission_withdraw')->group(function () {
+            Route::post('list', 'CommissionWithdrawalController@list');
+            Route::get('detail', 'CommissionWithdrawalController@detail');
+            Route::post('approved', 'CommissionWithdrawalController@approved');
+            Route::post('reject', 'CommissionWithdrawalController@reject');
+            Route::post('delete', 'CommissionWithdrawalController@delete');
+            Route::get('pending_count', 'CommissionWithdrawalController@getPendingCount');
+        });
+    });
 });

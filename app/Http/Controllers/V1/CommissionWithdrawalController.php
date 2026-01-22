@@ -57,7 +57,7 @@ class CommissionWithdrawalController extends Controller
         if (bccomp($withdrawAmount, $input->amount, 2) != 0) {
             $errMsg = "用户（ID：{$this->userId()}）提现金额（{$input->amount}）与实际可提现金额（{$withdrawAmount}）不一致，请检查";
             Log::error($errMsg);
-            return $this->fail(CodeResponse::INVALID_OPERATION, $errMsg);
+            return $this->fail(CodeResponse::INVALID_OPERATION, '提现失败，请联系客服');
         }
 
         DB::transaction(function () use ($withdrawAmount, $input) {

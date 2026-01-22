@@ -777,12 +777,10 @@ class CommissionService extends BaseService
 
     public function restoreCommissionByWithdrawalId($withdrawalId)
     {
-        $commissionList = Commission::query()->where('withdrawal_id', $withdrawalId)->where('status', 3)->get();
-        /** @var Commission $commission */
-        foreach ($commissionList as $commission) {
-            $commission->status = 2;
-            $commission->save();
-        }
+        Commission::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', 3)
+            ->update(['status' => 2]);
     }
 
     public function applyWithdrawal($userId, $scene, $withdrawalId)
@@ -829,17 +827,18 @@ class CommissionService extends BaseService
 
     public function getCommissionSumByWithdrawalId($withdrawalId, $status = 3)
     {
-        return Commission::query()->where('withdrawal_id', $withdrawalId)->where('status', $status)->sum('commission_amount');
+        return Commission::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', $status)
+            ->sum('commission_amount');
     }
 
     public function settleCommissionByWithdrawalId($withdrawalId)
     {
-        $commissionList = Commission::query()->where('withdrawal_id', $withdrawalId)->where('status', 3)->get();
-        /** @var Commission $commission */
-        foreach ($commissionList as $commission) {
-            $commission->status = 4;
-            $commission->save();
-        }
+        Commission::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', 3)
+            ->update(['status' => 4]);
     }
 
     public function monthlyCommissionList()
