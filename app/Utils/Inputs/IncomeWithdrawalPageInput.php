@@ -6,6 +6,7 @@ class IncomeWithdrawalPageInput extends PageInput
 {
     public $shopType;
     public $shopId;
+    public $userId;
     public $status;
     public $path;
 
@@ -14,6 +15,7 @@ class IncomeWithdrawalPageInput extends PageInput
         return array_merge([
             'shopType' => 'integer|in:1,2',
             'shopId' => 'integer|digits_between:1,20',
+            'userId' => 'integer|digits_between:1,20',
             'status' => 'integer|in:0,1,2',
             'path' => 'integer|in:1,2,3',
         ], parent::rules());

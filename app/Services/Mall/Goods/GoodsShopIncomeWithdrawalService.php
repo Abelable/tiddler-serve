@@ -47,11 +47,14 @@ class GoodsShopIncomeWithdrawalService extends BaseService
     public function getAdminPage(IncomeWithdrawalPageInput $input, $columns = ['*'])
     {
         $query = ShopIncomeWithdrawal::query();
-        if (!is_null($input->merchantType)) {
-            $query = $query->where('merchant_type', $input->merchantType);
+        if (!is_null($input->shopType)) {
+            $query = $query->where('shop_type', $input->shopType);
         }
         if (!is_null($input->shopId)) {
             $query = $query->where('shop_id', $input->shopId);
+        }
+        if (!is_null($input->userId)) {
+            $query = $query->where('user_id', $input->userId);
         }
         if (!is_null($input->status)) {
             $query = $query->where('status', $input->status);
