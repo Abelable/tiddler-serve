@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsShopIncomeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,7 +35,7 @@ class ShopIncomeConfirmJob implements ShouldQueue
     public function handle()
     {
         try {
-            ShopIncomeService::getInstance()->updateIncomeToConfirmStatus($this->incomeId);
+            GoodsShopIncomeService::getInstance()->updateIncomeToConfirmStatus($this->incomeId);
         } catch (\Throwable $e) {
             Log::error("shop income confirm job failed: " . $e->getMessage());
             throw $e;

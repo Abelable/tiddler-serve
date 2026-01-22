@@ -487,7 +487,7 @@ class OrderService extends BaseService
         CommissionService::getInstance()->updateListToOrderPaidStatus($orderIds, ProductType::GOODS);
 
         // 收益记录状态更新为：已支付待结算
-        ShopIncomeService::getInstance()->updateListToPaidStatus($orderIds);
+        GoodsShopIncomeService::getInstance()->updateListToPaidStatus($orderIds);
 
         // 更新订单商品状态
         OrderGoodsService::getInstance()->updateStatusByOrderIds($orderIds, 1);
@@ -580,7 +580,7 @@ class OrderService extends BaseService
                 CommissionService::getInstance()->deleteUnpaidListByOrderIds([$order->id], ProductType::GOODS);
 
                 // 删除收益记录
-                ShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 0);
+                GoodsShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 0);
             }
             return $order;
         });
@@ -823,7 +823,7 @@ class OrderService extends BaseService
                 }
 
                 // 收益记录变更为待提现
-                ShopIncomeService::getInstance()->updateToConfirmStatus(
+                GoodsShopIncomeService::getInstance()->updateToConfirmStatus(
                     $order->id,
                     $orderGoods->goods_id,
                     $order->delivery_mode,
@@ -952,7 +952,7 @@ class OrderService extends BaseService
 
                 // 删除店铺收益
                 if ($order->shop_id != 0) {
-                    ShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
+                    GoodsShopIncomeService::getInstance()->deleteListByOrderIds([$order->id], 1);
                 }
 
                 // 更新订单商品状态
@@ -1053,7 +1053,7 @@ class OrderService extends BaseService
             CommissionService::getInstance()->deletePaidCommission($order->id, ProductType::GOODS, $goodsId);
 
             // 删除收益记录
-            ShopIncomeService::getInstance()->deleteIncome($order->id, $goodsId, 1);
+            GoodsShopIncomeService::getInstance()->deleteIncome($order->id, $goodsId, 1);
 
             // 更新订单商品状态
             OrderGoodsService::getInstance()->updateStatusByOrderIds([$order->id], 2);

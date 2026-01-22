@@ -21,7 +21,7 @@ use App\Services\Mall\Goods\GoodsVerifyService;
 use App\Services\Mall\Goods\OrderGoodsService;
 use App\Services\Mall\Goods\OrderPackageService;
 use App\Services\Mall\Goods\OrderService;
-use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsShopIncomeService;
 use App\Services\Mall\Goods\ShopManagerService;
 use App\Services\Mall\Goods\ShopPickupAddressService;
 use App\Services\Mall\Goods\ShopService;
@@ -373,7 +373,7 @@ class OrderController extends Controller
                 }
 
                 // 10.生成店铺收益
-                ShopIncomeService::getInstance()->createIncome(
+                GoodsShopIncomeService::getInstance()->createIncome(
                     $shop->id,
                     $order->id,
                     $order->order_sn,

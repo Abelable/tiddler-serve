@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Mall\Goods\GoodsService;
 use App\Services\Mall\Goods\OrderGoodsService;
 use App\Services\Mall\Goods\OrderService;
-use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsShopIncomeService;
 use App\Services\Mall\ProductHistoryService;
 use App\Services\Mall\ShopTodoService;
 use App\Utils\Enums\ProductType;
@@ -37,11 +37,11 @@ class ShopDashboardController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $statusList = [1, 2, 3, 4];
 
-        $totalIncome = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, $statusList);
-        $dailyIncomeList = ShopIncomeService::getInstance()->dailyIncomeList($shopId, $statusList);
-        $monthlyIncomeList = ShopIncomeService::getInstance()->monthlyIncomeList($shopId, $statusList);
-        $dailyGrowthRate = ShopIncomeService::getInstance()->dailyIncomeGrowthRate($shopId, $statusList);
-        $weeklyGrowthRate = ShopIncomeService::getInstance()->weeklyIncomeGrowthRate($shopId, $statusList);
+        $totalIncome = GoodsShopIncomeService::getInstance()->getShopIncomeSum($shopId, $statusList);
+        $dailyIncomeList = GoodsShopIncomeService::getInstance()->dailyIncomeList($shopId, $statusList);
+        $monthlyIncomeList = GoodsShopIncomeService::getInstance()->monthlyIncomeList($shopId, $statusList);
+        $dailyGrowthRate = GoodsShopIncomeService::getInstance()->dailyIncomeGrowthRate($shopId, $statusList);
+        $weeklyGrowthRate = GoodsShopIncomeService::getInstance()->weeklyIncomeGrowthRate($shopId, $statusList);
 
         return $this->success([
             'totalIncome' => number_format($totalIncome, 2),

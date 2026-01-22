@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\Mall\Catering\CateringIncomeWithdrawalService;
 use App\Services\Mall\Catering\CateringShopIncomeService;
-use App\Services\Mall\Goods\IncomeWithdrawalService;
-use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsIncomeWithdrawalService;
+use App\Services\Mall\Goods\GoodsShopIncomeService;
+use App\Services\Mall\Hotel\HotelIncomeWithdrawalService;
 use App\Services\Mall\Hotel\HotelShopIncomeService;
+use App\Services\Mall\Scenic\ScenicIncomeWithdrawalService;
 use App\Services\Mall\Scenic\ScenicShopIncomeService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
@@ -70,7 +73,7 @@ class IncomeWithdrawalController extends Controller
                     ->sum('income_amount');
                 break;
             case MerchantType::GOODS:
-                $withdrawAmount = ShopIncomeService::getInstance()
+                $withdrawAmount = GoodsShopIncomeService::getInstance()
                     ->getShopIncomeQuery($shopId, [2])
                     ->whereMonth('created_at', '!=', Carbon::now()->month)
                     ->sum('income_amount');
@@ -84,26 +87,40 @@ class IncomeWithdrawalController extends Controller
         }
 
         DB::transaction(function () use ($shopId, $withdrawAmount, $input) {
-            $withdrawal = IncomeWithdrawalService::getInstance()
-                ->addWithdrawal($input->merchantType, $shopId, $this->userId(), $withdrawAmount, $input);
-
             switch ($input->merchantType) {
                 case MerchantType::SCENIC:
+                    $withdrawal = ScenicIncomeWithdrawalService::getInstance()
+                        ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     ScenicShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
+                    SystemTodoService::getInstance()
+                        ->createTodo(TodoEnums::SCENIC_INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
                     break;
+
                 case MerchantType::HOTEL:
+                    $withdrawal = HotelIncomeWithdrawalService::getInstance()
+                        ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     HotelShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
+                    SystemTodoService::getInstance()
+                        ->createTodo(TodoEnums::HOTEL_INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
                     break;
+
                 case MerchantType::CATERING:
+                    $withdrawal = CateringIncomeWithdrawalService::getInstance()
+                        ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     CateringShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
+                    SystemTodoService::getInstance()
+                        ->createTodo(TodoEnums::CATERING_INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
                     break;
+
                 case MerchantType::GOODS:
-                    ShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
+                    $withdrawal = GoodsIncomeWithdrawalService::getInstance()
+                        ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
+                    GoodsShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
+                    SystemTodoService::getInstance()
+                        ->createTodo(TodoEnums::GOODS_INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
                     break;
             }
-
             // todo 管理后台提现通知
-            SystemTodoService::getInstance()->createTodo(TodoEnums::INCOME_WITHDRAWAL_NOTICE, [$withdrawal->id]);
         });
 
         return $this->success();
@@ -116,7 +133,24 @@ class IncomeWithdrawalController extends Controller
         $merchantType = $this->verifyRequiredId('merchantType');
         $shopId = $this->verifyRequiredId('shopId');
 
-        $page = IncomeWithdrawalService::getInstance()->getShopPage($merchantType, $shopId, $input);
+        $page = collect();
+        switch ($merchantType) {
+            case MerchantType::SCENIC:
+                $page = ScenicIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                break;
+
+            case MerchantType::HOTEL:
+                $page = HotelIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                break;
+
+            case MerchantType::CATERING:
+                $page = CateringIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                break;
+
+            case MerchantType::GOODS:
+                $page = GoodsIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                break;
+        }
 
         return $this->successPaginate($page);
     }

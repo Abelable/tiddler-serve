@@ -7,7 +7,7 @@ use App\Models\Mall\Goods\ShopIncome;
 use App\Services\Mall\Goods\GoodsService;
 use App\Services\Mall\Goods\OrderGoodsService;
 use App\Services\Mall\Goods\OrderService;
-use App\Services\Mall\Goods\ShopIncomeService;
+use App\Services\Mall\Goods\GoodsShopIncomeService;
 use App\Services\Mall\ProductHistoryService;
 use App\Utils\Enums\ProductType;
 use App\Utils\Inputs\PageInput;
@@ -19,7 +19,7 @@ class ShopIncomeController extends Controller
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $totalIncome = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
+        $totalIncome = GoodsShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1, 2, 3, 4]);
 
         $todayOrderQuery = OrderService::getInstance()->getShopDateQuery($shopId);
         $todaySalesVolume = (clone $todayOrderQuery)->sum('payment_amount');
@@ -50,13 +50,13 @@ class ShopIncomeController extends Controller
     {
         $shopId = $this->verifyRequiredId('shopId');
 
-        $cashAmount = ShopIncomeService::getInstance()
+        $cashAmount = GoodsShopIncomeService::getInstance()
             ->getShopIncomeQuery($shopId, [2])
             ->whereMonth('created_at', '!=', Carbon::now()->month)
             ->sum('income_amount');
-        $pendingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
-        $withdrawingAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
-        $settledAmount = ShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
+        $pendingAmount = GoodsShopIncomeService::getInstance()->getShopIncomeSum($shopId, [1]);
+        $withdrawingAmount = GoodsShopIncomeService::getInstance()->getShopIncomeSum($shopId, [3]);
+        $settledAmount = GoodsShopIncomeService::getInstance()->getShopIncomeSum($shopId, [4]);
 
         return $this->success([
             'cashAmount' => $cashAmount,
@@ -71,7 +71,7 @@ class ShopIncomeController extends Controller
         $shopId = $this->verifyRequiredId('shopId');
         $timeType = $this->verifyRequiredInteger('timeType');
 
-        $query = ShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
+        $query = GoodsShopIncomeService::getInstance()->getShopIncomeQueryByTimeType($shopId, $timeType);
 
         $orderCount = (clone $query)->whereIn('status', [1, 2, 3, 4])->distinct('order_id')->count('order_id');
         $salesVolume = (clone $query)->whereIn('status', [1, 2, 3, 4])->sum('sales_amount');
@@ -94,7 +94,7 @@ class ShopIncomeController extends Controller
         $timeType = $this->verifyRequiredInteger('timeType');
         $statusList = $this->verifyArray('statusList');
 
-        $page = ShopIncomeService::getInstance()->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
+        $page = GoodsShopIncomeService::getInstance()->getShopIncomePageByTimeType($shopId, $timeType, $statusList, $input);
         $incomeList = collect($page->items());
 
         $orderIds = $incomeList->pluck('order_id')->toArray();

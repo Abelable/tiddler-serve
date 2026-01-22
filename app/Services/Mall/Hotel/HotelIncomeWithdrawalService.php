@@ -1,25 +1,26 @@
 <?php
 
-namespace App\Services\Mall\Goods;
+namespace App\Services\Mall\Hotel;
 
-use App\Models\Mall\Goods\ShopIncomeWithdrawal;
+use App\Models\Mall\Hotel\HotelShopIncomeWithdrawal;
 use App\Services\BaseService;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
-class IncomeWithdrawalService extends BaseService
+class HotelIncomeWithdrawalService extends BaseService
 {
-    public function addWithdrawal($merchantType, $shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
+    public function addWithdrawal($shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
     {
-        $withdrawal = ShopIncomeWithdrawal::new();
+        $withdrawal = HotelShopIncomeWithdrawal::new();
 
-        $handlingFee = MathTool::bcRound(bcmul($withdrawAmount, '0.006', 10));
+        // todo 千六手续费临时改为0
+        $handlingFee = 0;
+        //  $handlingFee = MathTool::bcRound(bcmul($withdrawAmount, '0.006', 10));
+
         $actualAmount = bcsub($withdrawAmount, $handlingFee, 2);
 
-        $withdrawal->merchant_type = $merchantType;
         $withdrawal->shop_id = $shopId;
         $withdrawal->user_id = $userId;
         $withdrawal->withdraw_amount = $withdrawAmount;
@@ -34,10 +35,9 @@ class IncomeWithdrawalService extends BaseService
         return $withdrawal;
     }
 
-    public function getShopPage($merchantType, $shopId, PageInput $input, $columns = ['*'])
+    public function getShopPage($shopId, PageInput $input, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()
-            ->where('merchant_type', $merchantType)
+        return HotelShopIncomeWithdrawal::query()
             ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -45,7 +45,7 @@ class IncomeWithdrawalService extends BaseService
 
     public function getAdminPage(IncomeWithdrawalPageInput $input, $columns = ['*'])
     {
-        $query = ShopIncomeWithdrawal::query();
+        $query = HotelShopIncomeWithdrawal::query();
         if (!is_null($input->merchantType)) {
             $query = $query->where('merchant_type', $input->merchantType);
         }
@@ -66,12 +66,12 @@ class IncomeWithdrawalService extends BaseService
 
     public function getRecordById($id, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()->find($id, $columns);
+        return HotelShopIncomeWithdrawal::query()->find($id, $columns);
     }
 
     public function getUserApplication($userId, $scene, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()
+        return HotelShopIncomeWithdrawal::query()
             ->where('user_id', $userId)
             ->where('status', 0)
             ->first($columns);
@@ -79,12 +79,12 @@ class IncomeWithdrawalService extends BaseService
 
     public function getCountByStatus($status)
     {
-        return ShopIncomeWithdrawal::query()->where('status', $status)->count();
+        return HotelShopIncomeWithdrawal::query()->where('status', $status)->count();
     }
 
     public function getWithdrawSumListByUserIds(array $userIds)
     {
-        return ShopIncomeWithdrawal::query()
+        return HotelShopIncomeWithdrawal::query()
             ->where('status', 1)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('SUM(withdraw_amount) as sum'))

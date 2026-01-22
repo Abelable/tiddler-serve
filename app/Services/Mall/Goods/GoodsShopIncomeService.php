@@ -13,7 +13,7 @@ use App\Utils\MathTool;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class ShopIncomeService extends BaseService
+class GoodsShopIncomeService extends BaseService
 {
     public function createIncome(
         $shopId,
