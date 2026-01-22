@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Services\Mall\Hotel;
+namespace App\Services\Mall\Goods;
 
-use App\Models\Mall\Hotel\HotelShopIncomeWithdrawal;
+use App\Models\Mall\Goods\ShopIncomeWithdrawal;
 use App\Services\BaseService;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
-class HotelIncomeWithdrawalService extends BaseService
+class GoodsShopIncomeWithdrawalService extends BaseService
 {
     public function addWithdrawal($shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
     {
-        $withdrawal = HotelShopIncomeWithdrawal::new();
+        $withdrawal = ShopIncomeWithdrawal::new();
 
         // todo 千六手续费临时改为0
         $handlingFee = 0;
@@ -37,7 +38,7 @@ class HotelIncomeWithdrawalService extends BaseService
 
     public function getShopPage($shopId, PageInput $input, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()
+        return ShopIncomeWithdrawal::query()
             ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -45,7 +46,7 @@ class HotelIncomeWithdrawalService extends BaseService
 
     public function getAdminPage(IncomeWithdrawalPageInput $input, $columns = ['*'])
     {
-        $query = HotelShopIncomeWithdrawal::query();
+        $query = ShopIncomeWithdrawal::query();
         if (!is_null($input->merchantType)) {
             $query = $query->where('merchant_type', $input->merchantType);
         }
@@ -66,12 +67,12 @@ class HotelIncomeWithdrawalService extends BaseService
 
     public function getRecordById($id, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()->find($id, $columns);
+        return ShopIncomeWithdrawal::query()->find($id, $columns);
     }
 
     public function getUserApplication($userId, $scene, $columns = ['*'])
     {
-        return HotelShopIncomeWithdrawal::query()
+        return ShopIncomeWithdrawal::query()
             ->where('user_id', $userId)
             ->where('status', 0)
             ->first($columns);
@@ -79,12 +80,12 @@ class HotelIncomeWithdrawalService extends BaseService
 
     public function getCountByStatus($status)
     {
-        return HotelShopIncomeWithdrawal::query()->where('status', $status)->count();
+        return ShopIncomeWithdrawal::query()->where('status', $status)->count();
     }
 
     public function getWithdrawSumListByUserIds(array $userIds)
     {
-        return HotelShopIncomeWithdrawal::query()
+        return ShopIncomeWithdrawal::query()
             ->where('status', 1)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('SUM(withdraw_amount) as sum'))

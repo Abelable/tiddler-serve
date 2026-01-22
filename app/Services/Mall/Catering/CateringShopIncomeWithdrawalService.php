@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Services\Mall\Goods;
+namespace App\Services\Mall\Catering;
 
-use App\Models\Mall\Goods\ShopIncomeWithdrawal;
+use App\Models\Mall\Catering\CateringShopIncomeWithdrawal;
 use App\Services\BaseService;
 use App\Utils\Inputs\IncomeWithdrawalInput;
 use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\PageInput;
-use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
-class GoodsIncomeWithdrawalService extends BaseService
+class CateringShopIncomeWithdrawalService extends BaseService
 {
     public function addWithdrawal($shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
     {
-        $withdrawal = ShopIncomeWithdrawal::new();
+        $withdrawal = CateringShopIncomeWithdrawal::new();
 
         // todo 千六手续费临时改为0
         $handlingFee = 0;
@@ -38,7 +37,7 @@ class GoodsIncomeWithdrawalService extends BaseService
 
     public function getShopPage($shopId, PageInput $input, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()
+        return CateringShopIncomeWithdrawal::query()
             ->where('shop_id', $shopId)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
@@ -46,7 +45,7 @@ class GoodsIncomeWithdrawalService extends BaseService
 
     public function getAdminPage(IncomeWithdrawalPageInput $input, $columns = ['*'])
     {
-        $query = ShopIncomeWithdrawal::query();
+        $query = CateringShopIncomeWithdrawal::query();
         if (!is_null($input->merchantType)) {
             $query = $query->where('merchant_type', $input->merchantType);
         }
@@ -67,12 +66,12 @@ class GoodsIncomeWithdrawalService extends BaseService
 
     public function getRecordById($id, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()->find($id, $columns);
+        return CateringShopIncomeWithdrawal::query()->find($id, $columns);
     }
 
     public function getUserApplication($userId, $scene, $columns = ['*'])
     {
-        return ShopIncomeWithdrawal::query()
+        return CateringShopIncomeWithdrawal::query()
             ->where('user_id', $userId)
             ->where('status', 0)
             ->first($columns);
@@ -80,12 +79,12 @@ class GoodsIncomeWithdrawalService extends BaseService
 
     public function getCountByStatus($status)
     {
-        return ShopIncomeWithdrawal::query()->where('status', $status)->count();
+        return CateringShopIncomeWithdrawal::query()->where('status', $status)->count();
     }
 
     public function getWithdrawSumListByUserIds(array $userIds)
     {
-        return ShopIncomeWithdrawal::query()
+        return CateringShopIncomeWithdrawal::query()
             ->where('status', 1)
             ->whereIn('user_id', $userIds)
             ->select('user_id', DB::raw('SUM(withdraw_amount) as sum'))

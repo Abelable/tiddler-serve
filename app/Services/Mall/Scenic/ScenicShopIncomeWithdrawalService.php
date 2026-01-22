@@ -9,7 +9,7 @@ use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\DB;
 
-class ScenicIncomeWithdrawalService extends BaseService
+class ScenicShopIncomeWithdrawalService extends BaseService
 {
     public function addWithdrawal($shopId, $userId, $withdrawAmount, IncomeWithdrawalInput $input)
     {

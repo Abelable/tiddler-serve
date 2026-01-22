@@ -298,4 +298,28 @@ class GoodsShopIncomeService extends BaseService
             ->where('status', $status)
             ->delete();
     }
+
+    public function getIncomeSumByWithdrawalId($withdrawalId, $status = 3)
+    {
+        return ShopIncome::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', $status)
+            ->sum('income_amount');
+    }
+
+    public function settleIncomeByWithdrawalId($withdrawalId)
+    {
+        ShopIncome::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', 3)
+            ->update(['status' => 4]);
+    }
+
+    public function restoreCommissionByWithdrawalId($withdrawalId)
+    {
+        ShopIncome::query()
+            ->where('withdrawal_id', $withdrawalId)
+            ->where('status', 3)
+            ->update(['status' => 2]);
+    }
 }

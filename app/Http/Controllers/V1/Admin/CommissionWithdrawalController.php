@@ -111,13 +111,13 @@ class CommissionWithdrawalController extends Controller
     {
         $id = $this->verifyRequiredId('id');
         $reason = $this->verifyRequiredString('failureReason');
+
         $record = CommissionWithdrawalService::getInstance()->getRecordById($id);
         if (is_null($record)) {
             return $this->fail(CodeResponse::NOT_FOUND, '提现申请不存在');
         }
 
-        $user = UserService::getInstance()->getUserById($record->user_id);
-        DB::transaction(function () use ($reason, $user, $record) {
+        DB::transaction(function () use ($reason, $record) {
             CommissionService::getInstance()->restoreCommissionByWithdrawalId($record->id);
 
             $record->status = 2;

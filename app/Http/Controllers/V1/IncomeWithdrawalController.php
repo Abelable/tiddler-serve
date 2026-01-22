@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
-use App\Services\Mall\Catering\CateringIncomeWithdrawalService;
+use App\Services\Mall\Catering\CateringShopIncomeWithdrawalService;
 use App\Services\Mall\Catering\CateringShopIncomeService;
-use App\Services\Mall\Goods\GoodsIncomeWithdrawalService;
+use App\Services\Mall\Goods\GoodsShopIncomeWithdrawalService;
 use App\Services\Mall\Goods\GoodsShopIncomeService;
-use App\Services\Mall\Hotel\HotelIncomeWithdrawalService;
+use App\Services\Mall\Hotel\HotelShopIncomeWithdrawalService;
 use App\Services\Mall\Hotel\HotelShopIncomeService;
-use App\Services\Mall\Scenic\ScenicIncomeWithdrawalService;
+use App\Services\Mall\Scenic\ScenicShopIncomeWithdrawalService;
 use App\Services\Mall\Scenic\ScenicShopIncomeService;
 use App\Services\SystemTodoService;
 use App\Utils\CodeResponse;
@@ -89,7 +89,7 @@ class IncomeWithdrawalController extends Controller
         DB::transaction(function () use ($shopId, $withdrawAmount, $input) {
             switch ($input->merchantType) {
                 case MerchantType::SCENIC:
-                    $withdrawal = ScenicIncomeWithdrawalService::getInstance()
+                    $withdrawal = ScenicShopIncomeWithdrawalService::getInstance()
                         ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     ScenicShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
                     SystemTodoService::getInstance()
@@ -97,7 +97,7 @@ class IncomeWithdrawalController extends Controller
                     break;
 
                 case MerchantType::HOTEL:
-                    $withdrawal = HotelIncomeWithdrawalService::getInstance()
+                    $withdrawal = HotelShopIncomeWithdrawalService::getInstance()
                         ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     HotelShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
                     SystemTodoService::getInstance()
@@ -105,7 +105,7 @@ class IncomeWithdrawalController extends Controller
                     break;
 
                 case MerchantType::CATERING:
-                    $withdrawal = CateringIncomeWithdrawalService::getInstance()
+                    $withdrawal = CateringShopIncomeWithdrawalService::getInstance()
                         ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     CateringShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
                     SystemTodoService::getInstance()
@@ -113,7 +113,7 @@ class IncomeWithdrawalController extends Controller
                     break;
 
                 case MerchantType::GOODS:
-                    $withdrawal = GoodsIncomeWithdrawalService::getInstance()
+                    $withdrawal = GoodsShopIncomeWithdrawalService::getInstance()
                         ->addWithdrawal($shopId, $this->userId(), $withdrawAmount, $input);
                     GoodsShopIncomeService::getInstance()->applyWithdrawal($shopId, $withdrawal->id);
                     SystemTodoService::getInstance()
@@ -136,19 +136,19 @@ class IncomeWithdrawalController extends Controller
         $page = collect();
         switch ($merchantType) {
             case MerchantType::SCENIC:
-                $page = ScenicIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                $page = ScenicShopIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
                 break;
 
             case MerchantType::HOTEL:
-                $page = HotelIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                $page = HotelShopIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
                 break;
 
             case MerchantType::CATERING:
-                $page = CateringIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                $page = CateringShopIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
                 break;
 
             case MerchantType::GOODS:
-                $page = GoodsIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
+                $page = GoodsShopIncomeWithdrawalService::getInstance()->getShopPage($shopId, $input);
                 break;
         }
 
