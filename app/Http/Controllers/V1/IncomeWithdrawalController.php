@@ -39,16 +39,16 @@ class IncomeWithdrawalController extends Controller
         $shopId = 0;
         switch ($input->merchantType) {
             case MerchantType::SCENIC:
-                $shopId = $this->user()->scenicShop->id;
+                $shopId = $this->user()->scenicShop->id ?? 0;
                 break;
             case MerchantType::HOTEL:
-                $shopId = $this->user()->hotelShop->id;
+                $shopId = $this->user()->hotelShop->id ?? 0;
                 break;
             case MerchantType::CATERING:
-                $shopId = $this->user()->cateringShop->id;
+                $shopId = $this->user()->cateringShop->id ?? 0;
                 break;
             case MerchantType::GOODS:
-                $shopId = $this->user()->shop->id;
+                $shopId = $this->user()->shop->id ?? 0;
                 break;
         }
 
@@ -83,7 +83,7 @@ class IncomeWithdrawalController extends Controller
         if (bccomp($withdrawAmount, $input->amount, 2) != 0) {
             $errMsg = "用户（ID：{$this->userId()}）店铺（type：{$input->merchantType}）收益提现金额（{$input->amount}）与实际可提现金额（{$withdrawAmount}）不一致，请检查";
             Log::error($errMsg);
-            return $this->fail(CodeResponse::INVALID_OPERATION, $errMsg);
+            return $this->fail(CodeResponse::INVALID_OPERATION, "提现失败，请联系客服");
         }
 
         DB::transaction(function () use ($shopId, $withdrawAmount, $input) {
