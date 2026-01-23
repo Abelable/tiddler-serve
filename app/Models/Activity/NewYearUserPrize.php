@@ -11,7 +11,7 @@ use App\Models\BaseModel;
  * @property int $user_id 用户id
  * @property int $prize_id 奖品id
  * @property int $prize_type 奖品类型：1-福气值，2-优惠券，3-商品
- * @property int $status 奖品状态：0-未使用，1-已使用
+ * @property int $status 奖品状态：0-未使用/未领取，1-已使用/已领取，2-已发货
  * @property string $cover 奖品图片
  * @property string $name 奖品名称
  * @property int $coupon_id 优惠券id
