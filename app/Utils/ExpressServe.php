@@ -8,7 +8,7 @@ class ExpressServe
 {
     use HttpClient;
 
-    const URL = 'https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx';
+    const URL = 'https://api.kdniao.com/api/dist';
 
     public static function new()
     {
@@ -23,7 +23,7 @@ class ExpressServe
         } else {
             $requestData = "{'OrderCode':'', 'ShipperCode':'{$shipperCode}', 'LogisticCode':'{$logisticCode}'}";
         }
-        $result = $this->httpPost(self::URL, $this->formatReqData($requestData, '1002'), 2);
+        $result = $this->httpPost(self::URL, $this->formatReqData($requestData, '8001'), 2);
         return $this->formatResData($result);
     }
 
