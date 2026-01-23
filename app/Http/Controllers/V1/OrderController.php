@@ -227,31 +227,46 @@ class OrderController extends Controller
 
     private function getCouponList($cartGoodsList)
     {
-        $couponIds = UserCouponService::getInstance()->getUserCouponList($this->userId())->pluck('coupon_id')->toArray();
-        $couponList = CouponService::getInstance()->getAvailableCouponListByIds($couponIds)->keyBy('goods_id');
-        return $cartGoodsList->map(function (CartGoods $cartGoods) use ($couponList) {
-            /** @var Coupon $coupon */
-            $coupon = $couponList->get($cartGoods->goods_id);
-            if (!is_null($coupon)) {
+        $couponIds = UserCouponService::getInstance()
+            ->getUserCouponList($this->userId())
+            ->pluck('coupon_id')
+            ->toArray();
+
+        $couponList = CouponService::getInstance()
+            ->getAvailableCouponListByIds($couponIds);
+
+        // 拆分：通用券 & 指定商品券
+        $commonCoupons = $couponList->whereNull('goods_id');
+        $goodsCoupons  = $couponList->whereNotNull('goods_id')->groupBy('goods_id');
+
+        return $cartGoodsList->flatMap(function (CartGoods $cartGoods) use ($commonCoupons, $goodsCoupons) {
+
+            // 当前商品可用的所有券（指定商品券 + 通用券）
+            $availableCoupons = collect();
+
+            if ($goodsCoupons->has($cartGoods->goods_id)) {
+                $availableCoupons = $availableCoupons->merge(
+                    $goodsCoupons->get($cartGoods->goods_id)
+                );
+            }
+
+            $availableCoupons = $availableCoupons->merge($commonCoupons);
+
+            return $availableCoupons->filter(function (Coupon $coupon) use ($cartGoods) {
                 switch ($coupon->type) {
                     case 1:
-                        return $coupon;
+                        return true;
+
                     case 2:
-                        if ($cartGoods->number >= $coupon->num_limit) {
-                            return $coupon;
-                        } else {
-                            return null;
-                        }
+                        return $cartGoods->number >= $coupon->num_limit;
+
                     case 3:
-                        if (bcmul($cartGoods->price, $cartGoods->number, 2) >= $coupon->price_limit) {
-                            return $coupon;
-                        } else {
-                            return null;
-                        }
+                        return bcmul($cartGoods->price, $cartGoods->number, 2) >= $coupon->price_limit;
                 }
-            }
-            return null;
-        })->filter()->sortBy('denomination');
+
+                return false;
+            });
+        })->sortByDesc('denomination')->values();
     }
 
     public function submit()
@@ -584,8 +599,10 @@ class OrderController extends Controller
         $order['shopInfo'] = $shopInfo ?: null;
         unset($order->shop_id);
 
-        $shopInfo['managerList'] = ShopManagerService::getInstance()
-            ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
+        if (!is_null($shopInfo)) {
+            $shopInfo['managerList'] = ShopManagerService::getInstance()
+                ->getManagerList($shopInfo->id, ['id', 'user_id', 'avatar', 'nickname', 'role_id']);
+        }
 
         $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
         $order['goods_list'] = $goodsList;

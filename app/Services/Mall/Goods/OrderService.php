@@ -278,34 +278,101 @@ class OrderService extends BaseService
         return Order::query()->where('order_sn', $orderSn)->exists();
     }
 
-    public function createOrder($userId, $cartGoodsList, CreateOrderInput $input, $freightTemplateList = null, Address $address = null, Coupon $coupon = null, Shop $shopInfo = null)
-    {
-        $totalPrice = 0;
-        $totalFreightPrice = 0;
-        $couponDenomination = 0;
+    public function createOrder(
+        $userId,
+        $cartGoodsList,
+        CreateOrderInput $input,
+        $freightTemplateList = null,
+        Address $address = null,
+        Coupon $coupon = null,
+        Shop $shopInfo = null
+    ) {
+        $totalPrice = '0.00';
+        $totalFreightPrice = '0.00';
+        $couponDenomination = '0.00';
+
+        // 用于优惠券校验的数据
+        $matchedGoodsTotalPrice = '0.00';
+        $matchedGoodsTotalNum = 0;
+        $totalGoodsNum = 0;
 
         /** @var CartGoods $cartGoods */
         foreach ($cartGoodsList as $cartGoods) {
             $price = bcmul($cartGoods->price, $cartGoods->number, 2);
             $totalPrice = bcadd($totalPrice, $price, 2);
+            $totalGoodsNum += $cartGoods->number;
 
-            // 优惠券
-            if (!is_null($coupon) && $coupon->goods_id == $cartGoods->goods_id) {
-                $couponDenomination = $coupon->denomination;
+            // 商品券：统计命中商品的数据
+            if (
+                !is_null($coupon) &&
+                !is_null($coupon->goods_id) &&
+                $coupon->goods_id == $cartGoods->goods_id
+            ) {
+                $matchedGoodsTotalPrice = bcadd($matchedGoodsTotalPrice, $price, 2);
+                $matchedGoodsTotalNum += $cartGoods->number;
             }
 
-            // 商品减库存加销量
+            // 扣库存
             $row = GoodsService::getInstance()
-                ->reduceStock($cartGoods->goods_id, $cartGoods->number, $cartGoods->selected_sku_index);
+                ->reduceStock(
+                    $cartGoods->goods_id,
+                    $cartGoods->number,
+                    $cartGoods->selected_sku_index
+                );
             if ($row == 0) {
                 $this->throwBusinessException(CodeResponse::GOODS_NO_STOCK);
             }
         }
 
-        // 计算运费
+        /**
+         * 计算优惠券金额（支持通用券 & 商品券）
+         */
+        if (!is_null($coupon)) {
+            switch ($coupon->type) {
+                // 无门槛
+                case 1:
+                    $couponDenomination = $coupon->denomination;
+                    break;
+
+                // 满件数
+                case 2:
+                    $num = is_null($coupon->goods_id)
+                        ? $totalGoodsNum
+                        : $matchedGoodsTotalNum;
+
+                    if ($num >= $coupon->num_limit) {
+                        $couponDenomination = $coupon->denomination;
+                    }
+                    break;
+
+                // 满金额
+                case 3:
+                    $price = is_null($coupon->goods_id)
+                        ? $totalPrice
+                        : $matchedGoodsTotalPrice;
+
+                    if (bccomp($price, $coupon->price_limit, 2) >= 0) {
+                        $couponDenomination = $coupon->denomination;
+                    }
+                    break;
+            }
+        }
+
+        // 防止优惠金额超过商品金额
+        $couponDenomination = bccomp($couponDenomination, $totalPrice, 2) > 0
+            ? $totalPrice
+            : $couponDenomination;
+
+        /**
+         * 运费
+         */
         if ($input->deliveryMode == 1) {
             $totalFreightPrice = FreightTemplateService::getInstance()
-                ->calcFreightPriceByCartGoods($cartGoodsList, $freightTemplateList, $address);
+                ->calcFreightPriceByCartGoods(
+                    $cartGoodsList,
+                    $freightTemplateList,
+                    $address
+                );
         }
 
         $paymentAmount = bcadd($totalPrice, $totalFreightPrice, 2);
@@ -313,23 +380,33 @@ class OrderService extends BaseService
 
         $orderSn = $this->generateOrderSn();
 
-        // 余额抵扣
-        $deductionBalance = 0;
+        /**
+         * 余额抵扣
+         */
+        $deductionBalance = '0.00';
         if ($input->useBalance == 1) {
             $account = AccountService::getInstance()->getUserAccount($userId);
             $deductionBalance = min($paymentAmount, $account->balance);
             $paymentAmount = bcsub($paymentAmount, $deductionBalance, 2);
 
-            // 更新余额
-            AccountService::getInstance()
-                ->updateBalance($userId, AccountChangeType::PURCHASE, -$deductionBalance, $orderSn, ProductType::GOODS);
+            AccountService::getInstance()->updateBalance(
+                $userId,
+                AccountChangeType::PURCHASE,
+                -$deductionBalance,
+                $orderSn,
+                ProductType::GOODS
+            );
         }
 
+        /**
+         * 创建订单
+         */
         $order = Order::new();
         $order->order_sn = $orderSn;
         $order->status = OrderStatus::CREATED;
         $order->user_id = $userId;
         $order->delivery_mode = $input->deliveryMode;
+
         if ($input->deliveryMode == 1) {
             $order->consignee = $address->name;
             $order->mobile = $address->mobile;
@@ -340,24 +417,32 @@ class OrderService extends BaseService
             $order->pickup_time = $input->pickupTime;
             $order->pickup_mobile = $input->pickupMobile;
         }
+
         if (!is_null($shopInfo)) {
             $order->shop_id = $shopInfo->id;
             $order->shop_logo = $shopInfo->logo;
             $order->shop_name = $shopInfo->name;
         }
+
         $order->goods_price = $totalPrice;
+
         if (!is_null($coupon)) {
             $order->coupon_id = $coupon->id;
             $order->coupon_shop_id = $coupon->shop_id;
             $order->coupon_denomination = $couponDenomination;
         }
+
         $order->deduction_balance = $deductionBalance;
         $order->payment_amount = $paymentAmount;
         $order->refund_amount = $paymentAmount;
         $order->save();
 
-        // 设置订单支付超时任务
-        dispatch(new OverTimeCancelOrderJob(ProductType::GOODS, $userId, $order->id));
+        // 支付超时取消
+        dispatch(new OverTimeCancelOrderJob(
+            ProductType::GOODS,
+            $userId,
+            $order->id
+        ));
 
         return $order;
     }
@@ -455,12 +540,14 @@ class OrderService extends BaseService
                 }
 
                 // 待发货短信通知
-                $shopId = $order->shopInfo->id;
-                $cacheKey = "order_sms_{$shopId}";
-                Cache::remember($cacheKey, now()->addMinutes(5), function () use ($order) {
-                    AliSmsServe::new()->send($order->shopInfo->merchantInfo->mobile, 'order');
-                    return 'sent';
-                });
+                if ($order->shopInfo) {
+                    $shopId = $order->shopInfo->id;
+                    $cacheKey = "order_sms_{$shopId}";
+                    Cache::remember($cacheKey, now()->addMinutes(5), function () use ($order) {
+                        AliSmsServe::new()->send($order->shopInfo->merchantInfo->mobile, 'order');
+                        return 'sent';
+                    });
+                }
             } else {
                 $order->status = OrderStatus::PENDING_VERIFICATION;
                 GoodsVerifyService::getInstance()->createVerifyCode($order->id, $order->shop_id);

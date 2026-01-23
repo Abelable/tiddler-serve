@@ -244,18 +244,20 @@ class CommonController extends Controller
                 /** @var Order $order */
                 foreach ($orderList as $order) {
                     // 邀请商家入驻活动
-                    $userTask = UserTaskService::getInstance()
-                        ->getByMerchantId(MerchantType::GOODS, $order->shopInfo->merchant_id, 3);
-                    if (!is_null($userTask)) {
-                        $userTask->status = 2;
-                        $userTask->step = 4;
-                        $userTask->order_id = $order->id;
-                        $userTask->finish_time = now();
-                        $userTask->save();
+                    if ($order->shopInfo) {
+                        $userTask = UserTaskService::getInstance()
+                            ->getByMerchantId(MerchantType::GOODS, $order->shopInfo->merchant_id, 3);
+                        if (!is_null($userTask)) {
+                            $userTask->status = 2;
+                            $userTask->step = 4;
+                            $userTask->order_id = $order->id;
+                            $userTask->finish_time = now();
+                            $userTask->save();
 
-                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
-                        $task->status = 3;
-                        $task->save();
+                            $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                            $task->status = 3;
+                            $task->save();
+                        }
                     }
                 }
             });
