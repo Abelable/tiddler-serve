@@ -163,11 +163,10 @@ class NewYearPrizeService extends BaseService
         return $userPrize;
     }
 
-    public function getUserPrizePage($userId, PageInput $input, $statusList = [0, 1], $columns = ['*'])
+    public function getUserPrizePage($userId, PageInput $input, $columns = ['*'])
     {
         return NewYearUserPrize::query()
             ->where('user_id', $userId)
-            ->whereIn('status', $statusList)
             ->orderBy($input->sort, $input->order)
             ->paginate($input->limit, $columns, 'page', $input->page);
     }

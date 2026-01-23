@@ -235,9 +235,8 @@ class NewYearController extends Controller
             if ($hitPrize->type == 1) {
                 NewYearLuckService::getInstance()
                     ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
-            } else {
-                // todo type == 2 发放优惠券
-                // todo type == 3 生成待领取商品奖品
+            } else if ($hitPrize->type == 2) {
+                // todo 发放优惠券
             }
 
             NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);
@@ -263,12 +262,12 @@ class NewYearController extends Controller
 
         $userPrize = NewYearPrizeService::getInstance()->getUserPrize($this->userId(), $prizeId);
         if (is_null($userPrize) || $userPrize->status != 0 || $userPrize->prize_type != 3) {
-            return $this->fail(CodeResponse::NOT_FOUND, '没有可领取的奖品');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '奖品已领取');
         }
 
         $address = AddressService::getInstance()->getById($this->userId(), $addressId);
         if (is_null($address)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+            return $this->fail(CodeResponse::INVALID_OPERATION, '用户地址不存在');
         }
 
         $userPrize->status = 1;
