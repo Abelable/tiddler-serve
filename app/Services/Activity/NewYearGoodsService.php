@@ -90,9 +90,14 @@ class NewYearGoodsService extends BaseService
         NewYearGoods::query()->where('id', $id)->update(['luck_score' => $luckScore]);
     }
 
-    public function updateLuckStock($id, $stock)
+    public function updateStock($id, $stock)
     {
-        NewYearGoods::query()->where('id', $id)->update(['luck_score' => $stock]);
+        NewYearGoods::query()->where('id', $id)->update(['stock' => $stock]);
+    }
+
+    public function updateLimit($id, $limit)
+    {
+        NewYearGoods::query()->where('id', $id)->update(['limit' => $limit]);
     }
 
     public function updateSort($id, $sort)

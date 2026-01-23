@@ -85,7 +85,23 @@ class NewYearGoodsController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
         }
 
-        NewYearGoodsService::getInstance()->updateLuckScore($id, $stock);
+        NewYearGoodsService::getInstance()->updateStock($id, $stock);
+        Cache::forget('new_year_goods_list');
+
+        return $this->success();
+    }
+
+    public function editLimit()
+    {
+        $id = $this->verifyRequiredId('id');
+        $limit = $this->verifyRequiredInteger('limit');
+
+        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($id);
+        if (is_null($newYearGoods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        NewYearGoodsService::getInstance()->updateLimit($id, $limit);
         Cache::forget('new_year_goods_list');
 
         return $this->success();
