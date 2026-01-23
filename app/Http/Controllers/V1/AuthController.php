@@ -33,16 +33,16 @@ class AuthController extends Controller
         /** @var WxMpRegisterInput $input */
         $input = WxMpRegisterInput::new();
 
-        $result = WxMpServe::new()->getUserOpenid($input->code);
         $user = UserService::getInstance()->getByMobile($input->mobile);
         if (!is_null($user)) {
             return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
         }
 
-        $token = DB::transaction(function () use ($input, $result) {
-            // 用户注册
-            $user = UserService::getInstance()->register($result['openid'], $input);
+        $session = WxMpServe::new()->getUserSession($input->code);
 
+        $token = DB::transaction(function () use ($input, $session) {
+            // 用户注册
+            $user = UserService::getInstance()->register($session['openid'], $input);
 
             if (!empty($input->superiorId)) {
                 // 绑定上下级
@@ -74,12 +74,15 @@ class AuthController extends Controller
     public function wxMpLogin()
     {
         $code = $this->verifyRequiredString('code');
-        $result = WxMpServe::new()->getUserOpenid($code);
-        $user = UserService::getInstance()->getByOpenid($result['openid']);
+
+        $session = WxMpServe::new()->getUserSession($code);
+        $user = UserService::getInstance()->getByOpenid($session['openid']);
+
         $token = '';
         if (!is_null($user)) {
             $token = Auth::guard('user')->login($user);
         }
+
         return $this->success($token);
     }
 

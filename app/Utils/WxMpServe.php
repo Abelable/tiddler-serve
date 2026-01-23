@@ -145,7 +145,7 @@ class WxMpServe
         return $result['phone_info']['purePhoneNumber'];
     }
 
-    public function getUserOpenid($code)
+    public function getUserSession($code)
     {
         $result = $this->httpGet(sprintf(self::GET_OPENID_URL, env('WX_MP_APPID'), env('WX_MP_SECRET'), $code));
         if (!empty($result['errcode'])) {
