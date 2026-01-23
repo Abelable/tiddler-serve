@@ -9,6 +9,8 @@ use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
+use App\Services\Activity\NewYearUserGoodsService;
+use App\Services\Mall\Goods\AddressService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Carbon;
@@ -251,6 +253,75 @@ class NewYearController extends Controller
         $input = PageInput::new();
         $columns = ['id', 'status', 'prize_id', 'prize_type', 'cover', 'name', 'coupon_id', 'goods_id', 'created_at'];
         $page = NewYearPrizeService::getInstance()->getUserPrizePage($this->userId(), $input, $columns);
+        return $this->successPaginate($page);
+    }
+
+    public function receivePrize()
+    {
+        $id = $this->verifyRequiredId('id');
+        $addressId = $this->verifyRequiredId('addressId');
+
+        $userPrize = NewYearPrizeService::getInstance()->getUserPrize($this->userId(), $id);
+        if (is_null($userPrize) || $userPrize->status != 0 || $userPrize->prize_type != 3) {
+            return $this->fail(CodeResponse::NOT_FOUND, '没有可领取的奖品');
+        }
+
+        $address = AddressService::getInstance()->getById($this->userId(), $addressId);
+        if (is_null($address)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+        }
+
+        $userPrize->status = 1;
+        $userPrize->consignee = $address->name;
+        $userPrize->mobile = $address->mobile;
+        $userPrize->address = $address->region_desc . ' ' . $address->address_detail;
+        $userPrize->save();
+
+        return $this->success();
+    }
+
+    public function exchangeGoods()
+    {
+        $id = $this->verifyRequiredId('id');
+        $addressId = $this->verifyRequiredId('addressId');
+
+        $address = AddressService::getInstance()->getById($this->userId(), $addressId);
+        if (is_null($address)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
+        }
+
+        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($id);
+        if (is_null($newYearGoods) || $newYearGoods->status != 1) {
+            return $this->fail(CodeResponse::NOT_FOUND, '兑换商品不存在');
+        }
+
+        if ($newYearGoods->stock == 0) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '商品已兑完');
+        }
+
+        $userLuckScore = NewYearLuckService::getInstance()->getUserLuckScore($this->userId());
+        if ($userLuckScore < $newYearGoods->luck_score) {
+            return $this->fail(CodeResponse::INVALID_OPERATION, '福气值不足，无法兑换');
+        }
+
+        DB::transaction(function () use ($address, $newYearGoods, $userLuckScore) {
+            NewYearUserGoodsService::getInstance()->createUserGoods($this->userId(), $newYearGoods, $address);
+
+            NewYearLuckService::getInstance()
+                ->createLuck($this->userId(), '福气兑换', 2, -$newYearGoods->luck_score, 98, 3);
+
+            NewYearGoodsService::getInstance()->decreaseStock($newYearGoods->id);
+        });
+
+        return $this->success();
+    }
+
+    public function userGoodsList()
+    {
+        /** @var PageInput $input */
+        $input = PageInput::new();
+        $columns = ['id', 'status', 'cover', 'name', 'luck_score', 'created_at'];
+        $page = NewYearUserGoodsService::getInstance()->getUserGoodsPage($this->userId(), $input, $columns);
         return $this->successPaginate($page);
     }
 }

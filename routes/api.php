@@ -1011,7 +1011,9 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::prefix('goods')->group(function () {
             Route::post('list', 'NewYearGoodsController@list');
             Route::post('add', 'NewYearGoodsController@add');
+            Route::post('edit', 'NewYearGoodsController@edit');
             Route::post('edit_luck_score', 'NewYearGoodsController@editLuckScore');
+            Route::post('edit_stock', 'NewYearGoodsController@editStock');
             Route::post('edit_sort', 'NewYearGoodsController@editSort');
             Route::post('up', 'NewYearGoodsController@up');
             Route::post('down', 'NewYearGoodsController@down');

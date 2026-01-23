@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Activity\NewYearGoodsService;
 use App\Services\Mall\Goods\GoodsService;
 use App\Utils\CodeResponse;
+use App\Utils\Inputs\Activity\NewYearGoodsBaseInput;
 use App\Utils\Inputs\Activity\NewYearGoodsInput;
 use App\Utils\Inputs\PageInput;
 use Illuminate\Support\Facades\Cache;
@@ -24,8 +25,8 @@ class NewYearGoodsController extends Controller
 
     public function add()
     {
-        /** @var NewYearGoodsInput $input */
-        $input = NewYearGoodsInput::new();
+        /** @var NewYearGoodsBaseInput $input */
+        $input = NewYearGoodsBaseInput::new();
 
         $newYearGoodsList = NewYearGoodsService::getInstance()->getFilterGoodsList($input);
         if (count($newYearGoodsList) != 0) {
@@ -43,6 +44,21 @@ class NewYearGoodsController extends Controller
         return $this->success();
     }
 
+    public function edit()
+    {
+        /** @var NewYearGoodsInput $input */
+        $input = NewYearGoodsInput::new();
+
+        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($input->id);
+        if (is_null($newYearGoods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        NewYearGoodsService::getInstance()->update($newYearGoods, $input);
+
+        return $this->success();
+    }
+
     public function editLuckScore()
     {
         $id = $this->verifyRequiredId('id');
@@ -54,6 +70,22 @@ class NewYearGoodsController extends Controller
         }
 
         NewYearGoodsService::getInstance()->updateLuckScore($id, $luckScore);
+        Cache::forget('new_year_goods_list');
+
+        return $this->success();
+    }
+
+    public function editStock()
+    {
+        $id = $this->verifyRequiredId('id');
+        $stock = $this->verifyRequiredInteger('stock');
+
+        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($id);
+        if (is_null($newYearGoods)) {
+            return $this->fail(CodeResponse::NOT_FOUND, '当前商品不存在');
+        }
+
+        NewYearGoodsService::getInstance()->updateLuckScore($id, $stock);
         Cache::forget('new_year_goods_list');
 
         return $this->success();

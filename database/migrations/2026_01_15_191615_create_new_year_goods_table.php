@@ -21,6 +21,8 @@ class CreateNewYearGoodsTable extends Migration
             $table->string('cover')->comment('图片');
             $table->string('name')->comment('名称');
             $table->integer('luck_score')->comment('兑换所需福气值');
+            $table->integer('stock')->default(-1)->comment('库存：-1不限，0售罄');
+            $table->integer('limit')->default(0)->comment('兑换上限');
             $table->integer('sort')->default(1)->comment('排序');
 
             $table->timestamps();

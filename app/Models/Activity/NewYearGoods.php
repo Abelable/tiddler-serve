@@ -13,6 +13,8 @@ use App\Models\BaseModel;
  * @property string $cover 图片
  * @property string $name 名称
  * @property int $luck_score 兑换所需福气值
+ * @property int $stock 库存：-1不限，0售罄
+ * @property int $limit 兑换上限
  * @property int $sort 排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -25,10 +27,12 @@ use App\Models\BaseModel;
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereLuckScore($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereStock($value)
  * @method static \Illuminate\Database\Eloquent\Builder|NewYearGoods whereUpdatedAt($value)
  * @mixin \Eloquent
  */

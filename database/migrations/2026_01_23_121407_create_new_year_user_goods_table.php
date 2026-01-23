@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNewYearUserPrizesTable extends Migration
+class CreateNewYearUserGoodsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,15 @@ class CreateNewYearUserPrizesTable extends Migration
      */
     public function up()
     {
-        Schema::create('new_year_user_prizes', function (Blueprint $table) {
+        Schema::create('new_year_user_goods', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index()->comment('用户id');
 
-            $table->unsignedBigInteger('prize_id')->index()->comment('奖品id');
-            $table->tinyInteger('prize_type')->comment('奖品类型：1-福气值，2-优惠券，3-商品');
-            $table->tinyInteger('status')->default(0)->comment('奖品状态：0-未使用/未领取，1-已使用/已领取，2-已发货');
-
+            $table->tinyInteger('status')->default(0)->comment('奖品状态：0-待发货，1-已发货');
+            $table->unsignedBigInteger('goods_id')->comment('奖品id');
             $table->string('cover', 500)->comment('奖品图片');
             $table->string('name', 100)->comment('奖品名称');
-            $table->unsignedBigInteger('coupon_id')->default(0)->comment('优惠券id');
-            $table->unsignedBigInteger('goods_id')->default(0)->comment('商品id');
+            $table->integer('luck_score')->comment('兑换消耗福气值');
 
             $table->string('consignee', 50)->nullable()->comment('收件人姓名');
             $table->string('mobile', 20)->nullable()->comment('收件人手机号');
@@ -48,6 +45,6 @@ class CreateNewYearUserPrizesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('new_year_user_prizes');
+        Schema::dropIfExists('new_year_user_goods');
     }
 }

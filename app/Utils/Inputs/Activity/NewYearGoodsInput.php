@@ -6,14 +6,20 @@ use App\Utils\Inputs\BaseInput;
 
 class NewYearGoodsInput extends BaseInput
 {
-    public $goodsIds;
+    public $id;
+    public $cover;
+    public $name;
     public $luckScore;
+    public $stock;
 
     public function rules()
     {
         return [
-            'goodsIds' => 'required|array|min:1',
-            'luckScore' => 'required|integer',
+            'ids' => 'required|integer|digits_between:1,20',
+            'cover' => 'string',
+            'name' => 'integer',
+            'luckScore' => 'integer',
+            'stock' => 'integer',
         ];
     }
 }

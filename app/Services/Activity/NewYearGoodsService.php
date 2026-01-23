@@ -5,6 +5,7 @@ namespace App\Services\Activity;
 use App\Models\Activity\NewYearGoods;
 use App\Models\Mall\Goods\Goods;
 use App\Services\BaseService;
+use App\Utils\Inputs\Activity\NewYearGoodsBaseInput;
 use App\Utils\Inputs\Activity\NewYearGoodsInput;
 use App\Utils\Inputs\PageInput;
 
@@ -27,7 +28,7 @@ class NewYearGoodsService extends BaseService
             ->get($columns);
     }
 
-    public function getFilterGoodsList(NewYearGoodsInput $input, $columns = ['*'])
+    public function getFilterGoodsList(NewYearGoodsBaseInput $input, $columns = ['*'])
     {
         return NewYearGoods::query()
             ->whereIn('goods_id', $input->goodsIds)
@@ -44,16 +45,38 @@ class NewYearGoodsService extends BaseService
         return NewYearGoods::query()->find($id, $columns);
     }
 
-    public function create(NewYearGoodsInput $input, Goods $goods)
+    public function create(NewYearGoodsBaseInput $input, Goods $goods)
     {
-        $giftGoods = NewYearGoods::new();
-        $giftGoods->goods_id = $goods->id;
-        $giftGoods->cover = $goods->cover;
-        $giftGoods->name = $goods->name;
-        $giftGoods->luck_score = $input->luckScore;
-        $giftGoods->save();
+        $newYearGoods = NewYearGoods::new();
+        $newYearGoods->goods_id = $goods->id;
+        $newYearGoods->cover = $goods->cover;
+        $newYearGoods->name = $goods->name;
+        $newYearGoods->luck_score = $input->luckScore;
+        if (!empty($input->stock)) {
+            $newYearGoods->stock = $input->stock;
+        }
+        $newYearGoods->save();
 
-        return $giftGoods;
+        return $newYearGoods;
+    }
+
+    public function update(NewYearGoods $newYearGoods, NewYearGoodsInput $input)
+    {
+        if (!empty($input->cover)) {
+            $newYearGoods->cover = $input->cover;
+        }
+        if (!empty($input->name)) {
+            $newYearGoods->name = $input->name;
+        }
+        if (!empty($input->luckScore)) {
+            $newYearGoods->luck_score = $input->luckScore;
+        }
+        if (!empty($input->stock)) {
+            $newYearGoods->stock = $input->stock;
+        }
+        $newYearGoods->save();
+
+        return $newYearGoods;
     }
 
     public function updateLuckScore($id, $luckScore)
@@ -61,8 +84,21 @@ class NewYearGoodsService extends BaseService
         NewYearGoods::query()->where('id', $id)->update(['luck_score' => $luckScore]);
     }
 
+    public function updateLuckStock($id, $stock)
+    {
+        NewYearGoods::query()->where('id', $id)->update(['luck_score' => $stock]);
+    }
+
     public function updateSort($id, $sort)
     {
         NewYearGoods::query()->where('id', $id)->update(['sort' => $sort]);
+    }
+
+    public function decreaseStock(int $id)
+    {
+        NewYearGoods::query()
+            ->where('id', $id)
+            ->where('stock', '>', 0)
+            ->decrement('stock', 1);
     }
 }

@@ -172,6 +172,11 @@ class NewYearPrizeService extends BaseService
             ->paginate($input->limit, $columns, 'page', $input->page);
     }
 
+    public function getUserPrize($userId, $id, $columns = ['*'])
+    {
+        return NewYearUserPrize::query()->where('user_id', $userId)->find($id, $columns);
+    }
+
     public function getUserPrizeCount($userId, $prizeIds, $statusList = [0, 1])
     {
         return NewYearUserPrize::query()
