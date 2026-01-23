@@ -84,7 +84,7 @@ class CouponService extends BaseService
         return $coupon;
     }
 
-    public function updateCoupon(Coupon $coupon, CouponInput $input, Goods $goods)
+    public function updateCoupon(Coupon $coupon, CouponInput $input, Goods $goods = null)
     {
         if ($coupon->status == 2) {
             $coupon->status = 1;
@@ -92,9 +92,11 @@ class CouponService extends BaseService
         $coupon->denomination = $input->denomination;
         $coupon->name = $input->name;
         $coupon->description = $input->description;
-        $coupon->goods_id = $goods->id;
-        $coupon->goods_cover = $goods->cover;
-        $coupon->goods_name = $goods->name;
+        if (!is_null($goods)) {
+            $coupon->goods_id = $goods->id;
+            $coupon->goods_cover = $goods->cover;
+            $coupon->goods_name = $goods->name;
+        }
         $coupon->type = $input->type;
         $coupon->num_limit = $input->numLimit ?? 0;
         $coupon->price_limit = $input->priceLimit ?? 0;

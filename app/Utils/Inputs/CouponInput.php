@@ -22,7 +22,7 @@ class CouponInput extends BaseInput
             'name' => 'required|string',
             'denomination' => 'required|numeric',
             'description' => 'required|string',
-            'goodsIds' => 'required|array',
+            'goodsIds' => 'array',
             'type' => 'required|integer|in:1,2,3',
             'numLimit' => 'integer|digits_between:1,20',
             'priceLimit' => 'numeric',

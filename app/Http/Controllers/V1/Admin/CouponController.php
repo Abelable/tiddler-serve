@@ -39,10 +39,15 @@ class CouponController extends Controller
         /** @var CouponInput $input */
         $input = CouponInput::new();
 
-        $goodsList = GoodsService::getInstance()->getGoodsListByIds($input->goodsIds, ['id', 'cover', 'name']);
-        foreach ($goodsList as $goods) {
+        if (!is_null($input->goodsIds)) {
+            $goodsList = GoodsService::getInstance()->getGoodsListByIds($input->goodsIds, ['id', 'cover', 'name']);
+            foreach ($goodsList as $goods) {
+                $coupon = Coupon::new();
+                CouponService::getInstance()->updateCoupon($coupon, $input, $goods);
+            }
+        } else {
             $coupon = Coupon::new();
-            CouponService::getInstance()->updateCoupon($coupon, $input, $goods);
+            CouponService::getInstance()->updateCoupon($coupon, $input);
         }
 
         return $this->success();
