@@ -19,7 +19,8 @@ class CreateNewYearUserPrizesTable extends Migration
 
             $table->unsignedBigInteger('prize_id')->index()->comment('奖品id');
             $table->tinyInteger('prize_type')->comment('奖品类型：1-福气值，2-优惠券，3-商品');
-            $table->tinyInteger('status')->default(0)->comment('奖品状态：0-未使用/未领取，1-已使用/已领取，2-已发货');
+            $table->tinyInteger('status')->default(0)
+                ->comment('奖品状态：0-未使用/未领取，1-已使用/已领取，2-已发货, 3-确认收货');
 
             $table->string('cover', 500)->comment('奖品图片');
             $table->string('name', 100)->comment('奖品名称');

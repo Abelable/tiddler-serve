@@ -258,10 +258,10 @@ class NewYearController extends Controller
 
     public function receivePrize()
     {
-        $id = $this->verifyRequiredId('id');
+        $prizeId = $this->verifyRequiredId('prizeId');
         $addressId = $this->verifyRequiredId('addressId');
 
-        $userPrize = NewYearPrizeService::getInstance()->getUserPrize($this->userId(), $id);
+        $userPrize = NewYearPrizeService::getInstance()->getUserPrize($this->userId(), $prizeId);
         if (is_null($userPrize) || $userPrize->status != 0 || $userPrize->prize_type != 3) {
             return $this->fail(CodeResponse::NOT_FOUND, '没有可领取的奖品');
         }
@@ -282,7 +282,7 @@ class NewYearController extends Controller
 
     public function exchangeGoods()
     {
-        $id = $this->verifyRequiredId('id');
+        $goodsId = $this->verifyRequiredId('goodsId');
         $addressId = $this->verifyRequiredId('addressId');
 
         $address = AddressService::getInstance()->getById($this->userId(), $addressId);
@@ -290,7 +290,7 @@ class NewYearController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '用户地址不存在');
         }
 
-        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($id);
+        $newYearGoods = NewYearGoodsService::getInstance()->getGoodsById($goodsId);
         if (is_null($newYearGoods) || $newYearGoods->status != 1) {
             return $this->fail(CodeResponse::NOT_FOUND, '兑换商品不存在');
         }
