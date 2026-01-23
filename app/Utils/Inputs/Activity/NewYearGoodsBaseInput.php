@@ -9,6 +9,7 @@ class NewYearGoodsBaseInput extends BaseInput
     public $goodsIds;
     public $luckScore;
     public $stock;
+    public $limit;
 
     public function rules()
     {
@@ -16,6 +17,7 @@ class NewYearGoodsBaseInput extends BaseInput
             'goodsIds' => 'required|array|min:1',
             'luckScore' => 'required|integer',
             'stock' => 'integer',
+            'limit' => 'integer',
         ];
     }
 }

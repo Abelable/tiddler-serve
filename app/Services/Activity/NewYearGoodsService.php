@@ -55,6 +55,9 @@ class NewYearGoodsService extends BaseService
         if (!empty($input->stock)) {
             $newYearGoods->stock = $input->stock;
         }
+        if (!empty($input->limit)) {
+            $newYearGoods->limit = $input->stock;
+        }
         $newYearGoods->save();
 
         return $newYearGoods;
@@ -73,6 +76,9 @@ class NewYearGoodsService extends BaseService
         }
         if (!empty($input->stock)) {
             $newYearGoods->stock = $input->stock;
+        }
+        if (!empty($input->limit)) {
+            $newYearGoods->limit = $input->limit;
         }
         $newYearGoods->save();
 

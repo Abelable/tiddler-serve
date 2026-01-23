@@ -307,10 +307,10 @@ class NewYearController extends Controller
         DB::transaction(function () use ($address, $newYearGoods, $userLuckScore) {
             NewYearUserGoodsService::getInstance()->createUserGoods($this->userId(), $newYearGoods, $address);
 
+            NewYearGoodsService::getInstance()->decreaseStock($newYearGoods->id);
+
             NewYearLuckService::getInstance()
                 ->createLuck($this->userId(), '福气兑换', 2, -$newYearGoods->luck_score, 98, 3);
-
-            NewYearGoodsService::getInstance()->decreaseStock($newYearGoods->id);
         });
 
         return $this->success();
