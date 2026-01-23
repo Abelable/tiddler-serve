@@ -4,12 +4,14 @@ namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Activity\NewYearTask;
+use App\Models\Mall\Coupon;
 use App\Services\Activity\NewYearDrawLogService;
 use App\Services\Activity\NewYearGoodsService;
 use App\Services\Activity\NewYearLuckService;
 use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
 use App\Services\Activity\NewYearUserGoodsService;
+use App\Services\Mall\CouponService;
 use App\Services\Mall\Goods\AddressService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\PageInput;
@@ -236,7 +238,7 @@ class NewYearController extends Controller
                 NewYearLuckService::getInstance()
                     ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
             } else if ($hitPrize->type == 2) {
-                // todo 发放优惠券
+                CouponService::getInstance()->receiveCoupon($this->userId(), $hitPrize->coupon_id);
             }
 
             NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);

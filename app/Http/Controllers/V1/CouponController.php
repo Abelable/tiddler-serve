@@ -16,26 +16,7 @@ class CouponController extends Controller
     public function receiveCoupon()
     {
         $id = $this->verifyRequiredId('id');
-        $coupon = CouponService::getInstance()->getAvailableCouponById($id);
-        if (is_null($coupon)) {
-            return $this->fail(CodeResponse::NOT_FOUND, '优惠券不存在');
-        }
-
-        $receivedCount = UserCouponService::getInstance()->getReceivedCount($this->userId(), $id);
-        if ($coupon->receive_limit != 0 && $receivedCount >= $coupon->receive_limit) {
-            return $this->fail(CodeResponse::INVALID_OPERATION, '已超优惠券限制数量，请勿重复领取');
-        }
-
-        DB::transaction(function () use ($coupon) {
-            $userCoupon = UserCoupon::new();
-            $userCoupon->user_id = $this->userId();
-            $userCoupon->coupon_id = $coupon->id;
-            $userCoupon->save();
-
-            $coupon->received_num = $coupon->received_num + 1;
-            $coupon->save();
-        });
-
+        CouponService::getInstance()->receiveCoupon($this->userId(), $id);
         return $this->success();
     }
 

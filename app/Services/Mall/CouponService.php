@@ -5,9 +5,12 @@ namespace App\Services\Mall;
 use App\Jobs\CouponExpireJob;
 use App\Models\Mall\Coupon;
 use App\Models\Mall\Goods\Goods;
+use App\Models\Mall\UserCoupon;
 use App\Services\BaseService;
+use App\Utils\CodeResponse;
 use App\Utils\Inputs\CouponInput;
 use App\Utils\Inputs\CouponPageInput;
+use Illuminate\Support\Facades\DB;
 
 class CouponService extends BaseService
 {
@@ -114,5 +117,28 @@ class CouponService extends BaseService
             ->where('status', 1)
             ->where('expiration_time', '<=', date('Y-m-d H:i:s', time()))
             ->update(['status' => 2]);
+    }
+
+    public function receiveCoupon($userId, $id)
+    {
+        $coupon = $this->getAvailableCouponById($id);
+        if (is_null($coupon)) {
+            $this->throwBusinessException(CodeResponse::NOT_FOUND, '优惠券不存在');
+        }
+
+        $receivedCount = UserCouponService::getInstance()->getReceivedCount($userId, $id);
+        if ($coupon->receive_limit != 0 && $receivedCount >= $coupon->receive_limit) {
+            $this->throwBusinessException(CodeResponse::INVALID_OPERATION, '已超优惠券限制数量，请勿重复领取');
+        }
+
+        DB::transaction(function () use ($userId, $coupon) {
+            $userCoupon = UserCoupon::new();
+            $userCoupon->user_id = $userId;
+            $userCoupon->coupon_id = $coupon->id;
+            $userCoupon->save();
+
+            $coupon->received_num = $coupon->received_num + 1;
+            $coupon->save();
+        });
     }
 }
