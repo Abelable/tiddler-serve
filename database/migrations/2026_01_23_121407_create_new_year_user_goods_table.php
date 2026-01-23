@@ -17,7 +17,7 @@ class CreateNewYearUserGoodsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id')->index()->comment('用户id');
 
-            $table->tinyInteger('status')->default(0)->comment('奖品状态：0-待发货，1-已发货');
+            $table->tinyInteger('status')->default(0)->comment('奖品状态：0-待发货，1-已发货, 2-确认收货');
             $table->unsignedBigInteger('goods_id')->comment('奖品id');
             $table->string('cover', 500)->comment('奖品图片');
             $table->string('name', 100)->comment('奖品名称');

@@ -9,7 +9,7 @@ use App\Models\BaseModel;
  *
  * @property int $id
  * @property int $user_id 用户id
- * @property int $status 奖品状态：0-待发货，1-已发货
+ * @property int $status 奖品状态：0-待发货，1-已发货, 2-确认收货
  * @property int $goods_id 奖品id
  * @property string $cover 奖品图片
  * @property string $name 奖品名称
