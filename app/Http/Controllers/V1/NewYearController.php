@@ -129,7 +129,11 @@ class NewYearController extends Controller
 
     public function luckScore()
     {
+        // 新手福气
+        NewYearTaskService::getInstance()->finishTask($this->userId(), 19);
+
         $luckScore = NewYearLuckService::getInstance()->getUserLuckScore($this->userId());
+
         return $this->success($luckScore);
     }
 
