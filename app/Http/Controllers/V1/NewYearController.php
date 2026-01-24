@@ -175,16 +175,27 @@ class NewYearController extends Controller
 
             // 未中奖
             if (is_null($hitPrize)) {
-                // 首次必中20福气值
+                // 新用户连续3次没中，第4次必中2元无门槛券，送完则降级为20福气值
                 $userDrawCount = NewYearDrawLogService::getInstance()->getUserDrawCount($this->userId());
-                if ($userDrawCount == 0) {
-                    $hitPrize = NewYearPrizeService::getInstance()->getPrizeById(1);
-                    if (!is_null($hitPrize) && $hitPrize->status == 1) {
-                        NewYearLuckService::getInstance()
-                            ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
+                $loseCount = NewYearDrawLogService::getInstance()->getContinuousLoseCount($this->userId(), 3);
+                if ($userDrawCount == 3 && $loseCount == 3) {
+                    // 2元无门槛券
+                    $hitPrize = NewYearPrizeService::getInstance()->getPrizeById(9);
+                    $success = NewYearPrizeService::getInstance()->decreaseStock($hitPrize->id);
+                    if ($success) {
+                        NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
+                        CouponService::getInstance()->receiveCoupon($this->userId(), $hitPrize->coupon_id);
                         NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);
                         return $hitPrize;
                     }
+
+                    // 20福气值
+                    $hitPrize = NewYearPrizeService::getInstance()->getPrizeById(1);
+                    NewYearPrizeService::getInstance()->createUserPrize($this->userId(), $hitPrize);
+                    NewYearLuckService::getInstance()
+                        ->createLuck($this->userId(), '抽奖获得福气值', 1, $hitPrize->luck_score, 0, 3);
+                    NewYearDrawLogService::getInstance()->createLog($this->userId(), $hitPrize);
+                    return $hitPrize;
                 }
 
                 NewYearDrawLogService::getInstance()->createLog($this->userId());
