@@ -171,10 +171,9 @@ class NewYearController extends Controller
 
             // 未中奖
             if (is_null($hitPrize)) {
-                // 新用户连续2次没中，第3次必中20福气值
+                // 首次必中20福气值
                 $userDrawCount = NewYearDrawLogService::getInstance()->getUserDrawCount($this->userId());
-                $loseCount = NewYearDrawLogService::getInstance()->getContinuousLoseCount($this->userId(), 2);
-                if ($userDrawCount == 2 && $loseCount == 2) {
+                if ($userDrawCount == 0) {
                     $hitPrize = NewYearPrizeService::getInstance()->getPrizeById(1);
                     if (!is_null($hitPrize) && $hitPrize->status == 1) {
                         NewYearLuckService::getInstance()
