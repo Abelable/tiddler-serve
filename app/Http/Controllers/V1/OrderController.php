@@ -11,6 +11,7 @@ use App\Models\Mall\Goods\Order;
 use App\Models\Mall\Goods\OrderPackageGoods;
 use App\Models\Mall\Goods\Shop;
 use App\Services\AccountService;
+use App\Services\Activity\NewYearPrizeService;
 use App\Services\Mall\CommissionService;
 use App\Services\Mall\CouponService;
 use App\Services\Mall\Goods\AddressService;
@@ -440,6 +441,9 @@ class OrderController extends Controller
             // 12.使用优惠券
             if (!is_null($input->couponId)) {
                 UserCouponService::getInstance()->useCoupon($this->userId(), $input->couponId);
+
+                // todo 团圆家乡年
+                NewYearPrizeService::getInstance()->useCouponPrize($this->userId(), $input->couponId);
             }
 
             return $orderIds;

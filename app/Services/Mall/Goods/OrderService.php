@@ -16,6 +16,7 @@ use App\Models\Mall\Goods\OrderGoods;
 use App\Models\Mall\Goods\Shop;
 use App\Services\AccountService;
 use App\Services\Activity\NewYearLuckService;
+use App\Services\Activity\NewYearPrizeService;
 use App\Services\Activity\NewYearTaskService;
 use App\Services\BaseService;
 use App\Services\Mall\CommissionService;
@@ -650,6 +651,9 @@ class OrderService extends BaseService
                 // 恢复优惠券
                 if ($order->coupon_id != 0) {
                     $this->restoreCoupon($order->user_id, $order->coupon_id);
+
+                    // todo 团圆家乡年
+                    NewYearPrizeService::getInstance()->restoreCouponPrize($order->user_id, $order->coupon_id);
                 }
 
                 // 退还余额
@@ -1021,6 +1025,9 @@ class OrderService extends BaseService
                 // 恢复优惠券
                 if ($order->coupon_id != 0) {
                     $this->restoreCoupon($order->user_id, $order->coupon_id);
+
+                    // todo 团圆家乡年
+                    NewYearPrizeService::getInstance()->restoreCouponPrize($order->user_id, $order->coupon_id);
                 }
 
                 // 退还余额

@@ -176,6 +176,36 @@ class NewYearPrizeService extends BaseService
         return NewYearUserPrize::query()->where('user_id', $userId)->find($id, $columns);
     }
 
+    public function useCouponPrize($userId, $couponId, $columns = ['*'])
+    {
+        $prize = NewYearUserPrize::query()
+            ->where('user_id', $userId)
+            ->where('prize_type', 2)
+            ->where('coupon_id', $couponId)
+            ->where('status', 0)
+            ->first($columns);
+        if (!is_null($prize)) {
+            $prize->status = 1;
+            $prize->save();
+        }
+        return $prize;
+    }
+
+    public function restoreCouponPrize($userId, $couponId, $columns = ['*'])
+    {
+        $prize = NewYearUserPrize::query()
+            ->where('user_id', $userId)
+            ->where('prize_type', 2)
+            ->where('coupon_id', $couponId)
+            ->where('status', 1)
+            ->first($columns);
+        if (!is_null($prize)) {
+            $prize->status = 0;
+            $prize->save();
+        }
+        return $prize;
+    }
+
     public function getUserPrizeCount($userId, $prizeIds, $statusList = [0, 1])
     {
         return NewYearUserPrize::query()
