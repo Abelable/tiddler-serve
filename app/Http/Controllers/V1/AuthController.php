@@ -52,18 +52,18 @@ class AuthController extends Controller
                 PromoterService::getInstance()->updateSubUserCount($input->superiorId);
 
                 // todo 团圆家乡年 - 邀请任务
-                // NewYearTaskService::getInstance()->finishInviteTask($input->superiorId);
+                NewYearTaskService::getInstance()->finishInviteTask($input->superiorId);
             }
 
             // 创建用户余额账户
             AccountService::getInstance()->createUserAccount($user->id);
 
             // todo 注册送身份（100天代言人）
-//            $promoter = PromoterService::getInstance()->adminCreate($user->id, 1, 100, 100);
-//            PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
-//            if (!empty($input->superiorId)) {
-//                PromoterService::getInstance()->updateSubPromoterCount($input->superiorId);
-//            }
+            $promoter = PromoterService::getInstance()->adminCreate($user->id, 1, 100, 100);
+            PromoterChangeLogService::getInstance()->createLog($promoter->id, 1);
+            if (!empty($input->superiorId)) {
+                PromoterService::getInstance()->updateSubPromoterCount($input->superiorId);
+            }
 
             return Auth::guard('user')->login($user);
         });
