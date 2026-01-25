@@ -323,10 +323,12 @@ class CommissionController extends Controller
         $selfPurchase = (clone $commissionQuery)->where('scene', 1)->sum('commission_amount');
         $share = (clone $commissionQuery)->whereIn('scene', [2, 3])->sum('commission_amount');
         $team = (clone $commissionQuery)->whereIn('scene', [4, 5])->sum('commission_amount');
+        $total = $selfPurchase + $share + $team;
         return $this->success([
             'selfPurchase' => $selfPurchase,
             'share' => $share,
-            'team' => $team
+            'team' => $team,
+            'total' => $total
         ]);
     }
 }
