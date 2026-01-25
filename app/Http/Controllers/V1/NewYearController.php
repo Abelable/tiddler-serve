@@ -218,7 +218,7 @@ class NewYearController extends Controller
             // 成本熔断（Lua脚本 原子性控制）
             $totalCostKey = 'new_year:total_cost';
             $hitCost = (int) ($hitPrize->cost ?? 0);
-            $maxTotal = 300;
+            $maxTotal = 600;
 
             // Lua 脚本
             $lua = <<<LUA
