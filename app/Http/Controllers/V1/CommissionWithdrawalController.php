@@ -23,7 +23,7 @@ class CommissionWithdrawalController extends Controller
         /** @var CommissionWithdrawalInput $input */
         $input = CommissionWithdrawalInput::new();
 
-        if (is_null($this->user()->authInfo)) {
+        if ($input->path != 3 && is_null($this->user()->authInfo)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '需完成实名认证才可提现');
         }
 
