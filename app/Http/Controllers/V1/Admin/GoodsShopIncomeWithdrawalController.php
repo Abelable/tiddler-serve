@@ -86,7 +86,7 @@ class GoodsShopIncomeWithdrawalController extends Controller
             $record->status = 1;
             $record->save();
 
-            SystemTodoService::getInstance()->createTodo(TodoEnums::GOODS_INCOME_WITHDRAWAL_NOTICE, $record->id);
+            SystemTodoService::getInstance()->finishTodo(TodoEnums::GOODS_INCOME_WITHDRAWAL_NOTICE, $record->id);
 
             // todo 消息通知
             // $noticeContent = '您申请提现的¥' . $record->actual_amount . '店铺收益，已成功转入您的银行账号请注意查收';

@@ -9,6 +9,7 @@ use App\Utils\Inputs\IncomeWithdrawalPageInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
+use function Psy\debug;
 
 class GoodsShopIncomeWithdrawalService extends BaseService
 {
@@ -27,7 +28,7 @@ class GoodsShopIncomeWithdrawalService extends BaseService
         $withdrawal->withdraw_amount = $withdrawAmount;
         $withdrawal->handling_fee = $handlingFee;
         $withdrawal->actual_amount = $actualAmount;
-        $withdrawal->path = $input->path;
+        $withdrawal->path = $input->path ?? 2;
         if (!empty($input->remark)) {
             $withdrawal->remark = $input->remark;
         }
