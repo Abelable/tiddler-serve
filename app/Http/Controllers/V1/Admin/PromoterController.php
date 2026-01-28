@@ -169,13 +169,15 @@ class PromoterController extends Controller
         $options = $promoterOptions->map(function (Promoter $promoter) use ($userList) {
             /** @var User $userInfo */
             $userInfo = $userList->get($promoter->user_id);
-            return [
+            return $userInfo ? [
                 'id' => $userInfo->id,
                 'nickname' => $userInfo->nickname,
                 'avatar' => $userInfo->avatar,
                 'level' => $promoter->level,
-            ];
-        });
+            ] : null;
+        })->filter(function ($user) {
+            return !is_null($user);
+        })->values();
         return $this->success($options);
     }
 
