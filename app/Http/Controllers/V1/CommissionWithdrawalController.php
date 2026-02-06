@@ -7,23 +7,24 @@ use App\Services\AccountService;
 use App\Services\Mall\CommissionService;
 use App\Services\Mall\CommissionWithdrawalService;
 use App\Services\SystemTodoService;
+use App\Services\WxTransferLogService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\TodoEnums;
-use App\Utils\Inputs\CommissionWithdrawalInput;
+use App\Utils\Inputs\WithdrawalInput;
 use App\Utils\Inputs\PageInput;
+use App\Utils\WxTransferServe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class CommissionWithdrawalController extends Controller
 {
     public function submit()
     {
-        /** @var CommissionWithdrawalInput $input */
-        $input = CommissionWithdrawalInput::new();
+        /** @var WithdrawalInput $input */
+        $input = WithdrawalInput::new();
 
-        if ($input->path != 3 && is_null($this->user()->authInfo)) {
+        if ($input->path == 2 && is_null($this->user()->authInfo)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '需完成实名认证才可提现');
         }
 
@@ -60,8 +61,21 @@ class CommissionWithdrawalController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '提现失败，请联系客服');
         }
 
+        // 提现至微信
+        if ($input->path == 1) {
+            $result = WxTransferServe::new()->transfer(
+                '1005',
+                $this->userId(),
+                $this->user()->openid,
+                $withdrawAmount,
+                '家乡代言人',
+                '代言推广奖励'
+            );
+            return $this->success($result);
+        }
+
         DB::transaction(function () use ($withdrawAmount, $input) {
-            $withdrawal = CommissionWithdrawalService::getInstance()->addWithdrawal($this->userId(), $withdrawAmount, $input);
+            $withdrawal = CommissionWithdrawalService::getInstance()->addWithdrawal($this->userId(), $input);
 
             if ($input->path == 3) { // 提现至余额
                 CommissionService::getInstance()->finishWithdrawal($this->userId(), $input->scene, $withdrawal->id);
@@ -74,6 +88,30 @@ class CommissionWithdrawalController extends Controller
                 SystemTodoService::getInstance()->createTodo(TodoEnums::COMMISSION_WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
+
+        return $this->success();
+    }
+
+    public function transferSuccess()
+    {
+        /** @var WithdrawalInput $input */
+        $input = WithdrawalInput::new();
+
+        DB::transaction(function () use ($input) {
+            $withdrawal = CommissionWithdrawalService::getInstance()->addWithdrawal($this->userId(), $input);
+            CommissionService::getInstance()->finishWithdrawal($this->userId(), $input->scene, $withdrawal->id);
+            WxTransferLogService::getInstance()->updateStatus($input->outBillNo);
+        });
+
+        return $this->success();
+    }
+
+    public function transferFail()
+    {
+        $outBillNo = $this->verifyRequiredString('outBillNo');
+        $reason = $this->verifyString('reason', '');
+
+        WxTransferServe::new()->transferFail($outBillNo, $reason);
 
         return $this->success();
     }

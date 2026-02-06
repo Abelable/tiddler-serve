@@ -86,11 +86,16 @@ class CateringShopService extends BaseService
         }
 
         return [
-            'out_trade_no' => time(),
-            'body' => '店铺保证金',
+            'out_trade_no' => date('YmdHis') . random_int(10000, 99999),
+            'description' => '店铺保证金',
             'attach' => 'catering_shop_id:' . $shopId,
-            'total_fee' => bcmul($shop->deposit, 100),
-            'openid' => $openid
+            'amount' => [
+                'total' => (int) bcmul($shop->deposit, 100),
+                'currency' => 'CNY',
+            ],
+            'payer' => [
+                'openid' => $openid,
+            ],
         ];
     }
 
@@ -98,7 +103,9 @@ class CateringShopService extends BaseService
     {
         $shopId = $data['attach'] ? str_replace('catering_shop_id:', '', $data['attach']) : '';
         $payId = $data['transaction_id'] ?? '';
-        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
+        $actualPaymentAmount = isset($data['amount']['total'])
+            ? bcdiv($data['amount']['total'], 100, 2)
+            : '0.00';
 
         $shop = $this->getShopById($shopId);
         if (is_null($shop)) {

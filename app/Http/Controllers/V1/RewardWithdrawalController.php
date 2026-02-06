@@ -8,11 +8,13 @@ use App\Services\SystemTodoService;
 use App\Services\Task\RewardWithdrawalService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
+use App\Services\WxTransferLogService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
 use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\RewardWithdrawalInput;
+use App\Utils\Inputs\WithdrawalInput;
+use App\Utils\WxTransferServe;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,10 +23,10 @@ class RewardWithdrawalController extends Controller
 {
     public function submit()
     {
-        /** @var RewardWithdrawalInput $input */
-        $input = RewardWithdrawalInput::new();
+        /** @var WithdrawalInput $input */
+        $input = WithdrawalInput::new();
 
-        if (is_null($this->user()->authInfo)) {
+        if ($input->path == 2 && is_null($this->user()->authInfo)) {
             return $this->fail(CodeResponse::INVALID_OPERATION, '需完成实名认证才可提现');
         }
 
@@ -48,18 +50,31 @@ class RewardWithdrawalController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, '订单需保持14天，才可领取奖励');
         }
 
+        // 提现至微信
+        if ($input->path == 1) {
+            $result = WxTransferServe::new()->transfer(
+                '1005',
+                $this->userId(),
+                $this->user()->openid,
+                $input->amount,
+                '家乡代言人',
+                '邀商家入驻奖励'
+            );
+            return $this->success($result);
+        }
+
         DB::transaction(function () use ($userTask, $input) {
             $withdrawal = RewardWithdrawalService::getInstance()->addWithdrawal($this->userId(), $input);
 
             if ($input->path == 3) { // 提现至余额
-                $userTask->status = 3;
+                $userTask->status = 4;
                 $userTask->withdrawal_id = $withdrawal->id;
                 $userTask->save();
 
                 AccountService::getInstance()
                     ->updateBalance($this->userId(), AccountChangeType::REWARD_WITHDRAWAL, $input->amount);
             } else {
-                $userTask->status = 4;
+                $userTask->status = 3;
                 $userTask->withdrawal_id = $withdrawal->id;
                 $userTask->save();
 
@@ -67,6 +82,36 @@ class RewardWithdrawalController extends Controller
                 SystemTodoService::getInstance()->createTodo(TodoEnums::REWARD_WITHDRAWAL_NOTICE, [$withdrawal->id]);
             }
         });
+
+        return $this->success();
+    }
+
+    public function transferSuccess()
+    {
+        /** @var WithdrawalInput $input */
+        $input = WithdrawalInput::new();
+
+        $userTask = UserTaskService::getInstance()->getUserTaskByStatus($this->userId(), $input->taskId, [2]);
+
+        DB::transaction(function () use ($userTask, $input) {
+            $withdrawal = RewardWithdrawalService::getInstance()->addWithdrawal($this->userId(), $input);
+
+            $userTask->status = 4;
+            $userTask->withdrawal_id = $withdrawal->id;
+            $userTask->save();
+
+            WxTransferLogService::getInstance()->updateStatus($input->outBillNo);
+        });
+
+        return $this->success();
+    }
+
+    public function transferFail()
+    {
+        $outBillNo = $this->verifyRequiredString('outBillNo');
+        $reason = $this->verifyString('reason', '');
+
+        WxTransferServe::new()->transferFail($outBillNo, $reason);
 
         return $this->success();
     }

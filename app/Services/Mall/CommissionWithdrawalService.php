@@ -4,7 +4,7 @@ namespace App\Services\Mall;
 
 use App\Models\Mall\CommissionWithdrawal;
 use App\Services\BaseService;
-use App\Utils\Inputs\CommissionWithdrawalInput;
+use App\Utils\Inputs\WithdrawalInput;
 use App\Utils\Inputs\PageInput;
 use App\Utils\Inputs\WithdrawalPageInput;
 use App\Utils\MathTool;
@@ -12,24 +12,24 @@ use Illuminate\Support\Facades\DB;
 
 class CommissionWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, $withdrawAmount, CommissionWithdrawalInput $input)
+    public function addWithdrawal($userId, WithdrawalInput $input)
     {
         $withdrawal = CommissionWithdrawal::new();
 
         if ($input->path == 3) { // 提现至余额
             $taxFee = 0;
             $handlingFee = 0;
-            $actualAmount = $withdrawAmount;
+            $actualAmount = $input->amount;
             $withdrawal->status = 1;
         } else {
-            $taxFee = $input->scene == 1 ? 0 : MathTool::bcRound(bcmul($withdrawAmount, '0.06', 10));
-            $handlingFee = MathTool::bcRound(bcmul($withdrawAmount, '0.006', 10));
-            $actualAmount = bcsub(bcsub($withdrawAmount, $taxFee, 2), $handlingFee, 2);
+            $taxFee = $input->scene == 1 ? 0 : MathTool::bcRound(bcmul($input->amount, '0.06', 10));
+            $handlingFee = MathTool::bcRound(bcmul($input->amount, '0.006', 10));
+            $actualAmount = bcsub(bcsub($input->amount, $taxFee, 2), $handlingFee, 2);
         }
 
         $withdrawal->user_id = $userId;
         $withdrawal->scene = $input->scene;
-        $withdrawal->withdraw_amount = $withdrawAmount;
+        $withdrawal->withdraw_amount = $input->amount;
         $withdrawal->tax_fee = $taxFee;
         $withdrawal->handling_fee = $handlingFee;
         $withdrawal->actual_amount = $actualAmount;

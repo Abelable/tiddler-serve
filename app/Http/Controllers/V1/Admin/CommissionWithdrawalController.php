@@ -14,7 +14,6 @@ use App\Utils\Enums\TodoEnums;
 use App\Utils\Inputs\WithdrawalPageInput;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Yansongda\LaravelPay\Facades\Pay;
 
 class CommissionWithdrawalController extends Controller
 {
@@ -67,8 +66,6 @@ class CommissionWithdrawalController extends Controller
             return $this->fail(CodeResponse::NOT_FOUND, '提现申请不存在');
         }
 
-        $user = UserService::getInstance()->getUserById($record->user_id);
-
         // 校验提现金额
         $commissionSum = CommissionService::getInstance()->getCommissionSumByWithdrawalId($record->id);
         if (bccomp($commissionSum, $record->withdraw_amount, 2) != 0) {
@@ -77,31 +74,18 @@ class CommissionWithdrawalController extends Controller
             return $this->fail(CodeResponse::INVALID_OPERATION, $errMsg);
         }
 
-        DB::transaction(function () use ($user, $record) {
+        DB::transaction(function () use ($record) {
             CommissionService::getInstance()->settleCommissionByWithdrawalId($record->id);
+
             $record->status = 1;
             $record->save();
 
-            SystemTodoService::getInstance()->createTodo(TodoEnums::COMMISSION_WITHDRAWAL_NOTICE, $record->id);
+            // SystemTodoService::getInstance()->finishTodo(TodoEnums::COMMISSION_WITHDRAWAL_NOTICE, $record->id);
 
-            $target = $record->path == 1 ? '微信账号' : '银行账号';
-            $noticeContent = '您申请提现的¥' . $record->actual_amount . '佣金，已成功转入您的' . $target . '，请注意查收';
             // todo 消息通知
+            // $noticeContent = '您申请提现的¥' . $record->actual_amount . '佣金，已成功转入您的银行账号，请注意查收';
             // NotificationService::getInstance()
             //  ->addNotification(NotificationEnums::WITHDRAWAL_NOTICE, '佣金提现成功通知', $noticeContent, $record->user_id);
-
-            if ($record->path == 1) {
-                // todo 微信转账
-                $params = [
-                    'partner_trade_no' => time(),
-                    'openid' => $user->openid,
-                    'check_name' => 'NO_CHECK',
-                    'amount' => bcmul($record->actual_amount, 100),
-                    'desc' => '代言奖励提现',
-                ];
-                $result = Pay::wechat()->transfer($params);
-                Log::info('commission_wx_transfer', $result->toArray());
-            }
         });
 
         return $this->success();

@@ -19,6 +19,7 @@ use App\Services\Mall\Scenic\ScenicShopService;
 use App\Services\Mall\Scenic\ScenicTicketService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
+use App\Services\WxTransferLogService;
 use App\Utils\AliOssServe;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MerchantType;
@@ -112,142 +113,40 @@ class CommonController extends Controller
 
     public function wxPayNotify()
     {
-        $data = Pay::wechat()->verify()->toArray();
+        $result = Pay::wechat()->callback();
+        Log::info('wx_pay_notify', $result->toArray());
+        $data = $result->toArray()['resource']['ciphertext'];
 
-        if (strpos($data['attach'], 'scenic_shop_id') !== false) {
-            Log::info('scenic_shop_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                ScenicShopService::getInstance()->wxPaySuccess($data);
-            });
+        if (data_get($result->toArray(), 'event_type') === 'MCHTRANSFER.BILL.FINISHED') {
+            $state = $data['state'];
+            $outBillNo = $data['out_bill_no'];
+            if ($state === 'SUCCESS') {
+                WxTransferLogService::getInstance()->updateStatus($outBillNo);
+            }
+            if ($state === 'FAIL') {
+                $failReason = $data['fail_reason'] ?? '';
+                WxTransferLogService::getInstance()->updateStatus($outBillNo, 2, $failReason);
+            }
         }
 
-        if (strpos($data['attach'], 'scenic_order_sn') !== false) {
-            Log::info('scenic_order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = ScenicOrderService::getInstance()->wxPaySuccess($data);
+        if (data_get($data, 'attach') !== null) {
+            if (strpos($data['attach'], 'scenic_shop_id') !== false) {
+                DB::transaction(function () use ($data) {
+                    ScenicShopService::getInstance()->wxPaySuccess($data);
+                });
+            }
 
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(MerchantType::SCENIC, $order->shopInfo->merchant_id, 3);
-                if (!is_null($userTask)) {
-                    $scenicOrderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
-                    $scenicTicket = ScenicTicketService::getInstance()->getTicketById($scenicOrderTicket->ticket_id);
-                    if (in_array($userTask->product_id, $scenicTicket->scenicIds())) {
-                        $userTask->status = 2;
-                        $userTask->step = 4;
-                        $userTask->order_id = $order->id;
-                        $userTask->finish_time = now();
-                        $userTask->save();
+            if (strpos($data['attach'], 'scenic_order_sn') !== false) {
+                DB::transaction(function () use ($data) {
+                    $order = ScenicOrderService::getInstance()->wxPaySuccess($data);
 
-                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
-                        $task->status = 3;
-                        $task->save();
-                    }
-                }
-            });
-        }
-
-        if (strpos($data['attach'], 'hotel_shop_id') !== false) {
-            Log::info('hotel_shop_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                HotelShopService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
-        if (strpos($data['attach'], 'hotel_order_sn') !== false) {
-            Log::info('hotel_order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = HotelOrderService::getInstance()->wxPaySuccess($data);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(MerchantType::HOTEL, $order->shopInfo->merchant_id, 3);
-                if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
-                    $userTask->status = 2;
-                    $userTask->step = 4;
-                    $userTask->order_id = $order->id;
-                    $userTask->finish_time = now();
-                    $userTask->save();
-
-                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
-                    $task->status = 3;
-                    $task->save();
-                }
-            });
-        }
-
-        if (strpos($data['attach'], 'catering_shop_id') !== false) {
-            Log::info('catering_shop_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                CateringShopService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
-        if (strpos($data['attach'], 'meal_ticket_order_sn') !== false) {
-            Log::info('meal_ticket_order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = MealTicketOrderService::getInstance()->wxPaySuccess($data);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
-                if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
-                    $userTask->status = 2;
-                    $userTask->step = 4;
-                    $userTask->order_id = $order->id;
-                    $userTask->product_type = ProductType::MEAL_TICKET;
-                    $userTask->finish_time = now();
-                    $userTask->save();
-
-                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
-                    $task->status = 3;
-                    $task->save();
-                }
-            });
-        }
-
-        if (strpos($data['attach'], 'set_meal_order_sn') !== false) {
-            Log::info('set_meal_order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $order = SetMealOrderService::getInstance()->wxPaySuccess($data);
-
-                // 邀请商家入驻活动
-                $userTask = UserTaskService::getInstance()
-                    ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
-                if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
-                    $userTask->status = 2;
-                    $userTask->step = 4;
-                    $userTask->order_id = $order->id;
-                    $userTask->product_type = ProductType::SET_MEAL;
-                    $userTask->finish_time = now();
-                    $userTask->save();
-
-                    $task = TaskService::getInstance()->getTaskById($userTask->task_id);
-                    $task->status = 3;
-                    $task->save();
-                }
-            });
-        }
-
-        if (strpos($data['attach'], 'shop_id') !== false) {
-            Log::info('shop_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                ShopService::getInstance()->wxPaySuccess($data);
-            });
-        }
-
-        if (strpos($data['attach'], 'order_sn_list') !== false) {
-            Log::info('order_wx_pay_notify', $data);
-            DB::transaction(function () use ($data) {
-                $orderList = OrderService::getInstance()->wxPaySuccess($data);
-
-                /** @var Order $order */
-                foreach ($orderList as $order) {
                     // 邀请商家入驻活动
-                    if ($order->shopInfo) {
-                        $userTask = UserTaskService::getInstance()
-                            ->getByMerchantId(MerchantType::GOODS, $order->shopInfo->merchant_id, 3);
-                        if (!is_null($userTask)) {
+                    $userTask = UserTaskService::getInstance()
+                        ->getByMerchantId(MerchantType::SCENIC, $order->shopInfo->merchant_id, 3);
+                    if (!is_null($userTask)) {
+                        $scenicOrderTicket = ScenicOrderTicketService::getInstance()->getTicketByOrderId($order->id);
+                        $scenicTicket = ScenicTicketService::getInstance()->getTicketById($scenicOrderTicket->ticket_id);
+                        if (in_array($userTask->product_id, $scenicTicket->scenicIds())) {
                             $userTask->status = 2;
                             $userTask->step = 4;
                             $userTask->order_id = $order->id;
@@ -259,8 +158,117 @@ class CommonController extends Controller
                             $task->save();
                         }
                     }
-                }
-            });
+                });
+            }
+
+            if (strpos($data['attach'], 'hotel_shop_id') !== false) {
+                DB::transaction(function () use ($data) {
+                    HotelShopService::getInstance()->wxPaySuccess($data);
+                });
+            }
+
+            if (strpos($data['attach'], 'hotel_order_sn') !== false) {
+                DB::transaction(function () use ($data) {
+                    $order = HotelOrderService::getInstance()->wxPaySuccess($data);
+
+                    // 邀请商家入驻活动
+                    $userTask = UserTaskService::getInstance()
+                        ->getByMerchantId(MerchantType::HOTEL, $order->shopInfo->merchant_id, 3);
+                    if (!is_null($userTask) && $userTask->product_id == $order->hotel_id) {
+                        $userTask->status = 2;
+                        $userTask->step = 4;
+                        $userTask->order_id = $order->id;
+                        $userTask->finish_time = now();
+                        $userTask->save();
+
+                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                        $task->status = 3;
+                        $task->save();
+                    }
+                });
+            }
+
+            if (strpos($data['attach'], 'catering_shop_id') !== false) {
+                DB::transaction(function () use ($data) {
+                    CateringShopService::getInstance()->wxPaySuccess($data);
+                });
+            }
+
+            if (strpos($data['attach'], 'meal_ticket_order_sn') !== false) {
+                DB::transaction(function () use ($data) {
+                    $order = MealTicketOrderService::getInstance()->wxPaySuccess($data);
+
+                    // 邀请商家入驻活动
+                    $userTask = UserTaskService::getInstance()
+                        ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
+                    if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                        $userTask->status = 2;
+                        $userTask->step = 4;
+                        $userTask->order_id = $order->id;
+                        $userTask->product_type = ProductType::MEAL_TICKET;
+                        $userTask->finish_time = now();
+                        $userTask->save();
+
+                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                        $task->status = 3;
+                        $task->save();
+                    }
+                });
+            }
+
+            if (strpos($data['attach'], 'set_meal_order_sn') !== false) {
+                DB::transaction(function () use ($data) {
+                    $order = SetMealOrderService::getInstance()->wxPaySuccess($data);
+
+                    // 邀请商家入驻活动
+                    $userTask = UserTaskService::getInstance()
+                        ->getByMerchantId(MerchantType::CATERING, $order->shopInfo->merchant_id, 3);
+                    if (!is_null($userTask) && $userTask->product_id == $order->restaurant_id) {
+                        $userTask->status = 2;
+                        $userTask->step = 4;
+                        $userTask->order_id = $order->id;
+                        $userTask->product_type = ProductType::SET_MEAL;
+                        $userTask->finish_time = now();
+                        $userTask->save();
+
+                        $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                        $task->status = 3;
+                        $task->save();
+                    }
+                });
+            }
+
+            if (strpos($data['attach'], 'shop_id') !== false) {
+                DB::transaction(function () use ($data) {
+                    ShopService::getInstance()->wxPaySuccess($data);
+                });
+            }
+
+            if (strpos($data['attach'], 'order_sn_list') !== false) {
+                DB::transaction(function () use ($data) {
+                    $orderList = OrderService::getInstance()->wxPaySuccess($data);
+
+                    /** @var Order $order */
+                    foreach ($orderList as $order) {
+                        // 邀请商家入驻活动
+                        if ($order->shopInfo) {
+                            $userTask = UserTaskService::getInstance()
+                                ->getByMerchantId(MerchantType::GOODS, $order->shopInfo->merchant_id, 3);
+                            if (!is_null($userTask)) {
+                                $userTask->status = 2;
+                                $userTask->step = 4;
+                                $userTask->order_id = $order->id;
+                                $userTask->finish_time = now();
+                                $userTask->save();
+
+                                $task = TaskService::getInstance()->getTaskById($userTask->task_id);
+                                $task->status = 3;
+                                $task->save();
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         return Pay::wechat()->success();

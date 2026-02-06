@@ -457,13 +457,14 @@ class OrderController extends Controller
         $orderIds = $this->verifyArrayNotEmpty('orderIds');
         $order = OrderService::getInstance()->createWxPayOrder($this->userId(), $orderIds, $this->user()->openid);
         $payParams = null;
-        if ($order['total_fee'] == 0) {
+
+        if ($order['amount']['total'] == 0) {
             $orderList = OrderService::getInstance()->getUnpaidListByIds($orderIds);
             DB::transaction(function () use ($orderList) {
                 OrderService::getInstance()->paySuccess($orderList);
             });
         } else {
-            $payParams = Pay::wechat()->miniapp($order);
+            $payParams = Pay::wechat()->mini($order);
         }
         return $this->success($payParams);
     }

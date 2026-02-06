@@ -5,14 +5,14 @@ namespace App\Services\Task;
 use App\Models\Task\TaskRewardWithdrawal;
 use App\Services\BaseService;
 use App\Utils\Inputs\PageInput;
-use App\Utils\Inputs\RewardWithdrawalInput;
+use App\Utils\Inputs\WithdrawalInput;
 use App\Utils\Inputs\WithdrawalPageInput;
 use App\Utils\MathTool;
 use Illuminate\Support\Facades\DB;
 
 class RewardWithdrawalService extends BaseService
 {
-    public function addWithdrawal($userId, RewardWithdrawalInput $input)
+    public function addWithdrawal($userId, WithdrawalInput $input)
     {
         $withdrawal = TaskRewardWithdrawal::new();
 

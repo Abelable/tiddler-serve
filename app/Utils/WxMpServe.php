@@ -4,10 +4,13 @@ namespace App\Utils;
 
 use App\Models\Mall\Goods\Order;
 use App\Models\Mall\Goods\OrderPackage;
+use App\Models\WxTransferLog;
 use App\Utils\Traits\HttpClient;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Yansongda\LaravelPay\Facades\Pay;
+use Yansongda\Pay\Exceptions\GatewayException;
 
 class WxMpServe
 {
@@ -331,5 +334,82 @@ class WxMpServe
         }
 
         return false;
+    }
+
+    public function transfer($sceneId, $userId, $openId, $amount, $title, $content)
+    {
+        $outBillNo = date('YmdHis') . random_int(10000, 99999);
+        $params = [
+            '_action' => 'mch_transfer',
+            'out_bill_no' => $outBillNo,
+            'transfer_scene_id' => $sceneId,
+            'openid' => $openId,
+            'transfer_amount' => (int) bcmul($amount, 100, 0),
+            'transfer_remark' => $content,
+            'transfer_scene_report_infos' => [
+                ['info_type' => '岗位类型', 'info_content' => $title],
+                ['info_type' => '报酬说明', 'info_content' => $content],
+            ],
+        ];
+
+        try {
+            $transfer = Pay::wechat()->transfer($params);
+            Log::info('wx_transfer', $transfer->toArray());
+        } catch (GatewayException|\Throwable $e) {
+            // 微信业务错误（余额不足 / 参数错误 / 风控等）
+            Log::warning('wx_transfer_fail', [
+                'out_bill_no' => $outBillNo,
+                'msg' => $e->getMessage(),
+            ]);
+            throw new \Exception('微信转账失败：' . $e->getMessage());
+        }
+
+        $log = WxTransferLog::new();
+        $log->user_id = $userId;
+        $log->openid = $openId;
+        $log->out_bill_no = $outBillNo;
+        $log->transfer_bill_no = $transfer->get('transfer_bill_no') ?? '';
+        $log->transfer_scene_id = $sceneId;
+        $log->transfer_amount = $amount;
+        $log->transfer_title = $title;
+        $log->transfer_content = $content;
+        $log->save();
+
+        return [
+            'appId' => env('WX_MP_APPID'),
+            'mchId' => env('WX_PAY_MCH_ID'),
+            'package' => $transfer->get('package_info') ?? '',
+        ];
+    }
+
+    public function cancelTransfer($outBillNo)
+    {
+        $params = [
+            '_action' => 'mch_transfer',
+            'out_bill_no' => $outBillNo,
+        ];
+
+        try {
+            $result = Pay::wechat()->cancel($params);
+            Log::info('wx_cancel_transfer', $result->toArray());
+        } catch (GatewayException|\Throwable $e) {
+            // 微信业务错误（余额不足 / 参数错误 / 风控等）
+            Log::warning('wx_cancel_transfer_fail', [
+                'out_bill_no' => $outBillNo,
+                'msg' => $e->getMessage(),
+            ]);
+            throw new \Exception('微信取消转账失败：' . $e->getMessage());
+        }
+
+        $log = WxTransferLog::query()->where('out_bill_no', $outBillNo)->first();
+        if (!$log) {
+            Log::warning('wx_cancel_transfer_no_log', ['out_bill_no' => $outBillNo]);
+            return;
+        }
+        if ($log->status == 0) {
+            $log->status = 2;
+            $log->fail_reason = '取消转账';
+            $log->save();
+        }
     }
 }

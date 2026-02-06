@@ -270,11 +270,16 @@ class HotelOrderService extends BaseService
         }
 
         return [
-            'out_trade_no' => time(),
-            'body' => '订单编号：' . $order->order_sn,
+            'out_trade_no' => date('YmdHis') . random_int(10000, 99999),
+            'description' => '订单编号：' . $order->order_sn,
             'attach' => 'hotel_order_sn:' . $order->order_sn,
-            'total_fee' => bcmul($order->payment_amount, 100),
-            'openid' => $openid
+            'amount' => [
+                'total' => (int) bcmul($order->payment_amount, 100),
+                'currency' => 'CNY',
+            ],
+            'payer' => [
+                'openid' => $openid,
+            ],
         ];
     }
 
@@ -282,7 +287,9 @@ class HotelOrderService extends BaseService
     {
         $orderSn = $data['attach'] ? str_replace('hotel_order_sn:', '', $data['attach']): '';
         $payId = $data['transaction_id'] ?? '';
-        $actualPaymentAmount = $data['total_fee'] ? bcdiv($data['total_fee'], 100, 2) : 0;
+        $actualPaymentAmount = isset($data['amount']['total'])
+            ? bcdiv($data['amount']['total'], 100, 2)
+            : '0.00';
 
         /** @var HotelOrder $order */
         $order = $this->getUnpaidOrderBySn($orderSn);
@@ -526,11 +533,14 @@ class HotelOrderService extends BaseService
                 if ($order->refund_amount != 0) {
                     $refundParams = [
                         'transaction_id' => $order->pay_id,
-                        'out_refund_no' => time(),
-                        'total_fee' => bcmul($order->payment_amount, 100),
-                        'refund_fee' => bcmul($order->refund_amount, 100),
-                        'refund_desc' => '酒店房间退款',
-                        'type' => 'miniapp'
+                        'out_refund_no' => date('YmdHis') . random_int(10000, 99999),
+                        'reason' => '酒店房间退款',
+                        'amount' => [
+                            'refund' => (int) bcmul($order->refund_amount, 100, 0),
+                            'total' => (int) bcmul($order->payment_amount, 100, 0),
+                            'currency' => 'CNY',
+                        ],
+                        '_action' => 'mini',
                     ];
 
                     $result = Pay::wechat()->refund($refundParams);

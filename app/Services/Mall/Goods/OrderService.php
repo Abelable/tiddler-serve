@@ -463,11 +463,16 @@ class OrderService extends BaseService
         }
 
         return [
-            'out_trade_no' => time(),
-            'body' => '订单编号：' . implode("','", $orderSnList),
+            'out_trade_no' => date('YmdHis') . random_int(10000, 99999),
+            'description' => '订单编号：' . implode("','", $orderSnList),
             'attach' => 'order_sn_list:' . json_encode($orderSnList),
-            'total_fee' => bcmul($paymentAmount, 100),
-            'openid' => $openid
+            'amount' => [
+                'total' => (int) bcmul($paymentAmount, 100),
+                'currency' => 'CNY',
+            ],
+            'payer' => [
+                'openid' => $openid,
+            ],
         ];
     }
 
@@ -487,8 +492,8 @@ class OrderService extends BaseService
 
         // 2. 解析支付金额
         $payId = $data['transaction_id'] ?? '';
-        $actualPaymentAmount = isset($data['total_fee'])
-            ? bcdiv($data['total_fee'], 100, 2)
+        $actualPaymentAmount = isset($data['amount']['total'])
+            ? bcdiv($data['amount']['total'], 100, 2)
             : '0.00';
 
         // 3. 查订单（只查待支付状态）
@@ -1001,11 +1006,14 @@ class OrderService extends BaseService
                 if ($order->refund_amount != 0) {
                     $refundParams = [
                         'transaction_id' => $order->pay_id,
-                        'out_refund_no' => time(),
-                        'total_fee' => bcmul($order->total_payment_amount, 100),
-                        'refund_fee' => bcmul($order->refund_amount, 100),
-                        'refund_desc' => '商品退款',
-                        'type' => 'miniapp'
+                        'out_refund_no' => date('YmdHis') . random_int(10000, 99999),
+                        'reason' => '商品退款',
+                        'amount' => [
+                            'refund' => (int) bcmul($order->refund_amount, 100, 0),
+                            'total' => (int) bcmul($order->total_payment_amount, 100, 0),
+                            'currency' => 'CNY',
+                        ],
+                        '_action' => 'mini',
                     ];
 
                     $result = Pay::wechat()->refund($refundParams);
@@ -1115,11 +1123,14 @@ class OrderService extends BaseService
         try {
             $refundParams = [
                 'transaction_id' => $order->pay_id,
-                'out_refund_no' => time(),
-                'total_fee' => bcmul($order->payment_amount, 100),
-                'refund_fee' => bcmul($actualRefundAmount, 100),
-                'refund_desc' => '商品退款',
-                'type' => 'miniapp'
+                'out_refund_no' => date('YmdHis') . random_int(10000, 99999),
+                'reason' => '商品退款',
+                'amount' => [
+                    'refund' => (int) bcmul($actualRefundAmount, 100, 0),
+                    'total' => (int) bcmul($order->payment_amount, 100, 0),
+                    'currency' => 'CNY',
+                ],
+                '_action' => 'mini',
             ];
 
             $result = Pay::wechat()->refund($refundParams);

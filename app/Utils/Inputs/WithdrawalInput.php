@@ -2,19 +2,23 @@
 
 namespace App\Utils\Inputs;
 
-class CommissionWithdrawalInput extends BaseInput
+class WithdrawalInput extends BaseInput
 {
+    public $taskId;
     public $scene;
     public $amount;
     public $path;
+    public $outBillNo;
     public $remark;
 
     public function rules()
     {
         return [
-            'scene' => 'required|integer|in:1,2,3',
+            'taskId' => 'integer|digits_between:1,20',
+            'scene' => 'integer|in:1,2,3',
             'amount' => 'required|numeric',
-            'path' => 'required|integer|in:1,2,3',
+            'path' => 'integer|in:1,2,3',
+            'outBillNo' => 'string',
             'remark' => 'string',
         ];
     }

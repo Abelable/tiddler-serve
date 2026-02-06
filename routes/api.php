@@ -860,6 +860,8 @@ Route::prefix('commission')->group(function () {
 Route::prefix('withdraw')->group(function () {
     Route::prefix('commission')->group(function () {
         Route::post('submit', 'CommissionWithdrawalController@submit');
+        Route::post('transfer_success', 'CommissionWithdrawalController@transferSuccess');
+        Route::post('transfer_fail', 'CommissionWithdrawalController@transferFail');
         Route::get('record_list', 'CommissionWithdrawalController@recordList');
     });
 
@@ -870,6 +872,8 @@ Route::prefix('withdraw')->group(function () {
 
     Route::prefix('reward')->group(function () {
         Route::post('submit', 'RewardWithdrawalController@submit');
+        Route::post('transfer_success', 'RewardWithdrawalController@transferSuccess');
+        Route::post('transfer_fail', 'RewardWithdrawalController@transferFail');
         Route::get('record_list', 'RewardWithdrawalController@recordList');
     });
 });
