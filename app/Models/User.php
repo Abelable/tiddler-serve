@@ -28,7 +28,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $nickname 用户昵称或网络名称
  * @property string $mobile 用户手机号码
  * @property string $password 登录密码
- * @property string $openid 小程序openid
+ * @property string|null $unionid 微信开放平台统一ID
  * @property int $gender 性别：0-未知，1-男，2-女
  * @property string $bg 背景图
  * @property string|null $birthday 生日
@@ -37,23 +37,22 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string|null $signature 签名
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property string|null $deleted_at
  * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read CateringMerchant|null $cateringMerchant
  * @property-read CateringShop|null $cateringShop
- * @property-read \App\Models\Mall\Hotel\HotelMerchant|null $hotelMerchant
- * @property-read \App\Models\Mall\Hotel\HotelShop|null $hotelShop
- * @property-read \App\Models\Mall\Goods\Merchant|null $merchant
+ * @property-read HotelMerchant|null $hotelMerchant
+ * @property-read HotelShop|null $hotelShop
+ * @property-read Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
- * @property-read \App\Models\Promoter\Promoter|null $promoterInfo
- * @property-read \App\Models\Mall\Scenic\ScenicMerchant|null $scenicMerchant
- * @property-read \App\Models\Mall\Scenic\ScenicShop|null $scenicShop
- * @property-read \App\Models\Mall\Goods\Shop|null $shop
+ * @property-read Promoter|null $promoterInfo
+ * @property-read ScenicMerchant|null $scenicMerchant
+ * @property-read ScenicShop|null $scenicShop
+ * @property-read Shop|null $shop
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
- * @method static \Illuminate\Database\Query\Builder|User onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User query()
  * @method static \Illuminate\Database\Eloquent\Builder|User whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereBg($value)
@@ -66,12 +65,10 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereMobile($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereNickname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|User whereOpenid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereSignature($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereUnionid($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|User withTrashed()
- * @method static \Illuminate\Database\Query\Builder|User withoutTrashed()
  * @mixin \Eloquent
  */
 class User extends BaseModel implements JWTSubject, AuthenticatableContract, AuthorizableContract

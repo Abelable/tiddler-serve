@@ -4,12 +4,15 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
+use App\Models\UserOpenId;
 use App\Services\AccountService;
 use App\Services\Activity\NewYearTaskService;
 use App\Services\Promoter\PromoterChangeLogService;
 use App\Services\Promoter\PromoterService;
 use App\Services\RelationService;
+use App\Services\UserOpenIdService;
 use App\Services\UserService;
+use App\Services\WxMpService;
 use App\Utils\CodeResponse;
 use App\Utils\Inputs\WxMpRegisterInput;
 use App\Utils\WxMpServe;
@@ -33,16 +36,23 @@ class AuthController extends Controller
         /** @var WxMpRegisterInput $input */
         $input = WxMpRegisterInput::new();
 
+        $appId = request()->header('appId');
+        if (empty($appId)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, 'appId不能为空');
+        }
+
         $user = UserService::getInstance()->getByMobile($input->mobile);
         if (!is_null($user)) {
             return $this->fail(CodeResponse::AUTH_NAME_REGISTERED);
         }
 
-        $session = WxMpServe::new()->getUserSession($input->code);
+        $secret = WxMpService::getInstance()->getSecret($appId);
+        $session = WxMpServe::new()->getUserSession($input->code, $appId, $secret);
 
-        $token = DB::transaction(function () use ($input, $session) {
+        $token = DB::transaction(function () use ($appId, $input, $session) {
             // 用户注册
-            $user = UserService::getInstance()->register($session['openid'], $input);
+            $user = UserService::getInstance()->register($input, $session['unionid'] ?? null);
+            UserOpenIdService::getInstance()->create($user->id, $session['openid'], $appId);
 
             if (!empty($input->superiorId)) {
                 // 绑定上下级
@@ -75,11 +85,44 @@ class AuthController extends Controller
     {
         $code = $this->verifyRequiredString('code');
 
-        $session = WxMpServe::new()->getUserSession($code);
-        $user = UserService::getInstance()->getByOpenid($session['openid']);
+        $appId = request()->header('appId');
+        if (empty($appId)) {
+            return $this->fail(CodeResponse::PARAM_VALUE_ILLEGAL, 'appId不能为空');
+        }
+
+        $secret = WxMpService::getInstance()->getSecret($appId);
+        $session = WxMpServe::new()->getUserSession($code, $appId, $secret);
+        $unionid = $session['unionid'] ?? null;
+        $openid  = $session['openid'];
+
+        $user = DB::transaction(function () use ($appId, $unionid, $openid) {
+            $user = null;
+            if (!empty($unionid)) {
+                $user = UserService::getInstance()->getByUnionid($unionid);
+                if ($user) {
+                    UserOpenIdService::getInstance()->create($user->id, $openid, $appId);
+                }
+            }
+
+            if (!$user) {
+                /** @var UserOpenId $userOpenId */
+                $userOpenId = UserOpenIdService::getInstance()->getByOpenId($openid, $appId);
+                if ($userOpenId) {
+                    $user = UserService::getInstance()->getUserById($userOpenId->user_id);
+                    if ($user && empty($user->unionid) && !empty($unionid)) {
+                        $user->unionid = $unionid;
+                        $user->save();
+                    }
+                }
+            }
+
+            return $user;
+        });
+
+
 
         $token = '';
-        if (!is_null($user)) {
+        if ($user) {
             $token = Auth::guard('user')->login($user);
         }
 

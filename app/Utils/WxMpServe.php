@@ -148,9 +148,9 @@ class WxMpServe
         return $result['phone_info']['purePhoneNumber'];
     }
 
-    public function getUserSession($code)
+    public function getUserSession($code, $appId, $secret)
     {
-        $result = $this->httpGet(sprintf(self::GET_OPENID_URL, env('WX_MP_APPID'), env('WX_MP_SECRET'), $code));
+        $result = $this->httpGet(sprintf(self::GET_OPENID_URL, $appId, $secret, $code));
         if (!empty($result['errcode'])) {
             throw new \Exception('获取微信小程序openid异常：' . $result['errcode'] . $result['errmsg']);
         }

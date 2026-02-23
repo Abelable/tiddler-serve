@@ -921,6 +921,14 @@ Route::namespace('Admin')->prefix('admin')->group(function () {
         Route::get('options', 'RoleController@options');
     });
 
+    Route::prefix('wx_mp')->group(function () {
+        Route::post('list', 'WxMpController@list');
+        Route::get('detail', 'WxMpController@detail');
+        Route::post('add', 'WxMpController@add');
+        Route::post('edit', 'WxMpController@edit');
+        Route::post('delete', 'WxMpController@delete');
+    });
+
     Route::prefix('user')->group(function () {
         Route::post('list', 'UserController@list');
         Route::get('detail', 'UserController@detail');

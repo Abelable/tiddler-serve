@@ -11,6 +11,7 @@ use App\Models\Mall\Hotel\HotelShopManager;
 use App\Models\Mall\Scenic\ScenicShop;
 use App\Models\Mall\Scenic\ScenicShopManager;
 use App\Models\User;
+use App\Models\UserOpenId;
 use App\Services\Mall\Catering\CateringShopManagerService;
 use App\Services\Mall\Catering\CateringShopService;
 use App\Services\Mall\Goods\ShopManagerService;
@@ -25,21 +26,22 @@ use App\Utils\Inputs\WxMpRegisterInput;
 
 class UserService extends BaseService
 {
-    public function register($openid, WxMpRegisterInput $input)
+    public function register(WxMpRegisterInput $input, $unionid = null)
     {
         $user = User::new();
-        $user->openid = $openid;
+        $user->unionid = $unionid;
         $user->avatar = $input->avatar;
         $user->nickname = $input->nickname;
         $user->gender = $input->gender;
         $user->mobile = $input->mobile;
         $user->save();
+
         return $user;
     }
 
-    public function getByOpenid($openid)
+    public function getByUnionid($unionid)
     {
-        return User::query()->where('openid', $openid)->first();
+        return User::query()->where('unionid', $unionid)->first();
     }
 
     public function getByMobile($mobile)
