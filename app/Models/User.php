@@ -41,11 +41,14 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property-read \App\Models\AuthInfo|null $authInfo
  * @property-read CateringMerchant|null $cateringMerchant
  * @property-read CateringShop|null $cateringShop
+ * @property-read mixed $openid
  * @property-read HotelMerchant|null $hotelMerchant
  * @property-read HotelShop|null $hotelShop
  * @property-read Merchant|null $merchant
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserOpenId[] $openids
+ * @property-read int|null $openids_count
  * @property-read Promoter|null $promoterInfo
  * @property-read ScenicMerchant|null $scenicMerchant
  * @property-read ScenicShop|null $scenicShop
@@ -88,9 +91,10 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
      * @var array<int, string>
      */
     protected $hidden = [
-        'openid',
         'password'
     ];
+
+    protected $with = ['openids'];
 
     /**
      * The attributes that should be cast.
@@ -116,6 +120,20 @@ class User extends BaseModel implements JWTSubject, AuthenticatableContract, Aut
             'nickname' => $this->nickname,
             'signature' => $this->signature,
         ];
+    }
+
+    public function openids()
+    {
+        return $this->hasMany(UserOpenId::class, 'user_id');
+    }
+
+    public function getOpenidAttribute()
+    {
+        $appId = current_app_id();
+
+        return $this->openids
+            ->firstWhere('app_id', $appId)
+            ?->openid;
     }
 
     public function promoterInfo()

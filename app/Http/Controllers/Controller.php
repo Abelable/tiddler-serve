@@ -24,6 +24,8 @@ class Controller extends BaseController
 
     public function __construct()
     {
+        $this->middleware('resolve.appid');
+
         $options = [];
         if (!is_null($this->only)) {
             $options['only'] = $this->only;
