@@ -560,7 +560,8 @@ class OrderService extends BaseService
                 GoodsVerifyService::getInstance()->createVerifyCode($order->id, $order->shop_id);
 
                 // 同步微信后台非物流订单
-                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                // todo 获取appid
+                $openid = UserOpenIdService::getInstance()->getOpenid($order->user_id, env('WX_MP_APPID'));
                 $goodsList = OrderGoodsService::getInstance()->getListByOrderId($order->id);
                 $goodsName = $goodsList->pluck('name')->implode('，');
                 dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $goodsName));
@@ -828,7 +829,8 @@ class OrderService extends BaseService
 
             // 发货同步小程序后台
             if ($order->refund_amount != 0) {
-                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                // todo 获取appid
+                $openid = UserOpenIdService::getInstance()->getOpenid($order->user_id, env('WX_MP_APPID'));
                 WxMpServe::new()->uploadShippingInfo($openid, $order, $orderPackageList, $isAllDelivered);
             }
 

@@ -12,6 +12,7 @@ use App\Services\BaseService;
 use App\Services\Mall\CommissionService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
+use App\Services\UserOpenIdService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
@@ -285,7 +286,8 @@ class SetMealOrderService extends BaseService
             ->updateListToPaidStatus([$order->id], ProductType::SET_MEAL);
 
         // 同步微信后台非物流订单
-        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        // todo 获取appid
+        $openid = UserOpenIdService::getInstance()->getOpenid($order->user_id, env('WX_MP_APPID'));
         dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $order->restaurant_name . '套餐'));
 
         // todo 通知（邮件或钉钉）管理员、

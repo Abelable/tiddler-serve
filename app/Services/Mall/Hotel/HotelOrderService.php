@@ -12,6 +12,7 @@ use App\Services\BaseService;
 use App\Services\Mall\CommissionService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
+use App\Services\UserOpenIdService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\AccountChangeType;
@@ -336,7 +337,8 @@ class HotelOrderService extends BaseService
         }
 
         // 同步微信后台非物流订单
-        $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+        // todo 获取appid
+        $openid = UserOpenIdService::getInstance()->getOpenid($order->user_id, env('WX_MP_APPID'));
         dispatch(new NotifyNoShipmentJob($openid, $order->pay_id, $order->hotel_name . '房间预定'));
 
         return $order;

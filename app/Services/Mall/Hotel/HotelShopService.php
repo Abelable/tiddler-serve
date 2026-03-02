@@ -6,6 +6,7 @@ use App\Jobs\NotifyNoShipmentJob;
 use App\Models\Mall\Hotel\HotelShop;
 use App\Services\BaseService;
 use App\Services\Task\UserTaskService;
+use App\Services\UserOpenIdService;
 use App\Services\UserService;
 use App\Utils\CodeResponse;
 use App\Utils\Enums\MerchantType;
@@ -148,7 +149,8 @@ class HotelShopService extends BaseService
         HotelShopDepositService::getInstance()->updateDeposit($shop->id, 1, $actualPaymentAmount, $payId);
 
         // 同步微信后台非物流订单
-        $openid = UserService::getInstance()->getUserById($shop->user_id)->openid;
+        // todo 获取appid
+        $openid = UserOpenIdService::getInstance()->getOpenid($shop->user_id, env('WX_MP_APPID'));
         dispatch(new NotifyNoShipmentJob($openid, $payId, '店铺保证金', 3));
     }
 }
