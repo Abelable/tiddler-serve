@@ -27,6 +27,7 @@ use App\Services\Promoter\PromoterService;
 use App\Services\SystemTodoService;
 use App\Services\Task\TaskService;
 use App\Services\Task\UserTaskService;
+use App\Services\UserOpenIdService;
 use App\Services\UserService;
 use App\Utils\AliSmsServe;
 use App\Utils\CodeResponse;
@@ -770,7 +771,8 @@ class OrderService extends BaseService
 
             // 发货同步小程序后台
             if ($order->refund_amount != 0) {
-                $openid = UserService::getInstance()->getUserById($order->user_id)->openid;
+                // todo 获取appid
+                $openid = UserOpenIdService::getInstance()->getOpenid($order->user_id, env('WX_MP_APPID'));
                 WxMpServe::new()->uploadShippingInfo($openid, $order, [$orderPackage], true);
             }
 

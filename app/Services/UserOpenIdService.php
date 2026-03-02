@@ -23,4 +23,9 @@ class UserOpenIdService extends BaseService
     {
         return UserOpenId::query()->where('openid', $openid)->where('app_id', $appId)->first();
     }
+
+    public function getOpenid($userId, $appId)
+    {
+        return UserOpenId::query()->where('user_id', $userId)->where('app_id', $appId)->first()->openid;
+    }
 }
